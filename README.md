@@ -1,4 +1,4 @@
-# lbfgs-lab
+# lbfgs_lab
 
 ## Set Up
 
@@ -8,7 +8,7 @@ source .venv/bin/activate
 pip install -r requirements.txt 
 ```
 
-https://pypi.org/project/lbfgs-lab/
+https://pypi.org/project/lbfgs_lab/
 
 https://packaging.python.org/en/latest/tutorials/packaging-projects/
 
