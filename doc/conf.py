@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.abspath("../src/"))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "lbfgs_lab"
+project = "lbfgs-lab"
 copyright = "2025, Hiroki Hamaguchi"
 author = "Hiroki Hamaguchi"
 
@@ -22,6 +22,7 @@ author = "Hiroki Hamaguchi"
 
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
     "sphinx.ext.todo",
     "sphinx.ext.napoleon",
