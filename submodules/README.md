@@ -5,6 +5,7 @@ This folder contains submodules for the project. They are not directly used in t
 - [submodules](#submodules)
   - [DirL-BFGS](#dirl-bfgs)
   - [LBFGSpp](#lbfgspp)
+  - [liblbfgs](#liblbfgs)
   - [mL-BFGS](#ml-bfgs)
   - [paper-regularized-qn-benchmark](#paper-regularized-qn-benchmark)
   - [py-owlqn](#py-owlqn)
@@ -25,6 +26,15 @@ This repository implements Direct L-BFGS (DirL-BFGS) method that, seeing H as a 
 [GitHub Link](https://github.com/yixuan/LBFGSpp)
 
 A header-only C++ library for L-BFGS and L-BFGS-B algorithms
+
+## liblbfgs
+
+[GitHub Link](https://github.com/chokkan/liblbfgs)
+
+libLBFGS: a library of Limited-memory Broyden-Fletcher-Goldfarb-Shanno (L-BFGS)
+
+This is a C port of the implementation of [Limited-memory
+Broyden-Fletcher-Goldfarb-Shanno (L-BFGS) method written by Jorge Nocedal](https://users.iems.northwestern.edu/~nocedal/lbfgs.html).
 
 ## mL-BFGS
 

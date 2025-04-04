@@ -22,3 +22,6 @@
 [submodule "submodules/LBFGSpp"]
 	path = submodules/LBFGSpp
 	url = https://github.com/yixuan/LBFGSpp.git
+[submodule "submodules/liblbfgs"]
+	path = submodules/liblbfgs
+	url = https://github.com/chokkan/liblbfgs.git
