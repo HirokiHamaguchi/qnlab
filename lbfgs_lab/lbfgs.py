@@ -4,12 +4,12 @@ from collections import deque
 import numpy as np
 import numpy.typing as npt
 
-from ._callback import CallbackData
-from ._lineSearch import owlqn_pseudo_gradient
-from ._objectiveFunction import ObjectiveFunction
-from ._params import LBFGSParameter
-from ._retValues import RetCode
-from ._utils import _check_termination, _two_loop_recursion, _update_lm
+from .util.callback import CallbackData
+from .util.lineSearch import owlqn_pseudo_gradient
+from .util.objectiveFunction import ObjectiveFunction
+from .util.params import LBFGSParameter
+from .util.retValues import RetCode
+from .util.utils import _check_termination, _two_loop_recursion, _update_lm
 
 
 def lbfgs(

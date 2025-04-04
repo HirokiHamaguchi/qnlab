@@ -3,9 +3,9 @@ import numpy as np
 import numpy.typing as npt
 from typing import Tuple
 
-from ._params import LBFGSParameter
-from ._retValues import RetCode
-from ._callback import CallbackData
+from .params import LBFGSParameter
+from .retValues import RetCode
+from .callback import CallbackData
 
 
 # default (MoreThuente)

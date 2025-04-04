@@ -1,6 +1,6 @@
 import numpy as np
 
-from lbfgs_lab.LBFGS._objectiveFunction import ObjectiveFunction
+from lbfgs_lab.util.objectiveFunction import ObjectiveFunction
 
 
 class CallbackData:

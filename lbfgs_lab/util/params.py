@@ -3,8 +3,8 @@ from typing import Callable, Tuple
 import numpy as np
 import numpy.typing as npt
 
-from ._callback import CallbackData
-from ._retValues import RetCode
+from .callback import CallbackData
+from .retValues import RetCode
 
 
 class LBFGSParameter:
@@ -12,7 +12,7 @@ class LBFGSParameter:
 
     def __init__(self):
         """Initializes default optimization parameters."""
-        from ._lineSearch import LBFGS_LINESEARCH_DEFAULT, line_search_morethuente
+        from .lineSearch import LBFGS_LINESEARCH_DEFAULT, line_search_morethuente
 
         # The number of corrections to approximate the inverse Hessian.
         self.m: int = 6
@@ -120,7 +120,7 @@ class LBFGSParameter:
         Returns:
             RetCode: Return code indicating success or type of error.
         """
-        from ._lineSearch import (
+        from .lineSearch import (
             LBFGS_LINESEARCH_BACKTRACKING,
             LBFGS_LINESEARCH_BACKTRACKING_ARMIJO,
             LBFGS_LINESEARCH_BACKTRACKING_STRONG_WOLFE,

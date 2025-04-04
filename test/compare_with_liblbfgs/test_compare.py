@@ -5,8 +5,8 @@ import numpy as np
 import numpy.typing as npt
 import scipy.optimize
 
-from lbfgs_lab.LBFGS._objectiveFunction import ObjectiveFunction
-from lbfgs_lab.LBFGS.lbfgs import lbfgs
+from lbfgs_lab.util.objectiveFunction import ObjectiveFunction
+from lbfgs_lab.lbfgs import lbfgs
 
 
 def solve_by_liblbfgs() -> npt.NDArray[np.float64]:

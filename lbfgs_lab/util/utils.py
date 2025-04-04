@@ -4,9 +4,9 @@ from collections import deque
 import numpy as np
 import numpy.typing as npt
 
-from ._callback import IterationData
-from ._params import LBFGSParameter
-from ._retValues import RetCode
+from .callback import IterationData
+from .params import LBFGSParameter
+from .retValues import RetCode
 
 
 def _check_termination(
