@@ -1,16 +1,8 @@
-# lbfgs_lab
+# lbfgs-lab
 
-## Set Up
+https://pypi.org/project/lbfgs-lab/
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt 
-```
-
-https://pypi.org/project/lbfgs_lab/
-
-https://packaging.python.org/en/latest/tutorials/packaging-projects/
+lbfgs-lab is a Python package that provides an implementation of the L-BFGS optimization algorithm.
 
 ## Documentation
 

@@ -3,7 +3,7 @@ requires = ["hatchling >= 1.26"]
 build-backend = "hatchling.build"
 
 [project]
-name = "lbfgs_lab"
+name = "lbfgs-lab"
 version = "0.0.3"
 authors = [
   { name="Hiroki Hamaguchi", email="hari64boli64@gmail.com" },
