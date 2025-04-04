@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lbfgs_lab"
-version = "0.0.1"
+version = "0.0.3"
 authors = [
   { name="Hiroki Hamaguchi", email="hari64boli64@gmail.com" },
 ]
@@ -21,3 +21,14 @@ license-files = ["LICEN[CS]E*"]
 [project.urls]
 Homepage = "https://github.com/HirokiHamaguchi/lbfgs_lab"
 Issues = "https://github.com/HirokiHamaguchi/lbfgs_lab/issues"
+
+[tool.hatch.version]
+path = "lbfgs_lab/__init__.py"
+
+[tool.hatch.build]
+sources = ["lbfgs_lab", "README.md", "LICENSE"]
+exclude = [
+    "test",
+    "doc",
+    "submodules",
+]
