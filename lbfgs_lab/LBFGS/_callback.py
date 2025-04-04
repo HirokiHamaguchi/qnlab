@@ -4,31 +4,27 @@ from lbfgs_lab.LBFGS._objectiveFunction import ObjectiveFunction
 
 
 class CallbackData:
-    """
-    Stores data passed to the callback during optimization.
-    """
+    """Stores data passed to the callback during optimization."""
 
-    def __init__(
-        self,
-        n: int,
-        instance: ObjectiveFunction,
-    ):
-        """
-        :param n: Number of variables
-        :param instance: Objective function instance
+    def __init__(self, n: int, instance: ObjectiveFunction):
+        """Initializes the CallbackData.
+
+        Args:
+            n (int): Number of variables.
+            instance (ObjectiveFunction): Objective function instance.
         """
         self.n = n
         self.instance = instance
 
 
 class IterationData:
-    """
-    Data structure to store per-iteration vectors and scalars.
-    """
+    """Data structure to store per-iteration vectors and scalars."""
 
     def __init__(self, n: int):
-        """
-        :param n: Dimension for s and y vectors
+        """Initializes the IterationData.
+
+        Args:
+            n (int): Dimension for s and y vectors.
         """
         self.alpha = 0.0
         self.s = np.zeros(n, dtype=np.float64)

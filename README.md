@@ -8,6 +8,10 @@ lbfgs-lab is a Python package that provides an implementation of the L-BFGS opti
 
 https://docs.readthedocs.com/platform/stable/tutorial/
 
+```bash
+docformatter --in-place --style=google --recursive lbfgs_lab/
+```
+
 ## References
 
 This project is partially inspired by the following L-BFGS-related repositories.

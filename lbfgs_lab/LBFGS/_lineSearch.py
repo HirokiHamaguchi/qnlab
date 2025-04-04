@@ -43,10 +43,10 @@ def _cubic_minimizer(
     fv: float,  # f(v)
     dv: float,  # f'(v)
 ) -> float:
-    """
-    Compute the cubic minimizer for the line search.
+    """Computes the cubic minimizer for the line search.
 
-    :return: Trial point for line search
+    Returns:
+        float: Trial point for line search.
     """
     d = v - u
     theta = (fu - fv) * 3 / d + du + dv
@@ -74,10 +74,10 @@ def _cubic_minimizer2(
     xmin: float,
     xmax: float,
 ) -> float:
-    """
-    Compute an alternative cubic minimizer with bounds.
+    """Computes an alternative cubic minimizer with bounds.
 
-    :return: Trial point clipped between xmin and xmax
+    Returns:
+        float: Trial point clipped between xmin and xmax.
     """
     d = v - u
     theta = (fu - fv) * 3 / d + du + dv
@@ -107,10 +107,10 @@ def _quad_minimizer(
     v: float,
     fv: float,  # f(v)
 ) -> float:
-    """
-    Compute a quadratic minimizer for line search interpolation.
+    """Computes a quadratic minimizer for line search interpolation.
 
-    :return: Trial point
+    Returns:
+        float: Trial point for line search.
     """
     a = v - u
     return u + du / ((fu - fv) / a + du) * (a / 2)
@@ -122,10 +122,10 @@ def _quad_minimizer2(
     v: float,
     dv: float,  # f'(v)
 ) -> float:
-    """
-    Compute another form of quadratic minimizer using derivatives.
+    """Computes another form of quadratic minimizer using derivatives.
 
-    :return: Trial point
+    Returns:
+        float: Trial point for line search.
     """
     a = u - v
     return v + dv / (dv - du) * a
@@ -145,10 +145,11 @@ def _update_trial_interval(
     tmax: float,
     brackt: bool,
 ) -> Tuple[float, float, float, float, float, float, float, bool, RetCode]:
-    """
-    Update trial interval during line search.
+    """Updates the trial interval during line search.
 
-    :return: Updated variables and status code
+    Returns:
+        Tuple[float, float, float, float, float, float, float, bool, RetCode]:
+        Updated variables and status code.
     """
     # Pre-check if the trial value is out of interval, etc.
     if brackt:
@@ -256,10 +257,10 @@ def _update_trial_interval(
 
 
 def _owlqn_x1norm(x: npt.NDArray[np.float64], start: int, end: int) -> float:
-    """
-    Compute the L1 norm of a segment of x for OWL-QN.
+    """Computes the L1 norm of a segment of x for OWL-QN.
 
-    :return: L1 norm
+    Returns:
+        float: L1 norm of x[start:end].
     """
     return float(np.sum(np.abs(x[start:end])))
 
@@ -270,10 +271,10 @@ def owlqn_pseudo_gradient(
     n: int,
     param: LBFGSParameter,
 ) -> npt.NDArray[np.float64]:
-    """
-    Compute the pseudo-gradient for orthant-wise L1 regularization.
+    """Computes the pseudo-gradient for orthant-wise L1 regularization.
 
-    :return: Array of pseudo-gradient values
+    Returns:
+        numpy.ndarray: Pseudo-gradient values.
     """
     pg = np.copy(g)
     for i in range(param.orthantwise_start, param.orthantwise_end):
@@ -298,10 +299,13 @@ def owlqn_pseudo_gradient(
 def _owlqn_project(
     d: npt.NDArray[np.float64], sign: npt.NDArray[np.float64], start: int, end: int
 ) -> None:
-    """
-    Project the direction onto the orthant.
+    """Projects the direction onto the orthant.
 
-    :return: None (updates d in place)
+    Args:
+        d (numpy.ndarray): Direction array.
+        sign (numpy.ndarray): Array for the orthant sign.
+        start (int): Start index.
+        end (int): End index.
     """
     d[start:end][d[start:end] * sign[start:end] <= 0] = 0
 
@@ -319,10 +323,10 @@ def line_search_backtracking(
     cd: CallbackData,
     param: LBFGSParameter,
 ) -> Tuple[RetCode, float, float, npt.NDArray[np.float64], npt.NDArray[np.float64]]:
-    """
-    Perform a backtracking line search with Armijo or Wolfe conditions.
+    """Performs a backtracking line search with Armijo or Wolfe conditions.
 
-    :return: Tuple of (RetCode, function value, step, new x, new gradient)
+    Returns:
+        Tuple[RetCode, float, float, numpy.ndarray, numpy.ndarray]: (status code, function value, step, new x, new g).
     """
     count = 0
     dec, inc = 0.5, 2.1
@@ -386,10 +390,11 @@ def line_search_backtracking_owlqn(
     cd: CallbackData,
     param: LBFGSParameter,
 ) -> Tuple[RetCode, float, float, npt.NDArray[np.float64], npt.NDArray[np.float64]]:
-    """
-    Backtracking line search for OWL-QN.
+    """Performs a backtracking line search for OWL-QN.
 
-    :return: Tuple of (RetCode, function value, step, new x, new gradient)
+    Returns:
+        Tuple[RetCode, float, float, numpy.ndarray, numpy.ndarray]:
+        (status code, function value, step, new x, new g).
     """
     count = 0
     width = 0.5
@@ -443,10 +448,11 @@ def line_search_morethuente(
     cd: CallbackData,
     param: LBFGSParameter,
 ) -> Tuple[RetCode, float, float, npt.NDArray[np.float64], npt.NDArray[np.float64]]:
-    """
-    Perform the More-Thuente line search.
+    """Performs the More-Thuente line search.
 
-    :return: Tuple of (RetCode, function value, step, new x, new gradient)
+    Returns:
+        Tuple[RetCode, float, float, numpy.ndarray, numpy.ndarray]:
+        (status code, function value, step, new x, new g).
     """
     count = 0
     brackt = False

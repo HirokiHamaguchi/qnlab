@@ -18,32 +18,16 @@ def lbfgs(
     instance: ObjectiveFunction,
     param: Union[LBFGSParameter, None],
 ) -> Tuple[RetCode, float, npt.NDArray[np.float64]]:
-    """
-    The L-BFGS algorithm for unconstrained optimization.
-    Parameters
-    ----------
+    """Runs the L-BFGS algorithm for unconstrained optimization.
 
-    n : int
-        The number of variables.
-    x : npt.NDArray[np.float64]
-        The initial point.
-    instance : ObjectiveFunction
-        The objective function to be minimized.
-    param : Union[LBFGSParameter, None]
-        The parameters for the L-BFGS algorithm. If None, default parameters are used.
+    Args:
+        n (int): The number of variables.
+        x (numpy.ndarray): The initial point.
+        instance (ObjectiveFunction): The objective function to be minimized.
+        param (LBFGSParameter | None): The L-BFGS parameters. If None, default parameters are used.
 
-    Returns
-    -------
-    RetCode
-        The return code indicating the status of the optimization.
-    float
-        The final function value.
-    npt.NDArray[np.float64]
-        The final point.
-
-    Notes
-    -----
-    This function implements the L-BFGS algorithm for unconstrained optimization.
+    Returns:
+        Tuple[RetCode, float, numpy.ndarray]: A tuple of (result code, final function value, final point).
     """
     if param is None:
         param = LBFGSParameter()

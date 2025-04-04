@@ -2,9 +2,7 @@ from enum import IntEnum, auto
 
 
 class _NegativeAutoEnum(IntEnum):
-    """
-    Negative auto enumerations for error codes.
-    """
+    """Negative auto enumerations for error codes."""
 
     @staticmethod
     def _generate_next_value_(name, start, count, last_values):
@@ -14,9 +12,7 @@ class _NegativeAutoEnum(IntEnum):
 
 
 class RetCode(_NegativeAutoEnum):
-    """
-    Return codes of the L-BFGS optimizer.
-    """
+    """Return codes of the L-BFGS optimizer."""
 
     # Return values of lbfgs().
     # Roughly speaking, a negative value indicates an error.
@@ -58,10 +54,10 @@ class RetCode(_NegativeAutoEnum):
     ERR_INCREASEGRADIENT = auto()
 
     def __str__(self):
-        """
-        Convert the code to a descriptive error or status message.
+        """Converts the code to a descriptive error or status message.
 
-        :return: String message describing the result code
+        Returns:
+            str: Description of the result code.
         """
         error_messages = {
             RetCode.SUCCESS: "Success: reached convergence (gtol).",

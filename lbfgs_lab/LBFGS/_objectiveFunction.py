@@ -4,24 +4,22 @@ from typing import Tuple
 
 
 class ObjectiveFunction:
-    """
-    Example objective function for optimization tests.
-    """
+    """Example objective function for optimization tests."""
 
     def __init__(self):
-        """
-        Initialize the objective function.
-        """
+        """Initializes the objective function."""
         pass
 
     def evaluate(
         self, x: npt.NDArray[np.float64]
     ) -> Tuple[float, npt.NDArray[np.float64]]:
-        """
-        Evaluate the function value and gradient at x.
+        """Evaluates the function value and gradient at x.
 
-        :param x: Input variable vector
-        :return: Tuple of (function value, gradient)
+        Args:
+            x (numpy.ndarray): Input variable vector.
+
+        Returns:
+            Tuple[float, numpy.ndarray]: Function value and gradient.
         """
         fx = 0.0
         g = np.zeros_like(x)
@@ -40,13 +38,13 @@ class ObjectiveFunction:
         step: float,
         k: int,
     ) -> None:
-        """
-        Print iteration progress.
+        """Prints iteration progress.
 
-        :param fx: Current function value
-        :param gnorm: Norm of the gradient
-        :param step: Step size
-        :param k: Iteration index
+        Args:
+            fx (float): Current function value.
+            gnorm (float): Norm of the gradient.
+            step (float): Step size.
+            k (int): Iteration index.
         """
         print(f"Iteration {k}:")
         print(f" fx={fx:.6f} gnorm={gnorm:.6f} step={step:.6f}")

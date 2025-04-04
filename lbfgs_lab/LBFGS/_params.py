@@ -8,14 +8,10 @@ from ._retValues import RetCode
 
 
 class LBFGSParameter:
-    """
-    Class holding L-BFGS optimization parameters.
-    """
+    """Class holding L-BFGS optimization parameters."""
 
     def __init__(self):
-        """
-        Initialize default optimization parameters.
-        """
+        """Initializes default optimization parameters."""
         from ._lineSearch import LBFGS_LINESEARCH_DEFAULT, line_search_morethuente
 
         # The number of corrections to approximate the inverse Hessian.
@@ -87,8 +83,10 @@ class LBFGSParameter:
         self.orthantwise_end: int = -1  # -1 will be converted to n
 
     def __str__(self):
-        """
-        Return a string representation of the parameters.
+        """Returns a string representation of the parameters.
+
+        Returns:
+            str: String describing all parameter values.
         """
         return (
             f"LBFGSParameter(m={self.m}, epsilon={self.epsilon}, past={self.past}, "
@@ -101,22 +99,26 @@ class LBFGSParameter:
         )
 
     def checkParams(self, n: int) -> None:
-        """
-        Validate parameter settings with respect to problem size.
+        """Validates parameter settings with respect to problem size.
 
-        :param n: Number of variables
-        :raises ValueError: If parameters are invalid
+        Args:
+            n (int): Number of variables.
+
+        Raises:
+            ValueError: If parameters are invalid.
         """
         error_code = self._internal_check_params(n)
         if error_code != RetCode.SUCCESS:
             raise ValueError(str(error_code))
 
     def _internal_check_params(self, n: int) -> RetCode:
-        """
-        Internal checker for parameter validity.
+        """Checks parameter validity internally.
 
-        :param n: Number of variables
-        :return: RetCode indicating success or error
+        Args:
+            n (int): Number of variables.
+
+        Returns:
+            RetCode: Return code indicating success or type of error.
         """
         from ._lineSearch import (
             LBFGS_LINESEARCH_BACKTRACKING,

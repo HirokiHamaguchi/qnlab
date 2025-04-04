@@ -19,7 +19,8 @@ license = "MIT"
 license-files = ["LICEN[CS]E*"]
 
 [project.urls]
-Homepage = "https://github.com/HirokiHamaguchi/lbfgs_lab"
+Documentation = "https://lbfgs-lab.readthedocs.io/"
+Repository = "https://github.com/HirokiHamaguchi/lbfgs_lab"
 Issues = "https://github.com/HirokiHamaguchi/lbfgs_lab/issues"
 
 [tool.hatch.version]
@@ -32,3 +33,7 @@ exclude = [
     "doc",
     "submodules",
 ]
+
+[tool.pydocstyle]
+convention = "google"
+add-ignore = ["D100", "D104"]
