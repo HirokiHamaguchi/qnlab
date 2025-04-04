@@ -1,0 +1,24 @@
+[submodule "submodules/DirL-BFGS"]
+	path = submodules/DirL-BFGS
+	url = https://github.com/ashkansl/DirL-BFGS.git
+[submodule "submodules/paper-regularized-qn-benchmark"]
+	path = submodules/paper-regularized-qn-benchmark
+	url = https://github.com/dmsteck/paper-regularized-qn-benchmark.git
+[submodule "submodules/pylbfgs-dedupeio"]
+	path = submodules/pylbfgs-dedupeio
+	url = https://github.com/dedupeio/pylbfgs.git
+[submodule "submodules/pylbfgs-larsmans"]
+	path = submodules/pylbfgs-larsmans
+	url = https://github.com/larsmans/pylbfgs.git
+[submodule "submodules/py-owlqn"]
+	path = submodules/py-owlqn
+	url = https://github.com/samson-wang/py-owlqn.git
+[submodule "submodules/python_lbfgsb"]
+	path = submodules/python_lbfgsb
+	url = https://github.com/avieira/python_lbfgsb.git
+[submodule "submodules/mL-BFGS"]
+	path = submodules/mL-BFGS
+	url = https://github.com/yuehniu/mL-BFGS.git
+[submodule "submodules/LBFGSpp"]
+	path = submodules/LBFGSpp
+	url = https://github.com/yixuan/LBFGSpp.git
