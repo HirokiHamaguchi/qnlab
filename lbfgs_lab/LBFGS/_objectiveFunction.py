@@ -8,11 +8,7 @@ class ObjectiveFunction:
         pass
 
     def evaluate(
-        self,
-        x: npt.NDArray[np.float64],
-        g: npt.NDArray[np.float64],
-        n: int,
-        step: float,
+        self, x: npt.NDArray[np.float64]
     ) -> Tuple[float, npt.NDArray[np.float64]]:
         fx = 0.0
         g = np.zeros_like(x)
@@ -26,17 +22,11 @@ class ObjectiveFunction:
 
     def progress(
         self,
-        x: npt.NDArray[np.float64],
-        g: npt.NDArray[np.float64],
         fx: float,
-        xnorm: float,
         gnorm: float,
         step: float,
-        n: int,
         k: int,
-        ls: int,
     ) -> None:
         print(f"Iteration {k}:")
-        print(f"  fx = {fx:.6f}")
-        print(f"  xnorm = {xnorm:.6f}, gnorm = {gnorm:.6f}, step = {step:.6f}")
+        print(f" fx={fx:.6f} gnorm={gnorm:.6f} step={step:.6f}")
         print()

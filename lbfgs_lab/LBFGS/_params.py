@@ -4,7 +4,7 @@ import numpy as np
 import numpy.typing as npt
 
 from ._callback import CallbackData
-from ._retValues import *
+from ._retValues import RetCode
 
 
 class LBFGSParameter:
@@ -47,7 +47,9 @@ class LBFGSParameter:
                 CallbackData,
                 LBFGSParameter,
             ],
-            Tuple[int, float, float, npt.NDArray[np.float64], npt.NDArray[np.float64]],
+            Tuple[
+                RetCode, float, float, npt.NDArray[np.float64], npt.NDArray[np.float64]
+            ],
         ] = line_search_morethuente
 
         # Maximum number of trials for the line search.
@@ -82,73 +84,84 @@ class LBFGSParameter:
         # End index for computing the L1 norm.
         self.orthantwise_end: int = -1  # -1 will be converted to n
 
+    def __str__(self):
+        return (
+            f"LBFGSParameter(m={self.m}, epsilon={self.epsilon}, past={self.past}, "
+            f"delta={self.delta}, max_iterations={self.max_iterations}, "
+            f"linesearch_kind={self.linesearch_kind}, max_linesearch={self.max_linesearch}, "
+            f"min_step={self.min_step}, max_step={self.max_step}, ftol={self.ftol}, "
+            f"wolfe={self.wolfe}, gtol={self.gtol}, xtol={self.xtol}, "
+            f"orthantwise_c={self.orthantwise_c}, orthantwise_start={self.orthantwise_start}, "
+            f"orthantwise_end={self.orthantwise_end})"
+        )
 
-def checkParams(n: int, param: LBFGSParameter) -> None:
-    error_code = _internal_check_params(n, param)
-    if error_code != 0:
-        raise ValueError(lbfgs_strerror(error_code))
+    def checkParams(self, n: int) -> None:
+        error_code = self._internal_check_params(n)
+        if error_code != RetCode.SUCCESS:
+            raise ValueError(str(error_code))
 
-
-def _internal_check_params(n: int, param: LBFGSParameter) -> int:
-    from ._lineSearch import (
-        LBFGS_LINESEARCH_BACKTRACKING,
-        LBFGS_LINESEARCH_BACKTRACKING_ARMIJO,
-        LBFGS_LINESEARCH_BACKTRACKING_STRONG_WOLFE,
-        LBFGS_LINESEARCH_BACKTRACKING_WOLFE,
-        LBFGS_LINESEARCH_MORETHUENTE,
-        line_search_backtracking,
-        line_search_backtracking_owlqn,
-        line_search_morethuente,
-    )
-
-    if param.epsilon < 0.0:
-        return LBFGSERR_INVALID_EPSILON
-    if param.past < 0:
-        return LBFGSERR_INVALID_TESTPERIOD
-    if param.delta < 0.0:
-        return LBFGSERR_INVALID_DELTA
-    if param.min_step < 0.0:
-        return LBFGSERR_INVALID_MINSTEP
-    if param.max_step < param.min_step:
-        return LBFGSERR_INVALID_MAXSTEP
-    if param.ftol < 0.0:
-        return LBFGSERR_INVALID_FTOL
-    if (
-        param.linesearch_kind == LBFGS_LINESEARCH_BACKTRACKING_WOLFE
-        or param.linesearch_kind == LBFGS_LINESEARCH_BACKTRACKING_STRONG_WOLFE
-    ):
-        if param.wolfe <= param.ftol or 1.0 <= param.wolfe:
-            return LBFGSERR_INVALID_WOLFE
-    if param.gtol < 0.0:
-        return LBFGSERR_INVALID_GTOL
-    if param.xtol < 0.0:
-        return LBFGSERR_INVALID_XTOL
-    if param.max_linesearch <= 0:
-        return LBFGSERR_INVALID_MAXLINESEARCH
-    if param.orthantwise_c < 0.0:
-        return LBFGSERR_INVALID_ORTHANTWISE
-    if param.orthantwise_start < 0 or n < param.orthantwise_start:
-        return LBFGSERR_INVALID_ORTHANTWISE_START
-
-    if param.orthantwise_end < 0:
-        param.orthantwise_end = n
-    if n < param.orthantwise_end:
-        return LBFGSERR_INVALID_ORTHANTWISE_END
-    if param.orthantwise_c != 0.0:
-        if param.linesearch_kind != LBFGS_LINESEARCH_BACKTRACKING:
-            return LBFGSERR_INVALID_LINESEARCH
-        else:
-            param.linesearch = line_search_backtracking_owlqn
-    else:
-        if param.linesearch_kind == LBFGS_LINESEARCH_MORETHUENTE:
-            param.linesearch = line_search_morethuente
-        elif param.linesearch_kind in [
+    def _internal_check_params(self, n: int) -> RetCode:
+        from ._lineSearch import (
+            LBFGS_LINESEARCH_BACKTRACKING,
             LBFGS_LINESEARCH_BACKTRACKING_ARMIJO,
-            LBFGS_LINESEARCH_BACKTRACKING_WOLFE,
             LBFGS_LINESEARCH_BACKTRACKING_STRONG_WOLFE,
-        ]:
-            param.linesearch = line_search_backtracking
-        else:
-            return LBFGSERR_INVALID_LINESEARCH
+            LBFGS_LINESEARCH_BACKTRACKING_WOLFE,
+            LBFGS_LINESEARCH_MORETHUENTE,
+            line_search_backtracking,
+            line_search_backtracking_owlqn,
+            line_search_morethuente,
+        )
 
-    return 0
+        if (self.m <= 0 and self.m != -1) or 1e10 <= self.m:
+            return RetCode.ERR_INVALID_M
+        if self.epsilon < 0.0:
+            return RetCode.ERR_INVALID_EPSILON
+        if self.past < 0:
+            return RetCode.ERR_INVALID_TESTPERIOD
+        if self.delta < 0.0:
+            return RetCode.ERR_INVALID_DELTA
+        if self.min_step < 0.0:
+            return RetCode.ERR_INVALID_MINSTEP
+        if self.max_step < self.min_step:
+            return RetCode.ERR_INVALID_MAXSTEP
+        if self.ftol < 0.0:
+            return RetCode.ERR_INVALID_FTOL
+        if (
+            self.linesearch_kind == LBFGS_LINESEARCH_BACKTRACKING_WOLFE
+            or self.linesearch_kind == LBFGS_LINESEARCH_BACKTRACKING_STRONG_WOLFE
+        ):
+            if self.wolfe <= self.ftol or 1.0 <= self.wolfe:
+                return RetCode.ERR_INVALID_WOLFE
+        if self.gtol < 0.0:
+            return RetCode.ERR_INVALID_GTOL
+        if self.xtol < 0.0:
+            return RetCode.ERR_INVALID_XTOL
+        if self.max_linesearch <= 0:
+            return RetCode.ERR_INVALID_MAXLINESEARCH
+        if self.orthantwise_c < 0.0:
+            return RetCode.ERR_INVALID_ORTHANTWISE
+        if self.orthantwise_start < 0 or n < self.orthantwise_start:
+            return RetCode.ERR_INVALID_ORTHANTWISE_START
+
+        if self.orthantwise_end < 0:
+            self.orthantwise_end = n
+        if n < self.orthantwise_end:
+            return RetCode.ERR_INVALID_ORTHANTWISE_END
+        if self.orthantwise_c != 0.0:
+            if self.linesearch_kind != LBFGS_LINESEARCH_BACKTRACKING:
+                return RetCode.ERR_INVALID_LINESEARCH
+            else:
+                self.linesearch = line_search_backtracking_owlqn
+        else:
+            if self.linesearch_kind == LBFGS_LINESEARCH_MORETHUENTE:
+                self.linesearch = line_search_morethuente
+            elif self.linesearch_kind in [
+                LBFGS_LINESEARCH_BACKTRACKING_ARMIJO,
+                LBFGS_LINESEARCH_BACKTRACKING_WOLFE,
+                LBFGS_LINESEARCH_BACKTRACKING_STRONG_WOLFE,
+            ]:
+                self.linesearch = line_search_backtracking
+            else:
+                return RetCode.ERR_INVALID_LINESEARCH
+
+        return RetCode.SUCCESS

@@ -4,8 +4,8 @@ import numpy.typing as npt
 from typing import Tuple
 
 from ._params import LBFGSParameter
-from ._retValues import *
-from ._callback import *
+from ._retValues import RetCode
+from ._callback import CallbackData
 
 
 # default (MoreThuente)
@@ -124,7 +124,7 @@ def _update_trial_interval(
     tmin: float,
     tmax: float,
     brackt: bool,
-) -> Tuple[float, float, float, float, float, float, float, bool, int]:
+) -> Tuple[float, float, float, float, float, float, float, bool, RetCode]:
     """
     Returns updated values (x, fx, dx, y, fy, dy, t, brackt, status).
     In the original function the pointers are updated in-place.
@@ -138,13 +138,13 @@ def _update_trial_interval(
     if brackt:
         if t <= min(x, y) or max(x, y) <= t:
             # The trial value t is out of the interval.
-            return x, fx, dx, y, fy, dy, t, brackt, LBFGSERR_OUTOFINTERVAL
+            return x, fx, dx, y, fy, dy, t, brackt, RetCode.ERR_OUTOFINTERVAL
         if 0.0 <= dx * (t - x):
             # The function must decrease from x.
-            return x, fx, dx, y, fy, dy, t, brackt, LBFGSERR_INCREASEGRADIENT
+            return x, fx, dx, y, fy, dy, t, brackt, RetCode.ERR_INCREASEGRADIENT
         if tmax < tmin:
             # Incorrect tmin and tmax specified.
-            return x, fx, dx, y, fy, dy, t, brackt, LBFGSERR_INCORRECT_TMINMAX
+            return x, fx, dx, y, fy, dy, t, brackt, RetCode.ERR_INCORRECT_TMINMAX
 
     bound = 0
     dsign = dt * dx < 0.0
@@ -236,7 +236,7 @@ def _update_trial_interval(
 
     # Set the new trial value.
     t = newt
-    return x, fx, dx, y, fy, dy, t, brackt, 0
+    return x, fx, dx, y, fy, dy, t, brackt, RetCode.LINESEARCH_SUCCESS
 
 
 def _owlqn_x1norm(x: npt.NDArray[np.float64], start: int, end: int) -> float:
@@ -287,16 +287,16 @@ def line_search_backtracking(
     wp: npt.NDArray[np.float64],
     cd: CallbackData,
     param: LBFGSParameter,
-) -> Tuple[int, float, float, npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+) -> Tuple[RetCode, float, float, npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     count = 0
     dec, inc = 0.5, 2.1
 
     if stp <= 0.0:
-        return LBFGSERR_INVALIDPARAMETERS, f, stp, x, g
+        return RetCode.ERR_INVALIDPARAMETERS, f, stp, x, g
 
     dginit = np.dot(g, s)
     if dginit > 0:
-        return LBFGSERR_INCREASEGRADIENT, f, stp, x, g
+        return RetCode.ERR_INCREASEGRADIENT, f, stp, x, g
 
     finit = f
     dgtest = param.ftol * dginit
@@ -305,7 +305,7 @@ def line_search_backtracking(
         x[:] = xp[:]
         x += s * stp
 
-        f, g = cd.instance.evaluate(x, g, cd.n, stp)
+        f, g = cd.instance.evaluate(x)
         count += 1
 
         if f > finit + stp * dgtest:
@@ -313,26 +313,26 @@ def line_search_backtracking(
         else:
             # Sufficient decrease (Armijo condition) met
             if param.linesearch_kind == LBFGS_LINESEARCH_BACKTRACKING_ARMIJO:
-                return count, f, stp, x, g
+                return RetCode.LINESEARCH_SUCCESS, f, stp, x, g
             # Check Wolfe condition
             dg = np.dot(g, s)
             if dg < param.wolfe * dginit:
                 width = inc
             else:
                 if param.linesearch_kind == LBFGS_LINESEARCH_BACKTRACKING_WOLFE:
-                    return count, f, stp, x, g
+                    return RetCode.LINESEARCH_SUCCESS, f, stp, x, g
                 if dg > -param.wolfe * dginit:
                     width = dec
                 else:
                     # Strong Wolfe condition is met
-                    return count, f, stp, x, g
+                    return RetCode.LINESEARCH_SUCCESS, f, stp, x, g
 
         if stp < param.min_step:
-            return LBFGSERR_MINIMUMSTEP, f, stp, x, g
+            return RetCode.ERR_MINIMUMSTEP, f, stp, x, g
         if stp > param.max_step:
-            return LBFGSERR_MAXIMUMSTEP, f, stp, x, g
+            return RetCode.ERR_MAXIMUMSTEP, f, stp, x, g
         if param.max_linesearch <= count:
-            return LBFGSERR_MAXIMUMLINESEARCH, f, stp, x, g
+            return RetCode.ERR_MAXIMUMLINESEARCH, f, stp, x, g
 
         stp *= width
 
@@ -349,14 +349,14 @@ def line_search_backtracking_owlqn(
     wp: npt.NDArray[np.float64],
     cd: CallbackData,
     param: LBFGSParameter,
-) -> Tuple[int, float, float, npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+) -> Tuple[RetCode, float, float, npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     count = 0
     width = 0.5
     norm = 0.0
     finit = f
 
     if stp <= 0.0:
-        return LBFGSERR_INVALIDPARAMETERS, f, stp, x, g
+        return RetCode.ERR_INVALIDPARAMETERS, f, stp, x, g
 
     # Choose the orthant: if xp[i] is zero, use -gp[i], else xp[i]
     wp[:] = np.where(xp == 0.0, -gp, xp)
@@ -368,7 +368,7 @@ def line_search_backtracking_owlqn(
         # Project x onto the orthant defined by wp. (Assumes owlqn_project is defined.)
         _owlqn_project(x, wp, param.orthantwise_start, param.orthantwise_end)
         # Evaluate f and gradient g.
-        f, g = cd.instance.evaluate(x, g, cd.n, stp)
+        f, g = cd.instance.evaluate(x)
         # Compute L1 norm for OWL-QN and add penalty.
         norm = _owlqn_x1norm(x, param.orthantwise_start, param.orthantwise_end)
         f += norm * param.orthantwise_c
@@ -378,13 +378,13 @@ def line_search_backtracking_owlqn(
         dgtest = np.sum((x - xp) * gp)
 
         if f <= finit + param.ftol * dgtest:
-            return count, f, stp, x, g
+            return RetCode.LINESEARCH_SUCCESS, f, stp, x, g
         if stp < param.min_step:
-            return LBFGSERR_MINIMUMSTEP, f, stp, x, g
+            return RetCode.ERR_MINIMUMSTEP, f, stp, x, g
         if stp > param.max_step:
-            return LBFGSERR_MAXIMUMSTEP, f, stp, x, g
+            return RetCode.ERR_MAXIMUMSTEP, f, stp, x, g
         if param.max_linesearch <= count:
-            return LBFGSERR_MAXIMUMLINESEARCH, f, stp, x, g
+            return RetCode.ERR_MAXIMUMLINESEARCH, f, stp, x, g
 
         stp *= width
 
@@ -401,18 +401,18 @@ def line_search_morethuente(
     wp: npt.NDArray[np.float64],
     cd: CallbackData,
     param: LBFGSParameter,
-) -> Tuple[int, float, float, npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+) -> Tuple[RetCode, float, float, npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     count = 0
     brackt = False
     stage1 = True
     uinfo = 0
 
     if stp <= 0.0:
-        return LBFGSERR_INVALIDPARAMETERS, f, stp, x, g
+        return RetCode.ERR_INVALIDPARAMETERS, f, stp, x, g
 
     dginit = np.dot(g, s)
     if dginit > 0:
-        return LBFGSERR_INCREASEGRADIENT, f, stp, x, g
+        return RetCode.ERR_INCREASEGRADIENT, f, stp, x, g
 
     finit = f
     dgtest = param.ftol * dginit
@@ -457,23 +457,23 @@ def line_search_morethuente(
         x[:] = xp[:]
         x += s * stp
         # Evaluate function and compute directional derivative.
-        f, g = cd.instance.evaluate(x, g, cd.n, stp)
+        f, g = cd.instance.evaluate(x)
         dg = np.dot(g, s)
         ftest1 = finit + stp * dgtest
         count += 1
 
         if brackt and (stp <= stmin or stmax <= stp or uinfo != 0):
-            return LBFGSERR_ROUNDING_ERROR, f, stp, x, g
+            return RetCode.ERR_ROUNDING_ERROR, f, stp, x, g
         if stp == param.max_step and f <= ftest1 and dg <= dgtest:
-            return LBFGSERR_MAXIMUMSTEP, f, stp, x, g
+            return RetCode.ERR_MAXIMUMSTEP, f, stp, x, g
         if stp == param.min_step and (ftest1 < f or dgtest <= dg):
-            return LBFGSERR_MINIMUMSTEP, f, stp, x, g
+            return RetCode.ERR_MINIMUMSTEP, f, stp, x, g
         if brackt and (stmax - stmin) <= param.xtol * stmax:
-            return LBFGSERR_OUTOFINTERVAL, f, stp, x, g
+            return RetCode.ERR_OUTOFINTERVAL, f, stp, x, g
         if param.max_linesearch <= count:
-            return LBFGSERR_MAXIMUMLINESEARCH, f, stp, x, g
+            return RetCode.ERR_MAXIMUMLINESEARCH, f, stp, x, g
         if f <= ftest1 and abs(dg) <= param.gtol * (-dginit):
-            return count, f, stp, x, g
+            return RetCode.LINESEARCH_SUCCESS, f, stp, x, g
 
         if stage1 and f <= ftest1 and min(param.ftol, param.gtol) * dginit <= dg:
             stage1 = False
