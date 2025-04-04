@@ -9,11 +9,13 @@ from ._retValues import RetCode
 
 class LBFGSParameter:
     """
-    Class representing L-BFGS optimization parameters.
-    This class mirrors the lbfgs_parameter_t struct from lbfgs.h.
+    Class holding L-BFGS optimization parameters.
     """
 
     def __init__(self):
+        """
+        Initialize default optimization parameters.
+        """
         from ._lineSearch import LBFGS_LINESEARCH_DEFAULT, line_search_morethuente
 
         # The number of corrections to approximate the inverse Hessian.
@@ -85,6 +87,9 @@ class LBFGSParameter:
         self.orthantwise_end: int = -1  # -1 will be converted to n
 
     def __str__(self):
+        """
+        Return a string representation of the parameters.
+        """
         return (
             f"LBFGSParameter(m={self.m}, epsilon={self.epsilon}, past={self.past}, "
             f"delta={self.delta}, max_iterations={self.max_iterations}, "
@@ -96,11 +101,23 @@ class LBFGSParameter:
         )
 
     def checkParams(self, n: int) -> None:
+        """
+        Validate parameter settings with respect to problem size.
+
+        :param n: Number of variables
+        :raises ValueError: If parameters are invalid
+        """
         error_code = self._internal_check_params(n)
         if error_code != RetCode.SUCCESS:
             raise ValueError(str(error_code))
 
     def _internal_check_params(self, n: int) -> RetCode:
+        """
+        Internal checker for parameter validity.
+
+        :param n: Number of variables
+        :return: RetCode indicating success or error
+        """
         from ._lineSearch import (
             LBFGS_LINESEARCH_BACKTRACKING,
             LBFGS_LINESEARCH_BACKTRACKING_ARMIJO,
