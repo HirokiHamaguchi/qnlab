@@ -1,3 +1,4 @@
+from operator import is_
 from typing import Callable, Tuple
 
 import numpy as np
@@ -108,7 +109,7 @@ class LBFGSParameter:
             ValueError: If parameters are invalid.
         """
         error_code = self._internal_check_params(n)
-        if error_code != RetCode.SUCCESS:
+        if error_code.is_error():
             raise ValueError(str(error_code))
 
     def _internal_check_params(self, n: int) -> RetCode:

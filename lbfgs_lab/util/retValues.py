@@ -15,7 +15,7 @@ class RetCode(_NegativeAutoEnum):
     """Return codes of the L-BFGS optimizer."""
 
     # Return values of lbfgs().
-    # Roughly speaking, a negative value indicates an error.
+    # Negative values indicate errors.
     SUCCESS = 0
     STOP = 1
     ALREADY_MINIMIZED = 2
@@ -98,3 +98,11 @@ class RetCode(_NegativeAutoEnum):
             RetCode.ERR_INCREASEGRADIENT: "The current search direction increases the objective function value.",
         }
         return error_messages.get(self, "(unknown)")
+
+    def is_error(self) -> bool:
+        """Checks if the return code indicates an error.
+
+        Returns:
+            bool: True if the return code indicates an error, False otherwise.
+        """
+        return self < 0
