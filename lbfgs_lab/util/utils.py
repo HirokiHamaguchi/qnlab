@@ -61,7 +61,7 @@ def _update_lm(
     return new_data.ys, yy
 
 
-def _two_loop_recursion(d, lm, m, ys, yy):
+def _two_loop_recursion(d, lm: deque, ys: float, yy: float) -> npt.NDArray[np.float64]:
     """Perform two-loop recursion to compute the search direction.
 
     :param d: Current direction (will be updated) :param lm: Deque of

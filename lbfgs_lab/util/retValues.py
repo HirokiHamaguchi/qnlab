@@ -97,7 +97,8 @@ class RetCode(_NegativeAutoEnum):
             RetCode.ERR_INVALIDPARAMETERS: "A logic error (negative line-search step) occurred.",
             RetCode.ERR_INCREASEGRADIENT: "The current search direction increases the objective function value.",
         }
-        return error_messages.get(self, "(unknown)")
+        msg = error_messages.get(self, "(unknown error has occurred)")
+        return f"{self.name}: {msg}"
 
     def is_error(self) -> bool:
         """Checks if the return code indicates an error.

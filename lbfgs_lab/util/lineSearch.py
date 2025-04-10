@@ -163,14 +163,14 @@ def _update_trial_interval(
             # Incorrect tmin and tmax specified.
             return x, fx, dx, y, fy, dy, t, brackt, RetCode.ERR_INCORRECT_TMINMAX
 
-    bound = 0
+    bound = False
     dsign = dt * dx < 0.0
     newt = 0.0
 
     # Case 1: f(x) < f(t)
     if fx < ft:
         brackt = True
-        bound = 1
+        bound = True
         mc = _cubic_minimizer(x, fx, dx, t, ft, dt)
         mq = _quad_minimizer(x, fx, dx, t, ft)
         if abs(mc - x) < abs(mq - x):
@@ -180,7 +180,7 @@ def _update_trial_interval(
     # Case 2: f(t) <= f(x) and derivatives have opposite sign.
     elif dsign:
         brackt = True
-        bound = 0
+        bound = False
         mc = _cubic_minimizer(x, fx, dx, t, ft, dt)
         mq = _quad_minimizer2(x, dx, t, dt)
         if abs(mc - t) > abs(mq - t):
@@ -189,7 +189,7 @@ def _update_trial_interval(
             newt = mq
     # Case 3: f(t) <= f(x) and |dt| < |dx|
     elif abs(dt) < abs(dx):
-        bound = 1
+        bound = True
         mc = _cubic_minimizer2(x, fx, dx, t, ft, dt, tmin, tmax)
         mq = _quad_minimizer2(x, dx, t, dt)
         if brackt:
@@ -204,7 +204,7 @@ def _update_trial_interval(
                 newt = mq
     # Case 4: f(t) <= f(x) and |dt| is not smaller than |dx|.
     else:
-        bound = 0
+        bound = False
         if brackt:
             newt = _cubic_minimizer(t, ft, dt, y, fy, dy)
         elif x < t:
@@ -457,7 +457,7 @@ def line_search_morethuente(
     count = 0
     brackt = False
     stage1 = True
-    uinfo = 0
+    uinfo = RetCode.LINESEARCH_SUCCESS
 
     if stp <= 0.0:
         return RetCode.ERR_INVALIDPARAMETERS, f, stp, x, g
@@ -500,7 +500,7 @@ def line_search_morethuente(
                 stp <= stmin
                 or stmax <= stp
                 or param.max_linesearch <= count + 1
-                or uinfo != 0
+                or uinfo != RetCode.LINESEARCH_SUCCESS
             )
         ) or (brackt and (stmax - stmin <= param.xtol * stmax)):
             stp = stx
@@ -514,7 +514,9 @@ def line_search_morethuente(
         ftest1 = finit + stp * dgtest
         count += 1
 
-        if brackt and (stp <= stmin or stmax <= stp or uinfo != 0):
+        if brackt and (
+            stp <= stmin or stmax <= stp or uinfo != RetCode.LINESEARCH_SUCCESS
+        ):
             return RetCode.ERR_ROUNDING_ERROR, f, stp, x, g
         if stp == param.max_step and f <= ftest1 and dg <= dgtest:
             return RetCode.ERR_MAXIMUMSTEP, f, stp, x, g

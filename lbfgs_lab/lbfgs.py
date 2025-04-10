@@ -1,5 +1,5 @@
-from typing import Union, Tuple
 from collections import deque
+from typing import Tuple, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -13,24 +13,22 @@ from .util.utils import _check_termination, _two_loop_recursion, _update_lm
 
 
 def lbfgs(
-    n: int,
-    x: npt.NDArray[np.float64],
     instance: ObjectiveFunction,
-    param: Union[LBFGSParameter, None],
+    param: Union[LBFGSParameter, None] = None,
 ) -> Tuple[RetCode, float, npt.NDArray[np.float64]]:
     """Runs the L-BFGS algorithm for unconstrained optimization.
 
     Args:
-        n (int): The number of variables.
-        x (numpy.ndarray): The initial point.
         instance (ObjectiveFunction): The objective function to be minimized.
         param (LBFGSParameter | None): The L-BFGS parameters. If None, default parameters are used.
 
     Returns:
         Tuple[RetCode, float, numpy.ndarray]: A tuple of (result code, final function value, final point).
     """
+    n, x = instance.n, instance.x0
     if param is None:
         param = LBFGSParameter()
+    assert isinstance(param, LBFGSParameter), "param must be of type LBFGSParameter"
     param.checkParams(n)
 
     m = param.m
@@ -88,7 +86,7 @@ def lbfgs(
             )
             pg = owlqn_pseudo_gradient(x, g, n, param)
 
-        if ls < 0:
+        if ls.is_error():
             x[:] = xp
             g[:] = gp
             return ls, fx, x
@@ -105,7 +103,7 @@ def lbfgs(
 
         ys, yy = _update_lm(lm, x, g, xp, gp)
         k += 1
-        d = _two_loop_recursion(d, lm, m, ys, yy)
+        d = _two_loop_recursion(d, lm, ys, yy)
 
         # For OWL-QN, constrain the search direction.
         if param.orthantwise_c != 0.0:
