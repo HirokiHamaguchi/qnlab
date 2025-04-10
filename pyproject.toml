@@ -8,7 +8,7 @@ version = "0.0.3"
 authors = [
   { name="Hiroki Hamaguchi", email="hari64boli64@gmail.com" },
 ]
-description = "L-BFGS variants for academic research"
+description = "Quasi-Newton Methods for Academic Research"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
@@ -33,6 +33,9 @@ exclude = [
     "doc",
     "submodules",
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["qnlab"]
 
 [tool.pydocstyle]
 convention = "google"
