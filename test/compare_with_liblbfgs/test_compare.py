@@ -1,23 +1,28 @@
-import matplotlib.pyplot as plt
 import numpy as np
-import numpy.typing as npt
 import os
 
+from typing import Union
 from lbfgs_lab.lbfgs import lbfgs
+
 from lbfgs_lab.problems.rosenbrock import RosenbrockProblem
+from lbfgs_lab.problems.dixon_price import DixonPriceProblem
+from lbfgs_lab.problems.powell import PowellProblem
+from lbfgs_lab.problems.zakharov import ZakharovProblem
 
 
-def main():
-    prob = RosenbrockProblem()
+def trial(
+    prob: Union[RosenbrockProblem, PowellProblem, DixonPriceProblem, ZakharovProblem],
+):
+    name = prob.__class__.__name__.replace("Problem", "")
+    print(f"----- Problem name: {name} -----")
+
     info, fx, x_opt = lbfgs(prob)
-    print(info)
-    return
+    print(f"Info: {info}")
 
     recorded_gnorms = np.array(prob.gnorms)
-    print(f"Recorded GNORMs: {recorded_gnorms}")
 
     folder_path = os.path.dirname(os.path.abspath(__file__))
-    file_name = "data/RosenbrockFunction_results.txt"
+    file_name = f"data/{name}_results.txt"
     with open(os.path.join(folder_path, file_name), "r") as f:
         txt_gnorms = np.array([float(line.strip()) for line in f if line.strip()])
 
@@ -31,5 +36,28 @@ def main():
     print("GNORM comparison passed!")
 
 
+def test_rosenbrock():
+    prob = RosenbrockProblem()
+    trial(prob)
+
+
+def test_powell():
+    prob = PowellProblem()
+    trial(prob)
+
+
+def test_dixon_price():
+    prob = DixonPriceProblem()
+    trial(prob)
+
+
+def test_zakharov():
+    prob = ZakharovProblem()
+    trial(prob)
+
+
 if __name__ == "__main__":
-    main()
+    test_rosenbrock()
+    test_powell()
+    test_dixon_price()
+    test_zakharov()

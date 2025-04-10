@@ -3,7 +3,7 @@ import numpy as np
 
 
 class RosenbrockProblem(ObjectiveFunction):
-    def __init__(self, n: int = 2):
+    def __init__(self, n: int = 100):
         x0 = np.zeros(n)
         for i in range(n):
             x0[i] = 1.0 if i % 2 else -1.2
@@ -13,11 +13,12 @@ class RosenbrockProblem(ObjectiveFunction):
     def evaluate(self, x):
         fx = 0.0
         grad = np.zeros_like(x)
-        for i in range(len(x) - 1):
-            temp = x[i + 1] - x[i] * x[i]
-            fx += 100.0 * temp * temp + (1.0 - x[i]) ** 2
-            grad[i] += -400.0 * x[i] * temp - 2.0 * (1.0 - x[i])
-            grad[i + 1] += 200.0 * temp
+        for i in range(0, self.n, 2):
+            t1 = 1.0 - x[i]
+            t2 = 10.0 * (x[i + 1] - x[i] ** 2)
+            fx += t1**2 + t2**2
+            grad[i + 1] = 20.0 * t2
+            grad[i] = -2.0 * (x[i] * grad[i + 1] + t1)
         return fx, grad
 
     def progress(self, fx, gnorm, step, k):

@@ -12,7 +12,12 @@ class RosenbrockFunction {
  public:
   RosenbrockFunction() {}
 
+  static constexpr const char* RESULT_FILE_NAME = "Rosenbrock_results.txt";
+
   int run(int n) {
+    FILE* fp =
+        fopen((global_folder_name + "/" + RESULT_FILE_NAME).c_str(), "w");
+    if (fp) fclose(fp);
     lbfgsfloatval_t fx;
     lbfgsfloatval_t* x = lbfgs_malloc(n);
     for (int i = 0; i < n; i += 2) {
@@ -43,10 +48,10 @@ class RosenbrockFunction {
                        const lbfgsfloatval_t* g, lbfgsfloatval_t fx,
                        lbfgsfloatval_t xnorm, lbfgsfloatval_t gnorm,
                        lbfgsfloatval_t step, int n, int k, int ls) {
-    FILE* fp = fopen(
-        (global_folder_name + "/RosenbrockFunction_results.txt").c_str(), "a");
+    FILE* fp =
+        fopen((global_folder_name + "/" + RESULT_FILE_NAME).c_str(), "a");
     if (fp) {
-      fprintf(fp, "%f\n", gnorm);
+      fprintf(fp, "%.10e\n", gnorm);
       fclose(fp);
     }
     return 0;
@@ -61,7 +66,12 @@ class DixonPriceFunction {
  public:
   DixonPriceFunction() {}
 
+  static constexpr const char* RESULT_FILE_NAME = "DixonPrice_results.txt";
+
   int run(int n) {
+    FILE* fp =
+        fopen((global_folder_name + "/" + RESULT_FILE_NAME).c_str(), "w");
+    if (fp) fclose(fp);
     lbfgsfloatval_t fx;
     lbfgsfloatval_t* x = lbfgs_malloc(n);
     for (int i = 0; i < n; i++) x[i] = 0.5;
@@ -90,10 +100,10 @@ class DixonPriceFunction {
                        const lbfgsfloatval_t* g, lbfgsfloatval_t fx,
                        lbfgsfloatval_t xnorm, lbfgsfloatval_t gnorm,
                        lbfgsfloatval_t step, int n, int k, int ls) {
-    FILE* fp = fopen(
-        (global_folder_name + "/DixonPriceFunction_results.txt").c_str(), "a");
+    FILE* fp =
+        fopen((global_folder_name + "/" + RESULT_FILE_NAME).c_str(), "a");
     if (fp) {
-      fprintf(fp, "%f\n", gnorm);
+      fprintf(fp, "%.10e\n", gnorm);
       fclose(fp);
     }
     return 0;
@@ -108,7 +118,12 @@ class PowellFunction {
  public:
   PowellFunction() {}
 
+  static constexpr const char* RESULT_FILE_NAME = "Powell_results.txt";
+
   int run(int n) {
+    FILE* fp =
+        fopen((global_folder_name + "/" + RESULT_FILE_NAME).c_str(), "w");
+    if (fp) fclose(fp);
     if (n != 4) {
       printf("ERROR: Powell function requires n==4.\n");
       return 1;
@@ -150,10 +165,10 @@ class PowellFunction {
                        const lbfgsfloatval_t* g, lbfgsfloatval_t fx,
                        lbfgsfloatval_t xnorm, lbfgsfloatval_t gnorm,
                        lbfgsfloatval_t step, int n, int k, int ls) {
-    FILE* fp = fopen(
-        (global_folder_name + "/PowellFunction_results.txt").c_str(), "a");
+    FILE* fp =
+        fopen((global_folder_name + "/" + RESULT_FILE_NAME).c_str(), "a");
     if (fp) {
-      fprintf(fp, "%f\n", gnorm);
+      fprintf(fp, "%.10e\n", gnorm);
       fclose(fp);
     }
     return 0;
@@ -169,7 +184,12 @@ class ZakharovFunction {
  public:
   ZakharovFunction() {}
 
+  static constexpr const char* RESULT_FILE_NAME = "Zakharov_results.txt";
+
   int run(int n) {
+    FILE* fp =
+        fopen((global_folder_name + "/" + RESULT_FILE_NAME).c_str(), "w");
+    if (fp) fclose(fp);
     lbfgsfloatval_t fx;
     lbfgsfloatval_t* x = lbfgs_malloc(n);
     for (int i = 0; i < n; i++) x[i] = 1.0;
@@ -199,10 +219,10 @@ class ZakharovFunction {
                        const lbfgsfloatval_t* g, lbfgsfloatval_t fx,
                        lbfgsfloatval_t xnorm, lbfgsfloatval_t gnorm,
                        lbfgsfloatval_t step, int n, int k, int ls) {
-    FILE* fp = fopen(
-        (global_folder_name + "/ZakharovFunction_results.txt").c_str(), "a");
+    FILE* fp =
+        fopen((global_folder_name + "/" + RESULT_FILE_NAME).c_str(), "a");
     if (fp) {
-      fprintf(fp, "%f\n", gnorm);
+      fprintf(fp, "%.10e\n", gnorm);
       fclose(fp);
     }
     return 0;

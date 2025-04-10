@@ -103,6 +103,10 @@ def lbfgs(
 
         ys, yy = _update_lm(lm, x, g, xp, gp)
         k += 1
+        if param.orthantwise_c == 0.0:
+            d = -np.copy(g)
+        else:
+            d = -np.copy(pg)
         d = _two_loop_recursion(d, lm, ys, yy)
 
         # For OWL-QN, constrain the search direction.

@@ -7,7 +7,7 @@ class _NegativeAutoEnum(IntEnum):
     @staticmethod
     def _generate_next_value_(name, start, count, last_values):
         if not last_values:
-            return -1
+            return 3
         return last_values[-1] - 1
 
 
@@ -16,10 +16,11 @@ class RetCode(_NegativeAutoEnum):
 
     # Return values of lbfgs().
     # Negative values indicate errors.
-    SUCCESS = 0
-    STOP = 1
-    ALREADY_MINIMIZED = 2
-    LINESEARCH_SUCCESS = 3
+    LINESEARCH_SUCCESS = auto()
+    ALREADY_MINIMIZED = auto()
+    STOP = auto()
+    SUCCESS = auto()
+    assert SUCCESS == 0, "SUCCESS must be 0"
     ERR_UNKNOWNERROR = auto()
     ERR_LOGICERROR = auto()
     ERR_OUTOFMEMORY = auto()
@@ -60,8 +61,8 @@ class RetCode(_NegativeAutoEnum):
             str: Description of the result code.
         """
         error_messages = {
-            RetCode.SUCCESS: "Success: reached convergence (gtol).",
-            RetCode.STOP: "Success: met stopping criteria (ftol).",
+            RetCode.SUCCESS: "Reached convergence (gtol).",
+            RetCode.STOP: "Met stopping criteria (ftol).",
             RetCode.ALREADY_MINIMIZED: "The initial variables already minimize the objective function.",
             RetCode.LINESEARCH_SUCCESS: "Line search succeeded.",
             RetCode.ERR_UNKNOWNERROR: "Unknown error.",
@@ -98,7 +99,7 @@ class RetCode(_NegativeAutoEnum):
             RetCode.ERR_INCREASEGRADIENT: "The current search direction increases the objective function value.",
         }
         msg = error_messages.get(self, "(unknown error has occurred)")
-        return f"{self.name}: {msg}"
+        return f"[{self.name}: {msg}]"
 
     def is_error(self) -> bool:
         """Checks if the return code indicates an error.

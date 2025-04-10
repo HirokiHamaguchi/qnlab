@@ -3,8 +3,9 @@ import numpy as np
 
 
 class ZakharovProblem(ObjectiveFunction):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, n: int = 100):
+        x0 = np.ones(n, dtype=np.float64)
+        super().__init__(n, x0)
         self.gnorms = []
 
     def evaluate(self, x):
