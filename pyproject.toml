@@ -3,7 +3,7 @@ requires = ["hatchling >= 1.26"]
 build-backend = "hatchling.build"
 
 [project]
-name = "lbfgs-lab"
+name = "qnlab"
 version = "0.0.3"
 authors = [
   { name="Hiroki Hamaguchi", email="hari64boli64@gmail.com" },
@@ -19,15 +19,15 @@ license = "MIT"
 license-files = ["LICEN[CS]E*"]
 
 [project.urls]
-Documentation = "https://lbfgs-lab.readthedocs.io/"
-Repository = "https://github.com/HirokiHamaguchi/lbfgs_lab"
-Issues = "https://github.com/HirokiHamaguchi/lbfgs_lab/issues"
+Documentation = "https://qnlab.readthedocs.io/"
+Repository = "https://github.com/HirokiHamaguchi/qnlab"
+Issues = "https://github.com/HirokiHamaguchi/qnlab/issues"
 
 [tool.hatch.version]
-path = "lbfgs_lab/__init__.py"
+path = "qnlab/__init__.py"
 
 [tool.hatch.build]
-sources = ["lbfgs_lab", "README.md", "LICENSE"]
+sources = ["qnlab", "README.md", "LICENSE"]
 exclude = [
     "test",
     "doc",

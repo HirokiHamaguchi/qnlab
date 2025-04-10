@@ -2,12 +2,12 @@ import numpy as np
 import os
 
 from typing import Union
-from lbfgs_lab.lbfgs import lbfgs
+from qnlab.lbfgs import lbfgs
 
-from lbfgs_lab.problems.rosenbrock import RosenbrockProblem
-from lbfgs_lab.problems.dixon_price import DixonPriceProblem
-from lbfgs_lab.problems.powell import PowellProblem
-from lbfgs_lab.problems.zakharov import ZakharovProblem
+from qnlab.problems.rosenbrock import RosenbrockProblem
+from qnlab.problems.dixon_price import DixonPriceProblem
+from qnlab.problems.powell import PowellProblem
+from qnlab.problems.zakharov import ZakharovProblem
 
 
 def trial(

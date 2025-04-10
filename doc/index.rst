@@ -1,11 +1,11 @@
-lbfgs-lab documentation
+qnlab documentation
 =======================
 
 .. autosummary::
     :toctree: generated
     :recursive:
 
-    lbfgs_lab
+    qnlab
 
 .. toctree::
    :maxdepth: 2

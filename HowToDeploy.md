@@ -15,6 +15,6 @@ https://packaging.python.org/en/latest/tutorials/packaging-projects/
 ```bash
 hatch version patch
 python3 -m build --sdist
-tar -tf dist/lbfgs-lab-0.0.3.tar.gz # check the content
+tar -tf dist/qnlab-0.0.3.tar.gz # check the content
 python3 -m twine upload --repository pypi dist/*
 ```

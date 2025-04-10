@@ -1,15 +1,15 @@
-# lbfgs-lab
+# qnlab
 
-https://pypi.org/project/lbfgs-lab/
+https://pypi.org/project/qnlab/
 
-lbfgs-lab is a Python package that provides an implementation of the L-BFGS optimization algorithm.
+qnlab is a Python package that provides an implementation of the L-BFGS optimization algorithm.
 
 ## Documentation
 
 https://docs.readthedocs.com/platform/stable/tutorial/
 
 ```bash
-docformatter --in-place --style=google --recursive lbfgs_lab/
+docformatter --in-place --style=google --recursive qnlab/
 ```
 
 ## References

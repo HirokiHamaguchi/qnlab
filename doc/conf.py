@@ -8,12 +8,12 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath("../lbfgs_lab/"))
+sys.path.insert(0, os.path.abspath("../qnlab/"))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "lbfgs-lab"
+project = "qnlab"
 copyright = "2025, Hiroki Hamaguchi"
 author = "Hiroki Hamaguchi"
 
