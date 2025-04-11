@@ -26,6 +26,9 @@ Issues = "https://github.com/HirokiHamaguchi/qnlab/issues"
 [tool.hatch.version]
 path = "qnlab/__init__.py"
 
+[tool.hatch.packages]
+include = ["qnlab"]
+
 [tool.hatch.build]
 sources = ["qnlab", "README.md", "LICENSE"]
 exclude = [
