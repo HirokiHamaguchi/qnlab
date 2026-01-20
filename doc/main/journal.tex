@@ -1,0 +1,222 @@
+\RequirePackage{fix-cm}
+\documentclass[dvipdfmx,smallextended]{svjour3}
+
+\smartqed  % flush right qed marks, e.g. at end of proof
+\usepackage{graphicx}
+\usepackage{mathptmx}
+
+\usepackage{ascmac}
+\usepackage{appendix}
+\usepackage[linesnumbered, ruled]{algorithm2e}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bm,bbm}
+\usepackage{booktabs}
+\usepackage{cancel}
+\usepackage{enumitem}
+\usepackage{fancybox}
+\usepackage{floatrow}
+\usepackage[breaklinks]{hyperref}
+\usepackage{ifthen}
+\usepackage{lipsum}
+\usepackage{makecell}
+\usepackage{mathrsfs}
+\usepackage[showonlyrefs]{mathtools}
+\usepackage{multirow}
+\usepackage{optidef}
+\usepackage{orcidlink}
+\usepackage{physics}
+\usepackage{pifont}
+\usepackage{subcaption}
+\usepackage{subfiles}
+\usepackage{thm-restate}
+\usepackage{tikz}
+\usepackage{xparse}
+
+% https://tex.stackexchange.com/questions/499497/capacity-exceeded-error-while-using-cleveref-package-with-svjour3-springer-cla
+\makeatletter
+\let\cl@chapter\undefined
+\makeatletter
+
+\usepackage{cleveref}
+\usepackage[numbers,sort&compress]{natbib}
+
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
+
+\definecolor{cA}{HTML}{0072BD}
+\definecolor{cB}{HTML}{EDB120}
+\definecolor{cC}{HTML}{77AC30}
+\definecolor{cD}{HTML}{D95319}
+
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+\newcommand{\cyan}[1]{\textcolor{cyan}{#1}}
+\newcommand{\gray}[1]{\textcolor{gray}{#1}}
+\newcommand{\green}[1]{\textcolor{green}{#1}}
+\newcommand{\brown}[1]{\textcolor{brown}{#1}}
+\newcommand{\black}[1]{\textcolor{black}{#1}}
+\newcommand{\orange}[1]{\textcolor{orange}{#1}}
+\newcommand{\st}{\text{ s.t. }}
+\newcommand{\Img}[1]{\mathrm{Im}\qty(#1)}
+\newcommand{\Ker}[1]{\mathrm{Ker}\qty(#1)}
+\newcommand{\Supp}[1]{\mathrm{supp}\qty(#1)}
+\newcommand{\Rank}[1]{\mathrm{rank}\qty(#1)}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+% C++ (https://tex.stackexchange.com/questions/4302/prettiest-way-to-typeset-c-cplusplus)
+\newcommand{\Cpp}{C\nolinebreak[4]\hspace{-.05em}\raisebox{.4ex}{\relsize{-3}{\textbf{++}}}}
+% https://tex.stackexchange.com/questions/28836/typesetting-the-define-equals-symbol
+\newcommand{\defeq}{\coloneqq}
+\newcommand{\eqdef}{\eqqcolon}
+% https://tex.stackexchange.com/questions/5502/how-to-get-a-mid-binary-relation-that-grows
+\newcommand{\relmiddle}[1]{\mathrel{}\middle#1\mathrel{}}
+
+% https://tex.stackexchange.com/questions/564216/newcommand-for-each-letter
+\ExplSyntaxOn
+\NewDocumentCommand{\definealphabet}{mmmm}{
+    \int_step_inline:nnn{`#3}{`#4}{
+        \cs_new_protected:cpx{#1 \char_generate:nn{##1}{11}}{
+            \exp_not:N #2{\char_generate:nn{##1}{11}}}}}
+\ExplSyntaxOff
+
+% cleveref fails to accurately capture pseudo-code line numbers. We define a custom reference command for lines in algorithms.
+\newcommand{\refLine}[1]{Line~\ref{#1}}
+\newcommand{\refLines}[2]{Lines~\ref{#1}--\ref{#2}}
+
+\definealphabet{bb}{\mathbb}{A}{Z}
+\definealphabet{rm}{\mathrm}{A}{Z}
+\definealphabet{cal}{\mathcal}{A}{Z}
+\definealphabet{frak}{\mathfrak}{a}{z}
+% \definealphabet{scr}{\mathscr}{A}{Z}
+% \definealphabet{frak}{\mathfrak}{A}{Z}
+
+\spn@wtheorem{assumption}{Assumption}{\bfseries}{\itshape}
+
+% cleverefの設定
+\crefname{theorem}{Theorem}{Theorems}
+\crefname{proposition}{Proposition}{Propositions}
+\crefname{lemma}{Lemma}{Lemmas}
+\crefname{assumption}{Assumption}{Assumptions}
+\crefname{definition}{Definition}{Definitions}
+\crefname{corollary}{Corollary}{Corollaries}
+\crefname{remark}{Remark}{Remarks}
+\crefname{example}{Example}{Examples}
+\crefname{figure}{Figure}{Figures}
+\crefname{table}{Table}{Tables}
+\crefname{algorithm}{Algorithm}{Algorithms}
+
+% https://qiita.com/rityo_masu/items/efd44bc8f9229e014237
+\allowdisplaybreaks[4]
+
+% todo: remove this
+% https://tex.stackexchange.com/questions/184203/huge-white-space-in-latex-template-springer-journal
+\AtBeginDocument{%
+    \paperwidth=\dimexpr
+    1in + \oddsidemargin
+    + \textwidth
+    % + \marginparsep + \marginparwidth
+    + 1in + \oddsidemargin
+    \relax
+    \paperheight=\dimexpr
+    1in + \topmargin
+    + \headheight + \headsep
+    + \textheight
+    % + \footskip
+    + 1in + \topmargin
+    \relax
+    \usepackage[pass]{geometry}
+    \relax
+}
+
+\newcommand{\feps}{\epsilon_\mathrm{f}}
+\newcommand{\gtol}{\epsilon_{\mathrm{gtol}}}
+\newcommand{\AdaGrad}{\textsc{AdaGrad} }
+\newcommand{\Adam}{\textsc{Adam} }
+\newcommand{\AdaGradNorm}{\textsc{AdaGrad-Norm} }
+
+\journalname{Mathematical Programming Computational}
+
+\begin{document}
+
+\title{Practical Regularized Quasi-Newton Methods with Inexact Function Values}
+% \titlerunning{Short form of title}    % if too long for running head
+
+\author{
+    Hiroki Hamaguchi\,\orcidlink{0009-0005-7348-1356} \and
+    Naoki Marumo\,\orcidlink{0000-0002-7372-4275} \and
+    Akiko Takeda\,\orcidlink{0000-0002-8846-4496}
+}
+% \authorrunning{Short form of author list} % if too long for running head
+
+\institute{
+    H. Hamaguchi \at
+    Graduate School of Information Science and Technology, The University of Tokyo, Tokyo, Japan \\
+    \email{hirokihamaguchi0331@gmail.com}
+    \and
+    N. Marumo \at
+    Graduate School of Information Science and Technology, The University of Tokyo, Tokyo, Japan
+    \and
+    A. Takeda \at
+    Graduate School of Information Science and Technology, The University of Tokyo, Tokyo, Japan \\
+    Center for Advanced Intelligence Project, RIKEN, Tokyo, Japan
+}
+
+\date{Received: date / Accepted: date}
+% The correct dates will be entered by the editor
+
+\maketitle
+
+\begin{abstract}
+    \input{abstract.tex}
+
+    \keywords{
+        Regularized Quasi-Newton Method \and
+        Numerical Stability \and
+        Numerical Error \and
+        AdaGrad \and
+        Objective-Function-Free Optimization
+    }
+    % \PACS{PACS code1 \and PACS code2 \and more}
+    \subclass{
+        90C53\and %: Methods of quasi-Newton type
+        90C06\and %: Large-scale problems
+        65K05\and %: Mathematical programming
+        49M15 % : Methods of Newton--Raphson, Galerkin and Ritz types
+    }
+\end{abstract}
+
+\section{Introduction}\label{sec:introduction}
+
+\subfile{introduction.tex}
+
+The remainder of this paper is organized as follows.
+In \cref{sec:preliminaries}, we introduce the problem setting and review relevant background.
+In \cref{sec:algorithm}, we present the proposed algorithm.
+In \cref{sec:analysis}, we establish a global convergence property of the proposed algorithm.
+In \cref{sec:proposed_choice}, we discuss practical choices of algorithmic variables and parameters.
+In \cref{sec:experiments}, we report numerical results on CUTEst benchmark problems.
+Finally, in \cref{sec:conclusion}, we conclude the paper with a summary and future research directions.
+
+Our implementation is publicly available on GitHub%
+\footnote{\label{fn:ourGitHub}\url{https://github.com/HirokiHamaguchi/qnlab}}.
+
+\subfile{main_contents.tex}
+
+\appendix
+\input{appendix.tex}
+
+\begin{acknowledgements}
+    This work was partially supported by JSPS KAKENHI (23H03351, 24K23853) and JST CREST (JPMJCR24Q2).
+\end{acknowledgements}
+
+\section*{Conflict of Interest}
+
+The authors declare that they have no conflict of interest.
+
+% BibTeX users please use one of
+\bibliographystyle{spbasic}      % basic style, author-year citations
+%\bibliographystyle{spmpsci}      % mathematics and physical sciences
+%\bibliographystyle{spphys}       % APS-like style for physics
+\bibliography{../L-BFGS.bib}
+
+\end{document}

@@ -1,0 +1,184 @@
+\section{Proof of \texorpdfstring{\cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}}{Lemma \ref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}}}\label{sec:proof_of_sum_norm_g_over_mu_geq_2sqrt_leq_log}
+
+The proof of \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} is similar to existing results \citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020}, \citep[Lemma~3.1]{Gratton08022024}.
+\begin{proof}
+    Recall that \cref{eq:offo_based_update} defines $\mu_k$ as $\theta \sqrt{\varsigma + \sum_{k \in K^+} \norm{g_{k}}^2}$ with $K^+$ at iteration $k$, and \refLine{line:update_theta} of \cref{alg:regularized_qn} asserts $\theta \in [\theta_{\min}, \theta_{\max}]$.
+    Let $k_i \in K^+$ be the $i$-th element of $K^+$ and define the empty sum as zero.
+    For any $0 < x < y$, $x/y \le -\ln(1-x/y) = \ln y - \ln(y-x)$ holds. Thus, we have
+    \begin{align*}
+        \frac{\norm{g_{k_i}}^2}{\mu_{k_i}^2}
+         & \leq \frac{1}{\theta_{\min}^2} \frac{\norm{g_{k_i}}^2}{\varsigma+\sum_{\ell=0}^{i} \norm{g_{k_\ell}}^2}                                                    &  & (\text{definition})        \\
+         & \le \frac{1}{\theta_{\min}^2} \qty(\ln\qty(\varsigma+\sum_{\ell=0}^{i} \norm{g_{k_\ell}}^2) - \ln\qty(\varsigma+\sum_{\ell=0}^{i-1} \norm{g_{k_\ell}}^2)). &  & (x/y \le \ln y - \ln(y-x))
+    \end{align*}
+    Similarly, $x/\sqrt{y} \ge x/(\sqrt{y}+\sqrt{y-x}) = \sqrt{y}-\sqrt{y-x}$ holds. Thus, we have
+    \begin{align*}
+        \frac{\norm{g_{k_i}}^2}{\mu_{k_i}}
+         & \ge \frac{1}{\theta_{\max}} \frac{\norm{g_{k_i}}^2}{\sqrt{\varsigma + \sum_{\ell=0}^{i} \norm{g_{k_\ell}^2}}}                                                      &  & (\text{definition})                  \\
+         & \ge \frac{1}{\theta_{\max}} \qty(\sqrt{\varsigma+\sum_{\ell=0}^{i\vphantom{i-1}} \norm{g_{k_\ell}}^2} - \sqrt{\varsigma+\sum_{\ell=0}^{i-1} \norm{g_{k_\ell}}^2}). &  & (x/\sqrt{y} \ge \sqrt{y}-\sqrt{y-x})
+    \end{align*}
+    Summing up these inequalities over $0 \le i < \abs{K^+}$ yields the claim.
+    \qed
+\end{proof}
+
+
+\section{Proof of \texorpdfstring{\cref{prop:bounded_BFGS}}{Proposition \ref{prop:bounded_BFGS}}}\label{sec:proof_of_bounded_BFGS}
+
+The proof of \cref{prop:bounded_BFGS} is similar to existing results \citep[Theorem 5.5]{gaoQuasiNewtonMethodsSuperlinear2018} \citep[Lemma 1]{gowerStochasticBlockBFGS2016}.
+\begin{proof}
+    We consider standard BFGS updates with a single curvature pair $(s,y)$.
+    From \cref{eq:curvature_conditions1,eq:curvature_conditions2}, we have
+    \begin{equation}\label{eq:curvature_norm_bounds}
+        \norm{\frac{y y^\top}{y^\top s}} = \frac{y^\top y}{y^\top s} \le \Lambda, \quad
+        \norm{\frac{y s^\top}{y^\top s}} \le \frac{\norm{y}\norm{s}}{\sqrt{\frac{1}{\Lambda}\norm{y}^2}\sqrt{\lambda\norm{s}^2}} = \sqrt{\kappa}, \quad
+        \norm{\frac{s s^\top}{y^\top s}} = \frac{s^\top s}{y^\top s} \le \frac{1}{\lambda}.
+    \end{equation}
+    Let $B, H$ denote the positive definite Hessian approximation before the update and its inverse, and $B_+, H_+$ the updated matrices.
+    The BFGS update rule is
+    \begin{equation*}
+        B_+   =B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}, \quad
+        H_+   =\left(I-\frac{s y^\top}{y^\top s}\right)H\left(I-\frac{y s^\top}{y^\top s}\right)+\frac{s s^\top}{y^\top s}.
+    \end{equation*}
+    Since $B$ is symmetric positive definite matrix and $s \neq 0$, we have
+    \begin{align}
+        \norm{B_+} & \le\norm{B}+\norm{\frac{yy^\top}{y^\top s}} \le \norm{B}+\Lambda,\label{eq:BFGS_B_norm_bound}                                                                                                                                                     \\
+        \norm{H_+} & =\norm{\qty(I-\frac{y s^\top}{y^\top s})^\top H\qty(I-\frac{y s^\top}{y^\top s})+\frac{s s^\top}{y^\top s}}                                                                                \notag                                                 \\
+                   & \le\norm{I-\frac{y s^\top}{y^\top s}}^2\norm{H}+\norm{\frac{s s^\top}{y^\top s}}                                                                                                       \notag                                                     \\
+                   & \le\qty(1+\norm{\frac{y s^\top}{y^\top s}})^2\norm{H}+\norm{\frac{s s^\top}{y^\top s}}                                                                                                       \notag                                               \\
+                   & \le \qty(1+\sqrt{\kappa})^2\norm{H}+\frac{1}{\lambda}.  \label{eq:BFGS_H_norm_bound}                                                                                                                &  & (\text{\cref{eq:curvature_norm_bounds}})
+    \end{align}
+    Applying \cref{eq:BFGS_B_norm_bound,eq:BFGS_H_norm_bound} recursively over $p$ updates and using the
+    initial matrix $\gamma I$, we obtain
+    \begin{align*}
+        \norm{\mathrm{BFGS}(\{s_{k_i},y_{k_i}\}_{i=0}^{p-1})}        & \le \gamma + p\Lambda,                                                                                     \\
+        \norm{(\mathrm{BFGS}(\{s_{k_i},y_{k_i}\}_{i=0}^{p-1}))^{-1}} & \le (1+\sqrt{\kappa})^{2p} \gamma +\frac{1}{\lambda}\sum_{i=0}^{p-1}(1+\sqrt{\kappa})^{2i}                 \\
+                                                                     & = (1+\sqrt{\kappa})^{2p} \gamma +\frac{1}{\lambda}\frac{(1+\sqrt{\kappa})^{2p}-1}{(1+\sqrt{\kappa})^{2}-1} \\
+                                                                     & \le (1+\sqrt{\kappa})^{2p}\qty(\gamma+\frac{1}{\lambda\qty(2\sqrt{\kappa}+\kappa)}).
+    \end{align*}
+    Therefore, $\mathrm{BFGS}(\{s_{k_i},y_{k_i}\}_{i=0}^{p-1})$ satisfies the stated bounds in \cref{eq:bounded_BFGS_mM}.
+    \qed
+\end{proof}
+
+The conditions \cref{eq:curvature_conditions1,eq:curvature_conditions2} are standard in the analysis of quasi-Newton methods \citep[Theorem 2.1]{byrdToolAnalysisQuasiNewton1989}.
+If $f$ is $L$-smooth (\cref{ass:LSmooth}) and convex, then by the Baillon--Haddad theorem \citep{baillonQuelquesProprietesOperateurs1977,bauschkeBaillonHaddadTheoremRevisited2009} its gradient is $1/L$-cocoercive:
+\begin{equation}
+    (\nabla f(x)-\nabla f(y))^\top (x-y) \ge \frac{1}{L} \norm{\nabla f(x)-\nabla f(y)}^2
+\end{equation}
+for all $x,y \in \bbR^n$.
+Applying this inequality with $x=x_{k+1}$ and $y=x_k$ yields \cref{eq:curvature_conditions1} with $\Lambda=L$.
+
+
+
+% ?? \section{Line Search Method Failures}\label{sec:scipy_fail}
+
+% \begin{table}[tbp]
+%     \centering
+%     \caption{Results for cases in which the SciPy L-BFGS-B algorithm failed. Here, $n$ is the problem dimension, $k$ is the final iteration index, and $\Delta f \defeq f(x_k) - f(x_k+d_k)$ is the change in the objective value for the trial step size $\alpha_k=1$.}
+%     \label{tab:failed}
+%     \begin{tabular}{>{\ttfamily}l>{\ttfamily}r>{\ttfamily}r>{\ttfamily}r>{\ttfamily}r>{\ttfamily}r>{\ttfamily}r}
+%         \toprule
+%         \normalfont{Problem} & $n$    & $k$  & \multicolumn{1}{c}{$f(x_k)$} & \multicolumn{1}{c}{$\Delta f$} & \multicolumn{1}{c}{$\| g_k \|$} & \multicolumn{1}{c}{$d_k^\top g_k$} \\
+%         \midrule
+%         ARGLINB              & 200    & 3    & 9.963e+01                    & -3.478e+13                     & 7.776e-01                       & -6.046e-01                         \\
+%         ARGLINC              & 200    & 4    & 1.011e+02                    & -3.616e+10                     & 2.545e-02                       & -6.477e-04                         \\
+%         GAUSS2LS             & 8      & 274  & 1.248e+03                    & -3.788e+03                     & 1.464e-03                       & -2.144e-06                         \\
+%         GAUSS3LS             & 8      & 906  & 1.244e+03                    & -7.998e+03                     & 2.497e-03                       & -6.234e-06                         \\
+%         INDEFM               & 100000 & 580  & -9.902e+06                   & -2.391e+00                     & 1.444e-02                       & -2.086e-04                         \\
+%         KIRBY2LS             & 5      & 137  & 3.905e+00                    & -4.923e+05                     & 1.560e-02                       & -2.432e-04                         \\
+%         MISRA1ALS            & 2      & 62   & 1.246e-01                    & -1.518e+01                     & 1.370e-05                       & -1.876e-10                         \\
+%         PALMER1C             & 8      & 760  & 9.761e-02                    & -1.623e-01                     & 2.916e-05                       & -8.504e-10                         \\
+%         PALMER1D             & 7      & 221  & 6.527e-01                    & -7.530e-01                     & 2.120e-04                       & -4.493e-08                         \\
+%         PALMER7C             & 8      & 548  & 6.020e-01                    & -1.212e-02                     & 1.300e-04                       & -1.690e-08                         \\
+%         PALMER8C             & 8      & 408  & 1.598e-01                    & -2.440e-04                     & 2.433e-05                       & -5.919e-10                         \\
+%         PARKCH               & 15     & 1514 & 1.624e+03                    & -1.837e+01                     & 4.487e-03                       & -2.014e-05                         \\
+%         PENALTY3             & 200    & 55   & 9.981e-04                    & -1.447e+04                     & 3.583e-01                       & -1.284e-01                         \\
+%         THURBERLS            & 7      & 184  & 5.643e+03                    & -4.792e+05                     & 7.678e-02                       & -5.895e-03                         \\
+%         VIBRBEAM             & 8      & 653  & 3.322e-01                    & -4.219e+05                     & 3.002e-03                       & -9.013e-06                         \\
+%         \\
+%         DJTL                 & 2      & 94   & -4.801e+03                   & -1.230e+19                     & 8.980e+05                       & -1.142e+05                         \\
+%         GAUSS1LS             & 8      & 65   & 1.367e+03                    & -inf                           & 4.268e+04                       & -1.764e+08                         \\
+%         JENSMP               & 2      & 5    & 2.143e+02                    & -inf                           & 3.716e+03                       & -2.599e+04                         \\
+%         MGH10LS              & 3      & 4    & 1.367e+09                    & -3.166e+12                     & 4.056e+03                       & -1.645e+07                         \\
+%         NELSONLS             & 3      & 57   & 3.766e+01                    & -inf                           & 4.005e+09                       & -1.604e+19                         \\
+%         PENALTY2             & 200    & 66   & 4.712e+13                    & -4.591e+07                     & 1.640e+01                       & -2.343e+02                         \\
+%         VESUVIOLS            & 8      & 128  & 9.917e+02                    & -7.222e+09                     & 2.821e-01                       & -6.296e-02                         \\
+%         \\
+%         BDQRTIC              & 5000   & 81   & 2.001e+04                    & -2.485e-04                     & 1.177e-03                       & -1.769e-06                         \\
+%         CHWIRUT1LS           & 3      & 27   & 2.384e+03                    & -1.774e-05                     & 1.115e-04                       & -3.828e-12                         \\
+%         FBRAIN3LS            & 6      & 593  & 2.426e-01                    & -2.041e-04                     & 3.861e-05                       & -1.525e-09                         \\
+%         FREUROTH             & 5000   & 21   & 6.082e+05                    & -9.439e-06                     & 1.413e-03                       & -2.025e-08                         \\
+%         LUKSAN12LS           & 98     & 304  & 4.292e+03                    & -4.439e-05                     & 2.418e-04                       & -3.444e-08                         \\
+%         LUKSAN13LS           & 98     & 88   & 2.519e+04                    & -1.481e-05                     & 1.079e-04                       & -1.164e-08                         \\
+%         MEYER3               & 3      & 493  & 8.877e+01                    & 4.088e-02                      & 2.102e-01                       & -4.140e-02                         \\
+%         MISRA1DLS            & 2      & 6    & 1.107e+00                    & 8.559e-04                      & 2.926e-02                       & -8.560e-04                         \\
+%         POWELLBSLS           & 2      & 74   & 3.800e-07                    & 8.104e-13                      & 1.196e-05                       & -8.104e-13                         \\
+%         SINQUAD              & 5000   & 29   & -6.757e+06                   & -1.003e+01                     & 2.070e-02                       & -4.284e-04                         \\
+%         STRATEC              & 10     & 677  & 2.212e+03                    & -4.330e-03                     & 2.179e-03                       & -1.584e-06                         \\
+%         VESUVIALS            & 8      & 145  & 2.297e+03                    & -1.971e+00                     & 1.167e-02                       & -5.594e-04                         \\
+%         VESUVIOULS           & 8      & 110  & 4.771e-01                    & -7.011e-01                     & 7.676e-05                       & -1.746e-09                         \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+
+% This section investigates the failures of the L-BFGS method with the Mor\'e--Thuente line search.
+% In \cref{sec:experiments}, we demonstrated the superiority of our method over conventional line search-based L-BFGS. To understand when and why our method outperforms, we analyze cases in which the standard L-BFGS fails.
+% In particular, we aim to clarify the reasons under which line search-based methods are prone to failure.
+
+% As described in \cref{sssec:methods}, we used the SciPy implementation of L-BFGS-B with \texttt{ftol=0}, and applied it to all CUTEst problems introduced in \cref{sssec:problems}.
+% We classify a run as a failure if it terminates without achieving $\norm{\nabla f(x_k)}<10^{-5}$ and not due to iteration or evaluation limits.
+% \Cref{tab:failed} summarizes these failure cases, categorized into three groups.
+% Groups 1 and 2 involve cases where the change in objective value $\Delta f = \overline{f}(x_k) - \overline{f}(x_k + d_k)$ becomes zero due to rounding errors, causing the algorithm to terminate successfully even though the gradient norm has not reached the desired threshold.
+% In Group 1, this occurs as $f(x_k)$ diverges, while in Group 2, this occurs as $f(x_k)$ converges prematurely.
+% Group 3 consists of cases where the Mor\'e--Thuente line search itself failed and stopped with an error.
+
+% Group 1 corresponds to cases where $f(x_k + \alpha_k d_k)$ becomes extremely large when using a step size of $\alpha_k=1$.
+% During line search, we set $x_{k+1}=x_k+\alpha_k d_k$ and then compute $f(x_{k+1})$.
+% Typically, the trial step starts at $\alpha_k=1$.
+% In some cases, however, this $f(x_k + d_k)$ becomes excessively large, exceeding the upper limit of floating-point representation and resulting in \texttt{inf}.
+% When this occurs, the Mor\'e--Thuente line search algorithm tends to select an extremely small step size $\alpha_k$ as the next trial, so that the function decrease $\Delta f$ falls below machine precision and is rounded to zero.
+% For example, the \texttt{GAUSS1LS} problem (\href{https://www.itl.nist.gov/div898/strd/nls/data/gauss2.shtml}{link}) performs a nonlinear least squares regression on data $\{ (x_i, y_i) \}_{i=1}^{250}$:
+% \begin{mini*}
+%     {b \in \bbR^8}
+%     {\sum_{i=1}^{250} \qty(y_i - \qty(b_1 e^{-b_2 x_i} + b_3 e^{-\frac{(x_i-b_4)^2}{b_5^2}} + b_6 e^{-\frac{(x_i-b_7)^2}{b_8^2}}))^2}
+%     {}{}
+% \end{mini*}
+% As shown in \cref{tab:failed}, $\Delta f$ is reported as \texttt{-inf}, indicating that the objective function changes too sharply for the line search to succeed.
+
+% In contrast, Group 2 is characterized by very small values of $\Delta f$, particularly of $d^\top g_k$. This suggests that $f$ is nearly flat, and any progress made by the line search is on the order of machine epsilon or less.
+% For instance, the \texttt{BDQRTIC} problem is defined as follows \citep{lukvsan2010modified} \citep[Problem 61]{connPerformanceMultifrontalScheme1994}:
+% \begin{mini*}
+%     {x \in \bbR^{5000}}
+%     {\sum_{i=1}^{n-4} \qty((3 - 4 x_i)^2 + (x_i^2 + 2 x_{i+1}^2 + 3 x_{i+2}^2 + 4 x_{i+3}^2 + 5 x_n^2)^2)}
+%     {}{}
+% \end{mini*}
+% Due to the flatness of $f$ around $x_k$,
+% $\Delta f$ becomes zero due to rounding errors, halting any progress in line search.
+
+% Group 3 includes cases where the Mor\'e--Thuente line search terminates abnormally. These failures include the issues observed in both Groups 1 and 2.
+
+% These observations summarize the failure cases of SciPy's L-BFGS-B algorithm and provide insight into the underlying reasons why line search fails.
+
+% ?? \section{Memo for Lambert W Function}
+
+% \begin{proof}
+%     Let define $h \colon \bbR_{\ge \varsigma} \to \bbR$ as $h(t) \defeq C_1 - C_2 \sqrt{t} + C_3 \ln t$.
+%     From the lemma statement, $G$ satisfies $h(G) > 0$ and $\lim_{t \to +\infty} h(t) = -\infty$.
+%     Since $h'(t)=-\frac{C_2}{2\sqrt{t}} + \frac{C_3}{t}$ is positive for $t < \max(\varsigma,(2C_3/C_2)^2)$ if any and negative for $t > \max(\varsigma, (2C_3/C_2)^2)$,
+%     there exists $t^* \ge \varsigma$ such that $h(t^*) = 0$ and $h(t) > 0$ for all $t \in [\varsigma, t^*]$. Thus, this $t^*$ gives an upper bound on $G$ as $G \le t^* - \varsigma$.
+
+%     Let us derive an explicit form of $t^*$.
+%     The equation $h(t^*)=0$ can be written as $C_1 = C_2 \sqrt{t^*} - C_3 \ln t^*$.
+%     Introducing the change of variables $x \defeq \sqrt{t^*} > 0$, this equation becomes $C_1 = C_2 x - 2C_3 \ln x$. Rearranging terms yields
+%     \begin{equation*}
+%         \ln x = \frac{C_2}{2C_3} x - \frac{C_1}{2C_3}.
+%     \end{equation*}
+%     Exponentiating both sides and multiplying by $-\frac{C_2}{2C_3}$, we have
+%     \begin{equation*}
+%         -\frac{C_2}{2C_3} x e^{-\frac{C_2}{2C_3} x} = -\frac{C_2}{2C_3} e^{-\frac{C_1}{2C_3}}.
+%     \end{equation*}
+%     The Lambert $W$ function $W(z)$ satisfies $W(z)e^{W(z)} = z$ by definition and the existence of $x>0$ imply
+%     \begin{equation*}
+%         x = -\frac{2C_3}{C_2} W_{-1} \qty(-\frac{C_2}{2C_3} e^{-\frac{C_1}{2C_3}}).
+%     \end{equation*}
+%     Recalling that $t^* = x^2$ and $G \le t^* - \varsigma$, we obtain the desired result.
+%     \qed
+% \end{proof}

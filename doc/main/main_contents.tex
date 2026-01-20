@@ -1,0 +1,1095 @@
+\documentclass[journal]{subfiles}
+
+\begin{document}
+
+\section{Problem Setting and Preliminaries}
+\label{sec:preliminaries}
+
+\subsection{Problem Setting}
+\label{sec:problem_setting}
+
+We consider optimization problems in which exact objective function values are unavailable, following the recent literature on error-aware optimization \citep{grattonNoteSolvingNonlinear2020,bellaviaImpactNoiseEvaluation2021,carterNumericalExperienceClass1993,clancyTROPHYTrustRegion2022,ruanAdaptiveRegularizedQuasiNewton2024}.
+When both objective values and gradients are heavily corrupted by noise, reliable optimization cannot be guaranteed.
+Thus, meaningful optimization requires that at least one source of information be sufficiently accurate.
+This work focuses on problems arising from finite-precision computations or inexact evaluations, where objective function evaluations are subject to non-negligible errors while gradient information can be computed with relatively high accuracy.
+Settings in which objective values are accurate but gradients are noisy, such as derivative-free optimization or stochastic approximation methods \citep{berahasTheoreticalEmpiricalComparison2021,shiNoiseTolerantQuasiNewtonAlgorithm2022}, are beyond the scope of this paper.
+
+In the following, we formalize the assumptions on function and gradient evaluations.
+We assume that only an error contaminated function $\overline{f}(x)$ is accessible, satisfying the hybrid absolute-relative error model \citep{highamAccuracyStabilityNumerical2002,10.5555/3168451.3168462}:
+\begin{equation}
+    \label{eq:relative_error_model}
+    \abs{f(x)-\overline{f}(x)} \le \feps \max(1,\abs{f(x)}),
+\end{equation}
+where $0 \le \feps < 1$ is an error rate.
+This model captures the typical behavior of rounding errors, such as in IEEE~754 floating-point arithmetic.
+The error is predominantly relative when $\abs{f(x)}$ is large and effectively absolute when $\abs{f(x)}$ is small.
+Closely related models are also employed in practical stopping criteria \citep{2020SciPy-NMeth}.
+
+We next state assumptions regarding gradient evaluations.
+In practice, termination is typically based on a gradient tolerance $\gtol$, and considers $\norm{\nabla \overline{f}(x)} \le \gtol$ as a stopping criterion.
+In our numerical experiments, following common implementations \citep{2020SciPy-NMeth}, we use the infinity norm for the gradient, though other norms could equally be employed.
+If the gradient noise were comparable to or larger than $\gtol$, the stopping criterion could not be reliably satisfied, no matter how close $x$ is to a stationary point.
+Therefore, $\gtol$ must be chosen sufficiently large relative to the gradient noise level.
+Accordingly, it is natural to assume that the error in gradient evaluations is small compared to the prescribed tolerance, namely,
+\begin{equation*}
+    \norm{\nabla f(x)-\nabla\overline{f}(x)}\ll\gtol.
+\end{equation*}
+Since $\norm{\nabla \overline{f}(x)} > \gtol$ holds prior to termination, the gradient noise is also negligible compared to the gradient norm itself.
+Consequently, in our theoretical analysis, in order to isolate the effect of inexact function evaluations, we assume exact gradients:
+\begin{equation}\label{eq:exact_gradient_assumption}
+    \norm{\nabla f(x)-\nabla\overline{f}(x)}=0.
+\end{equation}
+The assumption in \cref{eq:exact_gradient_assumption} serves as a theoretical modeling choice rather than a claim about practical implementations.
+Our numerical experiments in \cref{sec:experiments} also test the case where gradients are contaminated by noise, demonstrating the practical effectiveness of the proposed method even when \cref{eq:exact_gradient_assumption} is violated.
+
+\subsection{Regularized Quasi-Newton Methods}
+\label{sec:prel_rqn}
+
+In classical Newton and quasi-Newton methods, line search techniques are commonly used in practice \citep{2020SciPy-NMeth}.
+An alternative approach is to add regularization terms to the Hessian approximation.
+Recent years have seen renewed interest in regularized Newton-type methods,
+including cubic regularization schemes
+\citep{nesterovCubicRegularizationNewton2006a,ranganathSymmetricRankOneQuasiNewton2025,wangConvergenceRatesRegularized2025}.
+In this work, we focus on quadratic regularization
+\citep{kanzowRegularizationLimitedMemory2023,doikovSuperUniversalRegularizedNewton2024,liTruncatedRegularizedNewton2009,zhangNewRegularizedQuasiNewton2018,uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,shengNewAdaptiveTrust2018}.
+
+Let $g_k \defeq \nabla f(x_k)$ and let $B_k \in \bbR^{n\times n}$ denote an approximate Hessian. In line-search-based quasi-Newton methods, the update is given by
+\begin{equation*}
+    x_{k+1} = x_k + \alpha_k d_k, \quad
+    d_k = -B_k^{-1} g_k,
+\end{equation*}
+where $\alpha_k$ is determined by a line search.
+In contrast, regularized quasi-Newton methods compute the step as
+\begin{equation*}
+    x_{k+1} = x_k + d_k, \quad
+    d_k = -(B_k + \mu_k I)^{-1} g_k,
+\end{equation*}
+with a regularization parameter $\mu_k \ge 0$.
+Combining regularization with line search is also possible and has been explored \citep{uedaConvergencePropertiesRegularized2010}.
+
+A fundamental strategy for choosing $\mu_k$ in nonconvex optimization
+was proposed in earlier work on regularized Newton methods \citep{uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,shengNewAdaptiveTrust2018}. Their formulation sets
+\begin{equation}
+    \mu_k = c_1 \max(0, -\lambda_{\min}(B_k)) + c_2 \norm{\nabla f(x_k)}^\delta,
+    \label{eq:ueda_mu}
+\end{equation}
+where $c_1 > 1$, $c_2 > 0$, $\delta \ge 0$
+and $\lambda_{\min}(B_k)$ denotes the smallest eigenvalue of $B_k$. $\norm{\cdot}$ is the Euclidean norm.
+This choice guarantees that $B_k + \mu_k I$ is positive definite,
+ensuring that $d_k$ is a descent direction.
+The regularization strategy adopted in this paper is closely related in spirit,
+and we adapt it to noisy evaluation environments.
+
+\subsection{Objective-Function-Free Optimization}
+\label{sec:prel_offo}
+
+Objective-Function-Free Optimization (OFFO) refers to a class of methods
+that avoid explicit evaluations of the objective function and rely solely on gradient information \citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
+Such methods are particularly attractive when function values are unreliable due to noise.
+Similar adaptive trust-region approaches are also discussed \citep{grapigliaAdaptiveTrustregionMethod2022}.
+
+Prominent examples of OFFO include adaptive gradient methods such as \AdaGrad \citep{duchiAdaptiveSubgradientMethods2011} and \AdaGradNorm \citep{wardAdaGradStepsizesSharp2020}.
+Their update rules are
+\begin{align*}
+    x_{k+1}^{(i)}                                                            & = x_k^{(i)} -
+    \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k (g_j^{(i)})^2}} g_k^{(i)}, &               & (i=1,2,\ldots,n) \\
+    x_{k+1}                                                                  & = x_k -
+    \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k \norm{g_j}^2}} g_k,
+\end{align*}
+respectively, where $\varsigma>0$ and $\theta>0$ are algorithmic parameters, and $x^{(i)}$ denotes the $i$-th component of a vector $x$.
+
+In this work, we draw inspiration from the OFFO framework to design robust regularization and scaling strategies.
+Unlike purely objective-function-free methods, our algorithm exploits function values whenever they are numerically reliable, while smoothly transitioning to gradient-based control when they are not.
+This hybrid behavior enables improved stability without sacrificing efficiency in practical optimization tasks.
+
+\if0 % ???
+    We assume that only an approximate function value $\overline{f}(x)$ and true gradient $\nabla f(x)$ are available. For some constant $0 \le \feps < 1$, $\overline{f}(x)$ satisfies the relative error bound:
+    \begin{equation}
+        \abs{\overline{f}(x)-f(x)} \le \feps \max(1,\abs{f(x)}).
+    \end{equation}
+\fi
+
+\section{Proposed Algorithm}\label{sec:algorithm}
+
+In this section, we present the proposed algorithm for the problem setting stated in \cref{sec:problem_setting}. Its pseudo-code is given in \cref{alg:regularized_qn}, where we note that the minimum of the empty set is defined as $+\infty$ in \refLine{line:mu_0_condition}.
+\Cref{alg:backtracking_linesearch} is an auxiliary line search algorithm called in \cref{alg:regularized_qn}.
+
+\DontPrintSemicolon
+\begin{algorithm}[ht]
+    \normalsize
+    \KwIn{$x_0 \in \bbR^n$, $k_{\max} > 0$, $0 \le \feps < 1$, $0 < c < 1$, $0 < \theta_{\min} \leq \theta_{\max}$ and $\varsigma > 0$}
+    $k \gets 0$, $g_0 \gets \nabla f(x_0)$, $\Delta_{-1}=0$, $K^+ \gets \emptyset$ \label{line:init}\;
+    \For{$k=0,1,2,\ldots, k_{\max}$}{
+        \uIf{$\min_{0 \leq j < k} (\overline{f}(x_j)- \Delta_j - \Delta_{j-1}) \ge \overline{f}(x_k)$\label{line:mu_0_condition}}{
+            $\mu_k \gets 0$ \label{line:update_mu_0}\;
+        }
+        \uElse{
+            $K^+ \gets K^+ \cup \{k\}$ \label{line:update_K_plus}\;
+            $\mu_{k} \gets \theta \sqrt{\varsigma + \sum_{j \in K^+} \norm{g_{j}}^2}$ with $\theta \in [\theta_{\min}, \theta_{\max}]$ chosen adaptively \label{line:update_theta}\;
+        }
+        $d_k \gets -(B_k + \mu_k I)^{-1} g_k$ with $B_k$ chosen properly (\cref{sec:proposed_choice_Bk}) \label{line:d_k}\;
+        Find $\alpha_k$ and $\Delta_k$ satisfying \cref{eq:relaxed_Armijo_condition} by \cref{alg:backtracking_linesearch}  \label{line:armijo}\;
+        $x_{k+1} \gets x_k + \alpha_k d_k$,\,
+        $g_{k+1} \gets \nabla \overline{f}(x_{k+1})$ \label{line:update}\;
+    }
+    \caption{Noise Tolerant Regularized Quasi-Newton Method}
+    \label{alg:regularized_qn}
+\end{algorithm}
+
+\DontPrintSemicolon
+\begin{algorithm}[ht]
+    \normalsize
+    \KwIn{$x_k \in \bbR^n$, $d_k \in \bbR^n$, $g_k \in \bbR^n$, $0< c < 1$ and $0<\beta_{\min} < \beta_{\max} < 1$}
+    $\alpha_k \gets 1$\; \label{line:ls_init}
+    $\Delta_k \gets \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_k), -\overline{f}(x_k+\alpha_k d_k))$\;
+    \While{$\overline{f}(x_k) + c \alpha_k g_k^\top d_k + \Delta_k < \overline{f}(x_k+\alpha_k d_k)$}{
+        Choose $\alpha_k \in [\beta_{\min}\alpha_k,\beta_{\max}\alpha_k]$ using interpolation \label{line:ls_backtracking}\;
+        $\Delta_k \gets \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_k), -\overline{f}(x_k+\alpha_k d_k))$\;
+    }
+    \Return{$\alpha_k$}\;
+    \caption{Backtracking Line Search with Relaxed Armijo Condition}
+    \label{alg:backtracking_linesearch}
+\end{algorithm}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\columnwidth]{../imgs/for_paper/alg.pdf}
+    \caption{
+        An example of the sequence $\{\overline f(x_k)\}$ generated by \cref{alg:regularized_qn}.
+        Each iteration index $k$ is classified into $K^0$ (blue) or $K^+$ (red).
+        The relaxed Armijo condition \cref{eq:relaxed_Armijo_condition} ensures a temporary increase of $\overline{f}$ is at most $\Delta_k$, such as from $k=2$ to $k=3$.
+        We only set $\mu_k=0$ when the sufficient decrease condition \cref{eq:mu_0_condition} is satisfied over iterations in $K^0$, such as at $k=6$, preventing unbounded growth or oscillation of $\overline{f}$.
+    }
+    \label{fig:algorithm_illustration}
+\end{figure}
+
+In the following, we explain the three main components of \cref{alg:regularized_qn}.
+
+\paragraph{Computation of the Regularized Quasi-Newton Direction (\refLine{line:d_k})}\label{sec:algorithm_components_d}
+
+The first component is the computation of the regularized quasi-Newton direction $d_k$.
+Given $g_k=\nabla \overline{f}(x_k) = \nabla f(x_k)$, an approximate Hessian $B_k$, and a regularization parameter $\mu_k$, we compute the search direction $d_k = -(B_k+\mu_k I)^{-1} g_k$ as in \cref{sec:prel_rqn}.
+For the theoretical analysis, any choice of $B_k$ satisfying \cref{ass:BBounds} stated in \cref{sec:assumptions} is admissible, which ensures $B_k$ is positive definite.
+A practical choice of $B_k$ is discussed in \cref{sec:proposed_choice_Bk}.
+
+\paragraph{Relaxed Armijo Condition with an Error-Absorbing Term (\refLine{line:armijo})}\label{sec:algorithm_components_alpha}
+
+The second component is the computation of the step size $\alpha_k$ using a relaxed Armijo condition.
+We compute $\alpha_k$ satisfying the relaxed Armijo condition
+\begin{equation}\label{eq:relaxed_Armijo_condition}
+    \begin{dcases}
+        \overline{f}(x_k)+c\alpha_k g_k^\top d_k+\Delta_k\ge\overline{f}(x_k+\alpha_k d_k), \\
+        \Delta_k \defeq \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_k), -\overline{f}(x_k + \alpha_k d_k))
+    \end{dcases}
+\end{equation}
+where $\Delta_k$ is the error-absorbing term, which guarantees the existence of $\alpha_k \in (0,1]$ even in the presence of numerical errors in $\overline{f}$.
+When $B_k$ is positive definite and thus $g_k^\top d_k < 0$, \cref{eq:relaxed_Armijo_condition} ensures a temporary increase of $\overline{f}$ is at most $\Delta_k$ (\cref{fig:algorithm_illustration} illustrates this behavior).
+Since $\Delta_k$ depends on $-\overline{f}(x_{k+1})$ but not on $\overline{f}(x_{k+1})$, when $\overline{f}(x_{k+1}) > \overline{f}(x_k)$, the value of $\Delta_k$ is independent of how much $\overline{f}$ increases, preventing unbounded growth of $\Delta_k$.
+
+\paragraph{Adaptive Update of the Regularization Parameter (\refLines{line:mu_0_condition}{line:update_theta})}\label{sec:algorithm_components_mu}
+
+The third component is the adaptive update of the regularization parameter $\mu_k$.
+A larger $\mu_k$ yields a more conservative step, while a smaller $\mu_k$ allows a more aggressive quasi-Newton step, especially when $\mu_k=0$.
+In practical settings, setting $\mu_k=0$ is preferred, since this allows us to fully exploit the quasi-Newton approximation and typically leads to practically faster convergence.
+Let us partition the iteration indices $K\defeq \{0,1,2,\ldots, k_{\max}\}$ into two sets:
+\begin{equation}\label{eq:def_K0_Kplus}
+    K^0 \defeq \{k \in K \mid \mu_k = 0\}, \quad K^+ \defeq \{k \in K \mid \mu_k > 0\}.
+\end{equation}
+We set $\mu_k=0$ if and only if the following condition holds:
+\begin{equation}\label{eq:mu_0_condition}
+    \min_{0 \leq j < k} \qty(\overline{f}(x_j)- \Delta_j - \Delta_{j-1}) \ge \overline{f}(x_k),
+\end{equation}
+where $\Delta_{-1} \defeq 0$ and the minimum of the empty set is $+\infty$.
+This condition means that $\mu_k=0$ is set only when a sufficient decrease in $\overline{f}$ is observed.
+Thereby, while $\overline{f}$ can temporarily increase, this condition theoretically ensures that $\overline{f}$ does not grow unboundedly or oscillate indefinitely. See \cref{fig:algorithm_illustration} for an illustrative example.
+
+Otherwise, to ensure convergence to first-order stationary points, we apply an OFFO-based update
+\begin{equation}\label{eq:offo_based_update}
+    \mu_k = \theta\sqrt{\varsigma+\sum_{j \in K^+, \, j \leq k}\norm{g_j}^2},
+\end{equation}
+as described in \cref{sec:prel_offo}.
+Since OFFO schemes do not rely on function values, this update is robust to numerical errors in $\overline{f}$.
+
+\section{Theoretical Analysis}\label{sec:analysis}
+
+In this section, we establish the global convergence properties of
+\cref{alg:regularized_qn} under the problem setting in
+\cref{sec:problem_setting}, namely,
+\cref{eq:relative_error_model,eq:exact_gradient_assumption}.
+
+\subsection{Assumptions}\label{sec:assumptions}
+
+Before analyzing the convergence properties of \cref{alg:regularized_qn}, we state three assumptions used in the analysis.
+The first assumption guarantees that the objective function is bounded below.
+\begin{assumption}\label{ass:bounded}
+    The function $f$ is bounded below; that is, for all $x \in \bbR^n$,
+    \begin{equation*}
+        f(x) \ge f^* \defeq \inf_{x \in \bbR^n} f(x) > -\infty .
+    \end{equation*}
+\end{assumption}
+By the triangle inequality and \cref{eq:relative_error_model}, we have
+$\overline{f}(x) \ge f(x) - \feps \max(1, |f(x)|)$.
+Since the function $g(t) = t - \feps \max(1, |t|)$ is non-decreasing for $0 \le \feps < 1$, it follows that $\inf_x g(f(x)) = g(f^*)$.
+Consequently, we can also lower bound $\overline{f}$ as
+\begin{equation}\label{eq:ass_bounded_overline_f}
+    \overline{f}(x) \ge
+    \overline{f}^*
+    \defeq \inf_{x \in \bbR^n} \bigl( f(x) - \feps \max(1, |f(x)|) \bigr)
+    = f^* - \feps \max(1, |f^*|)
+    > -\infty .
+\end{equation}
+The second assumption ensures smoothness of the objective function.
+\begin{assumption}\label{ass:LSmooth}
+    The function $f \colon \bbR^n \to \bbR$ is $L$-smooth, meaning that there exists
+    a constant $L > 0$ such that for all $x, y \in \bbR^n$,
+    \begin{equation*}
+        f(y) \le f(x) + \nabla f(x)^\top (y - x) + \frac{L}{2} \norm{y - x}^2.
+    \end{equation*}
+\end{assumption}
+The third assumption requires the sequence of matrices $\{B_k\}$ to be uniformly bounded and uniformly positive definite.
+\begin{assumption}\label{ass:BBounds}
+    There exist constants $0 < m \leq 1 \leq M$ such that all $B_k$ in \cref{alg:regularized_qn} satisfies
+    \begin{equation*}\label{eq:BBounds}
+        mI \preceq B_k \preceq MI.
+    \end{equation*}
+\end{assumption}
+As we will discuss in \cref{sec:proposed_choice}, the standard BFGS update with a slight modification ensures that \cref{ass:BBounds} holds in practice.
+
+\subsection{Error Bound on Function Evaluations}\label{sec:error_bound_on_function_evaluations}
+
+We first prove a useful property of $\Delta_k$ defined in \cref{eq:relaxed_Armijo_condition}.
+The following lemma asserts that the error between the true values difference $f(x_k)-f(x_{k+1})$ and the observed values difference $\overline{f}(x_k)-\overline{f}(x_{k+1})$ can be bounded by $\Delta_k$.
+\begin{lemma}\label{lem:error_bound_on_function_evaluations}
+    If $x_k$ and $x_{k+1}$ satisfies $f(x_{k+1}) \le f(x_k)$, it holds that
+    \begin{equation}\label{eq:error_bound_on_function_evaluations}
+        f(x_k)-f(x_{k+1}) \leq \overline{f}(x_k)-\overline{f}(x_{k+1}) + \Delta_k.
+    \end{equation}
+\end{lemma}
+\begin{proof}
+    In general (without any assumptions), we have
+    \begin{align}
+              & \abs{(f(x_k)-f(x_{k+1}))-(\overline{f}(x_k)-\overline{f}(x_{k+1}))}                                                                            \notag                                                                                                 \\
+        ={}   & \abs{(f(x_k)-\overline{f}(x_k)) - (f(x_{k+1})-\overline{f}(x_{k+1}))}                                                                                 &  & (\text{rearrangement})                                \notag                               \\
+        \le{} & \feps\max(1,\abs{f(x_k)}) + \feps\max(1,\abs{f(x_{k+1})})                                                                                             &  & (\text{definition in \cref{eq:relative_error_model}}) \notag                               \\
+        \le{} & 2\feps \max(1,\abs{f(x_k)},\abs{f(x_{k+1})})                                                                                                          &  & (\text{max property})                                 \label{eq:general_diff_f_barf_bound}
+    \end{align}
+    Thus, to prove \cref{eq:error_bound_on_function_evaluations}, it suffices to bound \cref{eq:general_diff_f_barf_bound} by $\Delta_k$.
+
+    By the definition of $\overline{f}$ in \cref{eq:relative_error_model}, for any $x\in\bbR^n$ satisfying $\abs{f(x)} > 1$, we have
+    \begin{equation}\label{eq:relative_error_model_fx_1}
+        \abs{f(x)-\overline{f}(x)} \le \feps \abs{f(x)}.
+    \end{equation}
+    Since $\feps < 1$, \cref{eq:relative_error_model_fx_1} implies the signs of $f(x)$ and $\overline{f}(x)$ are the same.
+    From the triangle inequality, \cref{eq:relative_error_model_fx_1} also implies $\abs{f(x)} - \abs{\overline{f}(x)} \le \feps \abs{f(x)}$. Since $\abs{f(x)} > 1$ means $f(x) > 1$ or $-f(x) > 1$, we have
+    \begin{equation}\label{eq:fx_two_cases}
+        \begin{dcases}
+            f(x) \le \frac{1}{1-\feps} \overline{f}(x)     & \text{if $f(x) > 1$},  \\
+            -f(x) \le \frac{1}{1-\feps} (-\overline{f}(x)) & \text{if $-f(x) > 1$}.
+        \end{dcases}
+    \end{equation}
+    By using $f(x_{k+1}) \le f(x_k)$ and the max operator as the if statement, we have
+    \begin{align*}
+        2 \feps \max(1,\abs{f(x_k)},\abs{f(x_{k+1})})
+         & = 2 \feps \max(1,f(x_k),-f(x_{k+1}))                                         &  & (\text{$f(x_{k+1}) \le f(x_k)$}) \\
+         & \le \frac{2 \feps}{1-\feps}\max(1,\overline{f}(x_k),-\overline{f}(x_{k+1})). &  & (\text{\cref{eq:fx_two_cases}})  \\
+         & = \Delta_k.                                                                  &  &
+        (\text{\cref{eq:relaxed_Armijo_condition}})
+    \end{align*}
+    Thus, we can bound \cref{eq:general_diff_f_barf_bound} by $\Delta_k$, which completes the proof.
+    \qed
+\end{proof}
+
+\subsection{Backtracking Stage}\label{sec:inner_loop}
+
+We next analyze the line search procedure in \cref{alg:backtracking_linesearch}.
+Recall that we assume parameters in \cref{alg:backtracking_linesearch} satisfies $0 < c < 1$ and $0 < \beta_{\min} < \beta_{\max} < 1$.
+
+\begin{proposition}\label{prop:backtracking_finite}
+    Under \cref{ass:BBounds,ass:LSmooth}, \cref{alg:backtracking_linesearch} terminates if
+    \begin{equation}\label{eq:alpha_bar}
+        \alpha_k \le \min\qty(\frac{2(1-c)m^2}{LM},1).
+    \end{equation}
+\end{proposition}
+\begin{proof}
+    Under the $L$-smoothness of $f$ (\cref{ass:LSmooth}), we always have
+    \begin{align}
+        f(x_k)-f(x_k+\alpha_k d_k)
+         & \ge -\alpha_k g_k^\top d_k - \frac{L}{2}\alpha_k^2\norm{d_k}^2                                   \notag                           \\
+         & = -c \alpha_k g_k^\top d_k + \alpha_k \qty(-(1-c)g_k^\top d_k - \frac{L\alpha_k}{2}\norm{d_k}^2). \label{eq:backtracking_Lsmooth}
+    \end{align}
+    We first prove that if \cref{eq:alpha_bar} is satisfied, then the following inequality holds:
+    \begin{equation}\label{eq:alpha_bound}
+        -(1-c)g_k^\top d_k - \frac{L\alpha_k}{2}\norm{d_k}^2 \ge 0.
+    \end{equation}
+    Using $d_k=-(B_k+\mu_k I)^{-1} g_k$ (\refLine{line:d_k}) and the spectral bounds from \cref{ass:BBounds} asserting $(m + \mu_k)I \preceq B_k + \mu_k I \preceq (M + \mu_k)I$, we obtain the following two bounds:
+    \begin{align}
+        -g_k^\top d_k = g_k^\top (B_k+\mu_k I)^{-1} g_k & \ge \frac{1}{M+\mu_k}\norm{g_k}^2, \label{eq:backtracking_suff_first}       \\
+        -\norm{d_k}^2 = -\norm{(B_k+\mu_k I)^{-1}g_k}^2 & \ge -\frac{1}{(m+\mu_k)^2}\norm{g_k}^2. \label{eq:backtracking_suff_second}
+    \end{align}
+    Combining \eqref{eq:backtracking_suff_first} and \eqref{eq:backtracking_suff_second} with weights $(1-c)$ and $\frac{L\alpha_k}{2}$ yields
+    \begin{equation}\label{eq:backtracking_suff_sum}
+        -(1-c)g_k^\top d_k - \frac{L\alpha_k}{2}\norm{d_k}^2 \ge \qty(\frac{1-c}{M+\mu_k} - \alpha_k \frac{L}{2(m+\mu_k)^2})\norm{g_k}^2.
+    \end{equation}
+    Since \cref{eq:alpha_bar} gives $\alpha_k \le \frac{2(1-c)m^2}{LM}$, \cref{eq:backtracking_suff_sum} can be further bounded as
+    \begin{equation}\label{eq:backtracking_suff_eval}
+        -(1-c)g_k^\top d_k - \frac{L\alpha_k}{2}\norm{d_k}^2
+        \ge \frac{1-c}{(m+\mu_k)^2} \qty(\frac{(m+\mu_k)^2}{M+\mu_k} - \frac{m^2}{M}) \norm{g_k}^2.
+    \end{equation}
+    Since $0<m<M$ as stated in \cref{ass:BBounds},
+    we have $\frac{(m+\mu_k)^2}{M+\mu_k} \ge m \cdot \frac{m+\mu_k}{M+\mu_k} \ge \frac{m^2}{M}$.
+    Thus, using $c<1$ and $0 \le \mu_k$, we can establish \cref{eq:alpha_bound} by \cref{eq:backtracking_suff_eval}.
+
+    Let us finish the proof.
+    Since \cref{eq:backtracking_suff_first} implies $-c \alpha_k g_k^\top d_k \geq 0$, we have
+    \begin{align*}
+        -c \alpha_k g_k^\top d_k
+         & \le f(x_k) - f(x_k+\alpha_k d_k)                                   &  & (\text{\cref{eq:backtracking_Lsmooth,eq:alpha_bound}})                                        \\
+         & \le \overline{f}(x_k) - \overline{f}(x_k+\alpha_k d_k) + \Delta_k, &  & (\text{\cref{lem:error_bound_on_function_evaluations} and $f(x_k+\alpha_k d_k) \leq f(x_k)$})
+    \end{align*}
+    which means the relaxed Armijo condition (\cref{eq:relaxed_Armijo_condition}) is satisfied.
+    Thus, we can conclude that the backtracking stage terminates whenever \cref{eq:alpha_bar} holds.
+    \qed
+\end{proof}
+
+Let us analyze the behavior of \cref{alg:backtracking_linesearch} using \cref{prop:backtracking_finite}.
+We first bound the number of backtracking rejections as follows.
+\begin{corollary}\label{cor:inner_loop_rejections}
+    Under \cref{ass:BBounds,ass:LSmooth}, the number of backtracking rejections in \cref{alg:backtracking_linesearch} is bounded above by
+    \begin{equation*}
+        \ceil*{\log \min\qty(\frac{2(1-c)m^2}{LM},1) / \log \beta_{\max}}.
+    \end{equation*}
+\end{corollary}
+\begin{proof}
+    Let $r$ denote the number of backtracking rejections.
+    Initially, we have $\alpha_k = 1$ (\refLine{line:ls_init}) and each rejection multiplies $\alpha_k$ by at most $\beta_{\max} < 1$.
+    Thus, after $r$ rejections,
+    we have $\alpha_k \le \beta_{\max}^r$.
+    Since the backtracking terminates once \cref{eq:alpha_bar} holds, $\beta_{\max}^r < \min\qty(\frac{2(1-c)m^2}{LM},1)$ is a sufficient condition for backtracking termination.
+    Taking logarithms and rounding up gives the desired bound.
+    \qed
+\end{proof}
+
+Now, in the following, let us define
+\begin{equation*}
+    \overline{\alpha} \defeq \beta_{\min} \min\qty(\frac{2(1-c)m^2}{LM},1) > 0.
+\end{equation*}
+We can lower bound the step size $\alpha_k$ by $\overline{\alpha}$ as follows.
+\begin{corollary}\label{cor:alpha_lower_bound}
+    Under \cref{ass:BBounds,ass:LSmooth}, for each iteration $k$ of \cref{alg:regularized_qn},
+    the step size $\alpha_k$ satisfies
+    \begin{equation}\label{eq:alpha_lower_bound}
+        \alpha_k \ge \overline{\alpha}.
+    \end{equation}
+\end{corollary}
+\begin{proof}
+    Let $r$ denote the number of backtracking rejections.
+    If $r=0$, $\alpha_k=1$ and the \cref{eq:alpha_lower_bound} is obvious.
+    Otherwise, there is a last rejected step size $\alpha'_k$. By \cref{prop:backtracking_finite}, $\alpha'_k > \min\qty(\frac{2(1-c)m^2}{LM},1)$.
+    Since the final $\alpha_k$ is chosen from $[\beta_{\min} \alpha'_k, \beta_{\max} \alpha'_k]$ as in \refLine{line:ls_backtracking}, we have $\alpha_k \ge \beta_{\min}\alpha'_k$.
+    Combining these inequalities yields \cref{eq:alpha_lower_bound}.
+    \qed
+\end{proof}
+
+\subsection{Bound for the case \texorpdfstring{$\mu_k=0$}{mu k = 0}}
+
+In this subsection, we bound the sum of $\norm{g_{k}}^2$ over $k \in K^0$.
+Recall that $K^0$ be a set of iteration indices $k$ such that $\mu_k = 0$ in \cref{alg:regularized_qn} as defined in \cref{eq:def_K0_Kplus}.
+To this end, we first prove that $\overline{f}(x_k)$ and $\Delta_k$ are uniformly bounded for all $k \in K^0$, using
+\begin{equation}
+    \Delta_{\max} \defeq \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{0}), -\overline{f}^*).
+\end{equation}
+
+\begin{lemma}\label{lem:delta_bound_lambda_i}
+    Under \cref{ass:bounded}, for all ${k} \in K^0$ in \cref{alg:regularized_qn}, we have
+    \begin{equation*}
+        \overline{f}(x_{k}) \le \overline{f}(x_{0}), \quad
+        \Delta_{k} \le \Delta_{\max}.
+    \end{equation*}
+\end{lemma}
+\begin{proof}
+    Recall that \refLine{line:mu_0_condition} asserts that the following holds for $k \in K^0$:
+    \begin{equation}\label{eq:re_mu_0_condition}
+        \min_{0 \le j < k} (\overline{f}(x_j)-\Delta_j - \Delta_{j-1}) \ge \overline{f}(x_{k}).
+    \end{equation}
+    If $k>0$, \cref{eq:re_mu_0_condition} with $j=0$ ($\Delta_{-1}=0$ and $\Delta_0>0$) yields $\overline{f}(x_k) \le \overline{f}(x_0)$.
+    Thus, for all $k \in K^0$ including $k=0$, we have $\overline{f}(x_k) \le \overline{f}(x_0)$.
+    From the lower bound of $\overline{f}$ (\cref{eq:ass_bounded_overline_f} deduced from \cref{ass:bounded}), we have $\overline{f}^* \leq \overline{f}(x_{k+1})$, which yield
+    \begin{equation*}
+        \Delta_k = \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_k), -\overline{f}(x_{k+1}))
+        \leq \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{0}), -\overline{f}^*) = \Delta_{\max}.
+    \end{equation*}
+    \qed
+\end{proof}
+
+Now, let us bound the sum of $\norm{g_{k}}^2$ over ${k} \in K^0$.
+\begin{proposition}\label{prop:lambda}
+    Under \cref{ass:bounded,ass:BBounds,ass:LSmooth}, the sum of $\norm{g_k}^2$ over $k \in K^0$ satisfies
+    \begin{equation}\label{eq:gk_norm_bound_mu_0}
+        \sum_{{k} \in K^0} \norm{g_{k}}^2 < \frac{2M(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max})}{c \overline{\alpha}}.
+    \end{equation}
+\end{proposition}
+\begin{proof}
+    Let us enumerate the elements of $K^0$ in increasing order as $K^0 = (k_i)_{i=0}^{\abs{K^0}-1}$.
+    The relaxed Armijo condition at iteration $k_i \in K^0$ yields
+    \begin{align}
+        \overline{f}(x_{k_i}) - \overline{f}(x_{1+k_i}) + \Delta_{k_i} & \ge -c \alpha_{k_i} g_{k_i}^\top d_{k_i}                     &  & (\text{\cref{eq:relaxed_Armijo_condition}}) \notag                                \\
+                                                                       & \ge \frac{c \overline{\alpha}}{M+\mu_{k_i}} \norm{g_{k_i}}^2 &  & (\text{\cref{cor:alpha_lower_bound} and \cref{eq:backtracking_suff_first}})\notag \\
+                                                                       & = \frac{c \overline{\alpha}}{M} \norm{g_{k_i}}^2.            &  & (\mu_{k_i} = 0 \text{ since } {k}_i \in K^0)     \label{eq:sufficient_decrease}
+    \end{align}
+    We first consider the case of $\abs{K^0} \geq 3$.
+    For $0 \leq i < \abs{K^0}-2$, using \cref{eq:re_mu_0_condition} with $j=1+k_i$ and $k=k_{i+2}$, and $\Delta_{1+k_i} \geq 0$, we have
+    \begin{equation}\label{eq:delta_bound}
+        \Delta_{k_i} \le \overline{f}(x_{1+k_i}) - \Delta_{1+k_i} - \overline{f}(x_{k_{i+2}}) \le \overline{f}(x_{1+k_i}) - \overline{f}(x_{k_{i+2}}).
+    \end{equation}
+    Then, summing up \cref{eq:sufficient_decrease} over $0 \leq i < \abs{K^0}-2$ and applying \cref{eq:delta_bound} yields
+    \begin{align*}
+        \frac{c\overline{\alpha}}{M} \sum_{i=0}^{\abs{K^0}-3} \norm{g_{k_i}}^2
+         & \le
+        \sum_{i=0}^{\abs{K^0}-3} (\overline{f}(x_{k_i}) - \overline{f}(x_{1+k_i}) + \Delta_{k_i})                                           \\
+         & \le \sum_{i=0}^{\abs{K^0}-3} (\overline{f}(x_{k_i}) - \overline{f}(x_{k_{i+2}})) \qquad (\text{\cref{eq:delta_bound}})           \\
+         & = \overline{f}(x_{k_0}) + \overline{f}(x_{k_1}) - \overline{f}\qty(x_{k_{\abs{K^0}-2}}) - \overline{f}\qty(x_{k_{\abs{K^0}-1}}).
+    \end{align*}
+    Thus, adding the cases $i=\abs{K^0}-2, \abs{K^0}-1$ of \cref{eq:sufficient_decrease} to the above inequality yields
+    \begin{align}
+              & \frac{c\overline{\alpha}}{M} \sum_{i=0}^{\abs{K^0}-1} \norm{g_{k_i}}^2\notag                                                                                                               \\
+        \le{} &
+        \overline{f}(x_{k_0}) + \overline{f}(x_{k_1}) - \overline{f}\qty(x_{1+{k}_{\abs{K^0}-2}}) - \overline{f}\qty(x_{1+{k}_{\abs{K^0}-1}}) + \Delta_{k_{\abs{K^0}-2}} + \Delta_{k_{\abs{K^0}-1}} \notag \\
+        \le{} &
+        2(\overline{f}(x_{0}) - \overline{f}^* + \Delta_{\max}), \label{eq:final_bound}
+    \end{align}
+    where the last inequality follows from \cref{lem:delta_bound_lambda_i} and the lower bound of $\overline{f}$ (\cref{eq:ass_bounded_overline_f} deduced from \cref{ass:bounded}).
+    For the case $\abs{K^0} < 3$, we can directly obtain \cref{eq:final_bound} in a similar manner.
+    Finally, rearranging \cref{eq:final_bound} yields the desired bound \cref{eq:gk_norm_bound_mu_0}, which completes the proof.
+    \qed
+\end{proof}
+
+As the end of this subsection, we prove the following for the later discussion.
+\begin{lemma}\label{lem:sum_delta_k_bound}
+    Under \cref{ass:bounded,ass:BBounds,ass:LSmooth}, the sum of $\Delta_k$ over $k \in K^0$ satisfies
+    \begin{equation*}
+        \sum_{{k} \in K^0} \Delta_{k} \le \overline{f}(x_0) - \overline{f}^* + \Delta_{\max}.
+    \end{equation*}
+\end{lemma}
+\begin{proof}
+    Let us enumerate the elements of $K^0$ in increasing order as $K^0 = (k_i)_{i=0}^{\abs{K^0}-1}$. Recall that $\mu_0=0$ and $k_0 \in K^0$, meaning that $\abs{K^0} \geq 1$.
+    The case $\abs{K^0} = 1$ is obvious from $\Delta_k \leq \Delta_{\max}$.
+    We assume $\abs{K^0} \geq 2$ in the following.
+    The relaxed Armijo condition (\cref{eq:relaxed_Armijo_condition}) implies $\overline{f}(x_{1+{k}_i}) - \Delta_{k_i} \leq \overline{f}(x_{{k}_{i}})$. Thus, for $i < \abs{K^0}-1$, using \cref{eq:re_mu_0_condition} with $j=k_i$ and $k=k_{i+1}$, we have
+    \begin{equation}\label{eq:Delta_i_for_tele_sum}
+        \Delta_{k_i} \leq \overline{f}(x_{k_i}) - \Delta_{-1+k_{i+1}} - \overline{f}(x_{k_{i+1}}) \leq \overline{f}(x_{k_i}) - \overline{f}(x_{k_{i+1}}).
+    \end{equation}
+    Summing up \cref{eq:Delta_i_for_tele_sum} over $0 \leq i < \abs{K^0}-1$ and adding $\Delta_{k_i}$ with $i=\abs{K^0}-1$ yields
+    \begin{align*}
+        \sum_{i=0}^{\abs{K^0}-1} \Delta_{k_i}
+         & \le \sum_{i=0}^{\abs{K^0}-2} (\overline{f}(x_{k_i}) - \overline{f}(x_{k_{i+1}})) + \Delta_{{k}_{\abs{K^0}-1}} \qquad (\text{\cref{eq:Delta_i_for_tele_sum}}) \\
+         & = \overline{f}(x_{k_0}) - \overline{f}(x_{k_{\abs{K^0}-1}}) + \Delta_{k_{\abs{K^0}-1}}                                                                       \\
+         & \le \overline{f}(x_{0}) - \overline{f}^* + \Delta_{\max},   \qquad (\text{\cref{lem:delta_bound_lambda_i,eq:ass_bounded_overline_f}})
+    \end{align*}
+    which completes the proof.
+    \qed
+\end{proof}
+
+\subsection{Bound for the case \texorpdfstring{$\mu_k > 0$}{mu k > 0}}
+
+Next, we show that the sum of $\norm{g_{k}}^2$ over ${k} \in K^+$ ($\mu_{k} > 0$) is bounded.
+Before proceeding to the main proof, we present two auxiliary lemmas.
+
+The first one is about standard inequalities in the \AdaGrad-like algorithm analysis \citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020}, \citep[Lemma~3.1]{Gratton08022024}.
+Its proof is deferred to \cref{sec:proof_of_sum_norm_g_over_mu_geq_2sqrt_leq_log}.
+\begin{lemma}\label{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}
+    In \cref{alg:regularized_qn}, we have
+    \begin{align*}
+        \sum_{{k} \in K^+}\frac{\norm{g_{k}}^2}{\mu_{k}^2}
+         & \le \frac{1}{\theta_{\min}^2} \qty(\ln\qty(\varsigma+\sum_{\ell \in K^+} \norm{g_{k_\ell}}^2) - \ln(\varsigma)), \\
+        \sum_{{k} \in K^+} \frac{\norm{g_{k}}^2}{\mu_{k}}
+         & \ge \frac{1}{\theta_{\max}} \qty(\sqrt{\varsigma + \sum_{{k} \in K^+} \norm{g_{k}}^2} - \sqrt{\varsigma}).
+    \end{align*}
+\end{lemma}
+
+The second lemma is about upper-bounding a variable appearing in the following inequality.
+For some constants $C_1<\infty$ and $0<C_2<C_3$, let $G > 0$ satisfy
+\begin{equation}\label{eq:lambert_inequality}
+    C_1 \geq C_2 \sqrt{G} - C_3 \ln(G).
+\end{equation}
+As we will see later, such an inequality appears when bounding $G=\varsigma + \sum_{k \in K^+} \norm{g_k}^2$.
+Since $\sqrt{G}$ grows faster than $\ln(G)$ as $G \to \infty$, the $G$ satisfying \cref{eq:lambert_inequality} must be bounded above.
+This inequality is closely related to the Lambert $W$ function \citep{corlessLambertWFunction1996}.
+Let $\mathrm{e}$ be the base of the natural logarithm.
+The only fact we use in this paper is that,
+if $x \in [-1/\mathrm{e},0)$, $y \mathrm{e}^y = x$ has two real and negative solutions, and the smaller solution is given by the second branch of Lambert $W$ function $y^*=W_{-1}(x) < 0$ and thus $y \mathrm{e}^y > x$ for $y < W_{-1}(x)$.
+In fact, a tight bound for $G$ in \cref{eq:lambert_inequality} can be derived as
+\begin{equation*}
+    G \le \qty(\frac{2C_3}{C_2}
+    W_{-1}\qty(-\frac{C_2}{2C_3} \mathrm{e}^{-\frac{C_1}{2C_3}}))^2 - \varsigma.
+\end{equation*}
+Refer to \citep{Gratton08022024} for more details.
+In the following, we present a looser but simpler bound that suffices for our purpose.
+\begin{lemma}\label{lem:lambert}
+    For some constants $C_1<\infty$ and $0<C_2<C_3$, let $G > 0$ satisfy \cref{eq:lambert_inequality}.
+    Then, $G$ is bounded above as
+    \begin{equation*}
+        G \le \max\qty(\qty(\frac{2C_1}{C_2})^2, G_0),
+    \end{equation*}
+    where $G_0$ is
+    \begin{equation*}
+        G_0 = \qty(-\frac{4C_3}{C_2} W_{-1}\qty(-\frac{C_2}{4C_3}))^2.
+    \end{equation*}
+\end{lemma}
+\begin{proof}
+    We assume $G > G_0$ in the following.
+    The definition of $G_0$ implies
+    \begin{equation}\label{eq:lambert_inequality_sqrt_G_C2_4_C3}
+        -\frac{C_2 \sqrt{G}}{4C_3}
+        < W_{-1}\qty(-\frac{C_2}{4C_3}) < 0.
+    \end{equation}
+    Since $-\frac{1}{\mathrm{e}} \leq -\frac{C_2}{4C_3} < 0$ from $0<C_2<C_3$, the definition of $W_{-1}$ and \cref{eq:lambert_inequality_sqrt_G_C2_4_C3} yield
+    \begin{equation*}
+        -\frac{C_2 \sqrt{G}}{4C_3} \mathrm{e}^{-\frac{C_2 \sqrt{G}}{4C_3}} > -\frac{C_2}{4C_3}.
+    \end{equation*}
+    This is equivalent to $\sqrt{G} < \mathrm{e}^{\frac{C_2 \sqrt{G}}{4C_3}}$, and taking logarithms gives
+    \begin{equation}\label{eq:log_sqrt_G_bound}
+        2C_3 \ln(\sqrt{G}) = C_3 \ln(G) < \frac{C_2}{2} \sqrt{G}.
+    \end{equation}
+    Combining \cref{eq:lambert_inequality,eq:log_sqrt_G_bound} yields
+    \begin{equation*}
+        C_1 \geq C_2 \sqrt{G} - C_3 \ln(G) >
+        C_2 \sqrt{G} - \frac{C_2}{2} \sqrt{G} =
+        \frac{C_2}{2} \sqrt{G}.
+    \end{equation*}
+    Thus, we have $G \le \qty(\frac{2C_1}{C_2})^2$ for all $G > G_0$, which completes the proof.
+    \qed
+\end{proof}
+
+Recall that $K^+$ be a set of iteration indices $k$ such that $\mu_k > 0$ in \cref{alg:regularized_qn} as defined in \cref{eq:def_K0_Kplus}.
+Now, we are ready to prove the main proposition of this subsection, which bounds the sum of $\norm{g_{k}}^2$ over ${k} \in K^+$.
+\begin{proposition}\label{prop:gamma}
+    Under \cref{ass:bounded,ass:LSmooth,ass:BBounds}, there exist constants $F$, $\varsigma_0$, and $C_0$ such that the sum of $\norm{g_{k}}^2$ over ${k} \in K^+$ satisfies
+    \begin{equation}\label{eq:prop_gamma_final}
+        \sum_{{k} \in K^+} \norm{g_{k}}^2 \le \qty(\frac{2\theta_{\max}(F+\varsigma_0)}{\overline{\alpha}})^2 + C_0.
+    \end{equation}
+\end{proposition}
+\begin{proof}
+    The statement is trivial if $K^+$ is empty.
+    Thus, we assume $K^+ \neq \emptyset$ in the following.
+    Now, from the $L$-smoothness (\cref{ass:LSmooth}), for ${k} \in K^+$ we have
+    \begin{align}
+        f(x_{k}) - f(x_{{k}+1}) & = f(x_{k}) - f(x_{k} + \alpha_{k} d_{k})                                                      &  & (x_{{k}+1}=x_{k} + \alpha_{k} d_{k})      \notag                              \\
+                                & \ge -\alpha_{k} g_{k}^\top d_{k} - \frac{\alpha_{k}^2 L}{2} \norm{d_{k}}^2                    &  & (\text{\cref{ass:LSmooth}})      \notag                                       \\
+                                & \ge \qty(\frac{\alpha_{k}}{M+\mu_{k}} - \frac{\alpha_{k}^2 L}{2(m+\mu_{k})^2}) \norm{g_{k}}^2 &  & (\text{\cref{eq:backtracking_suff_first,eq:backtracking_suff_second}}) \notag \\
+                                & \ge \qty(\frac{\overline{\alpha}}{M+\mu_{k}} - \frac{L}{2(m+\mu_{k})^2}) \norm{g_{k}}^2.      &  & (\text{\cref{cor:alpha_lower_bound} and $\alpha_k \leq 1$})
+        \label{eq:mu_positive_diff}
+    \end{align}
+    We can further bound the terms in \cref{eq:mu_positive_diff} as
+    \begin{equation}\label{eq:mu_positive_diff_bound}
+        \frac{\overline{\alpha}}{M+\mu_{k}} = \frac{\overline{\alpha}}{\mu_{k}} \frac{1}{1+\frac{M}{\mu_{k}}} \geq \frac{\overline{\alpha}}{\mu_{k}} \qty(1-\frac{M}{\mu_{k}}) = \frac{\overline{\alpha}}{\mu_{k}} - \frac{M\overline{\alpha}}{\mu_{k}^2}, \quad
+        \frac{L}{2(m+\mu_{k})^2} \le \frac{L}{2\mu_{k}^2}.
+    \end{equation}
+    Thus, applying \cref{eq:mu_positive_diff_bound} to \cref{eq:mu_positive_diff} yields
+    \begin{equation}\label{eq:mu_positive_diff_desired}
+        f(x_{k}) - f(x_{{k}+1}) \ge \qty(\frac{\overline{\alpha}}{\mu_{k}} - \frac{M\overline{\alpha}+L/2}{\mu_{k}^2}) \norm{g_{k}}^2.
+    \end{equation}
+    Summing up \cref{eq:mu_positive_diff_desired} over ${k} \in K^+$ and applying \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} yield
+    \begin{align}
+              & \sum_{{k} \in K^+} (f(x_{k}) - f(x_{{k}+1}))                                                                                                                                                                            \label{eq:sum_f_diff}                   \\
+        \ge{} & \sum_{{k} \in K^+} \qty(\frac{\overline{\alpha}}{\mu_{k}} - \frac{M\overline{\alpha}+L/2}{\mu_{k}^2})\norm{g_{k}}^2                                                                                                                                      \notag \\
+        \ge{} & \frac{\overline{\alpha}}{\theta_{\max}} \qty(\sqrt{\varsigma + \sum_{{k} \in K^+} \norm{g_{k}}^2} - \sqrt{\varsigma}) - \frac{M\overline{\alpha}+L/2}{\theta_{\min}^2} \qty(\ln\qty(\varsigma+\sum_{{k} \in K^+} \norm{g_{k}}^2) - \ln(\varsigma)). \notag
+    \end{align}
+
+    Now, let us upper bound the term in \cref{eq:sum_f_diff}. Since the indices in $\{0,1,\ldots,k_{\max}\}$ are partitioned into $K^0$ and $K^+$, we have
+    \begin{equation}\label{eq:partition_K_zero_K_plus}
+        \sum_{{k} \in K^+} (f(x_{k})-f(x_{{k}+1}))
+        = (f(x_0)-f(x_{k+1})) - \sum_{{k} \in K^0} (f(x_{k})-f(x_{{k}+1})).
+    \end{equation}
+    From \cref{eq:general_diff_f_barf_bound} and the triangle inequality, for any ${k} \in K^0$, we have
+    \begin{equation}\label{eq:f_diff_bound_initial}
+        f(x_{k})-f(x_{{k}+1})
+        \geq \overline{f}(x_{k})-\overline{f}(x_{{k}+1})-\frac{2\feps}{1-\feps} \max(1, \abs{\overline{f}(x_{k})}, \abs{\overline{f}(x_{{k}+1})}).
+    \end{equation}
+    Using $\overline{f}(x_{{k}+1}) \leq \overline{f}(x_{k}) + \Delta_{k}$ and $-\overline{f}(x_{k}) \leq -\overline{f}(x_{{k}+1}) + \Delta_{k}$ implied by the relaxed Armijo condition (\cref{eq:relaxed_Armijo_condition}), \cref{eq:f_diff_bound_initial} can be further bounded as
+    \begin{align}
+        f(x_{k})-f(x_{{k}+1})
+         & \ge -\Delta_{k} - \frac{2\feps}{1-\feps} \max(1, \abs{\overline{f}(x_{k})}, \abs{\overline{f}(x_{{k}+1})}) \notag                                                           \\
+         & \ge -\Delta_{k} - \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}) + \Delta_{k}, -\overline{f}(x_{{k}+1}) + \Delta_{k}) \notag                                            \\
+         & \ge -\Delta_{k} - \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}), -\overline{f}(x_{{k}+1})) - \frac{2\feps}{1-\feps} \Delta_{k} \notag                                  \\
+         & = -\Delta_{k} - \qty(1+\frac{2\feps}{1-\feps}) \Delta_{k}  \qquad (\text{Definition of $\Delta_k$ in \cref{eq:relaxed_Armijo_condition}})                            \notag \\
+         & = -\frac{2}{1-\feps} \Delta_{k}. \label{eq:f_diff_bound_final}
+    \end{align}
+    Combining \cref{eq:partition_K_zero_K_plus,eq:f_diff_bound_final}, we can upper bound \cref{eq:sum_f_diff} as
+    \begin{align}\label{eq:mu_positive_telescoping_sum_bound}
+        \sum_{{k} \in K^+} (f(x_{k})-f(x_{{k}+1})) & \le (f(x_0) - f^*) -
+        \sum_{{k} \in K^0} (f(x_{k})-f(x_{{k}+1})) &                                                                                              & (\text{\cref{eq:partition_K_zero_K_plus}})                                        \notag                                                \\
+                                                   & \le (f(x_0) - f^*) + \frac{2}{1-\feps} \sum_{{k} \in K^0} \Delta_{k}                         &                                                                                          & (\text{\cref{eq:f_diff_bound_final}}) \notag \\
+                                                   & \le (f(x_0) - f^*) + \frac{2}{1-\feps} (\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}).
+                                                   &                                                                                              & (\text{\cref{lem:sum_delta_k_bound}})
+    \end{align}
+    Using \cref{eq:mu_positive_telescoping_sum_bound} in \cref{eq:sum_f_diff}, we obtain
+    \begin{equation*}
+        C_1 \geq C_2 \sqrt{\varsigma+\sum_{{k} \in K^+} \norm{g_{k}}^2} - C_3 \ln(\varsigma+\sum_{{k} \in K^+} \norm{g_{k}}^2)
+    \end{equation*}
+    where
+    \begin{align*}
+        C_1 & \defeq (f(x_0) - f^*) + \frac{2}{1-\feps} (\overline{f}(x_0) - \overline{f}^* + \Delta_{\max})
+        + \frac{\sqrt{\varsigma}}{\theta_{\max}} - \frac{M+L/2}{\theta_{\min}^2} \ln(\varsigma),             \\
+        C_2 & \defeq \frac{\overline{\alpha}}{\theta_{\max}}, \quad
+        C_3 \defeq \frac{M\overline{\alpha}+L/2}{\theta_{\min}^2}.
+    \end{align*}
+    From $1 \leq M$ and $\theta_{\min} \leq \theta_{\max}$, we have $0<C_2<C_3$. Thus, \cref{lem:lambert} implies
+    \begin{equation}\label{eq:varsigma_sum_gk_squared_bound}
+        \varsigma + \sum_{k \in K^+} \norm{g_k}^2 \le \max\qty(\qty(\frac{2\theta_{\max}(F+\varsigma_0)}{\overline{\alpha}})^2, G_0)
+    \end{equation}
+    where
+    \begin{align*}
+        F           & \defeq (f(x_0) - f^*) + \frac{2}{1-\feps} (\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}),                                                                                                                                                  \\
+        \varsigma_0 & \defeq \frac{\sqrt{\varsigma}}{\theta_{\max}} - \frac{M+L/2}{\theta_{\min}^2} \ln(\varsigma),                                                                                                                                                    \\
+        G_0         & \defeq \qty(\frac{4C_3}{C_2}W_{-1}(-\frac{C_2}{4C_3}))^2 = \qty(\frac{4\theta_{\max}(M\overline{\alpha}+L/2)}{\theta_{\min}^2\overline{\alpha}} W_{-1}\qty(-\frac{\theta_{\min}^2\overline{\alpha}}{4\theta_{\max}(M\overline{\alpha}+L/2)}))^2.
+    \end{align*}
+    Defining $C_0 \defeq \max(0, G_0 - \varsigma)$ yields
+    \begin{equation}\label{eq:final_bound_varsigma_sum_gk_squared}
+        \max\qty(\qty(\frac{2\theta_{\max}(F+\varsigma_0)}{\overline{\alpha}})^2, G_0) - \varsigma \le \qty(\frac{2\theta_{\max}(F+\varsigma_0)}{\overline{\alpha}})^2 + C_0.
+    \end{equation}
+    Combining \cref{eq:varsigma_sum_gk_squared_bound,eq:final_bound_varsigma_sum_gk_squared} yields \cref{eq:prop_gamma_final}, which completes the proof.
+    \qed
+\end{proof}
+
+\subsection{Global Convergence Result}
+
+Now, we establish the following global convergence result for \cref{alg:regularized_qn}.
+\begin{restatable}[Global Convergence]{theorem}{gc}\label{thm:gc}
+    Under \cref{ass:bounded,ass:LSmooth,ass:BBounds} with $k>0$, \cref{alg:regularized_qn} satisfies the following global convergence rate:
+    \begin{equation*}
+        \frac{1}{k+1} \sum_{j=0}^{k} \norm{g_j}^2 = \order{1/k}.
+    \end{equation*}
+\end{restatable}
+\begin{proof}
+    Using \cref{prop:lambda,prop:gamma}, we have
+    \begin{align}
+        \sum_{j=0}^{k} \norm{g_j}^2 & = \sum_{{k} \in K^0} \norm{g_{k}}^2 + \sum_{{k} \in K^+} \norm{g_{k}}^2                                                                                        \notag                     \\
+                                    & < \frac{2M(\overline{f}(x_0)-\overline{f}^*+\Delta_{\max})}{c \overline{\alpha}} + \qty(\frac{2\theta_{\max}(F+\varsigma_0)}{\overline{\alpha}})^2 + C_0, \label{eq:sum_gk_squared_bound}
+    \end{align}
+    where the right-hand side is constant with respect to $k$.
+    By dividing both sides by $k+1$, we complete the proof.
+    \qed
+\end{proof}
+
+\Cref{thm:gc} is a standard convergence guarantee for first-order optimization algorithms applied to $L$-smooth nonconvex functions.
+Furthermore, this result is equivalent to the following iteration complexity:
+\begin{equation*}
+    \min\left\{k \relmiddle| \norm{\nabla f(x_k)} < \varepsilon\right\} = \order{1/\varepsilon^2}.
+\end{equation*}
+
+We interpret the three terms in \cref{eq:sum_gk_squared_bound} in light of classical optimization results.
+\begin{itemize}
+    \item The first term is an analogue of the classical gradient descent bound for an error-contaminated function $\overline{f}$.
+          Indeed, for gradient descent with fixed step size $\alpha = 1/L$, the sum of squared gradients is bounded as
+          \begin{equation*}
+              \sum_{j=0}^{k} \norm{g_j}^2
+              \le 2L \qty(f(x_0)-f^*)
+              = \frac{2(f(x_0)-f^*)}{\alpha}.
+          \end{equation*}
+
+    \item The second term mirrors the convergence property of \AdaGradNorm \citep{wardAdaGradStepsizesSharp2020}, which is scaling as $(f(x_0)-f^*)^2$.
+          This follows from the fact that $F$ contains the initial optimality gaps
+          $f(x_0)-f^*$ and $\overline{f}(x_0)-\overline{f}^*$ (see the proof of \cref{prop:gamma}), and the term is quadratic in $F$.
+
+    \item The third term is $C_0$, which depends only on the algorithmic parameters and the smoothness constant $L$, acting as a constant offset.
+\end{itemize}
+
+\section{Practical Choices of Algorithmic Variables}\label{sec:proposed_choice}
+
+In \cref{sec:algorithm,sec:analysis}, we introduced \cref{alg:regularized_qn} and established its convergence properties.
+In this section, we discuss practical choices of algorithmic variables and parameters that lead to fast and stable performance in practice.
+The quantities to be discussed here are the matrices $B_k$, the step sizes $\alpha_k$, and the regularization parameters $\mu_k$.
+
+\subsection{Approximate Hessian $B_k$}\label{sec:proposed_choice_Bk}
+
+We first discuss the construction of the matrices $B_k$ used in \refLine{line:d_k} of \cref{alg:regularized_qn}.
+As mentioned in \cref{sec:introduction}, we employ an L-BFGS method to form $B_k$.
+The purpose of this subsection is to show that $B_k$ can satisfy \cref{ass:BBounds}, the uniform spectral bound, with the modification and selection of curvature pairs.
+
+\paragraph{Construction of $B_k$}
+
+Before stating concrete construction of $B_k$, we recall the L-BFGS method and the curvature pair notation \citep{nocedal1999numerical,liuLimitedMemoryBFGS1989a,berahasLimitedmemoryBFGSDisplacement2022}.
+For an iteration $k$, we define
+\begin{equation}
+    s_k \defeq x_{k+1}-x_k,\qquad
+    y_k \defeq g_{k+1}-g_k
+\end{equation}
+where $g_k$ and $g_{k+1}$ are the gradients at $x_k$ and $x_{k+1}$, respectively.
+Starting from an initial matrix, an approximate Hessian is obtained by successively applying BFGS updates to a sequence of curvature pairs.
+Let $\{(s_{k_i},y_{k_i})\}_{i=0}^{p-1}$ be a collection of curvature pairs, where $k_i$ denotes the iteration index at which the $i$-th pair was generated.
+Starting from the initial matrix $\gamma I$ with $\gamma=\norm{y_{k_0}}^2 / y_{k_0}^\top s_{k_0}$, we define $\mathrm{BFGS}(\{s_{k_i},y_{k_i}\}_{i=0}^{p-1})$ as the matrix obtained by sequentially applying the BFGS update using these pairs in the given order.
+Here, $p$ denotes the maximum number of stored curvature pairs and is a fixed small integer in the L-BFGS method.
+When fewer than $p$ curvature pairs are available, the BFGS update is applied using all currently available pairs.
+
+Now, we provide a sufficient condition for \cref{ass:BBounds} by the following proposition, which is a variant of existing work \citep[Theorem 5.5]{gaoQuasiNewtonMethodsSuperlinear2018} \citep[Lemma 1]{gowerStochasticBlockBFGS2016}. Its proof is deferred to \cref{sec:proof_of_bounded_BFGS}.
+\begin{proposition}\label{prop:bounded_BFGS}
+    Let $\{(s_{k_i},y_{k_i})\}_{i=0}^{p-1}$ be a fixed number of curvature pairs with $s_{k_i} \neq 0$. Assume that there exist constants $0<\lambda \leq \Lambda$ such that for all $(s,y) \in \{(s_{k_i},y_{k_i})\}_{i=0}^{p-1}$,
+    \begin{align}
+        y^\top s & \ge \frac{1}{\Lambda}\norm{y}^2, \label{eq:curvature_conditions1} \\
+        y^\top s & \ge \lambda\norm{s}^2. \label{eq:curvature_conditions2}
+    \end{align}
+    Define the condition number $\kappa\defeq\Lambda/\lambda$.
+    Then there exist $0<m<M$ such that
+    \begin{equation}\label{eq:bounded_BFGS_mM}
+        mI\preceq \mathrm{BFGS}(\{s_{k_i},y_{k_i}\}_{i=0}^{p-1}) \preceq MI,
+    \end{equation}
+    where
+    \begin{equation*}
+        M\defeq\gamma+p\Lambda,\qquad
+        m\defeq\qty((1+\sqrt{\kappa})^{2p}\qty(\gamma+\frac{1}{\lambda(2\sqrt{\kappa}+\kappa)}))^{-1}.
+    \end{equation*}
+\end{proposition}
+Proposition~\ref{prop:bounded_BFGS} shows that, whenever \cref{eq:curvature_conditions1,eq:curvature_conditions2} hold for the stored pairs, the resulting $\mathrm{BFGS}$ matrix satisfies \cref{ass:BBounds} as expressed in \cref{eq:bounded_BFGS_mM}.
+
+Based on \cref{prop:bounded_BFGS}, we basically adopt the following rule for forming $B_k$:
+\begin{equation}\label{eq:proposed_choice_of_Bk}
+    B_k=\mathrm{BFGS}(\{(s_{k_i}, \overline{y}_{k_i} \defeq \theta^{\mathrm{damp}}_i y_{k_i} + (1-\theta^{\mathrm{damp}}_i) B_{k-1}s_{k_i})\}),
+\end{equation}
+where $\theta^{\mathrm{damp}}_i \in [0,1]$ is determined using damped BFGS update \citep{powellAlgorithmsNonlinearConstraints1978,lotfiStochasticDampedLBFGS2020} and the indices $\{k_i\}_{i=0}^{p-1}$ are selected so that the modified pairs $(s_{k_i},\overline y_{k_i})$ satisfy \cref{eq:curvature_conditions1,eq:curvature_conditions2} for some constants $\lambda, \Lambda$.
+The damped BFGS is a classical technique to ensure $\overline y_{k_i}^\top s_{k_i}>0$.
+
+Since we do not employ the Wolfe conditions in the line search, this damping technique plays a central role in ensuring the positive definiteness of $B_k$.
+The selection of curvature pairs shares the same spirit as the cautious update \citep{liGlobalConvergenceBFGS2001,mannelStructuredLBFGSMethod2024,mannelGlobalizationLBFGSBarzilai2025}, which only uses pairs satisfying certain curvature conditions.
+By \cref{prop:bounded_BFGS}, $B_k$ satisfies the uniform spectral bound in \cref{ass:BBounds}.
+This confirms that the practical construction of $B_k$ is consistent with the theoretical requirements.
+
+\paragraph{Remarks for Practical Implementation}
+
+Having established that the proposed construction of $B_k$ satisfies \cref{ass:BBounds}, we now present several remarks on its practical implementation.
+We begin by describing how to compute the search direction
+\begin{equation}
+    d_k=-(B_k+\mu_k I)^{-1}g_k
+\end{equation}
+with $B_k$ in \cref{eq:proposed_choice_of_Bk}.
+When $\mu_k=0$, the direction can be computed efficiently by the standard L-BFGS two-loop recursion \citep{liuLimitedMemoryBFGS1989a,nocedal1999numerical}.
+For the case $\mu_k>0$, regularized limited-memory schemes may in principle be employed \citep{kanzowRegularizationLimitedMemory2023}.
+Alternatively, one may adopt the simple and robust approximation mentioned in the same reference.
+Specifically, we approximate $B_k$ in \cref{eq:proposed_choice_of_Bk} by
+\begin{equation}
+    B_k\approx\mathrm{BFGS}(\{s_{k_i},\overline{y}_{k_i}+\mu_k s_{k_i}\}_{i=0}^{p-1})-\mu_k I,
+\end{equation}
+so that $B_k+\mu_k I\approx\mathrm{BFGS}(\{s_{k_i},\overline{y}_{k_i}+\mu_k s_{k_i}\}_{i=0}^{p-1})$. Its inverse can then be computed using the standard two-loop recursion.
+Although this approximation is inexact, it has been reported to yield nearly identical practical performance while remaining comparatively simple to implement \citep{kanzowRegularizationLimitedMemory2023}.
+We adopt this approximation in the this work.
+
+Separately, there exist function-based modified secant conditions \citep{zhangPropertiesNumericalPerformance2001,babaie-kafakiTwoNewConjugate2010,yabeLocalSuperlinearConvergence2007,hassanModifiedSecantEquation2023} that adjust the secant equation using available function values and gradients when those quantities are deemed reliable. Such adjustments aim to improve practical convergence behavior
+We partially adopt these function-based modifications following prior work \citep{zhangNewQuasiNewtonEquation1999,yuanConvergenceAnalysisModified2010}. The suffix \texttt{-MS} in \cref{sec:experiments} indicates the use of this technique.
+Because these modifications are well established, we omit low-level implementation details here.
+Further specifics are available in the cited references and in our open-source implementation${}^{\text{\ref{fn:ourGitHub}}}$.
+
+\subsection{Step Size \texorpdfstring{$\alpha_k$}{alpha k}}\label{sec:proposed_choice_alpha}
+
+We next discuss the adjustment of the step size $\alpha_k$ in \refLine{line:ls_backtracking} of \cref{alg:backtracking_linesearch}.
+
+As indicated in the pseudo-code, we choose $\alpha_k$ using interpolation of the objective function.
+Mor\'e--Thuente line searches \citep{10.1145/192115.192132} are widely used in quasi-Newton methods \citep{2020SciPy-NMeth}, and they typically employ cubic or quadratic interpolation to select trial step sizes.
+In our implementation, we use essentially the same procedure with a slight modification, namely, clipping the trial step size to the interval $[\beta_{\min}\alpha_k, \beta_{\max}\alpha_k]$.
+For all numerical experiments, we set the Armijo parameter to $c = 10^{-4}$ and choose the interpolation bounds as $\beta_{\min} = 1/16$ and $\beta_{\max} = 15/16$.
+
+Furthermore, when $\mu_k>0$ and $\alpha_k=1$, we introduce a one-time adjustment of the trial step size using gradient information.
+Let $d_k$ be the search direction and $g_k$ and $g_{\mathrm{try}}$ the gradients at the current and trial points.
+If the directional derivative along $d_k$ changes sign, $d_k^\top g_k<0$ and $d_k^\top g_{\mathrm{try}}>0$, and the trial gradient is sufficiently aligned with $d_k$, namely $d_k^\top g_{\mathrm{try}}>0.5\norm{d_k}\norm{g_{\mathrm{try}}}$, we rescale $\alpha_k$ once by a secant-like factor,
+\begin{equation*}
+    \alpha_k \gets \mathrm{clip}\qty(\alpha_k \frac{-d_k^\top g_k}{d_k^\top g_{\mathrm{try}}-d_k^\top g_k},\beta_{\min}\alpha_k,\beta_{\max}\alpha_k),
+\end{equation*}
+where $\mathrm{clip}$ means clipping to the specified interval.
+When objective values are unreliable and backtracking and interpolation do not occur, this correction effectively refines the step size.
+Since this adjustment is at most once per iteration, the theoretical results in \cref{sec:analysis} remain valid.
+
+\subsection{Regularization Parameter \texorpdfstring{$\mu_k$}{mu k}}\label{sec:proposed_choice_mu}
+
+We finally discuss the adjustment of the regularization parameter $\mu_k$ in \refLine{line:update_theta} of \cref{alg:regularized_qn}.
+
+In our implementation, we choose the regularization parameter as
+\begin{equation*}
+    \mu_k = \mathrm{clip}\qty(\frac{1}{10}\norm{g_k}, \frac{1}{100} G_k, G_k) \text{ where } G_k \defeq \sqrt{\varsigma + \sum_{j \in K, \, j \leq k} \norm{g_{j}}^2},
+\end{equation*}
+which is consistent with the general form (\cref{eq:offo_based_update}) with an adaptive factor $\theta_k \in [10^{-2},1]$.
+In practice, we may set $\varsigma=0$ as long as the initial gradient is nonzero since $\varsigma$ is mainly introduced for avoiding zero division, but to make it consistent with the theory, we set $\varsigma=10^{-10}$ in all experiments.
+
+When $B_k$ is a good approximation of the Hessian, the regularization parameter $\mu_k$ should be small for fast convergence.
+Since the quantity $G_k$ is strictly increasing with $k$, it is natural in practice to decrease the effective regularization when sufficient progress in the objective function is achieved.
+When the corrected objective value decreases by more than $1$, we restart the accumulation by resetting $K^+$ to the empty set and $G_k$ to $\varsigma$.
+As long as the number of such restarts is finite, the overall convergence analysis in \cref{sec:analysis} remains valid.
+Since these choices are heuristic, there may be room for further improvement. Especially, further increasing $\mu_k$ stabilizes the method when the objective function values are highly noisy, and decreasing $\mu_k$ more aggressively may accelerate convergence when the objective function is accurate.
+
+\section{Numerical Experiments}\label{sec:experiments}
+
+\subsection{Methods}\label{sssec:methods}
+
+We compared the following optimization algorithms:
+
+\begin{itemize}
+    \item (\texttt{Ours}): Our proposed regularized quasi-Newton method
+          \begin{itemize}
+              \item We used Algorithm~\cref{alg:regularized_qn,alg:backtracking_linesearch} with the details in \cref{sec:proposed_choice}.
+          \end{itemize}
+
+    \item (\texttt{Line}): Line-search L-BFGS method
+          \begin{itemize}
+              \item Our Python implementation ported from LBFGSpp \citep{Okazaki2007libLBFGS}.
+              \item The step size was determined using the Mor\'e--Thuente line search, closely resembling SciPy's implementation.
+          \end{itemize}
+
+    \item (\texttt{SciPy}): SciPy's L-BFGS-B method \citep{2020SciPy-NMeth}
+          \begin{itemize}
+              \item An established L-BFGS method implemented in C and called from Python.
+              \item We used the default parameters, with the exception that \texttt{ftol} was set to $0$ to avoid premature termination.
+          \end{itemize}
+
+    \item (\texttt{Reg}): Regularized L-BFGS method \citep{kanzowRegularizationLimitedMemory2023}
+          \begin{itemize}
+              \item A quadratic regularization\-based quasi-Newton method that does not rely on line search and is conceptually closer to trust-region methods.
+              \item We wrapped the function \texttt{regLBFGS} using \texttt{solveNonmonotone}.
+          \end{itemize}
+
+    \item (\texttt{NTQN}): Noise-tolerant quasi-Newton method \citep{xie2020analysis,shiNoiseTolerantQuasiNewtonAlgorithm2022}
+          \begin{itemize}
+              \item A method designed to accommodate inexact gradient information, as mentioned in \cref{sec:problem_setting}.
+              \item We mainly used the default parameter settings, and slightly modified the stopping criteria to terminate at the desired gradient norm tolerance.
+          \end{itemize}
+\end{itemize}
+
+In the following, each method is referred to by the name given in parentheses.
+For (\texttt{Ours}) and (\texttt{Line}), we additionally tested variants incorporating the modified secant condition described in \cref{sec:proposed_choice_Bk}, which are denoted by (\texttt{Ours-MS}) and (\texttt{Line-MS}), respectively.
+All these methods are L-BFGS-based, and we set the number of stored curvature pairs to $10$, the default value in SciPy's L-BFGS-B implementation.
+
+All experiments were conducted on a Microsoft Windows 11 Home system (version~10.0, build~26100) equipped with a 13th Gen Intel\textsuperscript{\textregistered} Core\textsuperscript{\texttrademark} i7-1360P CPU, featuring 12 physical cores and 16 logical processors. All computations were performed using the CPU only.
+
+\subsection{Experimental Results}\label{sec:results}
+
+\subsubsection{Test Problems}\label{sssec:problems}
+
+We evaluated all algorithms on unconstrained problems from the CUTEst collection \citep{gouldCUTEstConstrainedUnconstrained2015}, implemented in Python using the PyCUTEst interface \citep{PyCUTEst2022}.
+All problems were initialized with the default starting points provided by the library.
+Following the previous work \citep{kanzowRegularizationLimitedMemory2023}, we excluded 17 problems where either the initial point is already stationary or all algorithms are known to fail.
+This left 220 test problems.
+To simulate different numerical environments, we tested the following four settings:
+
+\begin{itemize}
+    \item Artificial noise with absolute noise level of $10^{-3}$ at 64-bit precision (220 problems, $\feps=10^{-2}$)
+    \item 64-bit floating-point precision (220 problems, $\feps=2.22 \times 10^{-9}$)
+    \item 32-bit floating-point precision (220 problems, $\feps=1.19 \times 10^{-2}$)
+    \item 16-bit floating-point precision (152 problems, $\feps=9.77 \times 10^{-1}$)
+\end{itemize}
+
+Each setting uses a different error rate $\feps$ in the relative error model (\cref{eq:relative_error_model}), as summarized in \cref{tab:machine_epsilon}.
+The table relates the machine epsilon (maximum relative rounding error) for each floating-point precision to the $\feps$ value used in our experiments.
+We set $\feps$ equal to or larger than the machine epsilon to account for additional uncertainties in function and gradient evaluations.
+
+% !!! Auto-generated table by doc/main/check/float.py
+\begin{table}[t]
+    \centering
+    \caption{
+        The ``min abs value'' is the smallest positive normalized number,
+        the ``relative error'' is the maximum relative rounding error,
+        and $\feps$ is the parameter in \eqref{eq:relative_error_model} used in our experiments.
+    }
+    \begin{tabular}{l|ccc}
+        \toprule
+        explanation             & min abs value           & relative error                         & $\feps$               \\
+        \midrule
+        64-bit double precision & $2.23 \times 10^{-308}$ & $2^{-52} \approx 2.22 \times 10^{-16}$ & $2.22 \times 10^{-9}$ \\
+        32-bit single precision & $1.18 \times 10^{-38}$  & $2^{-23} \approx 1.19 \times 10^{-7}$  & $1.19 \times 10^{-3}$ \\
+        16-bit half precision   & $6.10 \times 10^{-5}$   & $2^{-10} \approx 9.77 \times 10^{-4}$  & $9.77 \times 10^{-3}$ \\
+        \bottomrule
+    \end{tabular}
+    \label{tab:machine_epsilon}
+\end{table}
+% !!! End of auto-generated table
+
+In the reduced precision settings, to simulate lower numerical precision, we first casted the input vector $x$ to the target lower precision, then computed $\overline{f}(x)$ and $\nabla \overline{f}(x)$ using the lower-precision input.
+Although the internal computations of CUTEst remain in 64-bit precision, the casting of the input vector effectively simulated the impact of reduced precision on function and gradient evaluations.
+In the 16-bit precision setting, we excluded problems where the initial gradient norm contains \texttt{NaN} or \texttt{INF} values after casting, resulting in a total of 152 problems.
+
+In the artificial noise setting, we added uniform random noise sampled from $[-10^{-3},\allowbreak 10^{-3}]$ to both the objective function values and each component of the gradient vectors independently, i.e.,
+\begin{equation*}
+    \overline{f}(x) = f(x) + \mathrm{unif}(-10^{-3}, 10^{-3}), \quad
+    \nabla \overline{f}(x) = \nabla f(x) + \mathrm{unif}(-10^{-3}, 10^{-3}) \mathbbm{1},
+\end{equation*}
+where $\mathrm{unif}(a,b)$ denotes a uniform random variable in the interval $[a,b]$ and $\mathbbm{1}$ is the vector of all ones.
+This setting is the same as the one in \citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
+
+\subsubsection{Performance Profiles}\label{sssec:metrics}
+
+We used performance profiles \citep{dolanBenchmarkingOptimizationSoftware2002} to compare the algorithms.
+Let $P$ denote the set of test problems and $S$ the set of solvers.
+For each problem $p \in P$ and solver $s \in S$, let $t_{p,s} > 0$ denote the number of function and gradient evaluations required to reach a specified gradient norm tolerance $\gtol$.
+Note that $t_{p,s}$ is not time in this experiment but the number of evaluations.
+When a solver fails to converge within the gradient tolerance or exceeds a maximum number of evaluations, we set $t_{p,s} = +\infty$.
+Then, the performance ratio $r_{p,s}$ is defined as
+\begin{equation*}
+    r_{p,s} = \frac{t_{p,s}}{\min_{s' \in S} t_{p,s'}}.
+\end{equation*}
+For a given threshold $\tau \geq 1$, the performance profile plots the proportion of problems for which $r_{p,s} \leq \tau$, which means that the $y$-coordinate for solver $s$ at $x$-coordinate $\tau$ is given by
+\begin{equation*}
+    \rho_s(\tau) = \frac{1}{\abs{P}} \abs{\left\{ p \in P \relmiddle| r_{p,s} \leq \tau \right\}}.
+\end{equation*}
+A curve that lies above others indicates better overall performance.
+
+\subsubsection{Results with Artificial Noise}\label{sssec:noise_results}
+
+We first present the results in the artificial noise setting described in \cref{sssec:problems}.
+\Cref{fig:results_noise} presents the performance profile with $\feps = 10^{-2}$. In this regime, the proposed method shows superior robustness compared to other quasi-Newton methods.
+Notably, (\texttt{Ours}) and (\texttt{Ours-MS}) outperform (\texttt{NTQN}), which is specifically designed to handle noisy gradients.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.9\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_noise0.001_gtol1e-02.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.8\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_legend.pdf}
+    \end{subfigure}
+
+    \caption{Performance profile for artificial noise setting (level of $10^{-3}$) and $\gtol=10^{-2}$.}
+    \label{fig:results_noise}
+\end{figure}
+
+\subsubsection{Results at Different Precision Levels}\label{sssec:exact_results}
+
+We next present performance profiles for each floating-point precision (64-bit, 32-bit, and 16-bit).
+We evaluated each method at three gradient norm tolerance levels ($10^{-3}$, $10^{-4}$, and $10^{-5}$), i.e., $\gtol \in \{10^{-3}, 10^{-4}, 10^{-5}\}$.
+These tolerance levels represent different optimization regimes, from moderate accuracy to high precision requirements.
+\Cref{fig:results_all_precisions} shows the comprehensive performance profiles across all three precision levels.
+Our method (\texttt{Ours}) demonstrates competitive or superior performance compared to existing methods in the standard 64-bit setting.
+The modified secant equation variant (\texttt{Ours-MS}) further improves performance.
+As numerical precision degrades from 64-bit to 32-bit and further to 16-bit, our regularization\-based approach demonstrates improved relative performance.
+The proposed method maintains stability even when traditional line-search methods encounter difficulties with reduced precision arithmetic.
+
+\begin{figure}[t]
+    \centering
+    % 64-bit precision
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision64_gtol1e-03.pdf}
+        \caption{64-bit, $\gtol=10^{-3}$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision64_gtol1e-04.pdf}
+        \caption{64-bit, $\gtol=10^{-4}$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision64_gtol1e-05.pdf}
+        \caption{64-bit, $\gtol=10^{-5}$}
+    \end{subfigure}
+
+    \vspace{0.5em}
+
+    % 32-bit precision
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision32_gtol1e-03.pdf}
+        \caption{32-bit, $\gtol=10^{-3}$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision32_gtol1e-04.pdf}
+        \caption{32-bit, $\gtol=10^{-4}$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision32_gtol1e-05.pdf}
+        \caption{32-bit, $\gtol=10^{-5}$}
+    \end{subfigure}
+
+    \vspace{0.5em}
+
+    % 16-bit precision
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision16_gtol1e-03.pdf}
+        \caption{16-bit, $\gtol=10^{-3}$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision16_gtol1e-04.pdf}
+        \caption{16-bit, $\gtol=10^{-4}$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision16_gtol1e-05.pdf}
+        \caption{16-bit, $\gtol=10^{-5}$}
+    \end{subfigure}
+
+    \vspace{0.5em}
+
+    % Legend
+    \begin{subfigure}[b]{0.8\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_legend.pdf}
+    \end{subfigure}
+    \caption{Performance profiles across different floating-point precisions (64, 32, and 16-bit) and tolerance levels. Each row corresponds to a different precision level, demonstrating the robustness of the proposed method as numerical precision degrades.}
+    \label{fig:results_all_precisions}
+\end{figure}
+
+\subsection{Computational Time}\label{sec:comp_time}
+
+In this subsection, we present an experiment to compare the per-iteration computational cost of each method. Since the previous experiments focused on the number of function and gradient evaluations, they did not directly reflect the computational overhead of each algorithm. Here, we measured the total execution time required to perform a fixed number of iterations on a simple problem.
+We conducted experiments on the ill-conditioned quadratic problem
+\begin{mini*}
+    {x \in \bbR^n}{\frac{1}{2}\sum_{i=1}^n i x_i^2}{}{}
+\end{mini*}
+with $n=10{,}000$, and measured the total execution time. Timing data were collected after three warm-up runs, followed by $100$ recorded trials.
+The initial point $x_0$ was chosen as the all-ones vector.
+We used memory size $m=10$ and maximum iterations $k_{\max}=100$, and we did not set any stopping criteria other than reaching $k_{\max}$.
+The simplicity of the optimization problem and the small value of $k_{\max}$ are well suited to the purpose of this experiment, as they ensure that the total runtime is dominated by algorithmic overhead rather than function or gradient computation.
+
+The results are summarized in \cref{tab:time_results,fig:exec_time}.
+In \cref{tab:time_results}, we report the total number of oracle calls (calls of $\overline{f}$ and $\nabla \overline{f}$) and final objective values $f(x_{k_{\max}})$. We only report the unique values per method since both quantities were identical across runs for each method.
+The comparable values in the table indicate that the comparison of execution times is fair and not affected by differences in convergence behavior.
+In \cref{fig:exec_time}, we report the execution time statistics, and we can observe that our proposed methods (\texttt{Ours}) and (\texttt{Ours-MS}) exhibit competitive performance compared to other methods.
+Although the (\texttt{SciPy}) calls optimized C routines, it incurs associated dispatch overhead, producing a larger mean time.
+The (\texttt{Reg}) method explicitly computes $-(B_k+\mu_k I)^{-1}g_k$, which is numerically attractive but entails extra per-iteration cost.
+In contrast, our proposed methods employ the simplified strategy described in \cref{sec:proposed_choice}, which reduces per-iteration overhead while preserving performance. This design accounts for their competitive mean execution times.
+
+% !!! Auto-generated table by notebooks/time.ipynb
+\begin{table}[ht]
+    \centering
+    \caption{The number of oracle calls and final observed objective values for the experiment in \cref{sec:comp_time}.}
+    \label{tab:time_results}
+    \begin{tabular}{lrrrrrrr}
+        \toprule
+                                     & \texttt{Line} & \texttt{Line-MS} & \texttt{Ours} & \texttt{Ours-MS} & \texttt{NTQN} & \texttt{SciPy} & \texttt{Reg} \\
+        \midrule
+        \# Calls                     & 212           & 212              & 202           & 202              & 219           & 212            & 206          \\
+        $\overline{f}(x_{k_{\max}})$ & 1.24          & 1.24             & 1.34          & 1.34             & 1.43          & 1.24           & 1.47         \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+% !!! End of auto-generated table
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../imgs/for_paper/time.pdf}
+    \caption{Mean execution times for the experiment in \cref{sec:comp_time}.
+        This plot roughly indicates the extra computational overhead of each method.
+        Error bars represent one standard deviation over $100$ runs.}
+    \label{fig:exec_time}
+\end{figure}
+
+\section{Conclusion}\label{sec:conclusion}
+
+In this work, we proposed a regularized quasi-Newton method for noisy nonconvex optimization and established its global convergence properties. We also demonstrated the method's effectiveness through numerical experiments on standard benchmark problems under various noise and precision settings.
+The results indicate that our method is robust and practically efficient, particularly in noisy or low-precision environments where traditional line-search methods may struggle.
+
+Future work includes the investigation of local convergence properties, the extension to constrained optimization, and the application to practical problems in machine learning and scientific computing. Additionally, exploring adaptive strategies for selecting algorithmic parameters based on problem characteristics could further enhance the method's performance.
+
+Explicitly analyzing the impact of inexact gradient evaluations can also provide valuable insights into the method's robustness and guide further enhancements.
+
+\ifSubfilesClassLoaded{
+    \bibliographystyle{spbasic}
+    \bibliography{../L-BFGS.bib}
+}{}
+
+\end{document}
