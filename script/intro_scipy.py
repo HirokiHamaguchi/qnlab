@@ -27,6 +27,6 @@ trial(
     prob,
     "Rosenbrock",
     methods,
-    pdf_path="doc_private/imgs/result_for_slide/introSciPy2_Rosenbrock",
+    pdf_path="doc/imgs/result_for_slide/introSciPy2_Rosenbrock",
     only_plot=True,
 )

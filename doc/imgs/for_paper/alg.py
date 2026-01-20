@@ -119,6 +119,6 @@ plt.yticks([])
 plt.xlim(-0.1, 8.5)
 
 plt.tight_layout()
-plt.savefig("doc_private/imgs/for_paper/alg.png", dpi=300)
-plt.savefig("doc_private/imgs/for_paper/alg.pdf")
+plt.savefig("doc/imgs/for_paper/alg.png", dpi=300)
+plt.savefig("doc/imgs/for_paper/alg.pdf")
 plt.close()

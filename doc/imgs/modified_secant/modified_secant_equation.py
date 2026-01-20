@@ -229,7 +229,7 @@ def trial(
         yVals.max() + 0.05 * (yVals.max() - yVals.min()),
     )
     plt.savefig(
-        f"doc_private/imgs/modified_secant/trial_{kind}.pdf",
+        f"doc/imgs/modified_secant/trial_{kind}.pdf",
         bbox_inches="tight",
     )
     # plt.show()
