@@ -1,0 +1,48 @@
+from typing import Dict, Union
+
+import numpy as np
+
+from qnlab.parameter import (
+    HamaguchiParameter,
+    KanzowParameter,
+    LineParameter,
+    NtqnParameter,
+    OwlParameter,
+)
+from qnlab.problem.base import BaseProblem
+from qnlab.solver.qn_hamaguchi import qn_hamaguchi
+from qnlab.solver.qn_kanzow import qn_kanzow
+from qnlab.solver.qn_line import qn_line
+from qnlab.solver.qn_ntqn import qn_ntqn
+from qnlab.solver.qn_owl import qn_owl
+from qnlab.solver.qn_scipy import qn_scipy
+from qnlab.util.callback import Callback
+from qnlab.util.method import Method
+
+
+def qn(
+    prob: BaseProblem,
+    method: Method,
+    options: Dict[str, Union[np.float64, int]] = {},
+    callback: Union[Callback, None] = None,
+    verbose: bool = False,
+):
+    if method.base == "SciPy":
+        return qn_scipy(prob, method, options, callback, verbose)
+
+    if method.base == "Line":
+        orthantwise_c = options.get("orthantwise_c", 0.0)
+        if orthantwise_c != 0.0:
+            return qn_owl(prob, OwlParameter(prob.n, options), method, callback)
+        else:
+            return qn_line(prob, LineParameter(prob.n, options), method, callback)
+    elif method.base == "Kanzow":
+        return qn_kanzow(prob, KanzowParameter(prob.n, options), method, callback)
+    elif method.base == "NTQN":
+        return qn_ntqn(prob, NtqnParameter(prob.n, options), method, callback, verbose)
+    elif method.base == "Hamaguchi":
+        return qn_hamaguchi(
+            prob, HamaguchiParameter(prob.n, options), method, callback, verbose
+        )
+    else:
+        raise ValueError(f"Unknown method: {method}. ")

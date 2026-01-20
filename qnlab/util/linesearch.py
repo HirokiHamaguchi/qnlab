@@ -1,0 +1,554 @@
+import math
+from typing import Any, Tuple, Union
+
+import numpy as np
+import numpy.typing as npt
+
+from qnlab.parameter import LineParameter, OwlParameter
+from qnlab.problem.base import BaseProblem
+from qnlab.util.ret_values import RetCode
+
+LineSearchParameter = Union[LineParameter, OwlParameter]
+
+# default (MoreThuente)
+LINESEARCH_DEFAULT = 0
+# MoreThuente method proposed by More and Thuente
+LINESEARCH_MORETHUENTE = 0
+# Backtracking method with the Armijo condition:
+# f(x + a * d) <= f(x) + lbfgs_parameter_t::ftol * a * g(x)^T d,
+# where x is the current point, d is the current search direction,
+# and a is the step length.
+LINESEARCH_BACKTRACKING_ARMIJO = 1
+# The backtracking method with the default (regular Wolfe) condition.
+LINESEARCH_BACKTRACKING = 2
+# Backtracking method with regular Wolfe condition.
+# both the Armijo condition (LBFGS_LINESEARCH_BACKTRACKING_ARMIJO)
+# and the curvature condition:
+# g(x + a * d)^T d >= lbfgs_parameter_t::wolfe * g(x)^T d,
+# where x is the current point, d is the current search direction,
+# and a is the step length.
+LINESEARCH_BACKTRACKING_WOLFE = 2
+# Backtracking method with strong Wolfe condition.
+# both the Armijo condition (LBFGS_LINESEARCH_BACKTRACKING_ARMIJO)
+# and the following condition:
+# |g(x + a * d)^T d| <= lbfgs_parameter_t::wolfe * |g(x)^T d|,
+# where x is the current point, d is the current search direction,
+# and a is the step length.
+LINESEARCH_BACKTRACKING_STRONG_WOLFE = 3
+
+
+def _cubic_minimizer(
+    u: np.float64,
+    fu: np.float64,  # f(u)
+    du: np.float64,  # f'(u)
+    v: np.float64,
+    fv: np.float64,  # f(v)
+    dv: np.float64,  # f'(v)
+) -> np.float64:
+    """Computes the cubic minimizer for the line search.
+
+    Returns:
+        np.float64: Trial point for line search.
+    """
+    d = v - u
+    theta = (fu - fv) * 3 / d + du + dv
+    p_val = abs(theta)
+    q_val = abs(du)
+    r_val = abs(dv)
+    s = max(p_val, q_val, r_val)
+    a = theta / s
+    gamma = s * math.sqrt(a * a - (du / s) * (dv / s))
+    if v < u:
+        gamma = -gamma
+    p_val = gamma - du + theta
+    q_val = gamma - du + gamma + dv
+    r_ratio = p_val / q_val
+    return u + r_ratio * d
+
+
+def _cubic_minimizer2(
+    u: np.float64,
+    fu: np.float64,  # f(u)
+    du: np.float64,  # f'(u)
+    v: np.float64,
+    fv: np.float64,  # f(v)
+    dv: np.float64,  # f'(v)
+    xmin: np.float64,
+    xmax: np.float64,
+) -> np.float64:
+    """Computes an alternative cubic minimizer with bounds.
+
+    Returns:
+        np.float64: Trial point clipped between xmin and xmax.
+    """
+    d = v - u
+    theta = (fu - fv) * 3 / d + du + dv
+    p_val = abs(theta)
+    q_val = abs(du)
+    r_val = abs(dv)
+    s = max(p_val, q_val, r_val)
+    a = theta / s
+    gamma = s * np.sqrt(max(np.float64(0.0), a * a - (du / s) * (dv / s)))
+    if u < v:
+        gamma = -gamma
+    p_val = gamma - dv + theta
+    q_val = gamma - dv + gamma + du
+    r_ratio = p_val / q_val
+    if r_ratio < 0.0 and gamma != 0.0:
+        return v - r_ratio * d
+    elif d > 0:
+        return xmax
+    else:
+        return xmin
+
+
+def _quad_minimizer(
+    u: np.float64,
+    fu: np.float64,  # f(u)
+    du: np.float64,  # f'(u)
+    v: np.float64,
+    fv: np.float64,  # f(v)
+) -> np.float64:
+    """Computes a quadratic minimizer for line search interpolation.
+
+    Returns:
+        np.float64: Trial point for line search.
+    """
+    a = v - u
+    return u + du / ((fu - fv) / a + du) * (a / 2)
+
+
+def _quad_minimizer2(
+    u: np.float64,
+    du: np.float64,  # f'(u)
+    v: np.float64,
+    dv: np.float64,  # f'(v)
+) -> np.float64:
+    """Computes another form of quadratic minimizer using derivatives.
+
+    Returns:
+        np.float64: Trial point for line search.
+    """
+    a = u - v
+    return v + dv / (dv - du) * a
+
+
+def _update_trial_interval(
+    x: np.float64,
+    fx: np.float64,
+    dx: np.float64,
+    y: np.float64,
+    fy: np.float64,
+    dy: np.float64,
+    t: np.float64,
+    ft: np.float64,
+    dt: np.float64,
+    tmin: np.float64,
+    tmax: np.float64,
+    brackt: bool,
+) -> Tuple[
+    np.float64,
+    np.float64,
+    np.float64,
+    np.float64,
+    np.float64,
+    np.float64,
+    np.float64,
+    bool,
+    RetCode,
+]:
+    """Updates the trial interval during line search.
+
+    Returns:
+        Tuple[np.float64, np.float64, np.float64, np.float64, np.float64, np.float64, np.float64, bool, RetCode]:
+        Updated variables and status code.
+    """
+    # Pre-check if the trial value is out of interval, etc.
+    if brackt:
+        if t <= min(x, y) or max(x, y) <= t:
+            # The trial value t is out of the interval.
+            return x, fx, dx, y, fy, dy, t, brackt, RetCode.ERR_OUTOFINTERVAL
+        if 0.0 <= dx * (t - x):
+            # The function must decrease from x.
+            return x, fx, dx, y, fy, dy, t, brackt, RetCode.ERR_INCREASEGRADIENT
+        if tmax < tmin:
+            # Incorrect tmin and tmax specified.
+            return x, fx, dx, y, fy, dy, t, brackt, RetCode.ERR_INCORRECT_TMINMAX
+
+    bound = False
+    dsign = math.copysign(1.0, dt) * math.copysign(1.0, dx) < 0.0
+    newt = np.float64(0.0)
+
+    # Case 1: f(x) < f(t)
+    if fx < ft:
+        brackt = True
+        bound = True
+        mc = _cubic_minimizer(x, fx, dx, t, ft, dt)
+        mq = _quad_minimizer(x, fx, dx, t, ft)
+        if abs(mc - x) < abs(mq - x):
+            newt = mc
+        else:
+            newt = mc + 0.5 * (mq - mc)
+    # Case 2: f(t) <= f(x) and derivatives have opposite sign.
+    elif dsign:
+        brackt = True
+        bound = False
+        mc = _cubic_minimizer(x, fx, dx, t, ft, dt)
+        mq = _quad_minimizer2(x, dx, t, dt)
+        if abs(mc - t) > abs(mq - t):
+            newt = mc
+        else:
+            newt = mq
+    # Case 3: f(t) <= f(x) and |dt| < |dx|
+    elif abs(dt) < abs(dx):
+        bound = True
+        mc = _cubic_minimizer2(x, fx, dx, t, ft, dt, tmin, tmax)
+        mq = _quad_minimizer2(x, dx, t, dt)
+        if brackt:
+            if abs(t - mc) < abs(t - mq):
+                newt = mc
+            else:
+                newt = mq
+        else:
+            if abs(t - mc) > abs(t - mq):
+                newt = mc
+            else:
+                newt = mq
+    # Case 4: f(t) <= f(x) and |dt| is not smaller than |dx|.
+    else:
+        bound = False
+        if brackt:
+            newt = _cubic_minimizer(t, ft, dt, y, fy, dy)
+        elif x < t:
+            newt = tmax
+        else:
+            newt = tmin
+
+    # Update the interval of uncertainty.
+    # - Case a: if f(x) < f(t),
+    #     x <- x, y <- t.
+    # - Case b: if f(t) <= f(x) && f'(t)*f'(x) > 0,
+    #     x <- t, y <- y.
+    # - Case c: if f(t) <= f(x) && f'(t)*f'(x) < 0,
+    #     x <- t, y <- x.
+    if fx < ft:
+        # Case a
+        y = t
+        fy = ft
+        dy = dt
+    else:
+        # Case c
+        if dsign:
+            y = x
+            fy = fx
+            dy = dx
+        # Case b and c
+        x = t
+        fx = ft
+        dx = dt
+
+    # Clip the new trial value within [tmin, tmax].
+    if newt > tmax:
+        newt = tmax
+    if newt < tmin:
+        newt = tmin
+
+    # Redefine newt if it is close to the upper bound of the interval.
+    if brackt and bound:
+        mq_val = x + 0.66 * (y - x)
+        if x < y:
+            if mq_val < newt:
+                newt = mq_val
+        else:
+            if newt < mq_val:
+                newt = mq_val
+
+    # Set the new trial value.
+    t = newt
+    return x, fx, dx, y, fy, dy, t, brackt, RetCode.LINESEARCH_SUCCESS
+
+
+def _owlqn_x1norm(x: npt.NDArray[np.float64], start: int, end: int) -> np.float64:
+    """Computes the L1 norm of a segment of x for OWL-QN.
+
+    Returns:
+        np.float64: L1 norm of x[start:end].
+    """
+    return np.sum(np.abs(x[start:end]))
+
+
+def _owlqn_project(
+    d: npt.NDArray[np.float64], sign: npt.NDArray[np.float64], start: int, end: int
+) -> None:
+    """Projects the direction onto the orthant.
+
+    Args:
+        d (numpy.ndarray): Direction array.
+        sign (numpy.ndarray): Array for the orthant sign.
+        start (int): Start index.
+        end (int): End index.
+    """
+    d[start:end][d[start:end] * sign[start:end] <= 0] = 0
+
+
+def line_search_backtracking(
+    n: int,
+    x: npt.NDArray[np.float64],
+    f: np.float64,
+    g: npt.NDArray[np.float64],
+    s: npt.NDArray[np.float64],
+    stp: np.float64,
+    xp: npt.NDArray[np.float64],
+    gp: npt.NDArray[np.float64],
+    wp: npt.NDArray[np.float64],
+    prob: BaseProblem,
+    param: LineSearchParameter,
+) -> Tuple[
+    RetCode, np.float64, np.float64, npt.NDArray[np.float64], npt.NDArray[np.float64]
+]:
+    """Performs a backtracking line search with Armijo or Wolfe conditions.
+
+    Returns:
+        Tuple[RetCode, np.float64, np.float64, numpy.ndarray, numpy.ndarray]: (status code, function value, step, new x, new g).
+    """
+    count = 0
+    dec, inc = 0.5, 2.1
+
+    if stp <= 0.0:
+        return RetCode.ERR_INVALIDPARAMETERS, f, stp, x, g
+
+    dginit = np.dot(g, s)
+    if dginit > 0:
+        return RetCode.ERR_INCREASEGRADIENT, f, stp, x, g
+
+    finit = f
+    dgtest = param.armijo * dginit
+
+    while True:
+        x[:] = xp[:]
+        x += s * stp
+
+        f = prob.f(x)
+        g = prob.g(x)
+        count += 1
+
+        if f > finit + stp * dgtest:
+            width = dec
+        else:
+            # Sufficient decrease (Armijo condition) met
+            if param.linesearch_kind == LINESEARCH_BACKTRACKING_ARMIJO:
+                return RetCode.LINESEARCH_SUCCESS, f, stp, x, g
+            # Check Wolfe condition
+            dg = np.dot(g, s)
+            if dg < param.wolfe * dginit:
+                width = inc
+            else:
+                if param.linesearch_kind == LINESEARCH_BACKTRACKING_WOLFE:
+                    return RetCode.LINESEARCH_SUCCESS, f, stp, x, g
+                if dg > -param.wolfe * dginit:
+                    width = dec
+                else:
+                    # Strong Wolfe condition is met
+                    return RetCode.LINESEARCH_SUCCESS, f, stp, x, g
+
+        if stp < param.min_step:
+            return RetCode.ERR_MINIMUMSTEP, f, stp, x, g
+        if stp > param.max_step:
+            return RetCode.ERR_MAXIMUMSTEP, f, stp, x, g
+        if param.max_linesearch <= count:
+            return RetCode.ERR_MAXIMUMLINESEARCH, f, stp, x, g
+
+        stp *= width
+
+
+def line_search_backtracking_owlqn(
+    n: int,
+    x: npt.NDArray[np.float64],
+    f: np.float64,
+    g: npt.NDArray[np.float64],
+    s: npt.NDArray[np.float64],
+    stp: np.float64,
+    xp: npt.NDArray[np.float64],
+    gp: npt.NDArray[np.float64],
+    wp: npt.NDArray[np.float64],
+    prob: BaseProblem,
+    param: OwlParameter,
+) -> Tuple[
+    RetCode, np.float64, np.float64, npt.NDArray[np.float64], npt.NDArray[np.float64]
+]:
+    """Performs a backtracking line search for OWL-QN.
+
+    Returns:
+        Tuple[RetCode, np.float64, np.float64, numpy.ndarray, numpy.ndarray]:
+        (status code, function value, step, new x, new g).
+    """
+    count = 0
+    width = 0.5
+    norm = np.float64(0.0)
+    finit = f
+
+    if stp <= 0.0:
+        return RetCode.ERR_INVALIDPARAMETERS, f, stp, x, g
+
+    # Choose the orthant: if xp[i] is zero, use -gp[i], else xp[i]
+    wp[:] = np.where(xp == 0.0, -gp, xp)
+
+    while True:
+        # x <- xp; then x = x + stp * s
+        x[:] = xp[:]
+        x += s * stp
+        # Project x onto the orthant defined by wp. (Assumes owlqn_project is defined.)
+        _owlqn_project(x, wp, param.orthantwise_start, param.orthantwise_end)
+        # Evaluate f and gradient g.
+        f = prob.f(x)
+        g = prob.g(x)
+        # Compute L1 norm for OWL-QN and add penalty.
+        norm = _owlqn_x1norm(x, param.orthantwise_start, param.orthantwise_end)
+        f += norm * param.orthantwise_c
+        count += 1
+
+        # Compute dgtest as sum((x - xp) * gp)
+        dgtest = np.sum((x - xp) * gp)
+
+        if f <= finit + param.armijo * dgtest:
+            return RetCode.LINESEARCH_SUCCESS, f, stp, x, g
+        if stp < param.min_step:
+            return RetCode.ERR_MINIMUMSTEP, f, stp, x, g
+        if stp > param.max_step:
+            return RetCode.ERR_MAXIMUMSTEP, f, stp, x, g
+        if param.max_linesearch <= count:
+            return RetCode.ERR_MAXIMUMLINESEARCH, f, stp, x, g
+
+        stp *= width
+
+
+def line_search_morethuente(
+    n: int,
+    x: npt.NDArray[np.float64],
+    f: np.float64,
+    g: npt.NDArray[np.float64],
+    s: npt.NDArray[np.float64],
+    stp: np.float64,
+    xp: npt.NDArray[np.float64],
+    gp: Any,
+    wp: Any,
+    prob: BaseProblem,
+    param: LineSearchParameter,
+) -> Tuple[
+    RetCode, np.float64, np.float64, npt.NDArray[np.float64], npt.NDArray[np.float64]
+]:
+    """Performs the More-Thuente line search.
+
+    Returns:
+        Tuple[RetCode, np.float64, np.float64, numpy.ndarray, numpy.ndarray]:
+        (status code, function value, step, new x, new g).
+    """
+    count = 0
+    brackt = False
+    stage1 = True
+    uinfo = RetCode.LINESEARCH_SUCCESS
+
+    if stp <= 0.0:
+        return RetCode.ERR_INVALIDPARAMETERS, f, stp, x, g
+
+    dginit = np.dot(g, s)
+    if dginit > 0:
+        return RetCode.ERR_INCREASEGRADIENT, f, stp, x, g
+
+    finit = f
+    dgtest = param.armijo * dginit
+    width = param.max_step - param.min_step
+    prev_width = 2.0 * width
+
+    stx = np.float64(0.0)
+    fx = finit
+    dgx = dginit
+    sty = np.float64(0.0)
+    fy = finit
+    dgy = dginit
+
+    while True:
+        # Set stmin and stmax based on bracketing.
+        if brackt:
+            stmin = min(stx, sty)
+            stmax = max(stx, sty)
+        else:
+            stmin = stx
+            stmax = stp + 4.0 * (stp - stx)
+
+        # Clip stp within [param.min_step, param.max_step]
+        if stp < param.min_step:
+            stp = param.min_step
+        if stp > param.max_step:
+            stp = param.max_step
+
+        # Unusual termination: if conditions are met, choose stx
+        if (
+            brackt
+            and (
+                stp <= stmin
+                or stmax <= stp
+                or param.max_linesearch <= count + 1
+                or uinfo != RetCode.LINESEARCH_SUCCESS
+            )
+        ) or (brackt and (stmax - stmin <= param.xtol * stmax)):
+            stp = stx
+
+        # x <- xp; then x = x + stp * s.
+        x[:] = xp[:]
+        x += s * stp
+        # Evaluate function and compute directional derivative.
+        f = prob.f(x)
+        g = prob.g(x)
+        dg = np.dot(g, s)
+        ftest1 = finit + stp * dgtest
+        count += 1
+
+        if brackt and (
+            stp <= stmin or stmax <= stp or uinfo != RetCode.LINESEARCH_SUCCESS
+        ):
+            return RetCode.ERR_ROUNDING_ERROR, f, stp, x, g
+        if stp == param.max_step and f <= ftest1 and dg <= dgtest:
+            return RetCode.ERR_MAXIMUMSTEP, f, stp, x, g
+        if stp == param.min_step and (ftest1 < f or dgtest <= dg):
+            return RetCode.ERR_MINIMUMSTEP, f, stp, x, g
+        if brackt and (stmax - stmin) <= param.xtol * stmax:
+            return RetCode.ERR_OUTOFINTERVAL, f, stp, x, g
+        if param.max_linesearch <= count:
+            return RetCode.ERR_MAXIMUMLINESEARCH, f, stp, x, g
+        if f <= ftest1 and abs(dg) <= param.wolfe * (-dginit):
+            return RetCode.LINESEARCH_SUCCESS, f, stp, x, g
+
+        if stage1 and f <= ftest1 and min(param.armijo, param.wolfe) * dginit <= dg:
+            stage1 = False
+
+        # Use modified function if in stage1.
+        if stage1 and ftest1 < f and f <= fx:
+            fm = f - stp * dgtest
+            fxm = fx - stx * dgtest
+            fym = fy - sty * dgtest
+            dgm = dg - dgtest
+            dgxm = dgx - dgtest
+            dgym = dgy - dgtest
+            # Update trial interval (using update_trial_interval below)
+            # Note: In Python, we simulate pointer updates by receiving updated values.
+            # x, fx, dx, y, fy, dy, t, brackt, 0
+            (stx, fxm, dgxm, sty, fym, dgym, stp, brackt, uinfo) = (
+                _update_trial_interval(
+                    stx, fxm, dgxm, sty, fym, dgym, stp, fm, dgm, stmin, stmax, brackt
+                )
+            )
+            fx = fxm + stx * dgtest
+            fy = fym + sty * dgtest
+            dgx = dgxm + dgtest
+            dgy = dgym + dgtest
+        else:
+            (stx, fx, dgx, sty, fy, dgy, stp, brackt, uinfo) = _update_trial_interval(
+                stx, fx, dgx, sty, fy, dgy, stp, f, dg, stmin, stmax, brackt
+            )
+
+        if brackt:
+            if 0.66 * prev_width <= abs(sty - stx):
+                stp = stx + 0.5 * (sty - stx)
+            prev_width = width
+            width = abs(sty - stx)

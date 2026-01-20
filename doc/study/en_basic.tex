@@ -1,0 +1,220 @@
+\documentclass[en]{subfiles}
+
+\begin{document}
+
+\section{Basic Concepts}\label{sec:background_basic}
+
+One of the central goals of numerical optimization is to determine decision variables that optimize a given quantitative performance measure.
+Examples include design performance, control stability, operational efficiency, and prediction error, each quantifying the quality of various phenomena or systems.
+These performance measures are typically modeled by an objective function that maps decision variables to real numbers.
+
+In this chapter, we define $f \colon \bbR^n \to \bbR$ as an objective function of class $C^2$, where $n$ denotes the dimension of the decision variables.
+We consider the following unconstrained optimization problem:
+\begin{equation}\label{eq:unconstrained-optimization}
+    \underset{x \in \bbR^n}{\text{minimize}} \quad f(x).
+\end{equation}
+In this section, we provide fundamental definitions and properties related to \cref{eq:unconstrained-optimization}.
+
+\subsection{Convexity and Strong Convexity}
+
+The notions of convexity and strong convexity are fundamental in optimization theory.
+Convexity and strong convexity of a function $f$ can be characterized by the following inequalities:
+\begin{align}
+    \text{(convex)} \quad
+    f(y) & \ge f(x)+\nabla f(x)^\top (y-x),
+    \label{eq:convex-def}                                             \\
+    \text{($\mu$-strongly convex)} \quad
+    f(y) & \ge f(x)+\nabla f(x)^\top (y-x)+\frac{\mu}{2}\norm{y-x}^2,
+    \label{eq:strongly-convex-def}
+\end{align}
+for any $x,y \in \bbR^n$, where $\mu>0$ is a constant.
+Strong convexity indicates that, in addition to convexity, the objective function has uniformly positive curvature.
+Examples of convex and strongly convex functions are shown in \cref{fig:convexity_comparison}.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth]{../imgs/quasi_newton/convexity_comparison_convex.pdf}
+    \includegraphics[width=\textwidth]{../imgs/quasi_newton/convexity_comparison_strongly_convex.pdf}
+    \caption{
+        Comparison of convex and strongly convex functions.
+        The dashed line shows the quadratic approximation at $x=0$.
+        The upper two functions are convex but not strongly convex, and no constant $\mu>0$ satisfies \cref{eq:strongly-convex-def}.
+        The lower two functions are strongly convex, and there exists $\mu>0$ that satisfies \cref{eq:strongly-convex-def}.
+    }
+    \label{fig:convexity_comparison}
+\end{figure}
+
+\subsection{Positive Definiteness of the Hessian}
+
+Next, we show how convexity and strong convexity relate to the definiteness of the Hessian matrix $\nabla^2 f(x)$.
+Let $A$ be a symmetric matrix in $\bbR^{n \times n}$. A matrix $A$ is called positive or negative definite (or semi-definite) based on the following conditions:
+\begin{align*}
+    \text{(positive definite)} \quad      & v^\top A v > 0 \quad \forall v \in \bbR^n \setminus \{0\}, \\
+    \text{(positive semi-definite)} \quad & v^\top A v \ge 0 \quad \forall v \in \bbR^n,               \\
+    \text{(negative definite)} \quad      & v^\top A v < 0 \quad \forall v \in \bbR^n \setminus \{0\}, \\
+    \text{(negative semi-definite)} \quad & v^\top A v \le 0 \quad \forall v \in \bbR^n.
+\end{align*}
+A matrix is indefinite if it is neither positive nor negative definite.
+For matrices $A,B \in \bbR^{n \times n}$, the notation $A \succeq B$ indicates that $A-B$ is positive semi-definite.
+For $\mu > 0$, the condition $A \succeq \mu I$ is equivalent to $v^\top A v \ge \mu \norm{v}^2$ for all $v \in \bbR^n$.
+It directly implies that all eigenvalues of $A$ are at least $\mu$, which in turn implies that the operator norm $\norm{A}$ is at least $\mu$, i.e., $\norm{A} \geq \mu$.
+In particular, if $B$ is a zero matrix, we simply write $A \succeq 0$.
+We similarly define $\preceq$ for negative semi-definiteness.
+
+We can relate convexity and strong convexity to the definiteness of the Hessian as follows.
+\begin{proposition}\label{prop:convexity-hessian}
+    Let $f \colon \bbR^n \to \bbR$ be of class $C^2$. Then
+    \begin{itemize}
+        \item $f$ is convex if and only if $\nabla^2 f(x)\succeq0$ holds for all $x \in \bbR^n$.
+        \item $f$ is $\mu$-strongly convex if and only if $\nabla^2 f(x)\succeq\mu I$ holds for all $x \in \bbR^n$.
+    \end{itemize}
+\end{proposition}
+\begin{proof}
+    First, let $\mu>0$ and assume $\nabla^2 f(x)\succeq \mu I$ for all $x \in \bbR^n$.
+    By the fundamental theorem of calculus, for any $x,y \in \bbR^n$, we have
+    \begin{equation}\label{eq:y_x_nabla_hess}
+        f(y)
+        = f(x)+\nabla f(x)^\top (y-x)
+        +\frac{1}{2} \int_0^1 (y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \dd{t}.
+    \end{equation}
+    Then, we obtain
+    \begin{equation}\label{eq:hessian-strongly-convex}
+        \int_0^1 (y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \dd{t}
+        \ge \int_0^1 \mu\norm{y-x}^2 \dd{t}
+        = \mu\norm{y-x}^2.
+    \end{equation}
+    Thus, substituting \cref{eq:hessian-strongly-convex} into \cref{eq:y_x_nabla_hess} yields \cref{eq:strongly-convex-def}, the definition of $\mu$-strong convexity.
+
+    Conversely, if $f$ is $\mu$-strongly convex, for any $x \in \bbR^n$, $v \in \bbR^n$ and $t > 0$, letting $y=x \pm tv$ gives
+    \begin{equation}\label{eq:strongly-convex-taylor}
+        \begin{dcases}
+            f(x + tv)\ge f(x) + t\nabla f(x)^\top v+\frac{\mu}{2}t^2\norm{v}^2, \\
+            f(x - tv)\ge f(x) - t\nabla f(x)^\top v+\frac{\mu}{2}t^2\norm{v}^2.
+        \end{dcases}
+    \end{equation}
+    By Taylor's theorem, there exists $s_\pm \in (0,1)$ such that
+    \begin{equation}\label{eq:strongly-convex-finite-diff}
+        \begin{dcases}
+            f(x + tv) = f(x) + t\nabla f(x)^\top v + \frac{1}{2} t^2 v^\top \nabla^2 f(x + s_+ t v) v, \\
+            f(x - tv) = f(x) - t\nabla f(x)^\top v + \frac{1}{2} t^2 v^\top \nabla^2 f(x - s_- t v) v.
+        \end{dcases}
+    \end{equation}
+    Substituting \cref{eq:strongly-convex-finite-diff} into \cref{eq:strongly-convex-taylor} and rearranging yields
+    \begin{equation}\label{eq:strongly-convex-hessian-bound}
+        v^\top \frac{\nabla^2 f(x+ s_+ t v) + \nabla^2 f(x - s_- t v)}{2} v \ge \mu \norm{v}^2.
+    \end{equation}
+    Letting $t \to 0$ in \cref{eq:strongly-convex-hessian-bound} and using the continuity of $\nabla^2 f$ from the $C^2$ assumption gives
+    \begin{equation*}
+        v^\top \nabla^2 f(x) v \ge \mu \norm{v}^2.
+    \end{equation*}
+    Because $v \in \bbR^n$ is arbitrary, we obtain $\nabla^2 f(x)\succeq \mu I$.
+
+    Setting $\mu=0$ in the above shows the convex case corresponding to \cref{eq:convex-def} in the same way.
+\end{proof}
+Quadratic functions whose Hessians are positive definite, indefinite, and negative definite are illustrated in \cref{fig:pd}. One can visually confirm the correspondence between positive definiteness and convexity.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth]{../imgs/quasi_newton/pd.pdf}
+    \caption{Quadratic model
+        $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ in 2-dimensional space with Hessians $H$ which is  (left) positive definite, (center) indefinite, (right) negative definite.}
+    \label{fig:pd}
+\end{figure}
+
+
+\subsection{$L$-smoothness}
+
+Finally, we introduce $L$-smoothness of functions.
+A function $f$ is $L$-smooth if
+\begin{equation}\label{eq:def_LSmooth}
+    \norm{\nabla f(x)-\nabla f(y)} \le L\norm{x-y}
+\end{equation}
+holds for all $x,y$.
+
+The next proposition shows that $L$-smoothness can be characterized by the upper bound of the Hessian.
+\begin{proposition}\label{prop:smoothness-hessian}
+    Let $f \colon \bbR^n \to \bbR$ be of class $C^2$. Then $f$ is $L$-smooth if and only if $\nabla^2 f(x)\preceq L I$ holds for all $x \in \bbR^n$.
+\end{proposition}
+\begin{proof}
+    Since $f$ is of class $C^2$, by the fundamental theorem of calculus, for any $x,y \in \bbR^n$, we have
+    \begin{equation}\label{eq:fundamental-theorem-calculus}
+        \nabla f(y) - \nabla f(x)
+        = \int_0^1 \nabla^2 f(x+t(y-x))(y-x) \dd{t}.
+    \end{equation}
+    Assume $\nabla^2 f(x)\preceq L I$ for all $x \in \bbR^n$.
+    It implies that the operator norm of $\nabla^2 f(x)$ satisfies $\norm{\nabla^2 f(x)} \le L$, and thus
+    \begin{align*}
+        \norm{\nabla f(y) - \nabla f(x)}
+         & = \norm{\int_0^1 \nabla^2 f(x+t(y-x))(y-x) \dd{t}}   &  & (\text{by \cref{eq:fundamental-theorem-calculus}}) \\
+         & \le \int_0^1 \norm{\nabla^2 f(x+t(y-x))(y-x)} \dd{t} &  & (\text{triangle inequality})                       \\
+         & \le \int_0^1 L\norm{y-x} \dd{t}                      &  & (\text{by assumption})                             \\
+         & = L\norm{y-x},
+    \end{align*}
+    which shows \cref{eq:def_LSmooth}.
+    Conversely, if $f$ is $L$-smooth, then for any $x \in \bbR^n$ and $v \in \bbR^n$, we have
+    \begin{equation}\label{eq:smoothness-bound}
+        \norm{\nabla f(x+tv)-\nabla f(x)} \le L\norm{tv} = Lt\norm{v}
+    \end{equation}
+    By Taylor's theorem, we also have
+    \begin{equation*}
+        \nabla f(x+tv)-\nabla f(x) = t \nabla^2 f(x) v + r(t),
+    \end{equation*}
+    where $r(t)$ satisfies $\norm{r(t)}/t \to 0$ as $t \to 0$, and we can rewrite it as
+    \begin{equation}
+        \nabla^2 f(x) v = \lim_{t \to 0} \frac{\nabla f(x+tv)-\nabla f(x) -r(t)}{t} = \lim_{t \to 0} \frac{\nabla f(x+tv)-\nabla f(x)}{t}.
+    \end{equation}
+    Taking the inner product  with $v$ gives
+    \begin{align*}
+        v^\top \nabla^2 f(x) v & = \lim_{t \to 0} \qty(\frac{\nabla f(x+tv)-\nabla f(x)}{t})^\top v                                                   \\
+                               & \leq \lim_{t \to 0} \frac{\norm{\nabla f(x+tv)-\nabla f(x)}}{t} \norm{v} &  & (\text{Cauchy--Schwarz inequality})    \\
+                               & \leq L\norm{v}^2.                                                        &  & (\text{by \cref{eq:smoothness-bound}})
+    \end{align*}
+    Because $v \in \bbR^n$ is arbitrary, we obtain $\nabla^2 f(x)\preceq L I$.
+    \qed
+\end{proof}
+
+\subsubsection{Baillon--Haddad Theorem}
+
+One of the useful properties of $L$-smooth functions is given by the following Baillon--Haddad theorem.
+Note that only $C^1$ differentiability is required here.
+\begin{proposition}[Baillon--Haddad theorem]\label{prop:baillon_haddad}
+    Let $f \colon \bbR^n \to \bbR$ be of class $C^1$. If $f$ is $L$-smooth and convex, then for all $x,y \in \bbR^n$, $\nabla f$ is $1/L$-cocoercive, i.e.,
+    \begin{equation}\label{eq:cocoercive}
+        (\nabla f(x)-\nabla f(y))^\top (x-y) \ge \frac{1}{L} \norm{\nabla f(x)-\nabla f(y)}^2
+    \end{equation}
+    for all $x,y \in \bbR^n$.
+\end{proposition}
+We refer to other literature for the proof \citep{bauschkeBaillonHaddadTheoremRevisited2009} \citep[Proposition 12.60]{rockafellarVariationalAnalysis1998}.
+One consequence of this theorem is that, for the sequences $\{x_k\}$ generated by an optimization algorithm, defining
+\begin{equation*}
+    s_k \defeq x_{k+1}-x_k, \quad y_k \defeq \nabla f(x_{k+1}) - \nabla f(x_k)
+\end{equation*}
+and applying \cref{eq:cocoercive} with $x=x_{k+1}$ and $y=x_k$ yields
+\begin{equation*}
+    s_k^\top y_k \ge \frac{1}{L} \norm{y_k}^2.
+\end{equation*}
+This inequality is sometimes used in the analysis of update formulas in methods such as BFGS and L-BFGS, and we will also use it in a later chapter.
+
+\subsubsection{Bound on Hessian Eigenvalues}
+
+The $L$-smoothness combined with $\mu$-strong convexity also provides bounds on the eigenvalues of the Hessian.
+\begin{proposition}\label{prop:hessian-eigenvalue-bound}
+    Let $f \colon \bbR^n \to \bbR$ be of class $C^2$.
+    If $f$ is $L$-smooth and $\mu$-strongly convex, then the eigenvalues of the Hessian $\nabla^2 f(x)$ are contained in the interval $[\mu, L]$ for all $x \in \bbR^n$.
+\end{proposition}
+\begin{proof}
+    By \cref{prop:convexity-hessian,prop:smoothness-hessian}, we have
+    \begin{equation*}
+        \mu I \preceq \nabla^2 f(x) \preceq L I,
+    \end{equation*}
+    which directly implies that the eigenvalues of $\nabla^2 f(x)$ are contained in the interval $[\mu, L]$.
+    \qed
+\end{proof}
+As shown in \cref{prop:hessian-eigenvalue-bound},  the $L$-smoothness and $\mu$-strong convexity impose upper and lower bounds on the eigenvalues of the Hessian, respectively.
+
+\ifSubfilesClassLoaded{
+    \bibliographystyle{plainnat}
+    \bibliography{../L-BFGS.bib}
+}{}
+
+\end{document}

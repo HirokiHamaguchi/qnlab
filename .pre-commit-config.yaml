@@ -1,0 +1,40 @@
+repos:
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.4.4
+    hooks:
+      - id: ruff
+        args: ["qnlab", "script", "notebooks"]
+      - id: ruff-format
+        args: ["qnlab", "script", "notebooks"]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: 'v1.15.0'
+    hooks:
+       - id: mypy
+         files: ^(qnlab|script|doc_private)/.*\.py$
+         additional_dependencies: [types-PyYAML==6.0.12.20250516]
+
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: bash -c 'PYTHONPATH=./ .venv/bin/pytest test'
+        language: system
+        types: [python]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.8.1
+    hooks:
+      - id: nbstripout
+        name: nbstripout (strip notebook outputs)
+        description: "Strip output cells and large embedded content from Jupyter notebooks (.ipynb)"
+        files: \.ipynb$

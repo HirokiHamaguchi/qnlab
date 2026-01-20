@@ -1,0 +1,232 @@
+import json
+import multiprocessing
+import os
+
+import numpy as np
+import pycutest
+
+from qnlab.problem.cutest import CUTEstQNProblem
+
+
+def problemsToRun(precision: int | None) -> list[str]:
+    """Get the list of problems to run, excluding those with setup errors."""
+    if precision is None:
+        ret = sorted(
+            pycutest.find_problems(
+                constraints="unconstrained",
+                regular=True,
+            )
+        )
+        # Exclude problems that cannot be loaded due to missing setup()
+        for name in ["DMN15333LS", "MNISTS0LS", "MNISTS5LS"]:
+            if name in ret:
+                ret.remove(name)
+        return ret
+    else:
+        assert precision in [16, 32, 64]
+        json_path = os.path.join(os.path.dirname(__file__), "valid_problems.json")
+        assert os.path.exists(json_path)
+        with open(json_path) as f:
+            data = json.load(f)
+        return data.get("valid_problems", {}).get(f"precision_{precision}", [])
+
+
+def get_n(problem_name: str) -> int:
+    """Get the dimension n of a problem."""
+    prop = pycutest.problem_properties(problem_name)
+    if isinstance(prop["n"], int):
+        return prop["n"]
+    prob = pycutest.import_problem(problem_name)
+    return prob.n
+
+
+def make_n_table():
+    """Generate and save n_table.json with problem dimensions."""
+    dirname = os.path.dirname(__file__)
+    json_path = os.path.join(dirname, "n_table.json")
+
+    problems = problemsToRun(None)
+
+    # Load existing data if available
+    if os.path.exists(json_path):
+        with open(json_path) as f:
+            n_table = json.load(f)
+    else:
+        n_table = {}
+
+    for prob in problems:
+        if prob in n_table:
+            continue
+        try:
+            n_table[prob] = get_n(prob)
+            with open(json_path, "w") as f:
+                json.dump(dict(sorted(n_table.items())), f, indent=2)
+            print(f"  {prob}: n={n_table[prob]}")
+        except Exception as e:
+            print(f"  {prob}: Error - {e}")
+
+    print(f"\nSaved to {json_path}")
+
+
+def check_problem_at_precision(
+    problem_name: str, precision: int, timeout: int = 100
+) -> bool | None:
+    """
+    Check if gradient can be computed stably at given precision.
+    Returns True if valid, False if invalid, None if timeout.
+    """
+
+    def worker(q, name, prec):
+        try:
+            prob = CUTEstQNProblem(name, precision=prec)
+            g = prob.g(prob.x0, count=False)
+            is_valid = np.all(np.isfinite(g))
+            q.put(("ok", is_valid))
+        except Exception as e:
+            q.put(("err", str(e)))
+
+    q: multiprocessing.Queue = multiprocessing.Queue()
+    p = multiprocessing.Process(target=worker, args=(q, problem_name, precision))
+    p.start()
+    p.join(timeout)
+
+    if p.is_alive():
+        p.terminate()
+        p.join()
+        return None
+
+    try:
+        kind, payload = q.get_nowait()
+        return bool(payload) if kind == "ok" else False
+    except Exception:
+        return False
+
+
+def check_initial_gradient():
+    """Check gradient computation stability across precisions."""
+    dirname = os.path.dirname(__file__)
+    json_path = os.path.join(dirname, "valid_problems.json")
+    problems = problemsToRun(None)
+
+    print(f"Checking {len(problems)} problems across precisions 16, 32, 64...")
+    print("=" * 80)
+
+    # Load or initialize results
+    if os.path.exists(json_path):
+        with open(json_path) as f:
+            data = json.load(f)
+    else:
+        data = {
+            "valid_problems": {f"precision_{p}": [] for p in [16, 32, 64]},
+            "invalid_problems": {f"precision_{p}": [] for p in [16, 32, 64]},
+            "skipped_problems": [
+                # List of problems that can be excluded because either:
+                #  * the initial point is already stationary (FLETCBV2)
+                #  * all algorithms are known to fail (the rest)
+                "BA-L16LS",
+                "BA-L21LS",
+                "BA-L49LS",
+                "BA-L52LS",
+                "BA-L73LS",
+                "CURLY30",
+                "FLETCBV2",
+                "FLETCBV3",
+                "FLETCHBV",
+                "INDEF",
+                "NONMSQRT",
+                "SBRYBND",
+                "SCOSINE",
+                "SCURLY10",
+                "SCURLY20",
+                "SCURLY30",
+                "SSCOSINE",
+            ],
+        }
+
+    # Convert to sets for efficient lookup
+    v_sets = {k: set(v) for k, v in data["valid_problems"].items()}
+    inv_sets = {k: set(v) for k, v in data["invalid_problems"].items()}
+    skipped_set = set(data["skipped_problems"])
+
+    def save():
+        """Persist results to JSON."""
+        with open(json_path, "w") as f:
+            json.dump(
+                {
+                    "valid_problems": {k: sorted(list(v_sets[k])) for k in v_sets},
+                    "invalid_problems": {
+                        k: sorted(list(inv_sets[k])) for k in inv_sets
+                    },
+                    "skipped_problems": sorted(list(skipped_set)),
+                },
+                f,
+                indent=2,
+            )
+
+    # Check each problem
+    for i, problem_name in enumerate(problems, 1):
+        print(f"[{i}/{len(problems)}] {problem_name}...", end=" ")
+
+        if problem_name in skipped_set:
+            print("SKIP")
+            continue
+
+        results = {}
+        for precision in [16, 32, 64]:
+            key = f"precision_{precision}"
+
+            if problem_name in v_sets[key]:
+                results[precision] = "✓"
+                continue
+            if problem_name in inv_sets[key]:
+                results[precision] = "✗"
+                continue
+
+            is_valid = check_problem_at_precision(problem_name, precision)
+
+            if is_valid is None:
+                skipped_set.add(problem_name)
+                save()
+                results[precision] = "S"
+                break
+            elif is_valid:
+                v_sets[key].add(problem_name)
+                results[precision] = "✓"
+            else:
+                inv_sets[key].add(problem_name)
+                results[precision] = "✗"
+            save()
+
+        status = " ".join([f"{p}:{results.get(p, '?')}" for p in [16, 32, 64]])
+        print(status)
+
+    print("=" * 80)
+    print(f"Results saved to {json_path}\n")
+
+    # Summary
+    for precision in [16, 32, 64]:
+        key = f"precision_{precision}"
+        valid = len(v_sets[key])
+        invalid = len(inv_sets[key])
+        print(f"Precision {precision}-bit: {valid} valid, {invalid} invalid")
+    print(f"Skipped: {len(skipped_set)}")
+
+
+if __name__ == "__main__":
+    action = (
+        input("Action: (m)ake_n_table, (c)heck_gradient, or (b)oth? [b]: ")
+        .strip()
+        .lower()
+    )
+
+    if action in ["b", ""]:
+        print("\n=== Making n_table ===")
+        make_n_table()
+        print("\n=== Checking gradients ===")
+        check_initial_gradient()
+    elif action == "m":
+        make_n_table()
+    elif action == "c":
+        check_initial_gradient()
+    else:
+        print("Invalid action")

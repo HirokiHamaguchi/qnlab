@@ -1,0 +1,132 @@
+\begin{thebibliography}{20}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Bauschke and Combettes(2009)]{bauschkeBaillonHaddadTheoremRevisited2009}
+Heinz~H. Bauschke and Patrick~L. Combettes.
+\newblock The {{Baillon-Haddad Theorem Revisited}}, December 2009.
+
+\bibitem[Rockafellar and Wets(1998)]{rockafellarVariationalAnalysis1998}
+R.~Tyrrell Rockafellar and Roger J.~B. Wets.
+\newblock \emph{Variational {{Analysis}}}, volume 317 of \emph{Grundlehren Der Mathematischen {{Wissenschaften}}}.
+\newblock Springer, Berlin, Heidelberg, 1998.
+\newblock ISBN 978-3-540-62772-2 978-3-642-02431-3.
+\newblock \doi{10.1007/978-3-642-02431-3}.
+
+\bibitem[Nocedal and Wright(1999)]{nocedal1999numerical}
+Jorge Nocedal and Stephen~J Wright.
+\newblock \emph{Numerical Optimization}.
+\newblock Springer, 1999.
+\newblock ISBN 978-0-387-30303-1.
+\newblock \doi{10.1007/978-0-387-40065-5}.
+
+\bibitem[Doikov(2021)]{Doikov2021SecondOrderTensor}
+Nikita Doikov.
+\newblock \emph{New Second-Order and Tensor Methods in Convex Optimization}.
+\newblock PhD thesis, Universit\'e catholique de Louvain, September 2021.
+
+\bibitem[Dennis and Mor{\'e}(1977)]{dennisjr.QuasiNewtonMethodsMotivation1977a}
+J.~E. Dennis, Jr. and Jorge~J. Mor{\'e}.
+\newblock Quasi-{{Newton Methods}}, {{Motivation}} and {{Theory}}.
+\newblock \emph{SIAM Review}, 19\penalty0 (1):\penalty0 46--89, January 1977.
+\newblock ISSN 0036-1445.
+\newblock \doi{10.1137/1019005}.
+
+\bibitem[Haelterman(2009)]{haeltermanAnalyticalStudyLeast2009}
+Robby Haelterman.
+\newblock \emph{{Analytical study of the Least Squares Quasi-Newton method for interaction problems}}.
+\newblock PhD thesis, 2009., 2009.
+
+\bibitem[Kanamori and Ohara(2010{\natexlab{a}})]{kanamoriBregmanExtensionQuasiNewton2010}
+Takafumi Kanamori and Atsumi Ohara.
+\newblock A {{Bregman Extension}} of quasi-{{Newton}} updates {{II}}: {{Convergence}} and {{Robustness Properties}}, October 2010{\natexlab{a}}.
+
+\bibitem[Kanamori and Ohara(2010{\natexlab{b}})]{kanamoriBregmanExtensionQuasiNewton2010a}
+Takafumi Kanamori and Atsumi Ohara.
+\newblock A {{Bregman Extension}} of quasi-{{Newton}} updates {{I}}: {{An Information Geometrical}} framework, October 2010{\natexlab{b}}.
+
+\bibitem[Powell(1986)]{powellHowBadAre1986}
+M.~J.~D. Powell.
+\newblock How bad are the {{BFGS}} and {{DFP}} methods when the objective function is quadratic?
+\newblock \emph{Mathematical Programming}, 34\penalty0 (1):\penalty0 34--47, January 1986.
+\newblock ISSN 1436-4646.
+\newblock \doi{10.1007/BF01582161}.
+
+\bibitem[Liu and Nocedal(1989)]{liuLimitedMemoryBFGS1989a}
+Dong~C. Liu and Jorge Nocedal.
+\newblock On the limited memory {{BFGS}} method for large scale optimization.
+\newblock \emph{Mathematical Programming}, 45\penalty0 (1):\penalty0 503--528, August 1989.
+\newblock ISSN 1436-4646.
+\newblock \doi{10.1007/BF01589116}.
+
+\bibitem[Shanno and Phua(1978)]{shannoMatrixConditioningNonlinear1978}
+D.~F. Shanno and Kang-Hoh Phua.
+\newblock Matrix conditioning and nonlinear optimization.
+\newblock \emph{Mathematical Programming}, 14\penalty0 (1):\penalty0 149--160, December 1978.
+\newblock ISSN 1436-4646.
+\newblock \doi{10.1007/BF01588962}.
+
+\bibitem[Barzilai and Borwein(1988)]{barzilaiTwoPointStepSize1988}
+Jonathan Barzilai and Jonathan~M. Borwein.
+\newblock Two-{{Point Step Size Gradient Methods}}.
+\newblock \emph{IMA Journal of Numerical Analysis}, 8\penalty0 (1):\penalty0 141--148, January 1988.
+\newblock ISSN 0272-4979.
+\newblock \doi{10.1093/imanum/8.1.141}.
+
+\bibitem[Yuan(1991)]{yuanModifiedBFGSAlgorithm1991}
+Ya-Xiang Yuan.
+\newblock A {{Modified BFGS Algorithm}} for {{Unconstrained Optimization}}.
+\newblock \emph{IMA Journal of Numerical Analysis}, 11\penalty0 (3):\penalty0 325--332, July 1991.
+\newblock ISSN 0272-4979.
+\newblock \doi{10.1093/imanum/11.3.325}.
+
+\bibitem[Wei et~al.(2006)Wei, Li, and Qi]{weiNewQuasiNewtonMethods2006}
+Zengxin Wei, Guoyin Li, and Liqun Qi.
+\newblock New quasi-{{Newton}} methods for unconstrained optimization problems.
+\newblock \emph{Applied Mathematics and Computation}, 175\penalty0 (2):\penalty0 1156--1188, April 2006.
+\newblock ISSN 0096-3003.
+\newblock \doi{10.1016/j.amc.2005.08.027}.
+
+\bibitem[{Babaie-Kafaki}(2011)]{babaie-kafakiModifiedBFGSAlgorithm2011}
+Saman {Babaie-Kafaki}.
+\newblock A modified {{BFGS}} algorithm based on a hybrid secant equation.
+\newblock \emph{Science China Mathematics}, 54\penalty0 (9):\penalty0 2019--2036, September 2011.
+\newblock ISSN 1869-1862.
+\newblock \doi{10.1007/s11425-011-4232-7}.
+
+\bibitem[Zhang et~al.(1999)Zhang, Deng, and Chen]{zhangNewQuasiNewtonEquation1999}
+J.~Z. Zhang, N.~Y. Deng, and L.~H. Chen.
+\newblock New {{Quasi-Newton Equation}} and {{Related Methods}} for {{Unconstrained Optimization}}.
+\newblock \emph{Journal of Optimization Theory and Applications}, 102\penalty0 (1):\penalty0 147--167, July 1999.
+\newblock ISSN 0022-3239, 1573-2878.
+\newblock \doi{10.1023/A:1021898630001}.
+
+\bibitem[Zhang and Xu(2001)]{zhangPropertiesNumericalPerformance2001}
+Jianzhong Zhang and Chengxian Xu.
+\newblock Properties and numerical performance of quasi-{{Newton}} methods with modified quasi-{{Newton}} equations.
+\newblock \emph{Journal of Computational and Applied Mathematics}, 137\penalty0 (2):\penalty0 269--278, December 2001.
+\newblock ISSN 0377-0427.
+\newblock \doi{10.1016/S0377-0427(00)00713-5}.
+
+\bibitem[Yabe et~al.(2007)Yabe, Ogasawara, and Yoshino]{yabeLocalSuperlinearConvergence2007}
+Hiroshi Yabe, Hideho Ogasawara, and Masayuki Yoshino.
+\newblock Local and superlinear convergence of quasi-{{Newton}} methods based on modified secant conditions.
+\newblock \emph{Journal of Computational and Applied Mathematics}, 205\penalty0 (1):\penalty0 617--632, August 2007.
+\newblock ISSN 03770427.
+\newblock \doi{10.1016/j.cam.2006.05.018}.
+
+\bibitem[Berahas et~al.(2022)Berahas, Curtis, and Zhou]{berahasLimitedmemoryBFGSDisplacement2022}
+Albert~S. Berahas, Frank~E. Curtis, and Baoyu Zhou.
+\newblock Limited-memory {{BFGS}} with displacement aggregation.
+\newblock \emph{Mathematical Programming}, 194\penalty0 (1):\penalty0 121--157, July 2022.
+\newblock ISSN 1436-4646.
+\newblock \doi{10.1007/s10107-021-01621-6}.
+
+\bibitem[Lee and Sun(2025)]{leeAdvancingMultiSecantQuasiNewton2025}
+Mokhwa Lee and Yifan Sun.
+\newblock Advancing {{Multi-Secant Quasi-Newton Methods}} for {{General Convex Functions}}, April 2025.
+
+\end{thebibliography}

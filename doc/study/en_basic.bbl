@@ -1,0 +1,19 @@
+\begin{thebibliography}{2}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Bauschke and Combettes(2009)]{bauschkeBaillonHaddadTheoremRevisited2009}
+Heinz~H. Bauschke and Patrick~L. Combettes.
+\newblock The {{Baillon-Haddad Theorem Revisited}}, December 2009.
+
+\bibitem[Rockafellar and Wets(1998)]{rockafellarVariationalAnalysis1998}
+R.~Tyrrell Rockafellar and Roger J.~B. Wets.
+\newblock \emph{Variational {{Analysis}}}, volume 317 of \emph{Grundlehren Der Mathematischen {{Wissenschaften}}}.
+\newblock Springer, Berlin, Heidelberg, 1998.
+\newblock ISBN 978-3-540-62772-2 978-3-642-02431-3.
+\newblock \doi{10.1007/978-3-642-02431-3}.
+
+\end{thebibliography}

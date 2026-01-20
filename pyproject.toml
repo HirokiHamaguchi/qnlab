@@ -1,0 +1,74 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "qnlab"
+version = "0.0.3"
+dependencies = [
+  "babel>=2.17.0",
+  "cvxopt>=1.3.2",
+  "cvxpy>=1.6.5",
+  "distlib>=0.3.9",
+  "fparser>=0.2.0",
+  "ipykernel>=6.29.5",
+  "ipython>=8.18.1",
+  "jax>=0.4.30",
+  "jaxlib>=0.4.30",
+  "joblib>=1.5.1",
+  "matplotlib>=3.10.3",
+  "Mosek>=11.0.22",
+  "mypy>=1.15.0",
+  "mypy_extensions>=1.1.0",
+  "networkx>=3.5",
+  "nlopt>=2.9.1",
+  "numpy>=2.0.2",
+  "pandas>=2.2.3",
+  "pillow>=11.2.1",
+  "pycutest>=1.7.2",
+  "pyperclip>=1.9.0",
+  "pytest>=8.3.5",
+  "ruff>=0.11.11",
+  "scikit-learn>=1.7.0",
+  "scipy>=1.13.1",
+  "seaborn>=0.13.2",
+  "setuptools>=80.8.0",
+  "sympy>=1.14.0",
+  "torch>=2.7.1",
+  "PyYaml>=6.0.2",
+  "numba>=0.61.2",
+  "tqdm>=4.67.1",
+  "pypdf>=6.1.3",
+]
+authors = [
+  { name="Hiroki Hamaguchi", email="hari64boli64@gmail.com" }
+]
+description = "Quasi-Newton Methods for Academic Research"
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Documentation = "https://qnlab.readthedocs.io/"
+Repository = "https://github.com/HirokiHamaguchi/qnlab"
+Issues = "https://github.com/HirokiHamaguchi/qnlab/issues"
+
+[tool.hatch.build]
+exclude = [
+    "doc",
+    "test",
+    "submodules",
+    "notebooks",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["qnlab"]
+
+[tool.pydocstyle]
+convention = "google"
+add-ignore = ["D100", "D104"]

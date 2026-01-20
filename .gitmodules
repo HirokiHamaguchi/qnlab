@@ -1,0 +1,12 @@
+[submodule "submodules/paper-regularized-qn-benchmark"]
+	path = submodules/paper-regularized-qn-benchmark
+	url = https://github.com/dmsteck/paper-regularized-qn-benchmark.git
+[submodule "submodules/LBFGSpp"]
+	path = submodules/LBFGSpp
+	url = https://github.com/yixuan/LBFGSpp.git
+[submodule "submodules/liblbfgs"]
+	path = submodules/liblbfgs
+	url = https://github.com/chokkan/liblbfgs.git
+[submodule "submodules/noise-tolerant-bfgs"]
+	path = submodules/noise-tolerant-bfgs
+	url = https://github.com/hjmshi/noise-tolerant-bfgs.git
