@@ -44,49 +44,57 @@ plt.plot([8, 8.5], [3.2, 3.0], "--", color="#d62728", lw=2.5)
 # -------------------------
 # annotations (inequalities)
 # -------------------------
-plt.text(0.6, 4.2, r"$\bar f(x_{k+1}) \leq \bar f(x_k)+\Delta_k$", fontsize=25)
-
+x = 2.1
+y = 4.2
 plt.text(
-    4.2,
-    5.7,
-    r"$\bar f(x_k)\leq \bar f(x_j)-\Delta_{j}-\Delta_{j-1}$",
+    x,
+    y,
+    r"$\bar f(x_{k+1}) \leq \bar f(x_k)+\Delta_k$",
     fontsize=25,
+    ha="center",
+    bbox=dict(facecolor="white"),
 )
 plt.text(
-    6.3,
-    5.0,
-    r"$(0\leq j<k)$",
+    x,
+    y - 0.55,
+    r"$(k \in K)$",
     fontsize=20,
+    ha="center",
+    bbox=dict(facecolor="white"),
+)
+
+x = 6.5
+y = 5.3
+plt.text(
+    x,
+    y,
+    r"$\bar f(x_k)\leq \bar f(x_j)-\Delta_{j}$",
+    fontsize=25,
+    ha="center",
+    bbox=dict(facecolor="white"),
+)
+plt.text(
+    x,
+    y - 0.55,
+    r"$(k \in K^0, \, 0 \leq j < k)$",
+    fontsize=20,
+    ha="center",
+    bbox=dict(facecolor="white"),
 )
 
 
-# -------------------------
-# step arrows (k=2 to k=3, k=3 to k=5)
-# -------------------------
-# k=2 to k=3: horizontal then vertical
-arrow_h1 = FancyArrowPatch(
-    (2.0, f[2]), (3.0, f[2]), arrowstyle="-", lw=1, linestyle="dashed", color="gray"
+arrow_h = FancyArrowPatch(
+    (2.0, f[2]), (5.0, f[2]), arrowstyle="-", lw=1, linestyle="dashed", color="gray"
 )
-plt.gca().add_patch(arrow_h1)
+plt.gca().add_patch(arrow_h)
 
 arrow_v1 = FancyArrowPatch(
     (3.0, f[2]), (3.0, f[3]), arrowstyle="->", mutation_scale=20, lw=2, color="black"
 )
 plt.gca().add_patch(arrow_v1)
 
-# k=3 to k=6: horizontal then vertical
-arrow_h2 = FancyArrowPatch(
-    (3.0, f[3]), (6.0, f[3]), arrowstyle="-", lw=1, linestyle="dashed", color="gray"
-)
-plt.gca().add_patch(arrow_h2)
-
-arrow_h2_2 = FancyArrowPatch(
-    (5.0, f[5]), (6.0, f[5]), arrowstyle="-", lw=1, linestyle="dashed", color="gray"
-)
-plt.gca().add_patch(arrow_h2_2)
-
 arrow_v2 = FancyArrowPatch(
-    (6.0, f[3]), (6.0, f[6]), arrowstyle="->", mutation_scale=30, lw=2, color="black"
+    (5.0, f[2]), (5.0, f[5]), arrowstyle="->", mutation_scale=30, lw=2, color="black"
 )
 plt.gca().add_patch(arrow_v2)
 

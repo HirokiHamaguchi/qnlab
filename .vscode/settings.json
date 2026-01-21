@@ -13,6 +13,7 @@
         "**/.mypy_cache": true,
         "**/.ruff_cache": true,
         "**/*.synctex.gz": true,
+        "**/*.bbl": true,
     },
     "latexlint.LLCrefExceptions": [
         "line:",
@@ -351,6 +352,7 @@
         "an noise tolerant",
         "\\\\emph\\{",
         "—",
-        "\\\\texttt\\{\\("
+        "\\\\texttt\\{\\(",
+        "\\\\Delta_\\{-1\\}"
     ],
 }
