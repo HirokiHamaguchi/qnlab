@@ -124,7 +124,6 @@ def plot_modified_BFGS_demo():
     axes[0].set_ylabel(r"$f(x)$", fontsize=25)
     axes[1].set_xlabel(r"$x$", fontsize=25)
     plt.tight_layout(rect=(0, 0, 1, 0.93))
-    plt.savefig("cubic_interpolation.png", dpi=300)
     plt.savefig("cubic_interpolation.pdf")
 
 

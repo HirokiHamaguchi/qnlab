@@ -65,7 +65,6 @@ def plot_surfaces_and_save():
     # Reduce spacing between subplots as much as practical
     plt.tight_layout(pad=0.0)
     plt.subplots_adjust(wspace=0.01)
-    plt.savefig("pd.png", dpi=300, bbox_inches="tight")
     plt.savefig("pd.pdf", bbox_inches="tight")
     plt.close(fig)
 

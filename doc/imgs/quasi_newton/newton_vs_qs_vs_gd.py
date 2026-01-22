@@ -29,6 +29,7 @@ def gradient_descent_with_line_search(
         d = -g
 
         alpha, fc, gc, fx_new, g_old, g_new = line_search(prob.f, prob.g, x, d, g, fx)
+        assert isinstance(alpha, float)
         x_new = x + alpha * d
         g_new = prob.g(x_new)
 

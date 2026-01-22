@@ -1,4 +1,3 @@
-import io
 import os
 import tempfile
 
@@ -225,30 +224,11 @@ def create_enhanced_figure(draw_func, filename):
         output_page.show_pdf_page(rect, doc1, 0, overlay=True)
 
         # PDFとして保存（圧縮を有効化）
-        pdf_filename = filename.replace(".png", ".pdf")
-        output_doc.save(pdf_filename, garbage=4, deflate=True, clean=True)
-
-        # 4. PDFをPNGに変換
-        page = output_doc[0]
-        mat = fitz.Matrix(300 / 72, 300 / 72)  # 300 DPI
-        pix = page.get_pixmap(matrix=mat, alpha=False)
-
-        # トリミング処理
-        img_data = pix.tobytes("png")
-        buf = io.BytesIO(img_data)
-        from PIL import Image
-
-        result = Image.open(buf)
-        w, h = result.size
-        trim_w = max(1, int(w * 0.03))
-        trim_h = max(1, int(h * 0.05))
-        result2 = result.crop((0 + trim_w, 0 + trim_h, w - trim_w, h - trim_h))
-        result2.save(filename, dpi=(300, 300))
+        output_doc.save(filename, garbage=4, deflate=True, clean=True)
 
         output_doc.close()
         doc1.close()
         doc2.close()
-        buf.close()
 
 
 def draw_panel1(ax, transparent_surfaces=True):
@@ -267,7 +247,7 @@ def draw_panel1(ax, transparent_surfaces=True):
         draw_surface_z(ax, alpha=1.0)
 
 
-create_enhanced_figure(draw_panel1, "quasi_newton_1.png")
+create_enhanced_figure(draw_panel1, "quasi_newton_1.pdf")
 
 Q_Bk = quadratic_surface(B_k, x_k, g_k, X, Y)
 
@@ -287,7 +267,7 @@ def draw_panel2(ax, transparent_surfaces=True):
         draw_surface_quadratic(ax, Q_Bk, "tab:orange", alpha=0.7)
 
 
-create_enhanced_figure(draw_panel2, "quasi_newton_2.png")
+create_enhanced_figure(draw_panel2, "quasi_newton_2.pdf")
 
 y_k = g_kp1 - g_k
 den1 = float(s_k.T @ B_k @ s_k)
@@ -309,7 +289,7 @@ def draw_panel3(ax, transparent_surfaces=True):
         draw_surface_quadratic(ax, Q_Bkp1, "tab:green", alpha=0.7)
 
 
-create_enhanced_figure(draw_panel3, "quasi_newton_3.png")
+create_enhanced_figure(draw_panel3, "quasi_newton_3.pdf")
 
 print("Summary:")
 print("x_k =", x_k)

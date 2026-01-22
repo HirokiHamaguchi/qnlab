@@ -50,10 +50,6 @@ class StronglyConvexFunction:
             )
 
         plt.legend(loc="upper center")
-        plt.savefig(
-            f"newton_failure_strongly_convex_function_{self.mu}_{x0}.png",
-            dpi=300,
-        )
         plt.savefig(f"newton_failure_strongly_convex_function_{self.mu}_{x0}.pdf")
         plt.close()
 
@@ -101,7 +97,6 @@ class SqrtFunction:
             )
 
         plt.legend(loc="upper center")
-        plt.savefig(f"newton_failure_sqrt_function_{x0}.png", dpi=300)
         plt.savefig(f"newton_failure_sqrt_function_{x0}.pdf")
         plt.close()
 
