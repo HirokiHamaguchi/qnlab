@@ -61,18 +61,18 @@ class BFGSUpdateRule(BaseUpdateRule):
         """Uses new_y = y + mu * s in the update."""
         assert len(lm) > 0
         d = -g.copy()
-        new_y_ys = []
         for item in reversed(lm):
-            new_y = item.y + mu * item.s
-            new_y_ys.append(new_y)
             item.alpha = np.dot(item.s, d) / (item.ys + mu * item.ss)
-            d -= item.alpha * new_y
+            d -= item.alpha * item.y
+            d -= item.alpha * mu * item.s
         firstItem = lm.get_last()
         d *= (firstItem.ys + mu * firstItem.ss) / (
             firstItem.yy + 2.0 * mu * firstItem.ys + mu * mu * firstItem.ss
         )
-        for item, new_y in zip(lm, reversed(new_y_ys)):
-            beta = np.dot(new_y, d) / (item.ys + mu * item.ss)
+        for item in lm:
+            yd = np.dot(item.y, d)
+            sd = np.dot(item.s, d)
+            beta = (yd + mu * sd) / (item.ys + mu * item.ss)
             d += (item.alpha - beta) * item.s
         return d
 
