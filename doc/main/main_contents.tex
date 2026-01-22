@@ -91,10 +91,10 @@ Similar adaptive trust-region approaches are also discussed \citep{grapigliaAdap
 Prominent examples of OFFO include adaptive gradient methods such as \AdaGrad \citep{duchiAdaptiveSubgradientMethods2011} and \AdaGradNorm \citep{wardAdaGradStepsizesSharp2020}.
 Their update rules are
 \begin{align*}
-    x_{k+1}^{(i)}                                                            & = x_k^{(i)} -
-    \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k (g_j^{(i)})^2}} g_k^{(i)}, &               & (i=1,2,\ldots,n) \\
-    x_{k+1}                                                                  & = x_k -
-    \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k \norm{g_j}^2}} g_k,
+    x_{k+1}^{(i)}                                                             & = x_k^{(i)} -
+    \frac{1}{\theta \sqrt{\varsigma + \sum_{j=0}^k (g_j^{(i)})^2}} g_k^{(i)}, &               & (i=1,2,\ldots,n) \\
+    x_{k+1}                                                                   & = x_k -
+    \frac{1}{\theta \sqrt{\varsigma + \sum_{j=0}^k \norm{g_j}^2}} g_k,
 \end{align*}
 respectively, where $\varsigma>0$ and $\theta>0$ are algorithmic parameters, and $x^{(i)}$ denotes the $i$-th component of a vector $x$.
 
@@ -117,15 +117,15 @@ In this section, we present the proposed algorithm for the problem setting state
 \DontPrintSemicolon
 \begin{algorithm}[ht]
     \normalsize
-    \KwIn{$x_0 \in \bbR^n$, $k_{\max} > 0$, $0 \le \feps < 1$, $0 < c < 1$, $0 < \theta_{\min} \leq \theta_{\max}$ and $\varsigma > 0$}
+    \KwIn{$x_0$, $0 < k_{\max}$, $0 \le \feps < 1$, $0 < c < 1$, $0 < \theta_{\min} \leq \theta_{\max}$ and $0 < \varsigma < 1$}
     $k \gets 0$, $g_0 \gets \nabla f(x_0)$, $K^+ \gets \emptyset$ \label{line:init}\;
-    \For{$k=0,1,2,\ldots, k_{\max}$}{
+    \For{$k=0,1,2,\ldots, k_{\max}-1$}{
         \uIf{$\min_{0 \leq j < k} (\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k)$\label{line:mu_0_condition}}{
             $\mu_k \gets 0$ \label{line:update_mu_0}\;
         }
         \uElse{
             $K^+ \gets K^+ \cup \{k\}$ \label{line:update_K_plus}\;
-            $\mu_{k} \gets \theta \sqrt{\varsigma + \sum_{j \in K^+} \norm{g_{j}}^2}$ with $\theta \in [\theta_{\min}, \theta_{\max}]$ chosen adaptively \label{line:update_theta}\;
+            $\mu_{k} \gets \theta_k \sqrt{\varsigma + \sum_{j \in K^+} \norm{g_{j}}^2}$ with $\theta_k \in [\theta_{\min}, \theta_{\max}]$ chosen adaptively \label{line:update_theta}\;
         }
         $d_k \gets -(B_k + \mu_k I)^{-1} g_k$ with $B_k$ chosen properly (\cref{sec:proposed_choice_Bk}) \label{line:d_k}\;
         Find $\alpha_k$ and $\Delta_k$ satisfying \cref{eq:relaxed_Armijo_condition} by \cref{alg:backtracking_linesearch}  \label{line:armijo}\;
@@ -191,7 +191,7 @@ Since $\Delta_k$ depends on $-\overline{f}(x_{k+1})$ but not on $\overline{f}(x_
 The third component is the adaptive update of the regularization parameter $\mu_k$.
 A larger $\mu_k$ yields a more conservative step, while a smaller $\mu_k$ allows a more aggressive quasi-Newton step, especially when $\mu_k=0$.
 In practical settings, setting $\mu_k=0$ is preferred, since this allows us to fully exploit the quasi-Newton approximation and typically leads to practically faster convergence.
-Let us partition the iteration indices $K\defeq \{0,1,2,\ldots, k_{\max}\}$ into two sets:
+Let us partition the iteration indices $K\defeq \{0,1,2,\ldots, k_{\max}-1\}$ into two sets:
 \begin{equation}\label{eq:def_K0_Kplus}
     K^0 \defeq \{k \in K \mid \mu_k = 0\}, \quad K^+ \defeq \{k \in K \mid \mu_k > 0\}.
 \end{equation}
@@ -205,7 +205,7 @@ Thereby, while $\overline{f}$ can temporarily increase, this condition theoretic
 
 Otherwise, to ensure convergence to first-order stationary points, we apply an OFFO-based update
 \begin{equation}\label{eq:offo_based_update}
-    \mu_k = \theta\sqrt{\varsigma+\sum_{j \in K^+, \, j \leq k}\norm{g_j}^2},
+    \mu_k = \theta_k \sqrt{\varsigma+\sum_{j \in K^+, \, j \leq k}\norm{g_j}^2},
 \end{equation}
 as described in \cref{sec:prel_offo}.
 Since OFFO schemes do not rely on function values, this update is robust to numerical errors in $\overline{f}$.
@@ -306,7 +306,7 @@ The following lemma asserts that the error between the true values difference $\
         (\text{\cref{eq:relaxed_Armijo_condition}})
     \end{align*}
     which yields \cref{eq:error_bound_on_function_evaluations}.
-    \qed
+    \myQED
 \end{proof}
 
 \subsection{Backtracking Stage}\label{sec:inner_loop}
@@ -358,7 +358,7 @@ Recall that we assume parameters in \cref{alg:backtracking_linesearch} satisfies
     \end{align*}
     which means the relaxed Armijo condition (\cref{eq:relaxed_Armijo_condition}) is satisfied.
     Thus, we can conclude that the backtracking stage terminates whenever \cref{eq:alpha_bar} holds.
-    \qed
+    \myQED
 \end{proof}
 
 Let us analyze the behavior of \cref{alg:backtracking_linesearch} using \cref{prop:backtracking_finite}.
@@ -376,7 +376,7 @@ We first bound the number of backtracking rejections as follows.
     we have $\alpha_k \le \beta_{\max}^r$.
     Since the backtracking terminates once \cref{eq:alpha_bar} holds, $\beta_{\max}^r < \min\qty(\frac{2(1-c)m^2}{LM},1)$ is a sufficient condition for backtracking termination.
     Taking logarithms and rounding up gives the desired bound.
-    \qed
+    \myQED
 \end{proof}
 
 Now, in the following, let us define
@@ -397,7 +397,7 @@ We can lower bound the step size $\alpha_k$ by $\overline{\alpha}$ as follows.
     Otherwise, there is a last rejected step size $\alpha'_k$. By \cref{prop:backtracking_finite}, $\alpha'_k > \min\qty(\frac{2(1-c)m^2}{LM},1)$.
     Since the final $\alpha_k$ is chosen from $[\beta_{\min} \alpha'_k, \beta_{\max} \alpha'_k]$ as in \refLine{line:ls_backtracking}, we have $\alpha_k \ge \beta_{\min}\alpha'_k$.
     Combining these inequalities yields \cref{eq:alpha_lower_bound}.
-    \qed
+    \myQED
 \end{proof}
 
 \subsection{Bound for the case \texorpdfstring{$\mu_k=0$}{mu k = 0}}
@@ -442,7 +442,7 @@ To this purpose, we introduce
                                     & = \overline{f}(x_0) - \overline{f}^* + \Delta_{\max},                                                                                                                      &  & \text{(\cref{eq:def_Delta_max})}
     \end{align*}
     which completes the proof.
-    \qed
+    \myQED
 \end{proof}
 
 Then, let us bound the sum of $\norm{g_{k}}^2$ over ${k} \in K^0$ using $\delta_k$.
@@ -466,7 +466,7 @@ Then, let us bound the sum of $\norm{g_{k}}^2$ over ${k} \in K^0$ using $\delta_
         \overline{\delta}_k + \Delta_{k}
          & \le \delta_k + \frac{2\feps}{1-\feps} \max(1, \abs{\overline{f}(x_{k})}, \abs{\overline{f}(x_{{k}+1})}) + \Delta_{k} \qquad (\text{\cref{lem:error_bound_on_function_evaluations}}) \notag  \\
          & \le \delta_k + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}) + \Delta_{k}, -\overline{f}(x_{{k}+1}) + \Delta_{k}) + \Delta_{k} \notag                                                  \\
-         & \le \delta_k + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}), -\overline{f}(x_{{k}+1})) + \frac{1+\feps}{1-\feps} \Delta_{k} \notag                                                    \\
+         & \le \delta_k + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}), -\overline{f}(x_{{k}+1})) + \qty(\frac{2\feps}{1-\feps}+1) \Delta_{k} \notag                                             \\
          & = \delta_k + \frac{1+3\feps}{1-\feps} \Delta_{k} \qquad (\text{definition of $\Delta_k$ in \cref{eq:relaxed_Armijo_condition}}), \label{eq:intermediate_bound_on_overline_delta_plus_Delta}
     \end{align}
     Then, combining \cref{eq:sufficient_decrease,eq:intermediate_bound_on_overline_delta_plus_Delta} and summing up over $k \in K^0$ gives
@@ -475,13 +475,13 @@ Then, let us bound the sum of $\norm{g_{k}}^2$ over ${k} \in K^0$ using $\delta_
                                                                       & \leq \sum_{k \in K^0} \delta_{k} + \frac{1+3\feps}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}). &  & \text{(\cref{lem:delta_bound_and_sum})}
     \end{align*}
     Rearranging the terms completes the proof.
-    \qed
+    \myQED
 \end{proof}
 
 \subsection{Bound for the case \texorpdfstring{$\mu_k > 0$}{mu k > 0}}
 
 Next, we show that the sum of $\norm{g_{k}}^2$ over ${k} \in K^+$ ($\mu_{k} > 0$) is bounded.
-Recall that $K^+$ be a set of iteration indices $k$ such that $\mu_k > 0$ in \cref{alg:regularized_qn} as defined in \cref{eq:def_K0_Kplus}.
+Recall that $K^+$ be a set of iteration indices $k$ such that $\mu_k > 0$  as defined in \cref{eq:def_K0_Kplus}, and that $\mu_k$ is defined as $\theta_k \sqrt{\varsigma + \sum_{j \in K^+,\ j < k} \norm{g_{j}}^2}$ with $\theta_k \in [\theta_{\min}, \theta_{\max}]$ in \refLine{line:update_theta} of \cref{alg:regularized_qn}.
 
 Before proceeding to the main proof, we present two auxiliary lemmas.
 The first one is about standard inequalities in the \AdaGrad algorithm analysis \citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020}, \citep[Lemma~3.1]{Gratton08022024}.
@@ -501,6 +501,7 @@ Now, we define the following constants for later use:
     C_1 \defeq \frac{\overline{\alpha}}{\theta_{\max}} \qquad
     C_2 \defeq \frac{M\overline{\alpha}+L/2}{\theta_{\min}^2} \label{eq:def_C1_C2}
 \end{equation}
+Note that $0 < C_1 \leq C_2$ holds since $1 \leq M$ and $\theta_{\min} \leq \theta_{\max}$.
 Then, we prove that the sum of $\delta_{k}$ over ${k} \in K^+$ can be bounded as follows.
 \begin{lemma}\label{lem:sum_small_delta_k_bound_Kplus}
     Under \cref{ass:bounded,ass:LSmooth,ass:BBounds},
@@ -541,11 +542,12 @@ Then, we prove that the sum of $\delta_{k}$ over ${k} \in K^+$ can be bounded as
 
 We again define a constant:
 \begin{equation}
-    F = f(x_0) - f^* + \frac{1+3\feps}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}) - C_1 \sqrt{\varsigma} + C_2 \ln(\varsigma).
+    F = f(x_0) - f^* + \frac{1+3\feps}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}) + C_1 \sqrt{\varsigma} - C_2 \ln(\varsigma).
     \label{eq:def_F}
 \end{equation}
 Then, combining the results for $k \in K^0$ and $k \in K^+$, we have the following proposition.
 \begin{proposition}\label{prop:sum_norm_g_k_bound}
+    Under \cref{ass:bounded,ass:LSmooth,ass:BBounds},
     \begin{equation*}
         F \ge
         \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \norm{g_{k}}^2 +
@@ -554,30 +556,44 @@ Then, combining the results for $k \in K^0$ and $k \in K^+$, we have the followi
     \end{equation*}
 \end{proposition}
 \begin{proof}
-    From \cref{lem:sum_small_delta_k_bound_K0,lem:sum_small_delta_k_bound_Kplus}, we have
-    \begin{align*}
-        F & = f(x_0) - f^* - \varsigma_0                                            \\
-          & \ge \sum_{k \in K^0} \delta_k + \sum_{k \in K^+} \delta_k - \varsigma_0 \\
-          & \ge \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \norm{g_{k}}^2 +
-        C_1 \sqrt{\varsigma + \sum_{k \in K^+} \norm{g_{k}}^2} -
-        C_2 \ln\qty(\varsigma+\sum_{k \in K^+} \norm{g_{k}}^2),
-    \end{align*}
+    By telescoping sum and $f(x_{k_{\max}}) \ge f^*$ by \cref{ass:bounded}, we have
+    \begin{equation*}
+        f(x_0) - f^* \geq f(x_0) - f(x_{k_{\max}}) = \sum_{k \in K} \delta_k = \sum_{k \in K^0} \delta_k + \sum_{k \in K^+} \delta_k.
+    \end{equation*}
+    From \cref{lem:sum_small_delta_k_bound_K0,lem:sum_small_delta_k_bound_Kplus}, we can further bound as
+    \begin{multline*}
+        f(x_0) - f^*
+        \ge \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \norm{g_{k}}^2
+        +C_1 \sqrt{\varsigma + \sum_{k \in K^+} \norm{g_{k}}^2}
+        - C_2 \ln\qty(\varsigma+\sum_{k \in K^+} \norm{g_{k}}^2)\\
+        - \frac{1+3\feps}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max})
+        - C_1 \sqrt{\varsigma}
+        + C_2 \ln(\varsigma).
+    \end{multline*}
+    Rearranging and substituting \cref{eq:def_F} yields the desired bound, concluding the proof.
+    \myQED
 \end{proof}
 This proposition is a key to prove the global convergence of \cref{alg:regularized_qn}, since we can derive upper-bounds for the sums of $\norm{g_k}^2$ over $k \in K^0$ and $k \in K^+$ separately.
 
-Let us first derive the bound for the sum over $k \in K^0$.
+Let us first derive the bound for the sum over $k \in K^0$. In the following, we define $G \defeq \varsigma + \sum_{k \in K^+} \norm{g_{k}}^2$ for simplicity.
 \begin{corollary}\label{cor:sum_norm_g_k_bound_K0}
     \begin{equation*}
         \sum_{k \in K^0} \norm{g_{k}}^2 \le
-        (TODO).
+        \frac{M}{c \overline{\alpha}} \qty(F - 2C_2 + 2C_2 \ln\frac{2C_2}{C_1}).
     \end{equation*}
 \end{corollary}
 \begin{proof}
-    todo
+    For $G>0$, \(C_1\sqrt{G}-C_2\ln G\) archives its minimum at \(G^\ast=(2C_2/C_1)^2\).
+    Since \(C_1\le C_2\), we have \(G^\ast \ge 1 >\varsigma\), hence, from \cref{prop:sum_norm_g_k_bound}, it holds that
+    \[
+        F \ge \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \norm{g_{k}}^2 +
+        C_1 \sqrt{G^\ast} - C_2 \ln(G^\ast)
+        = \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \norm{g_{k}}^2 + 2C_2-2C_2\ln\frac{2C_2}{C_1}.
+    \]
+    \myQED
 \end{proof}
 
 Then, we focus on the sum over $k \in K^+$.
-Let $G$ be $\varsigma + \sum_{k \in K^+} \norm{g_k}^2$.
 From \cref{prop:sum_norm_g_k_bound}, we have
 \begin{equation}\label{eq:lambert_inequality}
     F \ge C_1 \sqrt{G} - C_2 \ln(G).
@@ -594,43 +610,39 @@ In fact, a tight bound for $G$ in \cref{eq:lambert_inequality} can be derived as
 \end{equation*}
 Refer to \citep{Gratton08022024} for more details.
 In the following, we present a looser but simpler bound that suffices for our purpose.
-\begin{corollary}\label{cor:sum_norm_g_k_bound_K0}
+\begin{corollary}\label{cor:sum_norm_g_k_bound_Kplus}
     \begin{equation*}
-        \sum_{k \in K^+} \norm{g_{k}}^2 \le (TODO)
-    \end{equation*}
-
-    The following is old statement and proof.
-    \begin{equation*}
-        G \le \max\qty(\qty(\frac{2C_1}{C_2})^2, G_0),
+        \sum_{k \in K^+} \norm{g_{k}}^2 \le \max\qty(\qty(\frac{2F}{C_1})^2, G_0) - \varsigma,
     \end{equation*}
     where $G_0$ is
     \begin{equation*}
-        G_0 = \qty(-\frac{4C_3}{C_2} W_{-1}\qty(-\frac{C_2}{4C_3}))^2.
+        G_0 = \qty(-\frac{4C_2}{C_1} W_{-1}\qty(-\frac{C_1}{4C_2}))^2.
     \end{equation*}
 \end{corollary}
 \begin{proof}
+    From \cref{prop:sum_norm_g_k_bound}, it suffices to show that any $G > G_0$ satisfying \cref{eq:lambert_inequality} also satisfies $G \leq \qty(\frac{2F}{C_1})^2$.
     We assume $G > G_0$ in the following.
     The definition of $G_0$ implies
     \begin{equation}\label{eq:lambert_inequality_sqrt_G_C2_4_C3}
-        -\frac{C_2 \sqrt{G}}{4C_3}
-        < W_{-1}\qty(-\frac{C_2}{4C_3}) < 0.
+        -\frac{C_1 \sqrt{G}}{4C_2}
+        < W_{-1}\qty(-\frac{C_1}{4C_2}) < 0.
     \end{equation}
-    Since $-\frac{1}{\mathrm{e}} \leq -\frac{C_2}{4C_3} < 0$ from $0<C_2<C_3$, the definition of $W_{-1}$ and \cref{eq:lambert_inequality_sqrt_G_C2_4_C3} yield
+    Since $-\frac{1}{\mathrm{e}} \leq -\frac{C_1}{4C_2} < 0$ from $0 < C_1 \leq C_2$, the definition of $W_{-1}$ and \cref{eq:lambert_inequality_sqrt_G_C2_4_C3} yield
     \begin{equation*}
-        -\frac{C_2 \sqrt{G}}{4C_3} \mathrm{e}^{-\frac{C_2 \sqrt{G}}{4C_3}} > -\frac{C_2}{4C_3}.
+        -\frac{C_1 \sqrt{G}}{4C_2} \mathrm{e}^{-\frac{C_1 \sqrt{G}}{4C_2}} > -\frac{C_2}{4C_2}.
     \end{equation*}
-    This is equivalent to $\sqrt{G} < \mathrm{e}^{\frac{C_2 \sqrt{G}}{4C_3}}$, and taking logarithms gives
+    This is equivalent to $\sqrt{G} < \mathrm{e}^{\frac{C_1 \sqrt{G}}{4C_2}}$, and taking logarithms gives
     \begin{equation}\label{eq:log_sqrt_G_bound}
-        2C_3 \ln(\sqrt{G}) = C_3 \ln(G) < \frac{C_2}{2} \sqrt{G}.
+        2C_2 \ln(\sqrt{G}) = C_2 \ln(G) < \frac{C_1}{2} \sqrt{G}.
     \end{equation}
     Combining \cref{eq:lambert_inequality,eq:log_sqrt_G_bound} yields
     \begin{equation*}
-        C_1 \geq C_2 \sqrt{G} - C_3 \ln(G) >
-        C_2 \sqrt{G} - \frac{C_2}{2} \sqrt{G} =
-        \frac{C_2}{2} \sqrt{G}.
+        F \geq C_1 \sqrt{G} - C_2 \ln(G) >
+        C_1 \sqrt{G} - \frac{C_1}{2} \sqrt{G} =
+        \frac{C_1}{2} \sqrt{G}.
     \end{equation*}
-    Thus, we have $G \le \qty(\frac{2C_1}{C_2})^2$ for all $G > G_0$, which completes the proof.
-    \qed
+    Thus, we have $G \le \qty(\frac{2F}{C_1})^2$ for all $G > G_0$, which completes the proof.
+    \myQED
 \end{proof}
 
 Now, we establish the following global convergence result for \cref{alg:regularized_qn}.
@@ -641,14 +653,16 @@ Now, we establish the following global convergence result for \cref{alg:regulari
     \end{equation*}
 \end{restatable}
 \begin{proof}
-    Using \cref{prop:lambda,prop:gamma}, we have
+    Using \cref{cor:sum_norm_g_k_bound_K0,cor:sum_norm_g_k_bound_Kplus}, we have
     \begin{align}
-        \sum_{j=0}^{k} \norm{g_j}^2 & = \sum_{{k} \in K^0} \norm{g_{k}}^2 + \sum_{{k} \in K^+} \norm{g_{k}}^2                                                                                        \notag                     \\
-                                    & < \frac{2M(\overline{f}(x_0)-\overline{f}^*+\Delta_{\max})}{c \overline{\alpha}} + \qty(\frac{2\theta_{\max}(F+\varsigma_0)}{\overline{\alpha}})^2 + C_0, \label{eq:sum_gk_squared_bound}
+        \sum_{j=0}^{k} \norm{g_j}^2
+         & = \sum_{{k} \in K^0} \norm{g_{k}}^2 + \sum_{{k} \in K^+} \norm{g_{k}}^2                                                                                        \notag \\
+         & \leq \frac{2M(F - 2C_2 + 2C_2 \ln\frac{2C_2}{C_1})}{c \overline{\alpha}} + \max\qty(\qty(\frac{2F}{C_1})^2, G_0) - \varsigma
+        \label{eq:sum_gk_squared_bound}
     \end{align}
     where the right-hand side is constant with respect to $k$.
     By dividing both sides by $k+1$, we complete the proof.
-    \qed
+    \myQED
 \end{proof}
 
 \Cref{thm:gc} is a standard convergence guarantee for first-order optimization algorithms applied to $L$-smooth nonconvex functions.
@@ -669,9 +683,7 @@ We interpret the three terms in \cref{eq:sum_gk_squared_bound} in light of class
 
     \item The second term mirrors the convergence property of \AdaGradNorm \citep{wardAdaGradStepsizesSharp2020}, which is scaling as $(f(x_0)-f^*)^2$.
           This follows from the fact that $F$ contains the initial optimality gaps
-          $f(x_0)-f^*$ and $\overline{f}(x_0)-\overline{f}^*$ (see the proof of \cref{prop:gamma}), and the term is quadratic in $F$.
-
-    \item The third term is $C_0$, which depends only on the algorithmic parameters and the smoothness constant $L$, acting as a constant offset.
+          $f(x_0)-f^*$ and $\overline{f}(x_0)-\overline{f}^*$ (as the definition in \cref{eq:def_F}), and the term is quadratic in $F$.
 \end{itemize}
 
 \section{Practical Choices of Algorithmic Variables}\label{sec:proposed_choice}

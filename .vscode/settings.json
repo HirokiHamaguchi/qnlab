@@ -36,13 +36,6 @@
     "terminal.integrated.defaultProfile.linux": "bash",
     // latex-workshop settings
     "latex-workshop.latex.recipes": [
-        // {
-        //     "name": "uplatex",
-        //     "tools": [
-        //         "ptex2pdf (uplatex)",
-        //         "ptex2pdf (uplatex)",
-        //     ]
-        // },
         {
             "name": "uplatex&pbibtex",
             "tools": [
@@ -50,6 +43,13 @@
                 "pbibtex (uplatex)",
                 "ptex2pdf (uplatex)",
                 "ptex2pdf (uplatex)"
+            ]
+        },
+        {
+            "name": "uplatex",
+            "tools": [
+                "ptex2pdf (uplatex)",
+                "ptex2pdf (uplatex)",
             ]
         },
         // {
@@ -353,6 +353,7 @@
         "\\\\emph\\{",
         "—",
         "\\\\texttt\\{\\(",
-        "\\\\Delta_\\{-1\\}"
+        "\\\\Delta_\\{-1\\}",
+        "(?<!\\\\myQED\\s*)\\\\end\\{proof\\}"
     ],
 }
