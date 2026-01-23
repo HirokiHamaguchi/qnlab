@@ -649,19 +649,19 @@ Now, we establish the following global convergence result for \cref{alg:regulari
 \begin{restatable}[Global Convergence]{theorem}{gc}\label{thm:gc}
     Under \cref{ass:bounded,ass:LSmooth,ass:BBounds} with $k>0$, \cref{alg:regularized_qn} satisfies the following global convergence rate:
     \begin{equation*}
-        \frac{1}{k+1} \sum_{j=0}^{k} \norm{g_j}^2 = \order{1/k}.
+        \frac{1}{k_{\max}} \sum_{j=0}^{k_{\max}-1} \norm{g_j}^2 = \order{\frac{1}{k_{\max}}}.
     \end{equation*}
 \end{restatable}
 \begin{proof}
     Using \cref{cor:sum_norm_g_k_bound_K0,cor:sum_norm_g_k_bound_Kplus}, we have
     \begin{align}
-        \sum_{j=0}^{k} \norm{g_j}^2
+        \sum_{j=0}^{k_{\max}-1} \norm{g_j}^2
          & = \sum_{{k} \in K^0} \norm{g_{k}}^2 + \sum_{{k} \in K^+} \norm{g_{k}}^2                                                                                        \notag \\
          & \leq \frac{2M(F - 2C_2 + 2C_2 \ln\frac{2C_2}{C_1})}{c \overline{\alpha}} + \max\qty(\qty(\frac{2F}{C_1})^2, G_0) - \varsigma
         \label{eq:sum_gk_squared_bound}
     \end{align}
-    where the right-hand side is constant with respect to $k$.
-    By dividing both sides by $k+1$, we complete the proof.
+    where the right-hand side is constant with respect to $k_{\max}$.
+    \red{By dividing both sides by $k_{\max}$}, we complete the proof.
     \myQED
 \end{proof}
 

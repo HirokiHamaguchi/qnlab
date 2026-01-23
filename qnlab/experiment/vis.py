@@ -156,6 +156,7 @@ def _get_plot_properties(label: str, i: int) -> dict:
         "alpha": 1.0 if is_lbfgs else 0.8,
         "color": "black" if is_lbfgs else None,
         "linestyle": _get_line_style(i, is_lbfgs),
+        "zorder": 5 - i / 10,
     }
 
 
@@ -241,19 +242,26 @@ def _calculate_shift_value(callbacks: List[Callback]) -> float:
 def _truncate_callbacks(callbacks: List[Callback], max_length: int) -> None:
     """Truncate callback data to maximum length."""
     for callback in callbacks:
-        callback.xs = callback.xs[:max_length]
-        callback.fxs = callback.fxs[:max_length]
-        callback.gnorms = callback.gnorms[:max_length]
-        callback.calls = callback.calls[:max_length]
+        idx = 0
+        for i, call in enumerate(callback.calls):
+            if call > max_length:
+                idx = i
+                break
+        else:
+            idx = len(callback.calls)
+        callback.xs = callback.xs[:idx]
+        callback.fxs = callback.fxs[:idx]
+        callback.gnorms = callback.gnorms[:idx]
+        callback.calls = callback.calls[:idx]
 
 
 def _save_or_show_figure(pdf_path: str, suffix: str = "") -> None:
     """Save figure to PDF or show it."""
     plt.tight_layout()
     if pdf_path:
-        assert not pdf_path.endswith(
-            ".pdf"
-        ), "PDF path should not include .pdf extension"
+        assert not pdf_path.endswith(".pdf"), (
+            "PDF path should not include .pdf extension"
+        )
         plt.savefig(f"{pdf_path}{suffix}.pdf", bbox_inches="tight")
     else:
         plt.show()

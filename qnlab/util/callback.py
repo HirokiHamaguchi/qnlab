@@ -24,6 +24,12 @@ class Callback:
         self.save_xs = save_xs
         self.reset()
 
+    def __repr__(self) -> str:
+        if len(self.fxs) >= 2:
+            return f"Callback(iteration={self.iteration}, fxs=({self.fxs[0]},...,{self.fxs[-1]}) (total {len(self.fxs)}))"
+        else:
+            return f"Callback(iteration={self.iteration}, fxs={self.fxs})"
+
     def reset(self) -> None:
         """Resets the callback data."""
         self.xs: List[npt.NDArray[np.float64]] = []

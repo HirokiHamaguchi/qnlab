@@ -16,14 +16,14 @@ methods: List[Tuple[Method, dict]] = [
     (Method(base="SciPy", scipy_method="Powell"), {}),
     (Method(base="SciPy", scipy_method="Nelder-Mead"), {}),
     (Method(base="SciPy", scipy_method="COBYLA"), {}),
-    (Method(base="SciPy", scipy_method="SLSQP"), {}),
+    # (Method(base="SciPy", scipy_method="SLSQP"), {}),
     (Method(base="SciPy", scipy_method="trust-constr"), {}),
     (Method(base="SciPy", scipy_method="trust-ncg"), {}),
     (Method(base="SciPy", scipy_method="trust-krylov"), {}),
     (Method(base="SciPy", scipy_method="TNC"), {}),
 ]
 
-prob = RosenbrockProblem(n=100)
+prob = RosenbrockProblem(n=5)
 prob.x0 = np.zeros(prob.n)
 trial(
     prob,
@@ -31,4 +31,7 @@ trial(
     methods,
     pdf_path=str(Path(os.path.dirname(__file__)) / "SciPy_comparison_Rosenbrock"),
     only_plot=True,
+    only_grad=True,
+    max_length=1000,
+    use_tex=True,
 )
