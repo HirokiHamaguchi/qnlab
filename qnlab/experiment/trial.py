@@ -48,7 +48,7 @@ def trial(
             print("  others:", callback.others)
         callbacks.append(callback)
 
-        labelName = options.get("label_name", method.to_label())
+        labelName = options.get("label_name", method.label)
         labels.append(labelName)
 
     if do_vis:

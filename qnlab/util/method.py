@@ -6,6 +6,8 @@ BaseType = Literal[
     "Hamaguchi",
     "SciPy",
     "NTQN",
+    "GradientDescent",
+    "Newton",
 ]
 ScipyMethodType = Literal[
     "BFGS",
@@ -42,11 +44,14 @@ class Method:
         self.secant = secant
         self.update = update
         self.scipy_method = scipy_method
-        self.label = label
+        self.label = label if label else self._to_label()
 
         if self.base in ["SciPy", "Kanzow", "NTQN"]:
             if self.base == "SciPy":
                 assert scipy_method in get_args(ScipyMethodType), scipy_method
+            assert store == secant == "raw"
+            assert update == "bfgs"
+        elif self.base in ["GradientDescent", "Newton"]:
             assert store == secant == "raw"
             assert update == "bfgs"
         else:
@@ -64,15 +69,17 @@ class Method:
             )
             return f"Method(base={self.base}" + scipy_str + ")"
 
-    def to_label(self) -> str:
-        if self.label:
-            return self.label
+    def _to_label(self) -> str:
         if self.base == "SciPy":
             return f"S_{self.scipy_method}"
         elif self.base == "NTQN":
             return "NTQN"
         elif self.base == "Kanzow":
             return "Kanzow"
+        elif self.base == "GradientDescent":
+            return "GD"
+        elif self.base == "Newton":
+            return "Newton"
         else:
             label = "Hamaguchi"
 
