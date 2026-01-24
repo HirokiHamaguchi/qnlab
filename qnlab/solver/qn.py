@@ -10,6 +10,7 @@ from qnlab.parameter import (
     OwlParameter,
 )
 from qnlab.problem.base import BaseProblem
+from qnlab.solver.qn_basic import qn_gradient_descent, qn_newton
 from qnlab.solver.qn_hamaguchi import qn_hamaguchi
 from qnlab.solver.qn_kanzow import qn_kanzow
 from qnlab.solver.qn_line import qn_line
@@ -29,6 +30,12 @@ def qn(
 ):
     if method.base == "SciPy":
         return qn_scipy(prob, method, options, callback, verbose)
+
+    if method.base == "GradientDescent":
+        return qn_gradient_descent(prob, method, options, callback)
+
+    if method.base == "Newton":
+        return qn_newton(prob, method, options, callback)
 
     if method.base == "Line":
         orthantwise_c = options.get("orthantwise_c", 0.0)

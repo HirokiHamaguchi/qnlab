@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Literal
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -239,16 +239,22 @@ def _calculate_shift_value(callbacks: List[Callback]) -> float:
     return shift_val + 1e-5 if shift_val > 0 else 0
 
 
-def _truncate_callbacks(callbacks: List[Callback], max_length: int) -> None:
+def _truncate_callbacks(
+    callbacks: List[Callback], max_length: int, x_axis: str = "calls"
+) -> None:
     """Truncate callback data to maximum length."""
     for callback in callbacks:
-        idx = 0
-        for i, call in enumerate(callback.calls):
-            if call > max_length:
-                idx = i
-                break
+        if x_axis == "iterations":
+            idx = min(max_length, len(callback.calls))
         else:
-            idx = len(callback.calls)
+            idx = 0
+            for i, call in enumerate(callback.calls):
+                if call > max_length:
+                    idx = i
+                    break
+            else:
+                idx = len(callback.calls)
+
         callback.xs = callback.xs[:idx]
         callback.fxs = callback.fxs[:idx]
         callback.gnorms = callback.gnorms[:idx]
@@ -279,12 +285,12 @@ def vis(
     max_length: int = int(1e8),
     one_figure: bool = False,
     use_tex: bool = False,
-    x_axis: str = "calls",
+    x_axis: Literal["calls", "iterations"] = "calls",
 ) -> None:
     assert x_axis in ["calls", "iterations"]
 
     _configure_matplotlib(use_tex)
-    _truncate_callbacks(callbacks, max_length)
+    _truncate_callbacks(callbacks, max_length, x_axis)
 
     if one_figure:
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
