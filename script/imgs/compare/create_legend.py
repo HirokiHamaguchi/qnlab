@@ -6,7 +6,7 @@ import seaborn as sns
 from qnlab.util.method import get_methods
 
 
-def create_legend_only():
+def create_legend():
     methods, ALGORITHM_COLORS, ALGORITHM_LINE_STYLES = get_methods()
     alg_names = [method.label for method, _ in methods]
 
@@ -55,4 +55,4 @@ def create_legend_only():
 
 
 if __name__ == "__main__":
-    create_legend_only()
+    create_legend()
