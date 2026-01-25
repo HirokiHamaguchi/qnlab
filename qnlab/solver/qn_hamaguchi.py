@@ -191,7 +191,6 @@ def qn_hamaguchi(
     offo: np.float64 = var_sigma
     is_offo_mode = False
     min_fx_minus_delta = np.float64(np.inf)
-    last_delta = np.float64(0.0)
 
     # g is always finite (not nan or inf)
     if not np.isfinite(gnorm):
@@ -241,8 +240,7 @@ def qn_hamaguchi(
 
         lm.add_new_data(new_x, new_f, new_g, x, fx, g, callback, eps)
 
-        min_fx_minus_delta = min(min_fx_minus_delta, fx - last_delta - delta)
-        last_delta = delta
+        min_fx_minus_delta = min(min_fx_minus_delta, fx - delta)
         x, fx, g = new_x, new_f, new_g
         k += 1
         gnorm = np.float64(np.linalg.norm(g))
