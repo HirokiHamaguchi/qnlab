@@ -265,9 +265,9 @@ def _save_or_show_figure(pdf_path: str, suffix: str = "") -> None:
     """Save figure to PDF or show it."""
     plt.tight_layout()
     if pdf_path:
-        assert not pdf_path.endswith(".pdf"), (
-            "PDF path should not include .pdf extension"
-        )
+        assert not pdf_path.endswith(
+            ".pdf"
+        ), "PDF path should not include .pdf extension"
         plt.savefig(f"{pdf_path}{suffix}.pdf", bbox_inches="tight")
     else:
         plt.show()

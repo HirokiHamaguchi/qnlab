@@ -38,7 +38,7 @@ class ConvexEvenPolynomialProblem(BaseProblem):
         if degree not in (2, 4, 6):
             raise ValueError("degree must be one of {2, 4, 6}.")
         self.degree = degree
-        self.x_hists = []
+        self.x_hists: list[np.ndarray] = []
         x0 = np.array([0.0], dtype=np.float64)
         super().__init__(f"ConvexEvenPolynomial_{degree}", 1, x0)
 
@@ -331,8 +331,12 @@ if __name__ == "__main__":
 
     for c1, c2 in [(0.9, 0.99), (0.5, 0.9), (0.0001, 0.9)]:
         for scale2 in [0.0, 10.0, 1000.0]:
-            prob = ExponentialProblem(scale1=1.0, scale2=scale2)
-            visualize_opt_results(prob, np.float64(c1), np.float64(c2), str(output_dir))
+            prob1 = ExponentialProblem(scale1=1.0, scale2=scale2)
+            visualize_opt_results(
+                prob1, np.float64(c1), np.float64(c2), str(output_dir)
+            )
         for degree in [2, 4, 6]:
-            prob = ConvexEvenPolynomialProblem(degree=degree)
-            visualize_opt_results(prob, np.float64(c1), np.float64(c2), str(output_dir))
+            prob2 = ConvexEvenPolynomialProblem(degree=degree)
+            visualize_opt_results(
+                prob2, np.float64(c1), np.float64(c2), str(output_dir)
+            )

@@ -8,6 +8,39 @@ QNLab is a research repository containing the implementation of our paper "Pract
 
 (Under Construction)
 
+## Setup (uv)
+
+### Requirements
+
+- Python 3.12+
+- [uv](https://docs.astral.sh/uv/) CLI
+- Git with submodule support
+
+### Clone the repository
+
+```
+git clone --recurse-submodules https://github.com/HirokiHamaguchi/qnlab.git
+cd qnlab
+```
+
+If you already cloned without the `--recurse-submodules` flag, pull the submodules explicitly so that `pytest` can access the bundled benchmark libraries:
+
+```
+git submodule update --init --recursive
+```
+
+### Install dependencies with uv
+
+```
+uv sync
+```
+
+### Run tests
+
+```
+uv run pytest
+```
+
 ## Documentation
 
 This repository contains some study materials.

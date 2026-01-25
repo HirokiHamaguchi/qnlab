@@ -1,11 +1,8 @@
 from __future__ import annotations
 
-import io
-
 import fitz  # PyMuPDF
 import matplotlib.pyplot as plt
 import numpy as np
-from PIL import Image
 
 from qnlab.problem import SixHumpProblem
 from qnlab.solver.qn import qn
