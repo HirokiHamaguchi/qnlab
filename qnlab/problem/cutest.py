@@ -96,16 +96,18 @@ class CUTEstQNProblem(BaseProblem):
             return x
 
     def get_eps(self) -> np.float64:
+        eps = np.float64(0.0)
         if self.precision == 64:
-            return np.float64(np.finfo(np.float64).eps) * 1e7 + self.noise
+            eps = np.float64(np.finfo(np.float64).eps) * 1e7 + self.noise
         elif self.precision == 32:
-            return np.float64(np.finfo(np.float32).eps) * 1e4 + self.noise
+            eps = np.float64(np.finfo(np.float32).eps) * 1e4 + self.noise
         elif self.precision == 16:
-            return np.float64(np.finfo(np.float16).eps) * 1e1 + self.noise
+            eps = np.float64(np.finfo(np.float16).eps) * 1e1 + self.noise
         elif self.precision == -1:
-            return np.float64(1.0 - 1e-10)
+            eps = np.float64(1.0 - 1e-10)
         else:
             raise ValueError("Invalid precision value.")
+        return np.clip(eps, 0, np.float64(1.0 - 1e-10))
 
     def get_noise(self) -> np.float64:
         """Returns the noise level for this problem."""
