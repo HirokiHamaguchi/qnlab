@@ -8,36 +8,55 @@ QNLab is a research repository containing the implementation of our paper "Pract
 
 (Under Construction)
 
-## Setup (uv)
+## Setup for Users
 
 ### Requirements
 
 - Python 3.12+
 - [uv](https://docs.astral.sh/uv/) CLI
-- Git with submodule support
 
-### Clone the repository
+### Install dependencies with uv
 
+```bash
+uv sync
 ```
+
+## Setup for Developers
+
+### Additional Requirements
+
+- Git with submodule support
+- CUTEst installed and configured (for running tests involving CUTEst problems)
+
+### Pull git submodules
+
+In `pytest`, we use some libraries bundled as git submodules.
+You can explicitly pull the submodules using:
+
+```bash
+git submodule update --init --recursive
+```
+
+To clone the repository with submodules, use the following command:
+
+```bash
 git clone --recurse-submodules https://github.com/HirokiHamaguchi/qnlab.git
 cd qnlab
 ```
 
-If you already cloned without the `--recurse-submodules` flag, pull the submodules explicitly so that `pytest` can access the bundled benchmark libraries:
+### Run tests involving CUTEst problems
 
-```
-git submodule update --init --recursive
-```
+To run tests that involve CUTEst problems, ensure that CUTEst is properly installed and configured on your system.
 
-### Install dependencies with uv
+To examine and generate cache files for CUTEst problems, you can run:
 
-```
-uv sync
+```bash
+uv run data/CUTEst/check_CUTEst_problems.py
 ```
 
-### Run tests
+If it run successfully, you can now run tests involving CUTEst problems using:
 
-```
+```bash
 uv run pytest
 ```
 

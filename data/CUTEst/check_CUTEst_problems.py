@@ -40,7 +40,7 @@ def get_n(problem_name: str) -> int:
     return prob.n
 
 
-def make_n_table():
+def make_n_table(force: bool = False):
     """Generate and save n_table.json with problem dimensions."""
     dirname = os.path.dirname(__file__)
     json_path = os.path.join(dirname, "n_table.json")
@@ -55,7 +55,7 @@ def make_n_table():
         n_table = {}
 
     for prob in problems:
-        if prob in n_table:
+        if prob in n_table and not force:
             continue
         try:
             n_table[prob] = get_n(prob)
@@ -213,20 +213,7 @@ def check_initial_gradient():
 
 
 if __name__ == "__main__":
-    action = (
-        input("Action: (m)ake_n_table, (c)heck_gradient, or (b)oth? [b]: ")
-        .strip()
-        .lower()
-    )
-
-    if action in ["b", ""]:
-        print("\n=== Making n_table ===")
-        make_n_table()
-        print("\n=== Checking gradients ===")
-        check_initial_gradient()
-    elif action == "m":
-        make_n_table()
-    elif action == "c":
-        check_initial_gradient()
-    else:
-        print("Invalid action")
+    print("\n=== Making n_table ===")
+    make_n_table(force=True)
+    print("\n=== Checking gradients ===")
+    check_initial_gradient()
