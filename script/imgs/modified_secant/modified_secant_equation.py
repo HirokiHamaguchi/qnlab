@@ -5,6 +5,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
 
+from qnlab.util.doc_paths import doc_imgs_dir
+
+OUTPUT_DIR = doc_imgs_dir("modified_secant")
+
 
 def compute_y1(x, fx, g, xp, fxp, gp) -> npt.NDArray[np.float64]:
     s = x - xp
@@ -229,7 +233,7 @@ def trial(
         yVals.max() + 0.05 * (yVals.max() - yVals.min()),
     )
     plt.savefig(
-        f"doc/imgs/modified_secant/trial_{kind}.pdf",
+        OUTPUT_DIR / f"trial_{kind}.pdf",
         bbox_inches="tight",
     )
     # plt.show()

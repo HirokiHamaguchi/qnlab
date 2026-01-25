@@ -1,12 +1,11 @@
-import os
-
 from qnlab.experiment.vis import vis
 from qnlab.problem.rosenbrock import RosenbrockProblem
 from qnlab.solver.qn import qn
 from qnlab.util.callback import Callback
+from qnlab.util.doc_paths import doc_imgs_dir
 from qnlab.util.method import Method
 
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+OUTPUT_DIR = doc_imgs_dir("quasi_newton")
 
 
 def run_methods(prob: RosenbrockProblem):
@@ -59,7 +58,7 @@ def main():
         callbacks,
         labels,
         "Rosenbrock",
-        pdf_path="newton_vs_qs_vs_gd",
+        pdf_path=str(OUTPUT_DIR / "newton_vs_qs_vs_gd"),
         max_length=100,
         use_tex=True,
         one_figure=True,

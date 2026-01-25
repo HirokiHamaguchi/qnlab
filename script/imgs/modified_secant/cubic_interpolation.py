@@ -1,14 +1,15 @@
 import math
-import os
 
 import matplotlib.pyplot as plt
 import numpy as np
 
+from qnlab.util.doc_paths import doc_imgs_dir
+
+OUTPUT_DIR = doc_imgs_dir("modified_secant")
+
 # LaTeXを使用
 plt.rcParams["text.usetex"] = True
 plt.rcParams["font.family"] = "serif"
-
-os.chdir(os.path.dirname(__file__))
 
 
 def hermite_cubic_function(xk, yk, ypk, xk1, yk1, ypk1):
@@ -124,7 +125,7 @@ def plot_modified_BFGS_demo():
     axes[0].set_ylabel(r"$f(x)$", fontsize=25)
     axes[1].set_xlabel(r"$x$", fontsize=25)
     plt.tight_layout(rect=(0, 0, 1, 0.93))
-    plt.savefig("cubic_interpolation.pdf")
+    plt.savefig(OUTPUT_DIR / "cubic_interpolation.pdf")
 
 
 if __name__ == "__main__":

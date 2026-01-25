@@ -1,12 +1,13 @@
-import os
-from pathlib import Path
 from typing import List, Tuple
 
 import numpy as np
 
 from qnlab.experiment.trial import trial
 from qnlab.problem import RosenbrockProblem
+from qnlab.util.doc_paths import doc_imgs_dir
 from qnlab.util.method import Method
+
+OUTPUT_DIR = doc_imgs_dir("quasi_newton")
 
 methods: List[Tuple[Method, dict]] = [
     (Method(base="SciPy", scipy_method="L-BFGS-B"), {}),
@@ -29,7 +30,7 @@ trial(
     prob,
     "Rosenbrock",
     methods,
-    pdf_path=str(Path(os.path.dirname(__file__)) / "SciPy_comparison_Rosenbrock"),
+    pdf_path=str(OUTPUT_DIR / "SciPy_comparison_Rosenbrock"),
     only_plot=True,
     only_grad=True,
     max_length=1000,

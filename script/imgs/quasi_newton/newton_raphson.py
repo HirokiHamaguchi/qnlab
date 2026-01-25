@@ -1,10 +1,10 @@
-import os
-
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-os.chdir(os.path.dirname(__file__))
+from qnlab.util.doc_paths import doc_imgs_dir
+
+OUTPUT_DIR = doc_imgs_dir("quasi_newton")
 
 sns.set_style("darkgrid")
 
@@ -114,4 +114,5 @@ ax.set_ylabel("$f(x)$")
 ax.legend()
 
 plt.tight_layout()
-plt.savefig("newton_raphson.pdf")
+plt.savefig(OUTPUT_DIR / "newton_raphson.pdf")
+plt.close()

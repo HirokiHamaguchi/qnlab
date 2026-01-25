@@ -1,10 +1,11 @@
 import math
-import os
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+from qnlab.util.doc_paths import doc_imgs_dir
+
+OUTPUT_DIR = doc_imgs_dir("quasi_newton")
 
 
 def quadratic_f(x):
@@ -132,7 +133,7 @@ def plot_trajectories(lambda_, x_bfgs, x_dfp):
     axes[1].set_aspect("equal")
 
     plt.tight_layout()
-    plt.savefig(f"bfgs_vs_dfp_{lambda_}.pdf", bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / f"bfgs_vs_dfp_{lambda_}.pdf", bbox_inches="tight")
     plt.close()
 
 

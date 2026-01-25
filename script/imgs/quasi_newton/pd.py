@@ -1,9 +1,9 @@
-import os
-
 import matplotlib.pyplot as plt
 import numpy as np
 
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+from qnlab.util.doc_paths import doc_imgs_dir
+
+OUTPUT_DIR = doc_imgs_dir("quasi_newton")
 
 H_pos = np.array([[2.0, 0.4], [0.4, 1.2]])
 H_ind = np.array([[2.5, 0.0], [0.0, -2.5]])
@@ -65,7 +65,7 @@ def plot_surfaces_and_save():
     # Reduce spacing between subplots as much as practical
     plt.tight_layout(pad=0.0)
     plt.subplots_adjust(wspace=0.01)
-    plt.savefig("pd.pdf", bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "pd.pdf", bbox_inches="tight")
     plt.close(fig)
 
 

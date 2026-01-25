@@ -1,11 +1,14 @@
 import os
 import tempfile
+from pathlib import Path
 
 import fitz  # PyMuPDF
 import matplotlib.pyplot as plt
 import numpy as np
 
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+from qnlab.util.doc_paths import doc_imgs_dir
+
+OUTPUT_DIR = doc_imgs_dir("quasi_newton")
 
 plt.rcParams.update(
     {
@@ -179,6 +182,8 @@ def draw_step_elements(ax):
 
 
 def create_enhanced_figure(draw_func, filename):
+    filename = Path(filename)
+    filename.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory() as tmpdir:
         pdf1_path = os.path.join(tmpdir, "transparent.pdf")
         pdf2_path = os.path.join(tmpdir, "opaque.pdf")
@@ -224,7 +229,7 @@ def create_enhanced_figure(draw_func, filename):
         output_page.show_pdf_page(rect, doc1, 0, overlay=True)
 
         # PDFとして保存（圧縮を有効化）
-        output_doc.save(filename, garbage=4, deflate=True, clean=True)
+        output_doc.save(str(filename), garbage=4, deflate=True, clean=True)
 
         output_doc.close()
         doc1.close()
@@ -247,7 +252,7 @@ def draw_panel1(ax, transparent_surfaces=True):
         draw_surface_z(ax, alpha=1.0)
 
 
-create_enhanced_figure(draw_panel1, "quasi_newton_1.pdf")
+create_enhanced_figure(draw_panel1, OUTPUT_DIR / "quasi_newton_1.pdf")
 
 Q_Bk = quadratic_surface(B_k, x_k, g_k, X, Y)
 
@@ -267,7 +272,7 @@ def draw_panel2(ax, transparent_surfaces=True):
         draw_surface_quadratic(ax, Q_Bk, "tab:orange", alpha=0.7)
 
 
-create_enhanced_figure(draw_panel2, "quasi_newton_2.pdf")
+create_enhanced_figure(draw_panel2, OUTPUT_DIR / "quasi_newton_2.pdf")
 
 y_k = g_kp1 - g_k
 den1 = float(s_k.T @ B_k @ s_k)
@@ -289,7 +294,7 @@ def draw_panel3(ax, transparent_surfaces=True):
         draw_surface_quadratic(ax, Q_Bkp1, "tab:green", alpha=0.7)
 
 
-create_enhanced_figure(draw_panel3, "quasi_newton_3.pdf")
+create_enhanced_figure(draw_panel3, OUTPUT_DIR / "quasi_newton_3.pdf")
 
 print("Summary:")
 print("x_k =", x_k)

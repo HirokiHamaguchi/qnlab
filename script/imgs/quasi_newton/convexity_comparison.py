@@ -1,10 +1,10 @@
-import os
-
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-os.chdir(os.path.dirname(__file__))
+from qnlab.util.doc_paths import doc_imgs_dir
+
+OUTPUT_DIR = doc_imgs_dir("quasi_newton")
 
 sns.set_style("darkgrid")
 
@@ -112,7 +112,7 @@ ax.set_ylim(bottom=-1)
 fig.suptitle("Convex but not strongly convex")
 
 plt.tight_layout()
-plt.savefig("convexity_comparison_convex.pdf")
+plt.savefig(OUTPUT_DIR / "convexity_comparison_convex.pdf")
 plt.close()
 
 # ===== Figure 2: Strongly convex =====
@@ -137,5 +137,5 @@ ax.grid(True, alpha=0.3)
 fig.suptitle("Strongly convex")
 
 plt.tight_layout()
-plt.savefig("convexity_comparison_strongly_convex.pdf")
+plt.savefig(OUTPUT_DIR / "convexity_comparison_strongly_convex.pdf")
 plt.close()

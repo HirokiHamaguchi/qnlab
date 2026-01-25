@@ -1,10 +1,9 @@
-import os
-from pathlib import Path
-
 import matplotlib.pyplot as plt
 import numpy as np
 
-os.chdir(Path(__file__).parent)
+from qnlab.util.doc_paths import doc_imgs_dir
+
+OUTPUT_DIR = doc_imgs_dir("quasi_newton")
 
 
 class StronglyConvexFunction:
@@ -50,7 +49,9 @@ class StronglyConvexFunction:
             )
 
         plt.legend(loc="upper center")
-        plt.savefig(f"newton_failure_strongly_convex_function_{self.mu}_{x0}.pdf")
+        plt.savefig(
+            OUTPUT_DIR / f"newton_failure_strongly_convex_function_{self.mu}_{x0}.pdf"
+        )
         plt.close()
 
 
@@ -97,7 +98,7 @@ class SqrtFunction:
             )
 
         plt.legend(loc="upper center")
-        plt.savefig(f"newton_failure_sqrt_function_{x0}.pdf")
+        plt.savefig(OUTPUT_DIR / f"newton_failure_sqrt_function_{x0}.pdf")
         plt.close()
 
 

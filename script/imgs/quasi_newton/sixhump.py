@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import io
-from pathlib import Path
 
 import fitz  # PyMuPDF
 import matplotlib.pyplot as plt
@@ -12,9 +11,12 @@ from qnlab.problem import SixHumpProblem
 from qnlab.solver.qn import qn
 from qnlab.update.bfgs import compute_BH
 from qnlab.util.callback import Callback
+from qnlab.util.doc_paths import doc_imgs_dir
 from qnlab.util.iteration_data import IterationData
 from qnlab.util.memory_interface import QuasiNewtonMemory
 from qnlab.util.method import Method
+
+OUTPUT_DIR = doc_imgs_dir("quasi_newton")
 
 GRID_SIZE = 150
 X_RANGE = (-2, 0.5)
@@ -231,7 +233,7 @@ def main():
     prob = SixHumpProblem()
     xg, yg, zg = create_surface_grid(prob)
     callback, x_opt = run_optimization(prob)
-    output_dir = Path(__file__).parent
+    output_dir = OUTPUT_DIR
     output_dir.mkdir(parents=True, exist_ok=True)
     path = np.array(callback.xs)
     path_z = prob.f(path.T, count=False)

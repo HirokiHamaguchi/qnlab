@@ -3,6 +3,10 @@ import numpy as np
 import seaborn as sns
 from matplotlib.patches import FancyArrowPatch
 
+from qnlab.util.doc_paths import doc_imgs_dir
+
+OUTPUT_DIR = doc_imgs_dir("for_paper")
+
 # -------------------------
 # LaTeX settings
 # -------------------------
@@ -127,5 +131,5 @@ plt.yticks([])
 plt.xlim(-0.1, 8.5)
 
 plt.tight_layout()
-plt.savefig("doc/imgs/for_paper/alg.pdf")
+plt.savefig(OUTPUT_DIR / "alg.pdf")
 plt.close()
