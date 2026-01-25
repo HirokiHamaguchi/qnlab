@@ -26,7 +26,9 @@ uv sync
 ### Additional Requirements
 
 - Git with submodule support
-- CUTEst installed and configured (for running tests involving CUTEst problems)
+- PyCUTEst installed and configured (for running tests involving CUTEst problems)
+  - https://github.com/abelsiqueira/linux-cutest
+  - https://github.com/jfowkes/pycutest
 
 ### Pull git submodules
 

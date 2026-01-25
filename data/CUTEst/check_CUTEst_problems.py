@@ -102,7 +102,7 @@ def check_problem_at_precision(
         return False
 
 
-def check_initial_gradient():
+def check_initial_gradient(force: bool = False):
     """Check gradient computation stability across precisions."""
     dirname = os.path.dirname(__file__)
     json_path = os.path.join(dirname, "valid_problems.json")
@@ -175,10 +175,10 @@ def check_initial_gradient():
         for precision in [16, 32, 64]:
             key = f"precision_{precision}"
 
-            if problem_name in v_sets[key]:
+            if not force and problem_name in v_sets[key]:
                 results[precision] = "✓"
                 continue
-            if problem_name in inv_sets[key]:
+            if not force and problem_name in inv_sets[key]:
                 results[precision] = "✗"
                 continue
 
@@ -216,4 +216,4 @@ if __name__ == "__main__":
     print("\n=== Making n_table ===")
     make_n_table(force=True)
     print("\n=== Checking gradients ===")
-    check_initial_gradient()
+    check_initial_gradient(force=True)
