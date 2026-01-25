@@ -6,5 +6,6 @@ __pycache__
 .DS_Store
 *.bbl
 .vscode
+doc/imgs/png/
 
 TODO.md
