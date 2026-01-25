@@ -60,6 +60,14 @@ If it run successfully, you can now run tests involving CUTEst problems using:
 uv run pytest
 ```
 
+### Install git hooks
+
+Install the pre-commit hook once per clone so that formatting, lint, type, and test checks run automatically before every commit:
+
+```bash
+uv run pre-commit install --hook-type pre-commit
+```
+
 ## Documentation
 
 This repository contains some study materials.
