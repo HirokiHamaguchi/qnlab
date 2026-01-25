@@ -18,16 +18,12 @@ def qn_scipy(
     prob.reset()
 
     def callback_scipy_func(xk):
-        if callback:
-            callback.callback(
-                prob, xk, prob.f(xk, count=False), prob.g(xk, count=False)
-            )
+        assert callback is not None
+        callback.callback(prob, xk, prob.f(xk, count=False), prob.g(xk, count=False))
 
     def callback_trust_constr(xk, _):
-        if callback:
-            callback.callback(
-                prob, xk, prob.f(xk, count=False), prob.g(xk, count=False)
-            )
+        assert callback is not None
+        callback.callback(prob, xk, prob.f(xk, count=False), prob.g(xk, count=False))
 
     if callback:
         callback.start(prob, prob.x0)
@@ -37,7 +33,7 @@ def qn_scipy(
             prob.f,
             prob.x0,
             method=method.scipy_method,
-            callback=callback_scipy_func,
+            callback=callback_scipy_func if callback else None,
             options=option,
         )
     elif method.scipy_method in [
@@ -56,7 +52,7 @@ def qn_scipy(
             prob.x0,
             jac=prob.g,
             method=method.scipy_method,
-            callback=cb,
+            callback=cb if callback else None,
             options=option,
             hessp=lambda x, p: prob.hvp(x, p),  # trust-constr can be used with None
         )
@@ -66,7 +62,7 @@ def qn_scipy(
             prob.x0,
             jac=prob.g,
             method=method.scipy_method,
-            callback=callback_scipy_func,
+            callback=callback_scipy_func if callback else None,
             options=option,
         )
 
