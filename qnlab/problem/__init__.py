@@ -11,6 +11,7 @@ from qnlab.problem.non_convex import NonConvexProblem
 from qnlab.problem.polynomial import PolynomialProblem
 from qnlab.problem.powell import PowellProblem
 from qnlab.problem.rosenbrock import RosenbrockProblem
+from qnlab.problem.sixhump import SixHumpProblem
 from qnlab.problem.spiral import SpiralProblem
 from qnlab.problem.stair import StairProblem
 from qnlab.problem.zakharov import ZakharovProblem
@@ -29,6 +30,7 @@ __all__ = [
     "PolynomialProblem",
     "PowellProblem",
     "RosenbrockProblem",
+    "SixHumpProblem",
     "SpiralProblem",
     "StairProblem",
     "ZakharovProblem",
