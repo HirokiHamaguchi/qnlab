@@ -1,5 +1,7 @@
 from typing import List, Literal, Tuple, get_args
 
+import matplotlib.pyplot as plt
+
 BaseType = Literal[
     "Line",
     "Kanzow",
@@ -98,7 +100,9 @@ class Method:
             return label
 
 
-def get_methods(m: int = 10, MI: int = 15000) -> List[Tuple[Method, dict]]:
+def get_methods(
+    m: int = 10, MI: int = 15000
+) -> Tuple[List[Tuple[Method, dict]], dict, dict]:
     """Get standard set of methods for benchmarking.
 
     Args:
@@ -108,6 +112,7 @@ def get_methods(m: int = 10, MI: int = 15000) -> List[Tuple[Method, dict]]:
     Returns:
         List of tuples containing (Method, options_dict)
     """
+
     methods = [
         (
             Method("Hamaguchi", "cautious", "damped", "bfgs", label="Hamaguchi"),
@@ -141,4 +146,29 @@ def get_methods(m: int = 10, MI: int = 15000) -> List[Tuple[Method, dict]]:
         ),
     ]
 
-    return methods
+    TAB20 = plt.colormaps.get_cmap("tab20")
+
+    COLORS = {
+        "Hamaguchi": TAB20(0),
+        "Hamaguchi-MS": TAB20(1),
+        "Line": TAB20(2),
+        "Line-MS": TAB20(3),
+        "SciPy": TAB20(6),
+        "Reg": TAB20(4),
+        "NTQN": TAB20(8),
+    }
+
+    LINE_STYLES = {
+        "Hamaguchi": "o-",
+        "Hamaguchi-MS": "o--",
+        "Line": "^--",
+        "Line-MS": "^-.",
+        "SciPy": "v:",
+        "Reg": "D--",
+        "NTQN": "s-.",
+    }
+
+    assert set(COLORS.keys()) == set(method.label for method, _ in methods)
+    assert set(LINE_STYLES.keys()) == set(method.label for method, _ in methods)
+
+    return methods, COLORS, LINE_STYLES

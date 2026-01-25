@@ -3,12 +3,11 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from qnlab.experiment.cutest_analysis import ALGORITHM_COLORS, ALGORITHM_LINE_STYLES
 from qnlab.util.method import get_methods
 
 
 def create_legend_only():
-    methods = get_methods()
+    methods, ALGORITHM_COLORS, ALGORITHM_LINE_STYLES = get_methods()
     alg_names = [method.label for method, _ in methods]
 
     sns.set_style("whitegrid")
