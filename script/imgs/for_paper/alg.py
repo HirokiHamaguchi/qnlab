@@ -80,7 +80,7 @@ plt.text(
 plt.text(
     x,
     y - 0.55,
-    r"$(k \in K^0, \, 0 \leq j < k)$",
+    r"$(j, k \in K^0, \, j < k)$",
     fontsize=20,
     ha="center",
     bbox=dict(facecolor="white"),

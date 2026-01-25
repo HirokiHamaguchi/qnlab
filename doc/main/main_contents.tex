@@ -120,7 +120,7 @@ In this section, we present the proposed algorithm for the problem setting state
     \KwIn{$x_0$, $0 < k_{\max}$, $0 \le \feps < 1$, $0 < c < 1$, $0 < \theta_{\min} \leq \theta_{\max}$ and $0 < \varsigma < 1$}
     $k \gets 0$, $g_0 \gets \nabla f(x_0)$, $K^+ \gets \emptyset$ \label{line:init}\;
     \For{$k=0,1,2,\ldots, k_{\max}-1$}{
-        \uIf{$\min_{0 \leq j < k} (\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k)$\label{line:mu_0_condition}}{
+        \uIf{$\min_{j \in K^0} (\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k)$\label{line:mu_0_condition}}{
             $\mu_k \gets 0$ \label{line:update_mu_0}\;
         }
         \uElse{
@@ -197,7 +197,7 @@ Let us partition the iteration indices $K\defeq \{0,1,2,\ldots, k_{\max}-1\}$ in
 \end{equation}
 We set $\mu_k=0$ if and only if the following condition holds:
 \begin{equation}\label{eq:mu_0_condition}
-    \min_{0 \leq j < k} \qty(\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k),
+    \min_{j \in K^0, \, j < k} \qty(\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k),
 \end{equation}
 where the minimum of the empty set is $+\infty$.
 This condition means that $\mu_k=0$ is set only when a sufficient decrease in $\overline{f}$ is observed.
@@ -420,7 +420,7 @@ To this purpose, we introduce
 \begin{proof}
     Recall that \refLine{line:mu_0_condition} asserts that the following holds for $k \in K^0$:
     \begin{equation}\label{eq:re_mu_0_condition}
-        \min_{0 \le j < k} (\overline{f}(x_j)-\Delta_j) \ge \overline{f}(x_{k}).
+        \min_{j \in K^0, \, j < k} (\overline{f}(x_j)-\Delta_j) \ge \overline{f}(x_{k}).
     \end{equation}
     Note that $\mu_0=0$ and $0 \in K^0$, meaning that $\abs{K^0} \geq 1$, and that the empty sum is zero.
     Let us enumerate the elements of $K^0$ in increasing order as $K^0 = (k_i)_{i=0}^{\abs{K^0}-1}$.
