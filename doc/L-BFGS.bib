@@ -21,8 +21,6 @@
   booktitle = {Proceedings of the 17th Conference on Formal Methods in Computer-Aided Design},
   author = {Izycheva, Anastasiia and Darulova, Eva},
   year = 2017,
-  series = {Fmcad '17},
-  pages = {15--22},
   publisher = {FMCAD Inc},
   address = {Austin, Texas},
   abstract = {State-of-the-art static analysis tools for verifying finite-precision code compute worst-case absolute error bounds on numerical errors. These are, however, often not a good estimate of accuracy as they do not take into account the magnitude of the computed values. Relative errors, which compute errors relative to the value's magnitude, are thus preferable. While today's tools do report relative error bounds, these are merely computed via absolute errors and thus not necessarily tight or more informative. Furthermore, whenever the computed value is close to zero on part of the domain, the tools do not report any relative error estimate at all. Surprisingly, the quality of relative error bounds computed by today's tools has not been systematically studied or reported to date.In this paper, we investigate how state-of-the-art static techniques for computing sound absolute error bounds can be used, extended and combined for the computation of relative errors. Our experiments on a standard benchmark set show that computing relative errors directly, as opposed to via absolute errors, is often beneficial and can provide error estimates up to six orders of magnitude tighter, i.e. more accurate. We also show that interval subdivision, another commonly used technique to reduce over-approximations, has less benefit when computing relative errors directly, but it can help to alleviate the effects of the inherent issue of relative error estimates close to zero.},
@@ -272,6 +270,24 @@
   journal = {SIAM Journal on Optimization},
   volume = {17},
   publisher = {Citeseer}
+}
+
+@article{byrdSampleSizeSelection2012,
+  title = {Sample Size Selection in Optimization Methods for Machine Learning},
+  author = {Byrd, Richard H. and Chin, Gillian M. and Nocedal, Jorge and Wu, Yuchen},
+  year = 2012,
+  month = aug,
+  journal = {Mathematical Programming},
+  volume = {134},
+  number = {1},
+  pages = {127--155},
+  issn = {1436-4646},
+  doi = {10.1007/s10107-012-0572-5},
+  urldate = {2026-01-26},
+  abstract = {This paper presents a methodology for using varying sample sizes in batch-type optimization methods for large-scale machine learning problems. The first part of the paper deals with the delicate issue of dynamic sample selection in the evaluation of the function and gradient. We propose a criterion for increasing the sample size based on variance estimates obtained during the computation of a batch gradient. We establish an \$\$\textbraceleft O(1/\textbackslash epsilon)\textbraceright\$\$complexity bound on the total cost of a gradient method. The second part of the paper describes a practical Newton method that uses a smaller sample to compute Hessian vector-products than to evaluate the function and the gradient, and that also employs a dynamic sampling technique. The focus of the paper shifts in the third part of the paper to L1-regularized problems designed to produce sparse solutions. We propose a Newton-like method that consists of two phases: a (minimalistic) gradient projection phase that identifies zero variables, and subspace phase that applies a subsampled Hessian Newton iteration in the free variables. Numerical tests on speech recognition problems illustrate the performance of the algorithms.},
+  langid = {english},
+  keywords = {49M15,49M37,65K05},
+  file = {C:\Users\hirok\Zotero\storage\M9R2NU9T\Byrd et al. - 2012 - Sample size selection in optimization methods for machine learning.pdf}
 }
 
 @article{byrdToolAnalysisQuasiNewton1989,
@@ -1138,6 +1154,22 @@
   issn = {2167-3888},
   doi = {10.1561/2400000036},
   file = {C:\Users\hirok\Downloads\2101.09545v4 (1).pdf}
+}
+
+@article{paquetteStochasticLineSearch2020,
+  title = {A {{Stochastic Line Search Method}} with {{Expected Complexity Analysis}}},
+  author = {Paquette, Courtney and Scheinberg, Katya},
+  year = 2020,
+  month = jan,
+  journal = {SIAM Journal on Optimization},
+  volume = {30},
+  number = {1},
+  pages = {349--376},
+  publisher = {{Society for Industrial and Applied Mathematics}},
+  issn = {1052-6234},
+  doi = {10.1137/18M1216250},
+  urldate = {2026-01-26},
+  abstract = {For deterministic optimization, line search methods augment algorithms by providing stability and improved efficiency. Here we adapt a classical backtracking Armijo line search to the stochastic optimization setting. While traditional line search relies on exact computations of the gradient and values of the objective function, our method assumes that these values are available up to some dynamically adjusted accuracy which holds with some sufficiently large, but fixed, probability. We bound the expected number of iterations to reach a desired first-order accuracy in the nonconvex, convex, and strongly convex cases and show that this bound matches the complexity bound of deterministic gradient descent up to constants.Keywordsline searchcomplexitystochasticMSC codes90C3090C15}
 }
 
 @article{powellAlgorithmsNonlinearConstraints1978,

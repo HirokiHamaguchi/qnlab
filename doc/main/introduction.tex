@@ -8,6 +8,7 @@ This paper considers the unconstrained optimization problem
 \end{mini}
 where $f\colon \mathbb{R}^n \to \mathbb{R}$ is a continuously differentiable nonconvex function, and $x \in \mathbb{R}^n$ is the optimization variable.
 We focus on a noisy optimization setting in which numerical errors contaminate objective function evaluations.
+There are several types of numerical noise \citep{paquetteStochasticLineSearch2020,byrdSampleSizeSelection2012}, and we consider bounded and non-diminishing noise models \citep{sunTrustRegionMethod2023}.
 Specifically, only inexact function values $\overline{f}(x)$ are available, while gradient information can be computed with comparatively high accuracy.
 Such inaccuracies are unavoidable in many realistic scenarios, including finite-precision arithmetic,
 simulation-based evaluations, and stochastic approximations

@@ -27,8 +27,9 @@ repos:
     hooks:
       - id: trailing-whitespace
       - id: check-yaml
-      - id: check-added-large-files
       - id: check-merge-conflict
+      - id: check-added-large-files
+        exclude: ^doc/main/presentation.pdf
 
   - repo: https://github.com/kynan/nbstripout
     rev: 0.8.1

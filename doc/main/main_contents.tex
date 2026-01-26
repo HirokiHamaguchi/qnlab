@@ -8,7 +8,7 @@
 \subsection{Problem Setting}
 \label{sec:problem_setting}
 
-We consider optimization problems in which exact objective function values are unavailable, following the recent literature on error-aware optimization \citep{grattonNoteSolvingNonlinear2020,bellaviaImpactNoiseEvaluation2021,carterNumericalExperienceClass1993,clancyTROPHYTrustRegion2022,ruanAdaptiveRegularizedQuasiNewton2024}.
+We consider optimization problems in which exact objective function values are unavailable, following the recent literature on error-aware optimization \citep{grattonNoteSolvingNonlinear2020,bellaviaImpactNoiseEvaluation2021,carterNumericalExperienceClass1993,clancyTROPHYTrustRegion2022,sunTrustRegionMethod2023,ruanAdaptiveRegularizedQuasiNewton2024}.
 When both objective values and gradients are heavily corrupted by noise, reliable optimization cannot be guaranteed.
 Thus, meaningful optimization requires that at least one source of information be sufficiently accurate.
 This work focuses on problems arising from finite-precision computations or inexact evaluations, where objective function evaluations are subject to non-negligible errors while gradient information can be computed with relatively high accuracy.
@@ -850,7 +850,7 @@ All experiments were conducted on a Microsoft Windows 11 Home system (version~10
 
 \subsection{Experimental Results}\label{sec:results}
 
-\subsubsection{Test Problems}\label{sssec:problems}
+\subsubsection{Test Problems and Settings}\label{sssec:problems}
 
 We evaluated all algorithms on unconstrained problems from the CUTEst collection \citep{gouldCUTEstConstrainedUnconstrained2015}, implemented in Python using the PyCUTEst interface \citep{PyCUTEst2022}.
 All problems were initialized with the default starting points provided by the library.
@@ -868,6 +868,8 @@ To simulate different numerical environments, we tested the following four setti
 Each setting uses a different error rate $\feps$ in the relative error model (\cref{eq:relative_error_model}), as summarized in \cref{tab:machine_epsilon}.
 The table relates the machine epsilon (maximum relative rounding error) for each floating-point precision to the $\feps$ value used in our experiments.
 We set $\feps$ equal to or larger than the machine epsilon to account for additional uncertainties in function and gradient evaluations.
+We also set the maximum number of iterations to $k_{\max} = 15{,}000$ and timed out runs exceeding 10 minutes per problem.
+
 
 % !!! Auto-generated table by doc/main/check/float.py
 \begin{table}[t]
