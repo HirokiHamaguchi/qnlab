@@ -1,7 +1,6 @@
-import multiprocessing
 import os
 from pathlib import Path
-from typing import List, Tuple, TypeAlias
+from typing import List, Optional, Tuple, TypeAlias
 from zipfile import BadZipFile
 
 import numpy as np
@@ -9,7 +8,7 @@ import numpy as np
 from qnlab.experiment.vis import vis
 from qnlab.problem.cutest import CUTEstQNProblem
 from qnlab.solver.qn import qn
-from qnlab.util.callback import Callback
+from qnlab.util.callback import Callback, CallbackTimeoutError
 from qnlab.util.method import Method
 
 task_type: TypeAlias = Tuple[str, Method, dict, int, np.float64]
@@ -18,26 +17,24 @@ task_type: TypeAlias = Tuple[str, Method, dict, int, np.float64]
 def get_file_path(task: task_type) -> str:
     prob_name, method, _option, precision, noise = task
     prob_type = "noisy" if noise > 0 else str(precision)
-
-    return str(
-        Path(os.path.dirname(__file__)).parent.parent
-        / "data"
-        / "temp"
-        / prob_type
-        / prob_name
-        / f"{method.label}.npz"
-    )
+    folder = Path(os.path.dirname(__file__)).parent.parent / "data" / "temp"
+    return str(folder / prob_type / prob_name / f"{method.label}.npz")
 
 
-def solveProblemWithTimeout(task: task_type):
+def solveProblemWithTimeout(task: task_type, time_limit: Optional[float] = None):
     prob_name, method, option, precision, noise = task
     file_path = get_file_path(task)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     prob = CUTEstQNProblem(prob_name, precision=precision, noise=noise)
-    callback = Callback()
+    callback = Callback(time_limit=time_limit)
     try:
+        print(f"▶ Running: {file_path}")
         qn(prob, method, option, callback)
         print(f"✓ {prob_name} with {method.label}")
+    except CallbackTimeoutError as e:
+        print(f"⏱ {prob_name} with {method.label}: {str(e)}")
+        if time_limit is not None and time_limit < 600:
+            raise RuntimeError("Time limit too short, please increase it.") from e
     except Exception as e:
         print(f"✗ {prob_name} with {method.label}: {str(e)}")
     np.savez_compressed(
@@ -67,23 +64,14 @@ def run(
     print(f"Total tasks to run: {len(tasks)}")
 
     errors = []  # collect errors for reporting after all tasks
-    with multiprocessing.Pool(processes=1) as pool:
-        for i, task in enumerate(tasks):
-            file_path = get_file_path(task)
-            print(f"[{i + 1}/{len(tasks)}] ▶ Running: {file_path}")
-            try:
-                result = pool.apply_async(solveProblemWithTimeout, (task,))
-                result.get(timeout=TL)
-                print(f"[{i + 1}/{len(tasks)}] ✓ Success")
-            except multiprocessing.TimeoutError:
-                print(f"[{i + 1}/{len(tasks)}] ⏱ Timeout")
-                pool.terminate()
-                pool.join()
-                pool = multiprocessing.Pool(processes=1)  # restart the pool
-                errors.append((file_path, "Timeout"))
-            except Exception as e:
-                print(f"[{i + 1}/{len(tasks)}] ⚠ Error: {e}")
-                errors.append((file_path, f"Error: {e}"))
+    for i, task in enumerate(tasks):
+        file_path = get_file_path(task)
+        try:
+            solveProblemWithTimeout(task, TL)
+            print(f"[{i + 1}/{len(tasks)}] ✓ Success")
+        except Exception as e:
+            print(f"[{i + 1}/{len(tasks)}] ⚠ Error: {e}")
+            errors.append((file_path, f"Error: {e}"))
 
     if errors:
         msg = "\n".join([f" - {name}: {err}" for name, err in errors])

@@ -1,5 +1,5 @@
 import time
-from typing import DefaultDict, List
+from typing import DefaultDict, List, Optional
 
 import numpy as np
 import numpy.typing as npt
@@ -7,11 +7,16 @@ import numpy.typing as npt
 from qnlab.problem.base import BaseProblem
 
 
+class CallbackTimeoutError(RuntimeError):
+    """Raised when the callback exceeds a prescribed time limit."""
+
+
 class Callback:
     def __init__(
         self,
         gnorm_order=np.inf,
         save_xs=False,
+        time_limit: Optional[float] = None,
     ) -> None:
         """Initializes the Callback.
 
@@ -22,7 +27,8 @@ class Callback:
         # SciPy also uses infinity norm for gnorm
         self.gnorm_order = gnorm_order
         self.save_xs = save_xs
-        self.reset()
+        self.time_limit = time_limit
+        self._reset()
 
     def __repr__(self) -> str:
         if len(self.fxs) >= 2:
@@ -30,7 +36,7 @@ class Callback:
         else:
             return f"Callback(iteration={self.iteration}, fxs={self.fxs})"
 
-    def reset(self) -> None:
+    def _reset(self) -> None:
         """Resets the callback data."""
         self.xs: List[npt.NDArray[np.float64]] = []
         self.fxs: List[np.float64] = []
@@ -48,7 +54,7 @@ class Callback:
     ) -> None:
         """Called at the start of the optimization."""
         prob.reset()
-        self.reset()
+        self._reset()
         self.callback(
             prob,
             prob.x0,
@@ -69,5 +75,12 @@ class Callback:
         gnorm = np.float64(np.linalg.norm(g, ord=self.gnorm_order))
         self.fxs.append(fx)
         self.gnorms.append(gnorm)
-        self.times.append(time.perf_counter() - self.start_time)
+
+        elapsed = time.perf_counter() - self.start_time
+        self.times.append(elapsed)
         self.calls.append(prob.count_calls())
+
+        if self.time_limit is not None and elapsed >= self.time_limit:
+            raise CallbackTimeoutError(
+                f"Elapsed time {elapsed:.2f}s exceeded limit {self.time_limit:.2f}s"
+            )
