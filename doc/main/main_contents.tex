@@ -29,8 +29,8 @@ We next state assumptions regarding gradient evaluations.
 In practice, termination is typically based on a gradient tolerance $\gtol$, and considers $\norm{\nabla \overline{f}(x)} \le \gtol$ as a stopping criterion.
 In our numerical experiments, following common implementations \citep{2020SciPy-NMeth}, we use the infinity norm for the gradient, though other norms could equally be employed.
 If the gradient noise were comparable to or larger than $\gtol$, the stopping criterion could not be reliably satisfied, no matter how close $x$ is to a stationary point.
-Therefore, $\gtol$ must be chosen sufficiently large relative to the gradient noise level.
-Accordingly, it is natural to assume that the error in gradient evaluations is small compared to the prescribed tolerance, namely,
+Therefore, $\gtol$ must be chosen sufficiently large than the gradient noise level.
+Accordingly, it is natural to assume that the error in gradient evaluations is small compared to the prescribed tolerance:
 \begin{equation*}
     \norm{\nabla f(x)-\nabla\overline{f}(x)}\ll\gtol.
 \end{equation*}
@@ -118,9 +118,10 @@ In this section, we present the proposed algorithm for the problem setting state
 \begin{algorithm}[ht]
     \normalsize
     \KwIn{$x_0$, $0 < k_{\max}$, $0 \le \feps < 1$, $0 < c < 1$, $0 < \theta_{\min} \leq \theta_{\max}$ and $0 < \varsigma < 1$}
-    $k \gets 0$, $g_0 \gets \nabla f(x_0)$, $K^+ \gets \emptyset$ \label{line:init}\;
+    $k \gets 0$, $g_0 \gets \nabla f(x_0)$, $K^0 \gets \{0\}$, $K^+ \gets \emptyset$ \label{line:init}\;
     \For{$k=0,1,2,\ldots, k_{\max}-1$}{
         \uIf{$\min_{j \in K^0} (\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k)$\label{line:mu_0_condition}}{
+            $K^0 \gets K^0 \cup \{k\}$ \label{line:update_K_0}\;
             $\mu_k \gets 0$ \label{line:update_mu_0}\;
         }
         \uElse{
@@ -801,7 +802,7 @@ In practice, we may set $\varsigma=0$ as long as the initial gradient is nonzero
 
 When $B_k$ is a good approximation of the Hessian, the regularization parameter $\mu_k$ should be small for fast convergence.
 Since the quantity $G_k$ is strictly increasing with $k$, it is natural in practice to decrease the effective regularization when sufficient progress in the objective function is achieved.
-When the corrected objective value decreases by more than $1$, we restart the accumulation by resetting $K^+$ to the empty set and $G_k$ to $\varsigma$.
+When the difference between the two sides of \cref{eq:mu_0_condition} is larger than $1$, we restart the accumulation by resetting $K^+$ to the empty set and $G_k$ to $\varsigma$.
 As long as the number of such restarts is finite, the overall convergence analysis in \cref{sec:analysis} remains valid.
 Since these choices are heuristic, there may be room for further improvement. Especially, further increasing $\mu_k$ stabilizes the method when the objective function values are highly noisy, and decreasing $\mu_k$ more aggressively may accelerate convergence when the objective function is accurate.
 

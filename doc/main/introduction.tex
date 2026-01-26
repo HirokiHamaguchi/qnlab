@@ -7,37 +7,31 @@ This paper considers the unconstrained optimization problem
     {x}{f(x)}{\label{prob:main_problem}}{},
 \end{mini}
 where $f\colon \mathbb{R}^n \to \mathbb{R}$ is a continuously differentiable nonconvex function, and $x \in \mathbb{R}^n$ is the optimization variable.
-We focus on a noisy optimization setting in which numerical errors contaminate objective function evaluations.
-There are several types of numerical noise \citep{paquetteStochasticLineSearch2020,byrdSampleSizeSelection2012}, and we consider bounded and non-diminishing noise models \citep{sunTrustRegionMethod2023}.
+We focus on an optimization setting in which objective function evaluations are contaminated by bounded, non-diminishing numerical noise \citep{sunTrustRegionMethod2023}.
 Specifically, only inexact function values $\overline{f}(x)$ are available, while gradient information can be computed with comparatively high accuracy.
-Such inaccuracies are unavoidable in many realistic scenarios, including finite-precision arithmetic,
-simulation-based evaluations, and stochastic approximations
-\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022,moreEstimatingComputationalNoise2011,caflischMonteCarloQuasiMonte1998}.
+Such inaccuracies are unavoidable in many realistic scenarios, including finite-precision arithmetic, simulation-based evaluations, and stochastic approximations \citep{shiNoiseTolerantQuasiNewtonAlgorithm2022,moreEstimatingComputationalNoise2011,caflischMonteCarloQuasiMonte1998}.
 When function values are contaminated by numerical noise, standard optimization algorithms may lose their theoretical guarantees, behave erratically, or terminate prematurely with unreliable solutions.
 
-In the absence of noise and with accurate function evaluations, quasi-Newton methods, in particular the Broyden--Fletcher--Goldfarb--Shanno (BFGS) method and its limited-memory variant (L-BFGS), are among the most efficient and widely used algorithms to solve Problem~\eqref{prob:main_problem} \citep{liuLimitedMemoryBFGS1989a,nocedal1999numerical}.
-Their success is largely attributed to fast local convergence and excellent scalability.
+In the absence of noise and with accurate function evaluations, quasi-Newton methods, in particular the Broyden--Fletcher--Goldfarb--Shanno (BFGS) method and its limited-memory variant (L-BFGS), are among the most efficient and widely used algorithms to solve the problem~\eqref{prob:main_problem} \citep{liuLimitedMemoryBFGS1989a,nocedal1999numerical}.
+Their success is largely attributed to fast local convergence and scalability.
 Standard implementations \citep{2020SciPy-NMeth,Okazaki2007libLBFGS} rely on line search procedures that enforce the Wolfe conditions
 to guarantee sufficient descent and the positive definiteness of the Hessian approximation.
 
 In the presence of numerical noise, these line search conditions may become unreliable.
-Differences in function values or directional derivatives can be dominated by rounding errors,
-leading to unstable step sizes, ill-conditioned Hessian approximations, or abnormal termination
-\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
+Differences in function values or directional derivatives can be dominated by rounding errors, leading to unstable step sizes, ill-conditioned Hessian approximations, or abnormal termination \citep{shiNoiseTolerantQuasiNewtonAlgorithm2022,paquetteStochasticLineSearch2020}.
 From a computational perspective, improving the robustness of quasi-Newton methods in noisy environments is therefore crucial.
 In particular, it is desirable to design algorithms that (i) retain computational efficiency when function evaluations are accurate, (ii) remain stable when function values are unreliable, and (iii) guarantee convergence to first-order stationary points under mild assumptions.
 
 In this work, we propose a noise-tolerant regularized quasi-Newton method that addresses these challenges.
 Our approach combines Armijo-type line search with quadratic regularization
 \citep{uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023}
-with Objective-Function-Free Optimization (OFFO) inspired strategy
+and Objective-Function-Free Optimization (OFFO) inspired strategy
 \citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
-When a sufficient decrease in function value is observed, the method behaves similarly to standard line-search-based quasi-Newton methods, preserving practical efficiency.
-When numerical noise dominates, we introduce regularization on the approximate Hessian to ensure numerical stability, which yields convergence properties similar to those of OFFO methods, particularly that of \AdaGradNorm \citep{wardAdaGradStepsizesSharp2020}.
+When a sufficient decrease in function value is observed, the method behaves similarly to standard line-search-based quasi-Newton methods, preserving its practical efficiency.
+When numerical noise dominates, we introduce regularization on the approximate Hessian to ensure numerical stability, which yields convergence properties similar to those of OFFO methods, particularly \AdaGradNorm \citep{wardAdaGradStepsizesSharp2020}.
 The resulting algorithm is particularly well-suited for low-precision or noisy environments.
 
-From a theoretical standpoint, we establish that the proposed method achieves the standard
-global convergence rate of $\order{1/\varepsilon^2}$ for smooth nonconvex optimization problems, even when objective function values are corrupted by noise.
+From a theoretical standpoint, we establish that the proposed method achieves the standard global convergence rate of $\order{1/\varepsilon^2}$ for smooth nonconvex optimization problems, even when objective function values are corrupted by noise.
 Extensive numerical experiments on the CUTEst benchmark collection, across various floating-point precisions and artificial noise settings, demonstrate that the proposed method is significantly more stable than standard line-search-based methods in settings with significant numerical noise, while maintaining practical convergence speed.
 
 \ifSubfilesClassLoaded{
