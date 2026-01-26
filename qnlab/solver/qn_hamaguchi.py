@@ -144,8 +144,6 @@ def line_search_relaxed_armijo(
                 alpha *= np.clip(1 / 16, -dg / (dg_try - dg), 15 / 16)
                 continue
 
-        if verbose:
-            print(f"  ✅ Accepted step size: {alpha:.2e}")
         return RetCode.SUCCESS, x_try, f_try, g_try, delta, rejection_counter
     else:
         if verbose:
@@ -184,20 +182,17 @@ def qn_hamaguchi(
     pf2: Deque[np.float64] = deque([fx], maxlen=param.non_monotone)
     gnorm: np.float64 = np.float64(np.linalg.norm(g))
 
-    k = 0
-    # use caller-provided verbosity flag
-    mu = np.float64(0.0)
-    var_sigma = np.float64(1e-10)
-    offo: np.float64 = var_sigma
-    is_offo_mode = False
-    min_fx_minus_delta = np.float64(np.inf)
-
-    # g is always finite (not nan or inf)
     if not np.isfinite(gnorm):
         if callback:
             callback.callback(prob, x, fx, g)
         return RetCode.ERR_NUMERICAL_OVERFLOW, fx, x
 
+    k = 0
+    mu = np.float64(0.0)
+    var_sigma = np.float64(1e-10)
+    offo: np.float64 = var_sigma
+    is_offo_mode = False
+    min_fx_minus_delta = np.float64(np.inf)
     rejection_counter: int = 0
 
     while True:
@@ -240,7 +235,9 @@ def qn_hamaguchi(
 
         lm.add_new_data(new_x, new_f, new_g, x, fx, g, callback, eps)
 
-        min_fx_minus_delta = min(min_fx_minus_delta, fx - delta)
+        if mu == 0.0:
+            min_fx_minus_delta = min(min_fx_minus_delta, fx - delta)
+
         x, fx, g = new_x, new_f, new_g
         k += 1
         gnorm = np.float64(np.linalg.norm(g))
