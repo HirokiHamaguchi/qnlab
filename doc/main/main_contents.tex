@@ -669,7 +669,7 @@ Now, we establish the following global convergence result for \cref{alg:regulari
 \Cref{thm:gc} is a standard convergence guarantee for first-order optimization algorithms applied to $L$-smooth nonconvex functions.
 Furthermore, this result is equivalent to the following iteration complexity:
 \begin{equation*}
-    \min\left\{k \relmiddle| \norm{\nabla f(x_k)} < \varepsilon\right\} = \order{1/\varepsilon^2}.
+    \min\left\{k \relmiddle| \norm{\nabla f(x_k)} < \gtol \right\} = \order{1/\gtol^2}.
 \end{equation*}
 
 We interpret the three terms in \cref{eq:sum_gk_squared_bound} in light of classical optimization results.

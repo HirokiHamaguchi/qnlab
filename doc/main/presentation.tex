@@ -179,7 +179,7 @@
 \begin{frame}{無制約最適化問題と準ニュートン法の一種 L-BFGS}
     \begin{itemize}
         \item 問題設定: $\min_{x \in \mathbb{R}^n} f(x)$ \quad ($f\colon \mathbb{R}^n \to \mathbb{R}$ は連続可微分、一般には非凸)
-        \item 問題が解ける: $\norm{\nabla \overline{f}(x)} \leq \gtol$ を満たす点 $x$ の発見
+        \item 問題が「解ける」: $\norm{\nabla f(x)}$ が十分小さい値 $\gtol$ 以下になる点 $x$ の発見
         \item L-BFGS {\scriptsize(Limited-memory Broyden--Fletcher--Goldfarb--Shannon)}: SciPy (著名OSS) にて高速な手法
     \end{itemize}
     \begin{figure}[htbp]
@@ -200,7 +200,7 @@
     \begin{enumerate}[label=\textbullet]
         \item 理想的な状況下で、準ニュートン法は実用上最もよく使われる手法の一つ
         \item 現実の最適化では、計算機上で行うので\textbf{数値誤差}が発生
-        \item 特に、\textbf{関数値}の誤差は準ニュートン法の性能を著しく劣化させる
+        \item 特に、\textbf{関数値}の誤差は準ニュートン法の挙動を著しく不安定化
               \begin{enumerate}[label=--]
                   \item ビッグデータを扱う際の低精度浮動小数点数(32, 16bit)による計算や、\\
                         近似値や確率で変動する値のみが計算出来る状況では、不可避な誤差が\\
@@ -217,8 +217,8 @@
 
 \begin{frame}{本研究の位置づけ}
     \begin{itemize}
-        \item 無視できない数値誤差が $f$ にも $\nabla f$ にも存在すると、その最適化問題は不良設定問題
-        \item 本研究は、特に\underline{関数値に誤差が存在する}場合の最適化手法に焦点を当てる
+        \item 無視できない誤差が $f$ にも $\nabla f$ にも存在すると、その最適化問題は\colorbox{UniGray}{不良設定}
+        \item 本研究は、特に\underline{関数値に誤差が存在する場合}の最適化手法に焦点を当てる
     \end{itemize}
     \begin{table}
         \centering
@@ -227,7 +227,6 @@
              &                                                                                            & \multicolumn{2}{c}{$f$ の誤差}     \\
              &                                                                                            & 小                           & 大 \\
             \midrule
-
             \multirow{2}{*}{\rotatebox{90}{$\nabla f$ の誤差}}
              & \rotatebox{90}{\makebox[1.2cm][c]{小}}
              & \makecell[c]{通常の最適化                                                                                                          \\ \citep{liuLimitedMemoryBFGS1989a,2020SciPy-NMeth}}
@@ -240,27 +239,27 @@
             \bottomrule
         \end{tabular}
     \end{table}
-    より緩い誤差を扱ったり\citep{sunTrustRegionMethod2023,paquetteStochasticLineSearch2020,byrdSampleSizeSelection2012}、\\
-    信頼領域法における研究例\citep{sunTrustRegionMethod2023,bellaviaImpactNoiseEvaluation2021}も存在\\
+    より緩い誤差への研究や\citep{sunTrustRegionMethod2023,paquetteStochasticLineSearch2020,byrdSampleSizeSelection2012}、\\
+    信頼領域法における研究\citep{sunTrustRegionMethod2023,bellaviaImpactNoiseEvaluation2021}なども存在\\
     $\to$ 本研究は、\underline{消すことが出来ない誤差}に対して\underline{実用的な高速性を維持}したい
 \end{frame}
 
-\begin{frame}{問題に対する仮定}
-    停止条件は $\norm{\nabla \overline{f}(x)} \leq \gtol$ 最適化過程では常に $\norm{\nabla \overline{f}(x)} > \gtol$ が成立
+\begin{frame}{具体的な問題設定と誤差モデル}
+    現実的なIEEE~754浮動小数点数を想定した誤差モデル $\overline{f}$ のみが観測可能。
+    \begin{block}{関数値に対するハイブリッド型の誤差モデル}
+        絶対誤差と相対誤差が混在する誤差モデル\citep{highamAccuracyStabilityNumerical2002,10.5555/3168451.3168462}:
+        \begin{equation*}
+            \abs{f(x)-\overline{f}(x)} \le \feps \max(1,\abs{f(x)}).
+        \end{equation*}
+    \end{block}
 
-    \begin{block}{勾配に対する誤差モデル: 誤差が $\gtol$ より十分小さい}
+    停止条件は $\norm{\nabla \overline{f}(x)} \leq \gtol$ なので、過程では常に $\norm{\nabla \overline{f}(x)} > \gtol$ が成立する。
+    \begin{exampleblock}{勾配に対する誤差モデル: 誤差が $\gtol$ より十分小さい}
         \begin{equation*}
             \text{(数理実験)} \norm{\nabla f(x)-\nabla\overline{f}(x)}\ll\gtol, \qquad
             \text{(理論解析)} \norm{\nabla f(x)-\nabla\overline{f}(x)}=0.
         \end{equation*}
-    \end{block}
-    \begin{exampleblock}{関数値に対するハイブリッド型の誤差モデル}
-        絶対誤差と相対誤差が混在する誤差モデル\citep{highamAccuracyStabilityNumerical2002,10.5555/3168451.3168462}:
-        \begin{equation*}
-            \abs{f(x)-\overline{f}(x)} \le \feps \max(1,\abs{f(x)}),
-        \end{equation*}
     \end{exampleblock}
-    現実的なIEEE~754浮動小数点数の丸め誤差モデルを想定した問題設定
 \end{frame}
 
 \begin{frame}{研究概要}
@@ -285,15 +284,15 @@
 
 \begin{frame}{キーワード:目的関数値非依存最適化 \citep{grattonOFFOMinimizationAlgorithms2023}}
     機械学習分野での需要などから近年発展してきた手法。\\
-    \Adam や \AdaGrad などの最適化手法は、勾配だけで最適化を行う。
+    \Adam や \AdaGrad などの最適化手法は、勾配だけで最適化を行う:
     \begin{equation*}
-        x_{k+1}^{(i)} = x_k^{(i)} - \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k (g_j^{(i)})^2}} g_k^{(i)}, \
+        x_{k+1}^{(i)} = x_k^{(i)} - \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k (g_j^{(i)})^2}} g_k^{(i)}, \quad
         x_{k+1} = x_k - \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k \norm{g_j}^2}}\,g_k.
     \end{equation*}
     ($g_k$ は勾配, $\theta$ は学習率, $\varsigma$ は初期化定数)\\
-    \vspace{1em}
-    このような\underline{関数値}を陽に用いない最適化手法の総称。\\
-    $\to$ 誤差に影響されやすい\underline{関数値差分}を利用せずに最適化が可能。
+    \vspace{2em}
+    このような\underline{関数値}を陽に用いない最適化手法の総称\\
+    $\to$ 誤差に影響されやすい\underline{関数値差分}を利用せずに最適化が可能に
 \end{frame}
 
 \begin{frame}{提案手法の構成要素1/2: 緩和Armijo条件}
@@ -312,7 +311,7 @@
     この\red{$\Delta_k$}は(適切な条件下で)次を満たす、誤差吸収項:
     \begin{equation*}
         \big| \underbrace{(\overline{f}(x_k) - \overline{f}(x_k + \alpha_k d_k))}_{\text{観測された差分}} - \underbrace{(f(x_k) - f(x_k + \alpha_k d_k))}_{\text{真の差分}} \big|
-        \le \red{\Delta_k}
+        \le \red{\Delta_k}.
     \end{equation*}
     → \underline{現実的な誤差ありの設定でも、エラーなく最適化を進められる。}
 \end{frame}
@@ -320,7 +319,7 @@
 \begin{frame}{提案手法の構成要素2/2: 正則化を入れた探索方向}
     探索方向は正則化付き準ニュートン方向を採用:
     \begin{equation*}
-        d_k = -(B_k + \mu_k I)^{-1} g_k
+        d_k = -(B_k + \mu_k I)^{-1} g_k.
     \end{equation*}
     (直感: $f$ の勾配情報による近似 + 正則化項 $\frac{\mu_k}{2}\norm{d}^2$ を加えた二次形式の最小解方向)
     \begin{itemize}
@@ -349,17 +348,22 @@
 \end{frame}
 
 \begin{frame}{理論解析における仮定}
-    最適化問題が満たすべき、非常に標準的な2つの仮定:
+    以下では、提案手法が適切な仮定の下で収束することを示す。\\[1em]
+
+    最適化問題は、次の非常に標準的な2つの仮定を満たすとする:
     \begin{block}{仮定1: 目的関数 $f$ の下側に関する有界性}
         \begin{equation*}
             f(x) \ge f^* \defeq \inf_{x \in \bbR^n} f(x) > -\infty.
         \end{equation*}
     \end{block}
-    \begin{block}{仮定2: 目的関数 $f$ の$L$-smooth性}
+    \begin{block}{仮定2: 目的関数 $f$ の $L$-smooth性}
         \begin{equation*}
-            \exists\, 0< L < \infty \text{ s.t. } f(y) \le f(x) + \nabla f(x)^\top (y - x) + \frac{L}{2} \norm{y - x}^2.
+            \exists\, 0< L < \infty \quad\text{s.t.}\quad f(y) \le f(x) + \nabla f(x)^\top (y - x) + \frac{L}{2} \norm{y - x}^2.
         \end{equation*}
     \end{block}
+    \vspace{1em}
+
+    この設定の最適な反復計算量 $\min\{k \mid \norm{\nabla f(x_k)} \le \gtol\}$ は $\Omega(\gtol^{-2})$ である。
 \end{frame}
 
 \begin{frame}{収束解析の概要: コアとなる不等式}
@@ -411,10 +415,10 @@
             \frac{1}{k_{\max}+1}\sum_{j=0}^{k_{\max}} \norm{g_j}^2 = \order{\frac{1}{k_{\max}}}.
         \]
     \end{block}
-    \begin{exampleblock}{反復計算量}
+    \begin{exampleblock}{提案手法が達成する反復計算量}
         \[
-            \min\{k \mid \|\nabla f(x_k)\|\le\varepsilon\}
-            = \mathcal O(\varepsilon^{-2}).
+            \min\{k \mid \norm{\nabla f(x_k)} \le \gtol\}
+            = \order{\gtol^{-2}}.
         \]
     \end{exampleblock}
     \begin{itemize}
@@ -426,12 +430,12 @@
 
 \begin{frame}{実験設定}
     \begin{block}{比較手法}
-        \begin{itemize}
-            \item \texttt{Ours}: 提案手法 (\texttt{Ours-MS} は一種の改良版)
-            \item \texttt{Line}: Wolfe条件による直線探索型 (\texttt{Line-MS} も同様の変種)
-            \item \texttt{SciPy}: SciPy L-BFGS-B (冒頭で見せた著名OSSの実装)
-            \item \texttt{Reg}: 正則化 L-BFGS \citep{kanzowRegularizationLimitedMemory2023}
-            \item \texttt{NTQN}: ノイズ耐性準ニュートン法 \citep{shiNoiseTolerantQuasiNewtonAlgorithm2022} (冒頭で述べた0次法に類似した手法)
+        \begin{itemize}[leftmargin=4em]
+            \item[\texttt{Ours}:] 提案手法 (\texttt{Ours-MS} は一種の改良版)
+            \item[\texttt{Line}:] Wolfe条件による直線探索型 (\texttt{Line-MS} も同様の変種)
+            \item[\texttt{SciPy}:] 著名OSSである SciPy に実装された L-BFGS-B法
+            \item[\texttt{Reg}:] 近年の正則化 L-BFGS法 \citep{kanzowRegularizationLimitedMemory2023}
+            \item[\texttt{NTQN}:] 冒頭で述べた0次法に類似したノイズ耐性準ニュートン法 \citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}
         \end{itemize}
     \end{block}
     \begin{columns}
@@ -448,8 +452,8 @@
             \begin{block}{評価手法: Performance Profile}
                 \begin{itemize}
                     \item どれだけ安定かつ高速に解けたかを評価
-                    \item $y$ 軸方向に上であればあるほど安定
                     \item $x$ 軸方向に左であればあるほど高速
+                    \item $y$ 軸方向に上であればあるほど安定
                 \end{itemize}
             \end{block}
         \end{column}
@@ -513,26 +517,30 @@
 
 \begin{frame}{誤差なし設定からみる実用性}
     \begin{columns}
-        \column{0.33\textwidth}
+        \column{0.35\textwidth}
         \begin{center}
             誤差の殆ど関係ない設定:\\
             64-bit $\gtol=10^{-3}$\\
             \includegraphics[width=\columnwidth]{../imgs/compare/_pp_precision64_gtol1e-03.pdf}
+            最速で解けた問題数が、\\
+            2倍近くに達している
         \end{center}
-        \column{0.67\textwidth}
+        \hfill
+        \column{0.65\textwidth}
         \begin{itemize}
-            \item 提案法は誤差なし設定でも高速
+            \item 提案手法は誤差なし設定でも高速
             \item (最速で解けている問題数がSciPyの約2倍)
-            \item 実装における既存手法などの工夫を活用
-            \item 特に、仮定3を満たすためにdamped BFGSなどを採用
-                  \begin{align*}
-                      B_k & =\mathrm{BFGS}(\{(s_{k_i}, \overline{y}_{k_i} \defeq \theta^{\mathrm{damp}}_i y_{k_i} + (1-\theta^{\mathrm{damp}}_i) B_{k-1}s_{k_i})\}), \\
-                          & (\text{$\mathrm{BFGS}(\cdot)$ は行列を返す関数、$s_{k_i}, y_{k_i}$ は差分ベクトル})
-                  \end{align*}
-            \item 既存の理論的に良いとされる正則化に類似点
+            \item {}
+            \item 既存の理論的に良い正則化に類似点 $(c_1, c_2, \delta > 0)$:
                   \begin{equation*}
-                      \mu_k ={}   c_1 \max(0, -\lambda_{\min}(B_k)) + c_2 \norm{\nabla f(x_k)}^\delta \quad (c_1, c_2, \delta > 0)
+                      \mu_k ={}   c_1 \max(0, -\lambda_{\min}(B_k)) + c_2 \norm{\nabla f(x_k)}^\delta.
                   \end{equation*}
+            \item {}
+            \item 近似ヘッセ行列 $B_k$ に既存の工夫も活用:
+                  \begin{equation*}
+                      \mathrm{BFGS}(\{(s_{k_i}, \overline{y}_{k_i} \defeq \theta^{\mathrm{damp}}_i y_{k_i} + (1-\theta^{\mathrm{damp}}_i) B_{k-1}s_{k_i})\}).
+                  \end{equation*}
+                  ($\mathrm{BFGS}(\cdot)$ は更新則の関数、$s_{k_i}, y_{k_i}$ は差分ベクトル)
         \end{itemize}
     \end{columns}
 \end{frame}
@@ -545,14 +553,14 @@
         \end{center}
         \column{0.4\textwidth}
         \begin{itemize}
-            \item 左図は大まかにアルゴリズム自体 ($f$ や$\nabla f$ を除く) の計算時間。
+            \item 左図は大まかにアルゴリズム自体 ($f$ や $\nabla f$ を除く) の計算時間。
             \item 正則化型の手法
                   \begin{equation*}
                       d_k =-(B_k+\mu_k I)^{-1}g_k
                   \end{equation*}
-                  は行列計算に多少のコスト。
-            \item 提案は既存の近似手法を採用。\\
-                  それでも性能は落ちない。
+                  は行列計算に時間を要する。
+            \item 提案は既存の近似手法を採用。
+            \item それでも性能は落ちない。
         \end{itemize}
     \end{columns}
     \begin{align*}
