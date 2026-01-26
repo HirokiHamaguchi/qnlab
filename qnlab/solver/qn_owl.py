@@ -77,7 +77,7 @@ def qn_owl(
         if result is not None:
             return result, fx, x
 
-        lm.add_new_data(x, fx, g, xp, fxp, gp, callback, prob.get_eps())
+        lm.add_new_data(x, fx, g, xp, fxp, gp, callback, prob.get_machine_eps())
         k += 1
         d = get_direction(method, x, fx, pg, lm)
 

@@ -56,7 +56,7 @@ def qn_ntqn(
             f_func,
             g_func,
             prob.x0,
-            eps_f=prob.get_eps(),
+            eps_f=prob.get_machine_eps(),
             eps_g=prob.get_noise(),
             callback=_ntqn_callback_impl,
             options={

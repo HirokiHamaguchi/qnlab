@@ -167,7 +167,7 @@ def qn_hamaguchi(
 ) -> Tuple[RetCode, np.float64, npt.NDArray[np.float64]]:
     """Runs the L-BFGS algorithm for unconstrained optimization."""
     prob.reset()
-    eps = prob.get_eps()
+    eps = prob.get_machine_eps()
 
     x = np.array(prob.x0, dtype=np.float64)
 

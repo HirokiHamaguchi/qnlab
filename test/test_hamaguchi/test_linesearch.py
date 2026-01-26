@@ -87,7 +87,7 @@ def run_ls(
             d,
             prob,
             param,
-            prob.get_eps(),
+            prob.get_machine_eps(),
             fx,
             verbose=True,
             is_offo_mode=False,

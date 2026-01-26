@@ -8,12 +8,11 @@ from qnlab.problem.cutest import CUTEstQNProblem
 
 
 def compute_feps(precision: int) -> float:
-    """Compute \feps using CUTEstQNProblem.get_eps with zero noise."""
+    """Compute \feps using CUTEstQNProblem.get_machine_eps with zero noise."""
 
     dummy = CUTEstQNProblem.__new__(CUTEstQNProblem)
     dummy.precision = precision
-    dummy.noise = np.float64(0.0)
-    return float(dummy.get_eps())
+    return float(dummy.get_machine_eps())
 
 
 def copy_to_clipboard(text: str) -> None:

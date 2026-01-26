@@ -4,6 +4,7 @@ from qnlab.problem.base import BaseProblem
 from qnlab.problem.bdqrtic import BdqrticProblem
 from qnlab.problem.boxpower import BoxPowerProblem
 from qnlab.problem.cutest import CUTEstQNProblem
+from qnlab.problem.cutest_noised import CUTEstNoisedProblem
 from qnlab.problem.dixon_price import DixonPriceProblem
 from qnlab.problem.gauss1ls import Gauss1lsProblem
 from qnlab.problem.ill_quadratic import IllQuadraticProblem
@@ -23,6 +24,7 @@ __all__ = [
     "BdqrticProblem",
     "BoxPowerProblem",
     "CUTEstQNProblem",
+    "CUTEstNoisedProblem",
     "DixonPriceProblem",
     "Gauss1lsProblem",
     "IllQuadraticProblem",

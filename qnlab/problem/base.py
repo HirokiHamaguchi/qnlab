@@ -94,7 +94,7 @@ class BaseProblem(ABC):
         """Compute the Hessian-vector product at x with vector v."""
         return self._hessian(x) @ v
 
-    def get_eps(self) -> np.float64:
+    def get_machine_eps(self) -> np.float64:
         """Returns the machine epsilon for this problem.
 
         Default value is for 64-bit precision: 2.2204460492503131e-09
