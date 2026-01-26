@@ -200,7 +200,7 @@ def qn_hamaguchi(
             is_offo_mode = False
             mu = np.float64(0.0)
             # if sufficient decrease is observed, reset offo
-            if min_fx_minus_delta - 1 >= fx:
+            if min_fx_minus_delta - fx >= 1.0:
                 offo = var_sigma
         else:
             if not is_offo_mode and verbose:
