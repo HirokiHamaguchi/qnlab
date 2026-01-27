@@ -157,9 +157,9 @@
 
 \newcommand{\feps}{\epsilon_\mathrm{f}}
 \newcommand{\gtol}{\epsilon_{\mathrm{gtol}}}
-\newcommand{\AdaGrad}{\textsc{AdaGrad} }
-\newcommand{\Adam}{\textsc{Adam} }
-\newcommand{\AdaGradNorm}{\textsc{AdaGrad-Norm} }
+\newcommand{\AdaGrad}{\textsc{AdaGrad}}
+\newcommand{\Adam}{\textsc{Adam}}
+\newcommand{\AdaGradNorm}{\textsc{AdaGrad-Norm}}
 
 % === TITLE ===
 \title{
@@ -178,8 +178,8 @@
 
 \begin{frame}{無制約最適化問題と準ニュートン法の一種 L-BFGS}
     \begin{itemize}
-        \item 問題設定: $\min_{x \in \mathbb{R}^n} f(x)$ \quad ($f\colon \mathbb{R}^n \to \mathbb{R}$ は連続可微分、一般には非凸)
-        \item 問題が「解ける」: $\norm{\nabla f(x)}$ が十分小さい値 $\gtol$ 以下になる点 $x$ の発見
+        \item 問題設定: $\min_{x \in \mathbb{R}^n} f(x)$ \quad ($f\colon \mathbb{R}^n \to \mathbb{R}$ は連続可微分な非凸関数)
+        \item 問題を「解く」: $\norm{\nabla f(x)}$ が十分小さい値 $\gtol$ 以下になる点の発見
         \item L-BFGS {\scriptsize(Limited-memory Broyden--Fletcher--Goldfarb--Shannon)}: SciPy (著名OSS) にて高速な手法
     \end{itemize}
     \begin{figure}[htbp]
@@ -210,7 +210,7 @@
               \end{enumerate}
         \item 従来的な理論保証は失われ、小手先の改善では解決しない問題も多い
     \end{enumerate}
-    \begin{block}{Main Issue}
+    \begin{block}{本研究の主題}
         実用的な高速性を維持しつつ、特に関数値の数値誤差に頑健な準ニュートン法とは?
     \end{block}
 \end{frame}
@@ -218,7 +218,7 @@
 \begin{frame}{本研究の位置づけ}
     \begin{itemize}
         \item 無視できない誤差が $f$ にも $\nabla f$ にも存在すると、その最適化問題は\colorbox{UniGray}{不良設定}
-        \item 本研究は、特に\underline{関数値に誤差が存在する場合}の最適化手法に焦点を当てる
+        \item 本研究は、特に\underline{関数値 $f$ の誤差が大きい場合}に着目
     \end{itemize}
     \begin{table}
         \centering
@@ -244,26 +244,8 @@
     $\to$ 本研究は、\underline{消すことが出来ない誤差}に対して\underline{実用的な高速性を維持}したい
 \end{frame}
 
-\begin{frame}{具体的な問題設定と誤差モデル}
-    現実的なIEEE~754浮動小数点数を想定した誤差モデル $\overline{f}$ のみが観測可能。
-    \begin{block}{関数値に対するハイブリッド型の誤差モデル}
-        絶対誤差と相対誤差が混在する誤差モデル\citep{highamAccuracyStabilityNumerical2002,10.5555/3168451.3168462}:
-        \begin{equation*}
-            \abs{f(x)-\overline{f}(x)} \le \feps \max(1,\abs{f(x)}).
-        \end{equation*}
-    \end{block}
-
-    停止条件は $\norm{\nabla \overline{f}(x)} \leq \gtol$ なので、過程では常に $\norm{\nabla \overline{f}(x)} > \gtol$ が成立する。
-    \begin{exampleblock}{勾配に対する誤差モデル: 誤差が $\gtol$ より十分小さい}
-        \begin{equation*}
-            \text{(数理実験)} \norm{\nabla f(x)-\nabla\overline{f}(x)}\ll\gtol, \qquad
-            \text{(理論解析)} \norm{\nabla f(x)-\nabla\overline{f}(x)}=0.
-        \end{equation*}
-    \end{exampleblock}
-\end{frame}
-
 \begin{frame}{研究概要}
-    \begin{block}{Main Issue}
+    \begin{block}{本研究の主題}
         実用的な高速性を維持しつつ、特に関数値の数値誤差に頑健な準ニュートン法とは?
     \end{block}
     \begin{exampleblock}{先行研究}
@@ -275,36 +257,54 @@
     \end{exampleblock}
     \begin{alertblock}{本研究の貢献}
         \begin{itemize}
-            \item 正則化準ニュートン法を用いながら、\underline{数値誤差を陽に考慮する}
-            \item 関数値の誤差問題を回避するために\underline{関数値非依存最適化}を援用
+            \item 正則化準ニュートン法を用いながら、\underline{$f$ の数値誤差を陽に考慮する}
+            \item 誤差問題を回避するため、$f$ を使わない\underline{関数値非依存最適化}を援用
             \item \underline{数値誤差に耐性のある高速な準ニュートン法を提案}
         \end{itemize}
     \end{alertblock}
 \end{frame}
 
+\begin{frame}{具体的な問題設定と誤差モデル}
+    現実的なIEEE~754浮動小数点数を想定した誤差モデル $\overline{f}$ のみが観測可能。
+    \begin{block}{関数値に対するハイブリッド型の誤差モデル}
+        絶対誤差と相対誤差が混在する誤差モデル\citep{highamAccuracyStabilityNumerical2002,10.5555/3168451.3168462}:
+        \begin{equation*}
+            \abs{f(x)-\overline{f}(x)} \le \feps \max(1,\abs{f(x)}).
+        \end{equation*}
+    \end{block}
+    \vspace{1em}
+    停止条件は $\norm{\nabla \overline{f}(x)} \leq \gtol$ なので、過程では常に $\norm{\nabla \overline{f}(x)} > \gtol$ が成立する。
+    \begin{exampleblock}{勾配に対する誤差モデル: 誤差が $\gtol$ より十分小さい}
+        \begin{equation*}
+            \text{(数値実験)} \norm{\nabla f(x)-\nabla\overline{f}(x)}\ll\gtol, \qquad
+            \text{(理論解析)} \norm{\nabla f(x)-\nabla\overline{f}(x)}=0.
+        \end{equation*}
+    \end{exampleblock}
+\end{frame}
+
 \begin{frame}{キーワード:目的関数値非依存最適化 \citep{grattonOFFOMinimizationAlgorithms2023}}
     機械学習分野での需要などから近年発展してきた手法。\\
     \Adam や \AdaGrad などの最適化手法は、勾配だけで最適化を行う:
-    \begin{equation*}
-        x_{k+1}^{(i)} = x_k^{(i)} - \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k (g_j^{(i)})^2}} g_k^{(i)}, \quad
-        x_{k+1} = x_k - \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k \norm{g_j}^2}}\,g_k.
-    \end{equation*}
-    ($g_k$ は勾配, $\theta$ は学習率, $\varsigma$ は初期化定数)\\
+    \begin{align*}
+        (\text{\Adam}) \quad x_{k+1}^{(i)} & = x_k^{(i)} - \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k (\nabla f(x_j)^{(i)})^2}} \nabla f(x_k)^{(i)}, \\
+        (\text{\AdaGrad}) \quad x_{k+1}    & = x_k - \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k \norm{\nabla f(x_j)}^2}}\,\nabla f(x_k).
+    \end{align*}
+    ($\theta$ は学習率, $\varsigma$ は初期化定数, ${}^{(i)}$ は第 $i$ 成分)\\
     \vspace{2em}
-    このような\underline{関数値}を陽に用いない最適化手法の総称\\
+    このような\underline{関数値 $f$}を陽に用いない最適化手法の総称\\
     $\to$ 誤差に影響されやすい\underline{関数値差分}を利用せずに最適化が可能に
 \end{frame}
 
 \begin{frame}{提案手法の構成要素1/2: 緩和Armijo条件}
-    通常のArmijo条件:
+    通常のArmijo条件 (従来的なエラーが起きる直線探索の終了条件):
     \begin{equation*}
-        \overline{f}(x_k) + c \alpha_k g_k^\top d_k \ge \overline{f}(x_k + \alpha_k d_k).
+        \overline{f}(x_k) + c \alpha_k \nabla f(x_k)^\top d_k \ge \overline{f}(x_k + \alpha_k d_k).
     \end{equation*}
 
     本研究は以下の緩和 Armijo 条件を採用:
     \begin{equation*}
         \begin{dcases}
-            \overline{f}(x_k) + c \alpha_k g_k^\top d_k + \red{\Delta_k} \ge \overline{f}(x_k + \alpha_k d_k), \\
+            \overline{f}(x_k) + c \alpha_k \nabla f(x_k)^\top d_k + \red{\Delta_k} \ge \overline{f}(x_k + \alpha_k d_k), \\
             \red{\Delta_k} = \frac{2\feps}{1-\feps}\max(1,\overline{f}(x_k),-\overline{f}(x_k+\alpha_k d_k)).
         \end{dcases}
     \end{equation*}
@@ -319,14 +319,14 @@
 \begin{frame}{提案手法の構成要素2/2: 正則化を入れた探索方向}
     探索方向は正則化付き準ニュートン方向を採用:
     \begin{equation*}
-        d_k = -(B_k + \mu_k I)^{-1} g_k.
+        d_k = -(B_k + \mu_k I)^{-1} \nabla f(x_k).
     \end{equation*}
-    (直感: $f$ の勾配情報による近似 + 正則化項 $\frac{\mu_k}{2}\norm{d}^2$ を加えた二次形式の最小解方向)
+    (直感: $f$ の勾配情報による近似 $B_k$ + 正則化項 $\mu_k I$ を加えた二次形式の最小解方向)
     \begin{itemize}
         \item $\mu_k=0$: 直線探索型とほぼ同じ挙動を意味、速度の観点からは望ましい
         \item $\mu_k>0$: 保守的なステップになり、安定性向上、 \AdaGradNorm に似た正則化:
               \begin{equation*}
-                  \mu_k = \theta_k \sqrt{\varsigma + \sum_{j \in K^+} \norm{g_j}^2},\quad \theta_k \in [\theta_{\min}, \theta_{\max}].
+                  \mu_k = \theta_k \sqrt{\varsigma + \sum_{j \in K^+} \norm{\nabla f(x_j)}^2},\quad \theta_k \in [\theta_{\min}, \theta_{\max}].
               \end{equation*}
         \item $B_k \approx \nabla^2 f(x_k)$ のとき、$\mu_k > 0$ は二次近似を壊し、過度に保守的になる恐れがある。
         \item 十分に $\overline{f}$ が減少した試行では、$\mu_k=0$ を試すことで、速度と安定性の両立を図る。
@@ -336,7 +336,7 @@
 \begin{frame}{本質的な設計思想の図示}
     \begin{itemize}
         \item 直線探索で $\overline{f}$ の上昇を許し、エラーを回避する(図左側)
-        \item $\mu_k=0$ を優先的に試すが、十分に $f$ が減少した試行に限ることで、安定化 (図右側)
+        \item $\mu_k=0$ を優先的に試すが、十分に $\overline{f}$ が減少した試行に限ることで、安定化 (図右側)
     \end{itemize}
     \begin{figure}[htbp]
         \centering
@@ -373,13 +373,11 @@
     \end{equation*}
     \vspace{-0.7em}
     \begin{block}{勾配ノルム和に対する複合的な上界評価}
-        仮定1,2,3と
+        仮定1,2の下で、
         $F = \order{f(x_0)-f^*}$,
-        $C_0 = \order{\frac{2c(1-c)}{L}}$,
-        $C_1, C_2 = \order{\frac{2(1-c)}{L}}$
-        を用いて、\vspace{-0.5em}
+        定数 $C_0, C_1, C_2$ を用いて\vspace{-0.5em}
         \begin{equation*}
-            F \ge C_0 \sum_{k\in K^0}\|g_k\|^2 + C_1 \sqrt{\varsigma+\sum_{k\in K^+}\norm{g_k}^2} - C_2\ln\Bigl(\varsigma+\sum_{k\in K^+}\norm{g_k}^2\Bigr).
+            F \ge C_0 \sum_{k\in K^0}\norm{\nabla f(x_k)}^2 + C_1 \sqrt{\varsigma+\sum_{k\in K^+}\norm{\nabla f(x_k)}^2} - C_2\ln\Bigl(\varsigma+\sum_{k\in K^+}\norm{\nabla f(x_k)}^2\Bigr).
         \end{equation*}
     \end{block}
     \vspace{-1.2em}
@@ -390,7 +388,7 @@
                 \item 古典的な勾配法型の解析結果と一致:
             \end{itemize}
             \[
-                \sum_{k\in K^0}\norm{g_k}^2
+                \sum_{k\in K^0}\norm{\nabla f(x_k)}^2
                 \lesssim \frac{1}{C_0} F.
             \]
         \end{exampleblock}
@@ -400,7 +398,7 @@
                 \item $\sqrt{\cdot} \gg \ln{\cdot}$ より、$\sqrt{\cdot}$ の項が支配的:
             \end{itemize}
             \[
-                \sum_{k\in K^+}\norm{g_k}^2 \lesssim \qty(\frac{2F}{C_1})^2.
+                \sum_{k\in K^+}\norm{\nabla f(x_k)}^2 \lesssim \qty(\frac{2F}{C_1})^2.
             \]
         \end{exampleblock}
     \end{columns}
@@ -408,11 +406,11 @@
 
 \begin{frame}{大域収束率の結論}
     \begin{block}{主結果}
-        仮定1,2,3の下で、提案手法は以下を満たす:
+        仮定1,2の下で、任意の反復回数 $k_{\max}$ に対し、提案手法は以下を満たす:
         \[
-            \sum_{j=0}^{k_{\max}} \norm{g_j}^2 \le \text{const.}
+            \sum_{j=0}^{k_{\max}} \norm{\nabla f(x_j)}^2 \le \text{const.}
             \implies
-            \frac{1}{k_{\max}+1}\sum_{j=0}^{k_{\max}} \norm{g_j}^2 = \order{\frac{1}{k_{\max}}}.
+            \frac{1}{k_{\max}+1}\sum_{j=0}^{k_{\max}} \norm{\nabla f(x_j)}^2 = \order{\frac{1}{k_{\max}}}.
         \]
     \end{block}
     \begin{exampleblock}{提案手法が達成する反復計算量}
@@ -440,28 +438,28 @@
     \end{block}
     \begin{columns}
         \begin{column}{0.4\columnwidth}
-            \begin{block}{問題設定}
+            \begin{exampleblock}{問題設定}
                 \begin{itemize}
                     \item CUTEst 無制約問題
                     \item 非凸問題を含む有名ベンチマーク
                     \item 最大 220 問題
                 \end{itemize}
-            \end{block}
+            \end{exampleblock}
         \end{column}
         \begin{column}{0.55\columnwidth}
-            \begin{block}{評価手法: Performance Profile}
+            \begin{exampleblock}{評価手法: Performance Profile}
                 \begin{itemize}
                     \item どれだけ安定かつ高速に解けたかを評価
                     \item $x$ 軸方向に左であればあるほど高速
                     \item $y$ 軸方向に上であればあるほど安定
                 \end{itemize}
-            \end{block}
+            \end{exampleblock}
         \end{column}
     \end{columns}
 \end{frame}
 
 \begin{frame}{人工ノイズ下での性能}
-    \begin{block}{ノイズモデル \citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}}
+    \begin{block}{ノイズモデル \citep{shiNoiseTolerantQuasiNewtonAlgorithm2022} ($\mathrm{unif}$ は一様分布ノイズ)}
         \[
             \overline f(x)=f(x)+\mathrm{unif}(-10^{-3},10^{-3}),\quad
             \nabla\overline f(x)=\nabla f(x)+\mathtt{unif}(-10^{-3},10^{-3}) \mathbbm{1}
@@ -477,7 +475,8 @@
             \begin{itemize}
                 \item 提案法が最も高い成功率 \underline{(安定性)}
                 \item 最速で解いた数($\tau=1$)も最多 \underline{(高速性)}
-                \item 先行研究(\texttt{NTQN}) は勾配ノイズに強いが、我々の手法も勾配ノイズに耐性
+                \item 先行研究(\texttt{NTQN})\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022} は勾配ノイズに特に強いアルゴリズム
+                \item 我々の手法も勾配ノイズに耐性
                 \item ノイズレベルを変えても同様の傾向
             \end{itemize}
             \begin{center}
@@ -487,7 +486,7 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}{有限精度計算に対するロバスト性}
+\begin{frame}{有限精度計算に対する頑健性}
     \begin{columns}
 
         \column{0.32\textwidth}
@@ -556,7 +555,7 @@
             \item 左図は大まかにアルゴリズム自体 ($f$ や $\nabla f$ を除く) の計算時間。
             \item 正則化型の手法
                   \begin{equation*}
-                      d_k =-(B_k+\mu_k I)^{-1}g_k
+                      d_k =-(B_k+\mu_k I)^{-1}\nabla f(x_k)
                   \end{equation*}
                   は行列計算に時間を要する。
             \item 提案は既存の近似手法を採用。
@@ -565,7 +564,7 @@
     \end{columns}
     \begin{align*}
         \text{(近似ヘッセ行列)} &  & B_k & \approx\mathrm{BFGS}(\{s_{k_i},\overline{y}_{k_i}+\mu_k s_{k_i}\}_{i=0}^{p-1})-\mu_k I, \\
-        \text{(探索方向)}    &  & d_k & =-(B_k+\mu_k I)^{-1}g_k = -\mathrm{BFGS}(\dots)^{-1}g_k.
+        \text{(探索方向)}    &  & d_k & =-(B_k+\mu_k I)^{-1}\nabla f(x_k) = -\mathrm{BFGS}(\dots)^{-1}\nabla f(x_k).
     \end{align*}
 \end{frame}
 
@@ -573,7 +572,7 @@
     \begin{columns}
         \column{0.45\textwidth}
         \centering
-        修士1年の研究概要図\\
+        研究概要図\\
         \includegraphics[width=\linewidth]{../imgs/fig1_slide.pdf}
         \column{0.45\textwidth}
         \centering
