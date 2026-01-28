@@ -189,6 +189,8 @@ Since $\Delta_k$ depends on $-\overline{f}(x_{k+1})$ but not on $\overline{f}(x_
 
 \paragraph{Adaptive Update of the Regularization Parameter (\refLines{line:mu_0_condition}{line:update_theta})}\label{sec:algorithm_components_mu}
 
+\newcommand{\equationMuZeroCondition}{\min_{j \in K^0, \, j < k} \qty(\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k)}
+
 The third component is the adaptive update of the regularization parameter $\mu_k$.
 A larger $\mu_k$ yields a more conservative step, while a smaller $\mu_k$ allows a more aggressive quasi-Newton step, especially when $\mu_k=0$.
 In practical settings, setting $\mu_k=0$ is preferred, since this allows us to fully exploit the quasi-Newton approximation and typically leads to practically faster convergence.
@@ -198,7 +200,7 @@ Let us partition the iteration indices $K\defeq \{0,1,2,\ldots, k_{\max}-1\}$ in
 \end{equation}
 We set $\mu_k=0$ if and only if the following condition holds:
 \begin{equation}\label{eq:mu_0_condition}
-    \min_{j \in K^0, \, j < k} \qty(\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k),
+    \equationMuZeroCondition,
 \end{equation}
 where the minimum of the empty set is $+\infty$.
 This condition means that $\mu_k=0$ is set only when a sufficient decrease in $\overline{f}$ is observed.
@@ -406,51 +408,51 @@ We can lower bound the step size $\alpha_k$ by $\overline{\alpha}$ as follows.
 In this subsection, we bound the sum of $\norm{g_{k}}^2$ over $k \in K^0$.
 Recall that $K^0$ be a set of iteration indices $k$ such that $\mu_k = 0$ in \cref{alg:regularized_qn} as defined in \cref{eq:def_K0_Kplus}.
 
-To this end, we first establish uniform bounds on $\overline{f}(x_k)$ and $\Delta_k$ for all $k \in K^0$, and then show that the sum of $\Delta_k$ over $K^0$ is also bounded.
-To this purpose, we introduce
+To this end, we first establish that the sum of $\Delta_k$ over $K^0$ is bounded, which means that the total possible increase of $\overline{f}$ over $K^0$ is bounded.
+To this purpose, we introduce the following constant:
 \begin{equation}\label{eq:def_Delta_max}
     \Delta_{\max} \defeq \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{0}), -\overline{f}^*).
 \end{equation}
 
 \begin{lemma}\label{lem:delta_bound_and_sum}
-    Under \cref{ass:bounded,ass:BBounds,ass:LSmooth}, the sum of $\Delta_k$ over $k \in K^0$ in \cref{alg:regularized_qn} is bounded as
+    Under \cref{ass:bounded}, the sum of $\Delta_k$ over $k \in K^0$ in \cref{alg:regularized_qn} satisfies
     \begin{equation*}
-        \sum_{k \in K^0} \Delta_k   \le \overline{f}(x_0) - \overline{f}^* + \Delta_{\max}.
+        \sum_{k \in K^0} \Delta_k \le \overline{f}(x_0) - \overline{f}^* + \Delta_{\max}.
     \end{equation*}
 \end{lemma}
 \begin{proof}
-    Recall that \refLine{line:mu_0_condition} asserts that the following holds for $k \in K^0$:
-    \begin{equation}\label{eq:re_mu_0_condition}
-        \min_{j \in K^0, \, j < k} (\overline{f}(x_j)-\Delta_j) \ge \overline{f}(x_{k}).
-    \end{equation}
+    Recall that \refLine{line:mu_0_condition} asserts that the following \cref{eq:mu_0_condition} holds for $k \in K^0$:
+    \begin{equation*}
+        \equationMuZeroCondition.
+    \end{equation*}
     Note that $\mu_0=0$ and $0 \in K^0$, meaning that $\abs{K^0} \geq 1$, and that the empty sum is zero.
     Let us enumerate the elements of $K^0$ in increasing order as $K^0 = (k_i)_{i=0}^{\abs{K^0}-1}$.
-    For all $i < \abs{K^0}-1$, from the relaxed Armijo condition (\cref{eq:relaxed_Armijo_condition}) and \cref{eq:re_mu_0_condition}, we have
+    For all $i < \abs{K^0}-1$, using \cref{eq:mu_0_condition} with $j=k_i$ and $k=k_{i+1}$, we have
     \begin{equation}\label{eq:Delta_i_for_tele_sum}
         \Delta_{k_i} \leq \overline{f}(x_{k_i}) - \overline{f}(x_{k_{i+1}}).
     \end{equation}
     Summing up \cref{eq:Delta_i_for_tele_sum} over $i < \abs{K^0}-1$ and adding the case $k_{\mathrm{last}}\defeq k_{\abs{K^0}-1}$ yields
-    \begin{align}
+    \begin{equation}
         \sum_{k \in K^0} \Delta_{k}
-         & \le \sum_{i=0}^{\abs{K^0}-2} (\overline{f}(x_{k_i}) - \overline{f}(x_{k_{i+1}})) + \Delta_{{k}_{\mathrm{last}}} \notag                                                    \\
-         & = \overline{f}(x_0) - \overline{f}(x_{k_{\mathrm{last}}}) + \Delta_{k_{\mathrm{last}}}.                                &  & (k_0 = 0) \label{eq:telescoping_sum_Delta_K0}
-    \end{align}
-    It holds that $\overline{f}(x_{k_{\mathrm{last}}}) \le \overline{f}(x_0)$ from \cref{eq:re_mu_0_condition} with $j=0$ and $\Delta_0 \geq 0$.
-    It also holds that $-\overline{f}(x_k) < -\overline{f}^*$ for any $k$ from \cref{ass:bounded,eq:ass_bounded_overline_f}. Thus, we have
+        \le \sum_{i=0}^{\abs{K^0}-2} (\overline{f}(x_{k_i}) - \overline{f}(x_{k_{i+1}})) + \Delta_{{k}_{\mathrm{last}}}
+        = \overline{f}(x_0) - \overline{f}(x_{k_{\mathrm{last}}}) + \Delta_{k_{\mathrm{last}}}.  \label{eq:telescoping_sum_Delta_K0}
+    \end{equation}
+    It also holds that $\overline{f}(x_0) \ge \overline{f}(x_{k_{\mathrm{last}}}) \ge \overline{f}^*$ from \cref{eq:mu_0_condition} with $j=0$ and $k=k_{\mathrm{last}}$, and \cref{ass:bounded} and \cref{eq:ass_bounded_overline_f}.
+    Thus, \cref{eq:telescoping_sum_Delta_K0} can be further bounded as
     \begin{align*}
-        \sum_{k \in K^0} \Delta_{k} & \leq \overline{f}(x_0) - \overline{f}(x_{k_{\mathrm{last}}}) + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k_{\mathrm{last}}}), -\overline{f}(x_{k_{\mathrm{last}}+1})) &  & \text{(\cref{eq:telescoping_sum_Delta_K0,eq:relaxed_Armijo_condition})} \\
-                                    & \leq \overline{f}(x_0) - \overline{f}^* + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{0}), -\overline{f}^*)                                                                                                                                          \\
+        \sum_{k \in K^0} \Delta_{k} & \leq \overline{f}(x_0) - \overline{f}(x_{k_{\mathrm{last}}}) + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k_{\mathrm{last}}}), -\overline{f}(x_{k_{\mathrm{last}}+1})) &  & \text{(\cref{eq:relaxed_Armijo_condition})} \\
+                                    & \leq \overline{f}(x_0) - \overline{f}^* + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{0}), -\overline{f}^*)                                                             &  & \text{(\cref{eq:ass_bounded_overline_f})}   \\
                                     & = \overline{f}(x_0) - \overline{f}^* + \Delta_{\max},                                                                                                                      &  & \text{(\cref{eq:def_Delta_max})}
     \end{align*}
     which completes the proof.
     \myQED
 \end{proof}
 
-Then, let us bound the sum of $\norm{g_{k}}^2$ over ${k} \in K^0$ using $\delta_k$.
+Then, we bound the sum of $\norm{g_{k}}^2$ over ${k} \in K^0$ using $\delta_k = f(x_k) - f(x_{k+1})$ in \cref{eq:def_small_delta_k}.
 \begin{lemma}\label{lem:sum_small_delta_k_bound_K0}
     Under \cref{ass:bounded,ass:BBounds,ass:LSmooth}, the sum of $\delta_k$ over $k \in K^0$ satisfies
     \begin{equation*}
-        \sum_{k \in K^0} \delta_{k} \geq \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \norm{g_{k}}^2 - \frac{1+3\feps}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}).
+        \sum_{k \in K^0} \delta_{k} \geq \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \norm{g_{k}}^2 - \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}).
     \end{equation*}
 \end{lemma}
 \begin{proof}
@@ -465,15 +467,16 @@ Then, let us bound the sum of $\norm{g_{k}}^2$ over ${k} \in K^0$ using $\delta_
     Using $\overline{f}(x_{{k}+1}) \leq \overline{f}(x_{k}) + \Delta_{k}$ and $-\overline{f}(x_{k}) \leq -\overline{f}(x_{{k}+1}) + \Delta_{k}$ implied by the relaxed Armijo condition (\cref{eq:relaxed_Armijo_condition}), we can further bound
     \begin{align}
         \overline{\delta}_k + \Delta_{k}
-         & \le \delta_k + \frac{2\feps}{1-\feps} \max(1, \abs{\overline{f}(x_{k})}, \abs{\overline{f}(x_{{k}+1})}) + \Delta_{k} \qquad (\text{\cref{lem:error_bound_on_function_evaluations}}) \notag  \\
-         & \le \delta_k + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}) + \Delta_{k}, -\overline{f}(x_{{k}+1}) + \Delta_{k}) + \Delta_{k} \notag                                                  \\
-         & \le \delta_k + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}), -\overline{f}(x_{{k}+1})) + \qty(\frac{2\feps}{1-\feps}+1) \Delta_{k} \notag                                             \\
-         & = \delta_k + \frac{1+3\feps}{1-\feps} \Delta_{k} \qquad (\text{definition of $\Delta_k$ in \cref{eq:relaxed_Armijo_condition}}), \label{eq:intermediate_bound_on_overline_delta_plus_Delta}
+         & \le \delta_k + \frac{2\feps}{1-\feps} \max(1, \abs{\overline{f}(x_{k})}, \abs{\overline{f}(x_{{k}+1})}) + \Delta_{k} \qquad (\text{\cref{lem:error_bound_on_function_evaluations}}) \notag \\
+         & = \delta_k + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}), -\overline{f}(x_{k}), \overline{f}(x_{{k}+1}), -\overline{f}(x_{{k}+1})) + \Delta_{k} \notag                              \\
+         & \le \delta_k + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}) + \Delta_{k}, -\overline{f}(x_{{k}+1}) + \Delta_{k}) + \Delta_{k} \notag                                                 \\
+         & \le \delta_k + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}), -\overline{f}(x_{{k}+1})) + \qty(\frac{2\feps}{1-\feps}+1) \Delta_{k} \notag                                            \\
+         & = \delta_k + \frac{2}{1-\feps} \Delta_{k} \qquad (\text{definition of $\Delta_k$ in \cref{eq:relaxed_Armijo_condition}}), \label{eq:intermediate_bound_on_overline_delta_plus_Delta}
     \end{align}
     Then, combining \cref{eq:sufficient_decrease,eq:intermediate_bound_on_overline_delta_plus_Delta} and summing up over $k \in K^0$ gives
     \begin{align*}
-        \sum_{k \in K^0} \frac{c \overline{\alpha}}{M} \norm{g_{k}}^2 & \leq \sum_{k \in K^0} \delta_{k} + \frac{1+3\feps}{1-\feps} \sum_{k \in K^0} \Delta_{k}                                                                            \\
-                                                                      & \leq \sum_{k \in K^0} \delta_{k} + \frac{1+3\feps}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}). &  & \text{(\cref{lem:delta_bound_and_sum})}
+        \sum_{k \in K^0} \frac{c \overline{\alpha}}{M} \norm{g_{k}}^2 & \leq \sum_{k \in K^0} \delta_{k} + \frac{2}{1-\feps} \sum_{k \in K^0} \Delta_{k}                                                                            \\
+                                                                      & \leq \sum_{k \in K^0} \delta_{k} + \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}). &  & \text{(\cref{lem:delta_bound_and_sum})}
     \end{align*}
     Rearranging the terms completes the proof.
     \myQED
@@ -505,7 +508,7 @@ Now, we define the following constants for later use:
 Note that $0 < C_1 \leq C_2$ holds since $1 \leq M$ and $\theta_{\min} \leq \theta_{\max}$.
 Then, we prove that the sum of $\delta_{k}$ over ${k} \in K^+$ can be bounded as follows.
 \begin{lemma}\label{lem:sum_small_delta_k_bound_Kplus}
-    Under \cref{ass:bounded,ass:LSmooth,ass:BBounds},
+    Under \cref{ass:LSmooth,ass:BBounds}, the sum of $\delta_k$ over $k \in K^+$ satisfies
     \begin{equation*}
         \sum_{k \in K^+} \delta_k \ge
         C_1 \qty(\sqrt{\varsigma + \sum_{k \in K^+} \norm{g_{k}}^2} - \sqrt{\varsigma})
@@ -543,7 +546,7 @@ Then, we prove that the sum of $\delta_{k}$ over ${k} \in K^+$ can be bounded as
 
 We again define a constant:
 \begin{equation}
-    F = f(x_0) - f^* + \frac{1+3\feps}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}) + C_1 \sqrt{\varsigma} - C_2 \ln(\varsigma).
+    F = f(x_0) - f^* + \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}) + C_1 \sqrt{\varsigma} - C_2 \ln(\varsigma).
     \label{eq:def_F}
 \end{equation}
 Then, combining the results for $k \in K^0$ and $k \in K^+$, we have the following proposition.
@@ -567,7 +570,7 @@ Then, combining the results for $k \in K^0$ and $k \in K^+$, we have the followi
         \ge \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \norm{g_{k}}^2
         +C_1 \sqrt{\varsigma + \sum_{k \in K^+} \norm{g_{k}}^2}
         - C_2 \ln\qty(\varsigma+\sum_{k \in K^+} \norm{g_{k}}^2)\\
-        - \frac{1+3\feps}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max})
+        - \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max})
         - C_1 \sqrt{\varsigma}
         + C_2 \ln(\varsigma).
     \end{multline*}
