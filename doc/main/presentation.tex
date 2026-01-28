@@ -284,12 +284,12 @@
 
 \begin{frame}{キーワード:目的関数値非依存最適化 \citep{grattonOFFOMinimizationAlgorithms2023}}
     機械学習分野での需要などから近年発展してきた手法。\\
-    \Adam や \AdaGrad などの最適化手法は、勾配だけで最適化を行う:
+    \AdaGrad や \AdaGradNorm などの最適化手法は、勾配だけで最適化を行う:
     \begin{align*}
-        (\text{\Adam}) \quad x_{k+1}^{(i)} & = x_k^{(i)} - \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k (\nabla f(x_j)^{(i)})^2}} \nabla f(x_k)^{(i)}, \\
-        (\text{\AdaGrad}) \quad x_{k+1}    & = x_k - \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k \norm{\nabla f(x_j)}^2}}\,\nabla f(x_k).
+        (\text{\AdaGrad}) \quad x_{k+1}^{(i)} & = x_k^{(i)} - \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k (\nabla f(x_j)^{(i)})^2}} \nabla f(x_k)^{(i)}, \\
+        (\text{\AdaGradNorm}) \quad x_{k+1}   & = x_k - \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k \norm{\nabla f(x_j)}^2}}\,\nabla f(x_k).
     \end{align*}
-    ($\theta$ は学習率, $\varsigma$ は初期化定数, ${}^{(i)}$ は第 $i$ 成分)\\
+    ($\theta$ は学習率の逆数, $\varsigma$ は初期化定数, ${}^{(i)}$ は第 $i$ 成分)\\
     \vspace{2em}
     このような\underline{関数値 $f$}を陽に用いない最適化手法の総称\\
     $\to$ 誤差に影響されやすい\underline{関数値差分}を利用せずに最適化が可能に
@@ -406,12 +406,12 @@
 
 \begin{frame}{大域収束率の結論}
     \begin{block}{主結果}
-        仮定1,2の下で、任意の反復回数 $k_{\max}$ に対し、提案手法は以下を満たす:
-        \[
-            \sum_{j=0}^{k_{\max}} \norm{\nabla f(x_j)}^2 \le \text{const.}
+        仮定1,2の下で、任意の反復回数 $k_{\max}>0$ に対し、提案手法は以下を満たす:
+        \begin{equation*}
+            \sum_{j=0}^{k_{\max}-1} \norm{\nabla f(x_j)}^2 \le \text{const.}
             \implies
-            \frac{1}{k_{\max}+1}\sum_{j=0}^{k_{\max}} \norm{\nabla f(x_j)}^2 = \order{\frac{1}{k_{\max}}}.
-        \]
+            \frac{1}{k_{\max}}\sum_{j=0}^{k_{\max}-1} \norm{\nabla f(x_j)}^2 = \order{\frac{1}{k_{\max}}}.
+        \end{equation*}
     \end{block}
     \begin{exampleblock}{提案手法が達成する反復計算量}
         \[

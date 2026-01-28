@@ -87,7 +87,7 @@ def run_benchmark():
     )
     table_data = table_data.sort_values("time")
 
-    return df, stats, table_data
+    return stats, table_data
 
 
 def vis_benchmark(stats: pd.DataFrame):
@@ -165,17 +165,17 @@ def generate_latex_table(methods_list: list[str], table_data: pd.DataFrame):
 
     latex_table = (
         r"""\begin{table}[ht]
-        \centering
-        \caption{The number of oracle calls and final observed objective values for the experiment in \cref{sec:comp_time}.}
-        \label{tab:time_results}
-        \begin{tabular}{l"""
+    \centering
+    \caption{The number of oracle calls and final observed objective values for the experiment in \cref{sec:comp_time}.}
+    \label{tab:time_results}
+    \begin{tabular}{l"""
         + "r" * num_methods
         + r"""}
-            \toprule
-                                        & """
+    \toprule
+                                & """
         + " & ".join(map(lambda x: r"\texttt{" + x + "}", methods_list))
         + r""" \\
-            \midrule
+    \midrule
     """
     )
 
@@ -183,15 +183,36 @@ def generate_latex_table(methods_list: list[str], table_data: pd.DataFrame):
     latex_table += r"        \# Calls & " + " & ".join(calls) + r" \\" + "\n"
     fx_values = [f"{x:.2f}" for x in table_data["fx"].tolist()]
     latex_table += (
-        r"        $\overline{f}(x_{k_{\max}})$ & "
-        + " & ".join(fx_values)
-        + r" \\"
-        + "\n"
+        r"    $\overline{f}(x_{k_{\max}})$ & " + " & ".join(fx_values) + r" \\" + "\n"
     )
 
-    latex_table += r"""        \bottomrule
-        \end{tabular}
-    \end{table}
-    """
+    latex_table += (
+        r"""    \bottomrule
+    \end{tabular}"""
+        + "\n\\end{table}"
+    )
 
     return latex_table
+
+
+def main():
+    repo_root = Path(__file__).parent.parent.resolve()
+    assert (repo_root / "doc" / "main" / "check").exists()
+
+    stats, table_data = run_benchmark()
+    fig, output_path, methods_list = vis_benchmark(stats)
+
+    # Save as PDF
+    pdf_path = output_path / "time.pdf"
+    fig.savefig(pdf_path, format="pdf", bbox_inches="tight", dpi=300)
+    print(f"Saved figure to {pdf_path}")
+    plt.show()
+
+    latex_table = generate_latex_table(methods_list, table_data)
+    table_path = repo_root / "doc" / "main" / "check" / "time_results_table.tex"
+    table_path.write_text(latex_table + "\n", encoding="utf-8")
+    print(f"Saved LaTeX table to {table_path.relative_to(repo_root)}")
+
+
+if __name__ == "__main__":
+    main()

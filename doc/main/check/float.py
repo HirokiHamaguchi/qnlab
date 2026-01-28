@@ -1,6 +1,7 @@
 import os
 import subprocess
 import warnings
+from pathlib import Path
 
 import numpy as np
 
@@ -84,5 +85,9 @@ latex_output = f"""% !!! Auto-generated table by {script_path}
 \\end{{table}}
 % !!! End of auto-generated table"""
 
+output_path = Path(__file__).with_name("machine_epsilon_table.tex")
+output_path.write_text(latex_output + "\n", encoding="utf-8")
+
 print(latex_output)
+print(f"\n✓ Saved LaTeX table to {output_path}")
 copy_to_clipboard(latex_output)

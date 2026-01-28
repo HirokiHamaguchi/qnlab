@@ -114,16 +114,16 @@ def get_methods(
     """
 
     methods = [
-        # (
-        #     Method("Hamaguchi", "cautious", "damped", "bfgs", label="Hamaguchi"),
-        #     {"m": m, "max_iterations": MI},
-        # ),
-        # (
-        #     Method(
-        #         "Hamaguchi", "cautious", "damped_modified", "bfgs", label="Hamaguchi-MS"
-        #     ),
-        #     {"m": m, "max_iterations": MI},
-        # ),
+        (
+            Method("Hamaguchi", "cautious", "damped", "bfgs", label="Hamaguchi"),
+            {"m": m, "max_iterations": MI},
+        ),
+        (
+            Method(
+                "Hamaguchi", "cautious", "damped_modified", "bfgs", label="Hamaguchi-MS"
+            ),
+            {"m": m, "max_iterations": MI},
+        ),
         (
             Method("Line", "raw", "raw", "bfgs", label="Line"),
             {"m": m, "max_iterations": MI},
@@ -149,8 +149,8 @@ def get_methods(
     TAB20 = plt.colormaps.get_cmap("tab20")
 
     COLORS = {
-        # "Hamaguchi": TAB20(0),
-        # "Hamaguchi-MS": TAB20(1),
+        "Hamaguchi": TAB20(0),
+        "Hamaguchi-MS": TAB20(1),
         "Line": TAB20(2),
         "Line-MS": TAB20(3),
         "SciPy": TAB20(6),
@@ -159,8 +159,8 @@ def get_methods(
     }
 
     LINE_STYLES = {
-        # "Hamaguchi": "o-",
-        # "Hamaguchi-MS": "o--",
+        "Hamaguchi": "o-",
+        "Hamaguchi-MS": "o--",
         "Line": "^--",
         "Line-MS": "^-.",
         "SciPy": "v:",

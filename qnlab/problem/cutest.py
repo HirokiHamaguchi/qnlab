@@ -76,7 +76,7 @@ class CUTEstQNProblem(BaseProblem):
         elif self.precision == 32:
             eps = np.float64(np.finfo(np.float32).eps) * 1e4
         elif self.precision == 16:
-            eps = np.float64(np.finfo(np.float16).eps) * 1e1
+            eps = np.float64(np.finfo(np.float16).eps) * 1e2
         else:
             raise ValueError("Invalid precision value.")
         return np.clip(eps, 0, np.float64(1.0 - 1e-10))

@@ -21,7 +21,7 @@ We assume that only an error contaminated function $\overline{f}(x)$ is accessib
     \abs{f(x)-\overline{f}(x)} \le \feps \max(1,\abs{f(x)}),
 \end{equation}
 where $0 \le \feps < 1$ is an error rate.
-This model captures the typical behavior of rounding errors, such as in IEEE~754 floating-point arithmetic.
+This model captures the typical behavior of rounding errors, such as in IEEE~754 floating-point arithmetic, \red{and $\feps$ is about $10^7$ or $10^{2}$ times larger than the machine epsilon for single or double precision, respectively} \citep{highamAccuracyStabilityNumerical2002}.
 The error is predominantly relative when $\abs{f(x)}$ is large and effectively absolute when $\abs{f(x)}$ is small.
 Closely related models are also employed in practical stopping criteria \citep{2020SciPy-NMeth}.
 
@@ -118,7 +118,7 @@ In this section, we present the proposed algorithm for the problem setting state
 \begin{algorithm}[ht]
     \normalsize
     \KwIn{$x_0$, $0 < k_{\max}$, $0 \le \feps < 1$, $0 < c < 1$, $0 < \theta_{\min} \leq \theta_{\max}$ and $0 < \varsigma < 1$}
-    $k \gets 0$, $g_0 \gets \nabla f(x_0)$, $K^0 \gets \{0\}$, $K^+ \gets \emptyset$ \label{line:init}\;
+    $k \gets 0$, $g_0 \gets \nabla \overline{f}(x_0)$, $K^0 \gets \emptyset$, $K^+ \gets \emptyset$ \label{line:init}\;
     \For{$k=0,1,2,\ldots, k_{\max}-1$}{
         \uIf{$\min_{j \in K^0} (\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k)$\label{line:mu_0_condition}}{
             $K^0 \gets K^0 \cup \{k\}$ \label{line:update_K_0}\;
@@ -438,7 +438,7 @@ To this purpose, we introduce
     It holds that $\overline{f}(x_{k_{\mathrm{last}}}) \le \overline{f}(x_0)$ from \cref{eq:re_mu_0_condition} with $j=0$ and $\Delta_0 \geq 0$.
     It also holds that $-\overline{f}(x_k) < -\overline{f}^*$ for any $k$ from \cref{ass:bounded,eq:ass_bounded_overline_f}. Thus, we have
     \begin{align*}
-        \sum_{k \in K^0} \Delta_{k} & \leq \overline{f}(x_0) - \overline{f}(x_{k_{\mathrm{last}}}) + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k_{\mathrm{last}}}), -\overline{f}(x_{1+k_{\mathrm{last}}})) &  & \text{(\cref{eq:telescoping_sum_Delta_K0,eq:relaxed_Armijo_condition})} \\
+        \sum_{k \in K^0} \Delta_{k} & \leq \overline{f}(x_0) - \overline{f}(x_{k_{\mathrm{last}}}) + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k_{\mathrm{last}}}), -\overline{f}(x_{k_{\mathrm{last}}+1})) &  & \text{(\cref{eq:telescoping_sum_Delta_K0,eq:relaxed_Armijo_condition})} \\
                                     & \leq \overline{f}(x_0) - \overline{f}^* + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{0}), -\overline{f}^*)                                                                                                                                          \\
                                     & = \overline{f}(x_0) - \overline{f}^* + \Delta_{\max},                                                                                                                      &  & \text{(\cref{eq:def_Delta_max})}
     \end{align*}
@@ -662,7 +662,7 @@ Now, we establish the following global convergence result for \cref{alg:regulari
         \label{eq:sum_gk_squared_bound}
     \end{align}
     where the right-hand side is constant with respect to $k_{\max}$.
-    \red{By dividing both sides by $k_{\max}$}, we complete the proof.
+    By dividing both sides by $k_{\max}$, we complete the proof.
     \myQED
 \end{proof}
 
@@ -871,27 +871,7 @@ The table relates the machine epsilon (maximum relative rounding error) for each
 We set $\feps$ equal to or larger than the machine epsilon to account for additional uncertainties in function and gradient evaluations.
 We also set the maximum number of iterations to $k_{\max} = 15{,}000$ and timed out runs exceeding 10 minutes per problem.
 
-
-% !!! Auto-generated table by doc/main/check/float.py
-\begin{table}[t]
-    \centering
-    \caption{
-        The ``min abs value'' is the smallest positive normalized number,
-        the ``relative error'' is the maximum relative rounding error,
-        and $\feps$ is the parameter in \eqref{eq:relative_error_model} used in our experiments.
-    }
-    \begin{tabular}{l|ccc}
-        \toprule
-        explanation             & min abs value           & relative error                         & $\feps$               \\
-        \midrule
-        64-bit double precision & $2.23 \times 10^{-308}$ & $2^{-52} \approx 2.22 \times 10^{-16}$ & $2.22 \times 10^{-9}$ \\
-        32-bit single precision & $1.18 \times 10^{-38}$  & $2^{-23} \approx 1.19 \times 10^{-7}$  & $1.19 \times 10^{-3}$ \\
-        16-bit half precision   & $6.10 \times 10^{-5}$   & $2^{-10} \approx 9.77 \times 10^{-4}$  & $9.77 \times 10^{-3}$ \\
-        \bottomrule
-    \end{tabular}
-    \label{tab:machine_epsilon}
-\end{table}
-% !!! End of auto-generated table
+\input{check/machine_epsilon_table}
 
 In the reduced precision settings, to simulate lower numerical precision, we first casted the input vector $x$ to the target lower precision, then computed $\overline{f}(x)$ and $\nabla \overline{f}(x)$ using the lower-precision input.
 Although the internal computations of CUTEst remain in 64-bit precision, the casting of the input vector effectively simulated the impact of reduced precision on function and gradient evaluations.
@@ -1048,21 +1028,7 @@ Although the (\texttt{SciPy}) calls optimized C routines, it incurs associated d
 The (\texttt{Reg}) method explicitly computes $-(B_k+\mu_k I)^{-1}g_k$, which is numerically attractive but entails extra per-iteration cost.
 In contrast, our proposed methods employ the simplified strategy described in \cref{sec:proposed_choice}, which reduces per-iteration overhead while preserving performance. This design accounts for their competitive mean execution times.
 
-% !!! Auto-generated table by notebooks/time.ipynb
-\begin{table}[ht]
-    \centering
-    \caption{The number of oracle calls and final observed objective values for the experiment in \cref{sec:comp_time}.}
-    \label{tab:time_results}
-    \begin{tabular}{lrrrrrrr}
-        \toprule
-                                     & \texttt{Line} & \texttt{Line-MS} & \texttt{Ours} & \texttt{Ours-MS} & \texttt{NTQN} & \texttt{SciPy} & \texttt{Reg} \\
-        \midrule
-        \# Calls                     & 212           & 212              & 202           & 202              & 219           & 212            & 206          \\
-        $\overline{f}(x_{k_{\max}})$ & 1.24          & 1.24             & 1.34          & 1.34             & 1.43          & 1.24           & 1.47         \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-% !!! End of auto-generated table
+\input{check/time_results_table}
 
 \begin{figure}[t]
     \centering
