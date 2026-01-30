@@ -1,13 +1,9 @@
-# delete data/temp/16/*/NTQN.npz
-
 import glob
 import os
 
 
-def delete_temp_data():
+def delete_temp_data(method, precision):
     temp_data_path = os.path.join("data", "temp")
-    precision = 16
-    method = "NTQN"
     pattern = os.path.join(temp_data_path, str(precision), "*", f"{method}.npz")
     files = glob.glob(pattern)
 
@@ -32,4 +28,6 @@ def delete_temp_data():
 
 
 if __name__ == "__main__":
-    delete_temp_data()
+    for method in ["Hamaguchi", "Hamaguchi-MS"]:
+        for precision in [16, 32, 64, "noisy"]:
+            delete_temp_data(method=method, precision=precision)
