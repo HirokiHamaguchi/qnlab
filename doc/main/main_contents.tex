@@ -141,7 +141,7 @@ In this section, we present the proposed algorithm for the problem setting state
     $\alpha_k \gets 1$\; \label{line:ls_init}
     $\Delta_k \gets \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_k), -\overline{f}(x_k+\alpha_k d_k))$\;
     \While{$\overline{f}(x_k) + c \alpha_k g_k^\top d_k + \Delta_k < \overline{f}(x_k+\alpha_k d_k)$}{
-        Choose $\alpha_k \in [\beta_{\min}\alpha_k,\beta_{\max}\alpha_k]$ using interpolation \label{line:ls_backtracking}\;
+        $\alpha_k \leftarrow \beta \alpha_k$ with $\beta \in [\beta_{\min},\beta_{\max}]$ chosen adaptively (\cref{sec:proposed_choice_alpha}) \; \label{line:ls_backtracking}
         $\Delta_k \gets \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_k), -\overline{f}(x_k+\alpha_k d_k))$\;
     }
     \Return{$\alpha_k$}\;
@@ -180,10 +180,10 @@ We compute $\alpha_k$ satisfying the relaxed Armijo condition
         \Delta_k = \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_k), -\overline{f}(x_k + \alpha_k d_k))
     \end{dcases}
 \end{equation}
-where $\Delta_k$ is the error-absorbing term.
+where $\Delta_k$ is the error-absorbing term that is recomputed for each $\alpha_k$.
 This relaxation guarantees the existence of $\alpha_k \in (0,1]$ even in the presence of numerical errors in $\overline{f}$.
-When $B_k$ is positive definite and thus $g_k^\top d_k < 0$, \cref{eq:relaxed_Armijo_condition} ensures a temporary increase of $\overline{f}$ is at most $\Delta_k$ (\cref{fig:algorithm_illustration} illustrates this behavior).
-Since $\Delta_k$ depends on $-\overline{f}(x_{k+1})$ but not on $\overline{f}(x_{k+1})$, when $\overline{f}(x_{k+1}) > \overline{f}(x_k)$, the value of $\Delta_k$ is independent of how much $\overline{f}$ increases, preventing unbounded growth of $\Delta_k$.
+When $d_k$ is a descent direction ($g_k^\top d_k \leq 0$), \cref{eq:relaxed_Armijo_condition} ensures a temporary increase of $\overline{f}$ is at most $\Delta_k$, as illustrated in \cref{fig:algorithm_illustration}.
+Since $\Delta_k$ depends on $-\overline{f}(x_k + \alpha_k d_k)$ but not on $\overline{f}(x_k + \alpha_k d_k)$, the value of $\Delta_k$ is independent of how much $\overline{f}(x_k + \alpha_k d_k)$ increases, preventing unbounded growth of $\Delta_k$.
 
 \paragraph{Adaptive Update of the Regularization Parameter (\refLines{line:mu_0_condition}{line:update_theta})}\label{sec:algorithm_components_mu}
 
@@ -201,7 +201,7 @@ We set $\mu_k=0$ if and only if the following condition holds:
     \equationMuZeroCondition,
 \end{equation}
 where the minimum of the empty set is $+\infty$.
-This condition means that $\mu_k=0$ is set only when a sufficient decrease in $\overline{f}$ is observed.
+This condition restricts $\mu_k=0$ to iterations for which a sufficient decrease in $\overline f$ has been observed.
 Thereby, while $\overline{f}$ can temporarily increase, this condition theoretically ensures that $\overline{f}$ does not grow unboundedly or oscillate indefinitely. See \cref{fig:algorithm_illustration} for an illustrative example.
 
 Otherwise, to ensure convergence to first-order stationary points, we apply an OFFO-based update
@@ -239,6 +239,7 @@ Consequently, we can also lower bound $\overline{f}$ as
     = f^* - \feps \max(1, |f^*|)
     > -\infty .
 \end{equation}
+
 The second assumption ensures smoothness of the objective function.
 \begin{assumption}\label{ass:LSmooth}
     The function $f \colon \bbR^n \to \bbR$ is $L$-smooth, meaning that there exists
@@ -247,6 +248,7 @@ The second assumption ensures smoothness of the objective function.
         f(y) \le f(x) + \nabla f(x)^\top (y - x) + \frac{L}{2} \norm{y - x}^2.
     \end{equation*}
 \end{assumption}
+
 The third assumption requires the sequence of matrices $\{B_k\}$ to be uniformly bounded and uniformly positive definite.
 \begin{assumption}\label{ass:BBounds}
     There exist constants $0 < m \leq 1 \leq M$ such that all $B_k$ in \cref{alg:regularized_qn} satisfy
@@ -255,6 +257,12 @@ The third assumption requires the sequence of matrices $\{B_k\}$ to be uniformly
     \end{equation*}
 \end{assumption}
 As we will discuss in \cref{sec:proposed_choice}, the standard BFGS update with a slight modification ensures that \cref{ass:BBounds} holds in practice.
+By \cref{ass:BBounds}, we can derive two useful bounds involving $g_k$ and $d_k$.
+Using $d_k=-(B_k+\mu_k I)^{-1} g_k$ (\refLine{line:d_k}) and \cref{ass:BBounds} asserting $(m + \mu_k)I \preceq B_k + \mu_k I \preceq (M + \mu_k)I$, we obtain the following two bounds:
+\begin{align}
+    -g_k^\top d_k = g_k^\top (B_k+\mu_k I)^{-1} g_k & \ge \frac{1}{M+\mu_k}\norm{g_k}^2, \label{eq:BBounds_results_first}      \\
+    \norm{d_k}^2 = \norm{(B_k+\mu_k I)^{-1}g_k}^2   & \le \frac{1}{(m+\mu_k)^2}\norm{g_k}^2. \label{eq:BBounds_results_second}
+\end{align}
 
 \subsection{Error Bound on Function Evaluations}\label{sec:error_bound_on_function_evaluations}
 
@@ -265,24 +273,14 @@ In the following, we define the actual and observed function decreases as
     \label{eq:def_overline_small_delta_k}
 \end{align}
 We first prove a useful property of $\Delta_k$ defined in \cref{eq:relaxed_Armijo_condition}.
-The following lemma asserts that the error between the true values difference $\delta_k$ and the observed values difference $\overline{\delta}_k$ can be bounded by $\Delta_k$.
+The following lemma asserts that the error between the actual values difference $\delta_k$ and the observed values difference $\overline{\delta}_k$ can be bounded by $\Delta_k$.
 \begin{lemma}\label{lem:error_bound_on_function_evaluations}
-    For all $k \in K$, we have
-    \begin{equation}\label{eq:abs_error_bound_on_function_evaluations}
-        \abs{\delta_k - \overline{\delta}_k} \leq \frac{2 \feps}{1-\feps} \max(1, \abs{\overline{f}(x_k)}, \abs{\overline{f}(x_{k+1})}).
-    \end{equation}
-    Moreover, if $x_k$ and $x_{k+1}$ satisfies $f(x_{k+1}) \le f(x_k)$, it holds that
-    \begin{equation}\label{eq:error_bound_on_function_evaluations}
+    If $x_k$ and $x_{k+1}$ satisfies $f(x_{k+1}) \le f(x_k)$, it holds that
+    \begin{equation}
         \delta_k \leq \overline{\delta}_k + \Delta_k.
     \end{equation}
 \end{lemma}
 \begin{proof}
-    In general, for all $k \in K$, we have
-    \begin{align}
-        \abs{\delta_k-\overline{\delta}_k} & = \abs{(f(x_k)-\overline{f}(x_k)) - (f(x_{k+1})-\overline{f}(x_{k+1}))} &  & (\text{rearrangement})                                \notag                               \\
-                                           & \le \feps\max(1,\abs{f(x_k)}) + \feps\max(1,\abs{f(x_{k+1})})           &  & (\text{definition in \cref{eq:relative_error_model}}) \notag                               \\
-                                           & \le 2\feps \max(1,\abs{f(x_k)},\abs{f(x_{k+1})})                        &  & (\text{max property})                                 \label{eq:general_diff_f_barf_bound}
-    \end{align}
     By the definition of $\overline{f}$ in \cref{eq:relative_error_model}, for any $x\in\bbR^n$ satisfying $\abs{f(x)} > 1$, we have
     \begin{equation}\label{eq:relative_error_model_fx_1}
         \abs{f(x)-\overline{f}(x)} \le \feps \abs{f(x)}.
@@ -295,9 +293,13 @@ The following lemma asserts that the error between the true values difference $\
             -f(x) \le \frac{1}{1-\feps} (-\overline{f}(x)) & \text{if $-f(x) > 1$}.
         \end{dcases}
     \end{equation}
-    Thus, from the max operator and $1 \leq \frac{1}{1-\feps}$, \cref{eq:general_diff_f_barf_bound} always yields \cref{eq:abs_error_bound_on_function_evaluations}.
-
-    From the assumption $f(x_{k+1}) \le f(x_k)$, \cref{eq:general_diff_f_barf_bound} can be further bounded as
+    In general, for all $k \in K$, we have
+    \begin{align}
+        \abs{\delta_k-\overline{\delta}_k} & = \abs{(f(x_k)-\overline{f}(x_k)) - (f(x_{k+1})-\overline{f}(x_{k+1}))} &  & (\text{rearrangement})                                \notag \\
+                                           & \le \feps\max(1,\abs{f(x_k)}) + \feps\max(1,\abs{f(x_{k+1})})           &  & (\text{definition in \cref{eq:relative_error_model}}) \notag \\
+                                           & \le 2\feps \max(1,\abs{f(x_k)},\abs{f(x_{k+1})})                        &  & (\text{max property}) \label{eq:delta_k_error_bound}
+    \end{align}
+    From the condition of this lemma ($f(x_{k+1}) \le f(x_k)$), this can be further bounded as
     \begin{align*}
         2 \feps \max(1,\abs{f(x_k)},\abs{f(x_{k+1})})
          & = 2 \feps \max(1,f(x_k),-f(x_{k+1}))                                        &  & (\text{$f(x_{k+1}) \le f(x_k)$}) \\
@@ -305,19 +307,51 @@ The following lemma asserts that the error between the true values difference $\
          & = \Delta_k,                                                                 &  &
         (\text{\cref{eq:relaxed_Armijo_condition}})
     \end{align*}
-    which yields \cref{eq:error_bound_on_function_evaluations}.
+    which yields the desired inequality by the triangle inequality.
+    \myQED
+\end{proof}
+
+We also derive the following lemma for later use.
+\begin{lemma}\label{lem:error_delta_bounded_by_Delta}
+    If $x_k$ and $x_{k+1}$ satisfies the relaxed Armijo condition (\cref{eq:relaxed_Armijo_condition}) with a descent direction $d_k$ ($g_k^\top d_k \leq 0$),
+    it holds that
+    \begin{equation*}
+        \overline{\delta}_k \leq \delta_k + \frac{1 + \feps}{1 - \feps} \Delta_k.
+    \end{equation*}
+\end{lemma}
+\begin{proof}
+    By condition of this lemma and \cref{eq:relaxed_Armijo_condition}, we have
+    \begin{equation}\label{eq:overline_delta_k_lower_bound}
+        \overline{f}(x_k) - \overline{f}(x_{k+1})
+        \geq - c \alpha_k g_k^\top d_k -\Delta_k
+        \geq -\Delta_k.
+    \end{equation}
+    Using \cref{eq:fx_two_cases,eq:overline_delta_k_lower_bound}, the right-hand side of \cref{eq:delta_k_error_bound} can be further bounded as
+    \begin{align*}
+        2\feps \max(1,\abs{f(x_k)},\abs{f(x_{k+1})})
+         & \leq \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}), -\overline{f}(x_{k}), \overline{f}(x_{{k}+1}), -\overline{f}(x_{{k}+1})) \\
+         & \le \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}) + \Delta_{k}, -\overline{f}(x_{{k}+1}) + \Delta_{k})                       \\
+         & \le \frac{2\feps}{1-\feps} \qty(\max(1, \overline{f}(x_{k}), -\overline{f}(x_{{k}+1})) + \Delta_k).
+    \end{align*}
+    Combining this with \cref{eq:delta_k_error_bound} and the definition of $\Delta_k$ in \cref{eq:relaxed_Armijo_condition} yields
+    \begin{equation*}
+        \abs{\delta_k - \overline{\delta}_k} \leq \frac{2\feps}{1-\feps} \qty(\max(1, \overline{f}(x_{k}), -\overline{f}(x_{{k}+1})) + \Delta_k) = \qty(1 + \frac{2\feps}{1-\feps}) \Delta_k
+        = \frac{1 + \feps}{1 - \feps} \Delta_k.
+    \end{equation*}
+    Applying the triangle inequality completes the proof.
     \myQED
 \end{proof}
 
 \subsection{Backtracking Stage}\label{sec:inner_loop}
 
-We next analyze the line search procedure in \cref{alg:backtracking_linesearch}.
+We next analyze the line search in \cref{alg:backtracking_linesearch}.
 Recall that we assume parameters in \cref{alg:backtracking_linesearch} satisfies $0 < c < 1$ and $0 < \beta_{\min} < \beta_{\max} < 1$.
 
 \begin{proposition}\label{prop:backtracking_finite}
-    Under the assumptions, \cref{alg:backtracking_linesearch} terminates if
-    \begin{equation}\label{eq:alpha_bar}
-        \alpha_k \le \min\qty(\frac{2(1-c)m^2}{LM},1).
+    Under the assumptions,
+    the backtracking procedure in \cref{alg:backtracking_linesearch} terminates whenever the step size $\alpha_k$ satisfies
+    \begin{equation}\label{eq:alpha_k_upper_bound}
+        \alpha_k \le \frac{2(1-c)m}{L}.
     \end{equation}
 \end{proposition}
 \begin{proof}
@@ -327,76 +361,71 @@ Recall that we assume parameters in \cref{alg:backtracking_linesearch} satisfies
          & \ge -\alpha_k g_k^\top d_k - \frac{L}{2}\alpha_k^2\norm{d_k}^2                                   \notag                           \\
          & = -c \alpha_k g_k^\top d_k + \alpha_k \qty(-(1-c)g_k^\top d_k - \frac{L\alpha_k}{2}\norm{d_k}^2). \label{eq:backtracking_Lsmooth}
     \end{align}
-    We first prove that if \cref{eq:alpha_bar} is satisfied, then the following inequality holds:
-    \begin{equation}\label{eq:alpha_bound}
-        -(1-c)g_k^\top d_k - \frac{L\alpha_k}{2}\norm{d_k}^2 \ge 0.
+    From \refLine{line:d_k} of \cref{alg:regularized_qn}, it follows that $g_k=-(B_k+\mu_k I) d_k$.
+    Then, from \cref{ass:BBounds} and $\mu_k \ge 0$, we have
+    \begin{equation}\label{eq:backtracking_min_eig}
+        -g_k^\top d_k
+        = d_k^\top (B_k+\mu_k I)d_k
+        \ge (m+\mu_k)\norm{d_k}^2
+        \ge 0.
     \end{equation}
-    Using $d_k=-(B_k+\mu_k I)^{-1} g_k$ (\refLine{line:d_k}) and the spectral bounds from \cref{ass:BBounds} asserting $(m + \mu_k)I \preceq B_k + \mu_k I \preceq (M + \mu_k)I$, we obtain the following two bounds:
-    \begin{align}
-        -g_k^\top d_k = g_k^\top (B_k+\mu_k I)^{-1} g_k & \ge \frac{1}{M+\mu_k}\norm{g_k}^2, \label{eq:backtracking_suff_first}       \\
-        -\norm{d_k}^2 = -\norm{(B_k+\mu_k I)^{-1}g_k}^2 & \ge -\frac{1}{(m+\mu_k)^2}\norm{g_k}^2. \label{eq:backtracking_suff_second}
-    \end{align}
-    Combining \eqref{eq:backtracking_suff_first} and \eqref{eq:backtracking_suff_second} with weights $(1-c)$ and $\frac{L\alpha_k}{2}$ yields
-    \begin{equation}\label{eq:backtracking_suff_sum}
-        -(1-c)g_k^\top d_k - \frac{L\alpha_k}{2}\norm{d_k}^2 \ge \qty(\frac{1-c}{M+\mu_k} - \alpha_k \frac{L}{2(m+\mu_k)^2})\norm{g_k}^2.
-    \end{equation}
-    Since \cref{eq:alpha_bar} gives $\alpha_k \le \frac{2(1-c)m^2}{LM}$, \cref{eq:backtracking_suff_sum} can be further bounded as
-    \begin{equation}\label{eq:backtracking_suff_eval}
+    Thus, when $\alpha_k$ satisfies the bound in \cref{eq:alpha_k_upper_bound},
+    we have
+    \begin{equation}\label{eq:backtracking_simple_bound}
         -(1-c)g_k^\top d_k - \frac{L\alpha_k}{2}\norm{d_k}^2
-        \ge \frac{1-c}{(m+\mu_k)^2} \qty(\frac{(m+\mu_k)^2}{M+\mu_k} - \frac{m^2}{M}) \norm{g_k}^2.
+        \ge \qty((1-c)m - \frac{L\alpha_k}{2})\norm{d_k}^2 \ge 0.
     \end{equation}
-    Since $0<m<M$ as stated in \cref{ass:BBounds},
-    we have $\frac{(m+\mu_k)^2}{M+\mu_k} \ge m \cdot \frac{m+\mu_k}{M+\mu_k} \ge \frac{m^2}{M}$.
-    Thus, using $c<1$ and $0 \le \mu_k$, we can establish \cref{eq:alpha_bound} by \cref{eq:backtracking_suff_eval}.
-
-    Let us finish the proof.
-    Since \cref{eq:backtracking_suff_first} implies $-c \alpha_k g_k^\top d_k \geq 0$, we have
-    \begin{align*}
-        -c \alpha_k g_k^\top d_k
-         & \le f(x_k) - f(x_k+\alpha_k d_k)                                   &  & (\text{\cref{eq:backtracking_Lsmooth,eq:alpha_bound}})                                        \\
-         & \le \overline{f}(x_k) - \overline{f}(x_k+\alpha_k d_k) + \Delta_k, &  & (\text{\cref{lem:error_bound_on_function_evaluations} and $f(x_k+\alpha_k d_k) \leq f(x_k)$})
-    \end{align*}
-    which means the relaxed Armijo condition (\cref{eq:relaxed_Armijo_condition}) is satisfied.
-    Thus, we can conclude that the backtracking stage terminates whenever \cref{eq:alpha_bar} holds.
+    Combining \cref{eq:backtracking_Lsmooth,eq:backtracking_simple_bound} yields
+    \begin{equation*}
+        f(x_k) - f(x_k+\alpha_k d_k) \geq -c \alpha_k g_k^\top d_k \geq 0.
+    \end{equation*}
+    Hence, the condition of \cref{lem:error_bound_on_function_evaluations} is satisfied with $x_{k+1} = x_k + \alpha_k d_k$ and thus we obtain $\delta_k \le \overline{\delta}_k + \Delta_k$, i.e.,
+    \begin{equation*}
+        -c\alpha_k g_k^\top d_k
+        \le
+        f(x_k) - f(x_k+\alpha_k d_k)
+        \le \overline{f}(x_k) - \overline{f}(x_k+\alpha_k d_k) + \Delta_k.
+    \end{equation*}
+    This inequality means that the relaxed Armijo condition (\cref{eq:relaxed_Armijo_condition}) is satisfied and thus the backtracking procedure terminates.
+    This completes the proof.
     \myQED
 \end{proof}
 
-Let us analyze the behavior of \cref{alg:backtracking_linesearch} using \cref{prop:backtracking_finite}.
-We first bound the number of backtracking rejections as follows.
-\begin{corollary}\label{cor:inner_loop_rejections}
-    Under the assumptions, the number of backtracking rejections in \cref{alg:backtracking_linesearch} is bounded above by
+Now, let us analyze the behavior of \cref{alg:backtracking_linesearch} using \cref{prop:backtracking_finite}.
+Define
+\begin{equation}
+    \overline{\alpha}\defeq \beta_{\min}\min\qty(\frac{2(1-c)m}{L},1)>0.
+\end{equation}
+The following corollary summarizes two immediate consequences: the backtracking procedure terminates after finitely many rejections, and the resulting step size is uniformly bounded by $\overline{\alpha}$.
+
+\begin{corollary}\label{cor:backtracking_summary}
+    Under the assumptions, the backtracking line search in \cref{alg:backtracking_linesearch} terminates after finitely many rejections, and the step size $\alpha_k$ satisfies
     \begin{equation*}
-        \ceil*{\log \min\qty(\frac{2(1-c)m^2}{LM},1) / \log \beta_{\max}}.
+        \alpha_k\ge\overline{\alpha}.
     \end{equation*}
 \end{corollary}
 \begin{proof}
     Let $r$ denote the number of backtracking rejections.
-    Initially, we have $\alpha_k = 1$ (\refLine{line:ls_init}) and each rejection multiplies $\alpha_k$ by at most $\beta_{\max} < 1$.
-    Thus, after $r$ rejections,
-    we have $\alpha_k \le \beta_{\max}^r$.
-    Since the backtracking terminates once \cref{eq:alpha_bar} holds, $\beta_{\max}^r < \min\qty(\frac{2(1-c)m^2}{LM},1)$ is a sufficient condition for backtracking termination.
-    Taking logarithms and rounding up gives the desired bound.
-    \myQED
-\end{proof}
-
-Now, in the following, let us define
-\begin{equation*}
-    \overline{\alpha} \defeq \beta_{\min} \min\qty(\frac{2(1-c)m^2}{LM},1) > 0.
-\end{equation*}
-We can lower bound the step size $\alpha_k$ by $\overline{\alpha}$ as follows.
-\begin{corollary}\label{cor:alpha_lower_bound}
-    Under the assumptions,
-    the step size $\alpha_k$ in \cref{alg:backtracking_linesearch} satisfies
-    \begin{equation}\label{eq:alpha_lower_bound}
-        \alpha_k \ge \overline{\alpha}.
+    Initially, $\alpha_k=1$, and each rejection multiplies $\alpha_k$ by $\beta \leq \beta_{\max}<1$.
+    Hence, after $r$ rejections, $\alpha_k\le\beta_{\max}^r$ holds.
+    By \cref{prop:backtracking_finite}, if
+    \begin{equation}
+        \alpha_k \le \beta_{\max}^r \le \frac{2(1-c)m}{L},
     \end{equation}
-\end{corollary}
-\begin{proof}
-    Let $r$ denote the number of backtracking rejections.
-    If $r=0$, $\alpha_k=1$ and the \cref{eq:alpha_lower_bound} is obvious.
-    Otherwise, there is a last rejected step size $\alpha'_k$. By \cref{prop:backtracking_finite}, $\alpha'_k > \min\qty(\frac{2(1-c)m^2}{LM},1)$.
-    Since the final $\alpha_k$ is chosen from $[\beta_{\min} \alpha'_k, \beta_{\max} \alpha'_k]$ as in \refLine{line:ls_backtracking}, we have $\alpha_k \ge \beta_{\min}\alpha'_k$.
-    Combining these inequalities yields \cref{eq:alpha_lower_bound}.
+    the backtracking procedure must terminate.
+    Since $0 < c < 1$ and $0 < m$, the right-hand side is positive, and thus $r$ is finite.
+    We next establish the lower bound of $\alpha_k$.
+    For the case $r=0$, $\alpha_k=1\ge\overline{\alpha}$ by $\beta_{\min}<1$.
+    Otherwise, let $\alpha_k'$ denote the last rejected step size. By \cref{prop:backtracking_finite}, we have
+    \begin{equation}
+        \alpha_k' > \frac{2(1-c)m}{L} \geq \min\qty(\frac{2(1-c)m}{L},1).
+    \end{equation}
+    The accepted step size $\alpha_k$ is chosen from the interval
+    $[\beta_{\min}\alpha_k',\beta_{\max}\alpha_k']$, and thus
+    \begin{equation}
+        \alpha_k\ge\beta_{\min}\alpha_k'>\beta_{\min}\min\qty(\frac{2(1-c)m}{L},1)=\overline{\alpha}.
+    \end{equation}
+    This completes the proof.
     \myQED
 \end{proof}
 
@@ -424,7 +453,7 @@ To this purpose, we introduce the following constant:
     \end{equation*}
     Note that $\mu_0=0$ and $0 \in K^0$, meaning that $\abs{K^0} \geq 1$, and that the empty sum is zero.
     Let us enumerate the elements of $K^0$ in increasing order as $K^0 = (k_i)_{i=0}^{\abs{K^0}-1}$.
-    For all $i < \abs{K^0}-1$, using \cref{eq:mu_0_condition} with $j=k_i$ and $k=k_{i+1}$, we have
+    For all $i < \abs{K^0}-1$, using \cref{eq:mu_0_condition} with $j=k_i$ and $k=k_{i+1}$, we obtain
     \begin{equation}\label{eq:Delta_i_for_tele_sum}
         \Delta_{k_i} \leq \overline{f}(x_{k_i}) - \overline{f}(x_{k_{i+1}}).
     \end{equation}
@@ -439,9 +468,9 @@ To this purpose, we introduce the following constant:
     \begin{align*}
         \sum_{k \in K^0} \Delta_{k} & \leq \overline{f}(x_0) - \overline{f}(x_{k_{\mathrm{last}}}) + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k_{\mathrm{last}}}), -\overline{f}(x_{k_{\mathrm{last}}+1})) &  & \text{(\cref{eq:relaxed_Armijo_condition})} \\
                                     & \leq \overline{f}(x_0) - \overline{f}^* + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{0}), -\overline{f}^*)                                                             &  & \text{(\cref{eq:ass_bounded_overline_f})}   \\
-                                    & = \overline{f}(x_0) - \overline{f}^* + \Delta_{\max},                                                                                                                      &  & \text{(\cref{eq:def_Delta_max})}
+                                    & = \overline{f}(x_0) - \overline{f}^* + \Delta_{\max}.                                                                                                                      &  & \text{(\cref{eq:def_Delta_max})}
     \end{align*}
-    which completes the proof.
+    This completes the proof.
     \myQED
 \end{proof}
 
@@ -458,24 +487,20 @@ Using this lemma, we can bound the sum of $\norm{g_{k}}^2$ over ${k} \in K^0$ us
         \overline{\delta}_{k} + \Delta_{k}
          & = \overline{f}(x_{k}) - \overline{f}(x_{k+1}) + \Delta_{k} &  & (\text{\cref{eq:def_overline_small_delta_k}})                                   \notag \\
          & \ge -c \alpha_{k} g_{k}^\top d_{k}                         &  & (\text{\cref{eq:relaxed_Armijo_condition}}) \notag                                     \\
-         & \ge \frac{c \overline{\alpha}}{M+\mu_{k}} \norm{g_{k}}^2   &  & (\text{\cref{cor:alpha_lower_bound} and \cref{eq:backtracking_suff_first}})\notag      \\
+         & \ge \frac{c \overline{\alpha}}{M+\mu_{k}} \norm{g_{k}}^2   &  & (\text{\cref{cor:backtracking_summary} and \cref{eq:BBounds_results_first}})\notag     \\
          & = \frac{c \overline{\alpha}}{M} \norm{g_{k}}^2.            &  & (\mu_{k} = 0 \text{ since } k \in K^0)     \label{eq:sufficient_decrease}
     \end{align}
-    Using $\overline{f}(x_{{k}+1}) \leq \overline{f}(x_{k}) + \Delta_{k}$ and $-\overline{f}(x_{k}) \leq -\overline{f}(x_{{k}+1}) + \Delta_{k}$ implied by the relaxed Armijo condition (\cref{eq:relaxed_Armijo_condition}), we can upper bound the left-hand side of \cref{eq:sufficient_decrease} as
-    \begin{align}
-        \overline{\delta}_k + \Delta_{k}
-         & \le \delta_k + \frac{2\feps}{1-\feps} \max(1, \abs{\overline{f}(x_{k})}, \abs{\overline{f}(x_{{k}+1})}) + \Delta_{k} \qquad (\text{\cref{lem:error_bound_on_function_evaluations}}) \notag \\
-         & = \delta_k + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}), -\overline{f}(x_{k}), \overline{f}(x_{{k}+1}), -\overline{f}(x_{{k}+1})) + \Delta_{k} \notag                              \\
-         & \le \delta_k + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}) + \Delta_{k}, -\overline{f}(x_{{k}+1}) + \Delta_{k}) + \Delta_{k} \notag                                                 \\
-         & \le \delta_k + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}), -\overline{f}(x_{{k}+1})) + \qty(\frac{2\feps}{1-\feps}+1) \Delta_{k} \notag                                            \\
-         & = \delta_k + \frac{2}{1-\feps} \Delta_{k}. \qquad (\text{definition of $\Delta_k$ in \cref{eq:relaxed_Armijo_condition}}) \label{eq:intermediate_bound_on_overline_delta_plus_Delta}
-    \end{align}
+    Since the conditions of \cref{lem:error_delta_bounded_by_Delta} are always satisfied, we also have
+    \begin{equation}\label{eq:intermediate_bound_on_overline_delta_plus_Delta}
+        \overline{\delta}_k + \Delta_{k} \le \delta_k + \frac{1+\feps}{1-\feps} \Delta_k + \Delta_k = \delta_k + \frac{2}{1-\feps} \Delta_{k}.
+    \end{equation}
     Then, combining \cref{eq:sufficient_decrease,eq:intermediate_bound_on_overline_delta_plus_Delta} and summing up over $k \in K^0$ gives
-    \begin{align*}
-        \sum_{k \in K^0} \frac{c \overline{\alpha}}{M} \norm{g_{k}}^2 & \leq \sum_{k \in K^0} \delta_{k} + \frac{2}{1-\feps} \sum_{k \in K^0} \Delta_{k}                                                                            \\
-                                                                      & \leq \sum_{k \in K^0} \delta_{k} + \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}). &  & \text{(\cref{lem:delta_bound_and_sum})}
-    \end{align*}
-    Rearranging the terms completes the proof.
+    \begin{equation*}
+        \sum_{k \in K^0} \frac{c \overline{\alpha}}{M} \norm{g_{k}}^2   \leq \sum_{k \in K^0} \delta_{k} + \frac{2}{1-\feps} \sum_{k \in K^0} \Delta_{k}
+        \leq \sum_{k \in K^0} \delta_{k} + \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}),
+    \end{equation*}
+    where the last inequality follows from \cref{lem:delta_bound_and_sum}.
+    This completes the proof.
     \myQED
 \end{proof}
 
@@ -516,8 +541,8 @@ Note that $0 < C_1 \leq C_2$ holds since $1 \leq M$ and $\theta_{\min} \leq \the
     \begin{align}
         \delta_k & = f(x_k) - f(x_k + \alpha_{k} d_{k})                                                          &  & (\text{\cref{eq:def_small_delta_k} and } x_{{k}+1}=x_{k} + \alpha_{k} d_{k})      \notag \\
                  & \ge -\alpha_{k} g_{k}^\top d_{k} - \frac{\alpha_{k}^2 L}{2} \norm{d_{k}}^2                    &  & (\text{\cref{ass:LSmooth}})      \notag                                                  \\
-                 & \ge \qty(\frac{\alpha_{k}}{M+\mu_{k}} - \frac{\alpha_{k}^2 L}{2(m+\mu_{k})^2}) \norm{g_{k}}^2 &  & (\text{\cref{eq:backtracking_suff_first,eq:backtracking_suff_second}}) \notag            \\
-                 & \ge \qty(\frac{\overline{\alpha}}{M+\mu_{k}} - \frac{L}{2(m+\mu_{k})^2}) \norm{g_{k}}^2.      &  & (\text{\cref{cor:alpha_lower_bound} and $\alpha_k \leq 1$})
+                 & \ge \qty(\frac{\alpha_{k}}{M+\mu_{k}} - \frac{\alpha_{k}^2 L}{2(m+\mu_{k})^2}) \norm{g_{k}}^2 &  & (\text{\cref{eq:BBounds_results_first,eq:BBounds_results_second}}) \notag                \\
+                 & \ge \qty(\frac{\overline{\alpha}}{M+\mu_{k}} - \frac{L}{2(m+\mu_{k})^2}) \norm{g_{k}}^2.      &  & (\text{\cref{cor:backtracking_summary} and $\alpha_k \leq 1$})
         \label{eq:mu_positive_diff}
     \end{align}
     We can further bound the terms in \cref{eq:mu_positive_diff} as
@@ -542,7 +567,7 @@ Note that $0 < C_1 \leq C_2$ holds since $1 \leq M$ and $\theta_{\min} \leq \the
 \subsection{Global Convergence Result}
 
 Finally, we combine the results for $k \in K^0$ (\cref{lem:sum_small_delta_k_bound_K0}) and $k \in K^+$ (\cref{lem:sum_small_delta_k_bound_Kplus}) to derive a bound on the total sum of $\norm{g_k}^2$.
-We again define a constant:
+We define the constant $F$ as follows:
 \begin{equation}
     F = f(x_0) - f^* + \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}) + C_1 \sqrt{\varsigma} - C_2 \ln(\varsigma).
     \label{eq:def_F}
@@ -576,7 +601,7 @@ Then, we can obtain the following unified bound of the sum of $\norm{g_k}^2$.
     \myQED
 \end{proof}
 
-This proposition is key to prove the global convergence of \cref{alg:regularized_qn}, since we can derive upper-bounds for the sums of $\norm{g_k}^2$ over $k \in K^0$ and $k \in K^+$ separately.
+This proposition is key to proving the global convergence of \cref{alg:regularized_qn}, since we can derive upper-bounds for the sums of $\norm{g_k}^2$ over $k \in K^0$ and $k \in K^+$ separately.
 Let us first bound the sum of $\norm{g_k}^2$ over $k \in K^0$.
 In the following, let $G$ denote
 \begin{equation*}
@@ -606,7 +631,7 @@ for simplicity.
 \end{proof}
 
 Then, we focus on the sum over $k \in K^+$.
-From \cref{prop:sum_norm_g_k_bound}, we have
+From \cref{prop:sum_norm_g_k_bound}, we obtain
 \begin{equation}\label{eq:lambert_inequality}
     F \ge C_1 \sqrt{G} - C_2 \ln(G).
 \end{equation}
@@ -647,7 +672,7 @@ Using this fact, we can derive the following upper bound on the sum of $\norm{g_
         C_1 \sqrt{G} - \frac{C_1}{2} \sqrt{G} =
         \frac{C_1}{2} \sqrt{G}.
     \end{equation*}
-    Thus, we have $G \le \qty(\frac{2F}{C_1})^2$ for all $G > G_0$, which completes the proof.
+    Thus, we have $G \le \qty(\frac{2F}{C_1})^2$ for all $G > G_0$. This completes the proof.
     \myQED
 \end{proof}
 
@@ -683,9 +708,9 @@ Combining \cref{cor:sum_norm_g_k_bound_K0,cor:sum_norm_g_k_bound_Kplus}, we can 
 \end{proof}
 
 \Cref{thm:gc} is a standard convergence guarantee for first-order optimization algorithms applied to $L$-smooth nonconvex functions, and it matches the optimal convergence rate for such problems.
-We interpret the three terms in \cref{eq:sum_gk_squared_bound} in light of classical optimization results.
+We interpret these results in light of classical optimization results.
 \begin{itemize}
-    \item The first term is an analogue of the classical gradient descent bound for an error-contaminated function $\overline{f}$.
+    \item As for $K^0$ and \cref{cor:sum_norm_g_k_bound_K0}, this is an analogue of the classical gradient descent bound for an error-contaminated function $\overline{f}$.
           Indeed, for gradient descent with fixed step size $\alpha = 1/L$, the sum of squared gradients is bounded as
           \begin{equation*}
               \sum_{j=0}^{k} \norm{g_j}^2
@@ -693,9 +718,9 @@ We interpret the three terms in \cref{eq:sum_gk_squared_bound} in light of class
               = \frac{2(f(x_0)-f^*)}{\alpha}.
           \end{equation*}
 
-    \item The second term mirrors the convergence property of \AdaGradNorm~\citep{wardAdaGradStepsizesSharp2020}, which is scaling as $(f(x_0)-f^*)^2$.
+    \item As for $K^+$ and \cref{cor:sum_norm_g_k_bound_Kplus}, this is analogous to the convergence property of \AdaGradNorm~\citep{wardAdaGradStepsizesSharp2020}, which scales as $(f(x_0)-f^*)^2$.
           This follows from the fact that $F$ contains the initial optimality gaps
-          $f(x_0)-f^*$ and $\overline{f}(x_0)-\overline{f}^*$ (as the definition in \cref{eq:def_F}), and the term is quadratic in $F$.
+          $f(x_0)-f^*$ and $\overline{f}(x_0)-\overline{f}^*$ (as the definition in \cref{eq:def_F}), and the term in \cref{cor:sum_norm_g_k_bound_Kplus} is quadratic in $F$.
 \end{itemize}
 
 \section{Practical Choices of Algorithmic Variables}\label{sec:proposed_choice}
