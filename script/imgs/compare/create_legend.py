@@ -31,7 +31,7 @@ def create_legend():
         )
         handles.append(handle)
 
-    legend_names = [name.replace("Hamaguchi", "Ours") for name in alg_names]
+    legend_names = [name.replace("NTRQN", "Ours") for name in alg_names]
     ax.legend(
         handles,
         legend_names,

@@ -3,18 +3,18 @@ from typing import Dict, Union
 import numpy as np
 
 from qnlab.parameter import (
-    HamaguchiParameter,
     KanzowParameter,
     LineParameter,
     NtqnParameter,
+    NTRQNParameter,
     OwlParameter,
 )
 from qnlab.problem.base import BaseProblem
 from qnlab.solver.qn_basic import qn_gradient_descent, qn_newton
-from qnlab.solver.qn_hamaguchi import qn_hamaguchi
 from qnlab.solver.qn_kanzow import qn_kanzow
 from qnlab.solver.qn_line import qn_line
 from qnlab.solver.qn_ntqn import qn_ntqn
+from qnlab.solver.qn_ntrqn import qn_ntrqn
 from qnlab.solver.qn_owl import qn_owl
 from qnlab.solver.qn_scipy import qn_scipy
 from qnlab.util.callback import Callback
@@ -47,9 +47,9 @@ def qn(
         return qn_kanzow(prob, KanzowParameter(prob.n, options), method, callback)
     elif method.base == "NTQN":
         return qn_ntqn(prob, NtqnParameter(prob.n, options), method, callback, verbose)
-    elif method.base == "Hamaguchi":
-        return qn_hamaguchi(
-            prob, HamaguchiParameter(prob.n, options), method, callback, verbose
+    elif method.base == "NTRQN":
+        return qn_ntrqn(
+            prob, NTRQNParameter(prob.n, options), method, callback, verbose
         )
     else:
         raise ValueError(f"Unknown method: {method}. ")

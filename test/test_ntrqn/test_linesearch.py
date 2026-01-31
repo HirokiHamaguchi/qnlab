@@ -6,9 +6,9 @@ import numpy as np
 import numpy.typing as npt
 from scipy.optimize import line_search
 
-from qnlab.parameter import HamaguchiParameter
+from qnlab.parameter import NTRQNParameter
 from qnlab.problem.base import BaseProblem
-from qnlab.solver.qn_hamaguchi import line_search_relaxed_armijo
+from qnlab.solver.qn_ntrqn import line_search_relaxed_armijo
 
 
 class ExponentialProblem(BaseProblem):
@@ -75,11 +75,11 @@ def run_ls(
     prob.reset()
     prob.x_hists = [x]
 
-    if method_name == "qn_hamaguchi":
+    if method_name == "qn_ntrqn":
         fx = prob.f(x)
         g = prob.g(x)
         d = -g / np.linalg.norm(g)
-        param = HamaguchiParameter(n=1, options={"armijo": c1})
+        param = NTRQNParameter(n=1, options={"armijo": c1})
         _res, *_ = line_search_relaxed_armijo(
             x,
             fx,
@@ -102,7 +102,7 @@ def run_ls(
         raise ValueError(f"Unknown method name: {method_name}")
 
     xs = [
-        np.float64(xi[0]) if method_name == "qn_hamaguchi" else float(xi[0])
+        np.float64(xi[0]) if method_name == "qn_ntrqn" else float(xi[0])
         for xi in prob.x_hists
     ]
     ys = [prob.f(np.array([xi]), count=False) for xi in xs]
@@ -114,10 +114,10 @@ def run_ls(
 def plot_method_data(axes, xs, ys, gnorms, name):
     ax_f, ax_f_log, ax_g = axes
 
-    color = "C0" if name == "hamaguchi" else "C1"
-    marker = "o" if name == "hamaguchi" else "s"
-    label = "qn_hamaguchi" if name == "hamaguchi" else "scipy (c2=0.01)"
-    linestyle = "-" if name == "hamaguchi" else "--"
+    color = "C0" if name == "ntrqn" else "C1"
+    marker = "o" if name == "ntrqn" else "s"
+    label = "qn_ntrqn" if name == "ntrqn" else "scipy (c2=0.01)"
+    linestyle = "-" if name == "ntrqn" else "--"
 
     # Plot on function value plot (x vs f(x))
     ax_f.plot(
@@ -180,9 +180,9 @@ def visualize_opt_results(
     fig, axes = plt.subplots(1, 3, figsize=(15, 4))
     ax_f, ax_f_log, ax_g = axes
 
-    # Run qn_hamaguchi line search
-    xs_qn, y_path_qn, gnorms_qn = run_ls("qn_hamaguchi", prob, prob.x0, c1, c2)
-    plot_method_data((ax_f, ax_f_log, ax_g), xs_qn, y_path_qn, gnorms_qn, "hamaguchi")
+    # Run qn_ntrqn line search
+    xs_qn, y_path_qn, gnorms_qn = run_ls("qn_ntrqn", prob, prob.x0, c1, c2)
+    plot_method_data((ax_f, ax_f_log, ax_g), xs_qn, y_path_qn, gnorms_qn, "ntrqn")
 
     # Run scipy line search
     xs_scipy, y_path_scipy, gnorms_scipy = run_ls("scipy", prob, prob.x0, c1, c2)
@@ -252,7 +252,7 @@ def visualize_opt_results(
 
 
 def test_linesearch_qn_vs_scipy():
-    """Test that qn_hamaguchi line search results match scipy within tolerance."""
+    """Test that qn_ntrqn line search results match scipy within tolerance."""
     tolerance = 1e-10
 
     test_cases = [
@@ -266,7 +266,7 @@ def test_linesearch_qn_vs_scipy():
         for scale2 in [0.0, 10.0, 1000.0]:
             prob = ExponentialProblem(scale1=1.0, scale2=scale2)
             xs_qn, _, _ = run_ls(
-                "qn_hamaguchi", prob, prob.x0, np.float64(c1), np.float64(c2)
+                "qn_ntrqn", prob, prob.x0, np.float64(c1), np.float64(c2)
             )
 
             prob_scipy = ExponentialProblem(scale1=1.0, scale2=scale2)
@@ -293,7 +293,7 @@ def test_linesearch_qn_vs_scipy():
         for degree in [2, 4, 6]:
             prob = ConvexEvenPolynomialProblem(degree=degree)
             xs_qn, _, _ = run_ls(
-                "qn_hamaguchi", prob, prob.x0, np.float64(c1), np.float64(c2)
+                "qn_ntrqn", prob, prob.x0, np.float64(c1), np.float64(c2)
             )
 
             prob_scipy = ConvexEvenPolynomialProblem(degree=degree)

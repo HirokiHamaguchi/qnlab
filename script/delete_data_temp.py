@@ -28,6 +28,6 @@ def delete_temp_data(method, precision):
 
 
 if __name__ == "__main__":
-    for method in ["Hamaguchi", "Hamaguchi-MS"]:
+    for method in ["NTRQN", "NTRQN-MS"]:
         for precision in [16, 32, 64, "noisy"]:
             delete_temp_data(method=method, precision=precision)

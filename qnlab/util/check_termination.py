@@ -4,13 +4,13 @@ from typing import Union
 import numpy as np
 import numpy.typing as npt
 
-from qnlab.parameter import HamaguchiParameter, LineParameter, OwlParameter
+from qnlab.parameter import LineParameter, NTRQNParameter, OwlParameter
 from qnlab.util.ret_values import RetCode
 
 
 def check_termination(
     g: npt.NDArray[np.float64],
-    param: Union[LineParameter, OwlParameter, HamaguchiParameter],
+    param: Union[LineParameter, OwlParameter, NTRQNParameter],
     fx: np.float64,
     pf: deque,
     k: int,

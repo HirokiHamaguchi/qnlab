@@ -6,8 +6,8 @@ from qnlab.parameter.param import BaseParameter
 from qnlab.util.ret_values import RetCode
 
 
-class HamaguchiParameter(BaseParameter):
-    """Parameters for Hamaguchi relaxed Armijo solver."""
+class NTRQNParameter(BaseParameter):
+    """Parameters for NTRQN relaxed Armijo solver."""
 
     def __init__(
         self, n: int, options: Optional[Dict[str, Union[np.float64, int]]] = None
@@ -32,11 +32,11 @@ class HamaguchiParameter(BaseParameter):
         code = self._check_shared()
         if code.is_error():
             raise ValueError(str(code))
-        code = self._check_hamaguchi_params()
+        code = self._check_ntrqn_params()
         if code.is_error():
             raise ValueError(str(code))
 
-    def _check_hamaguchi_params(self) -> RetCode:
+    def _check_ntrqn_params(self) -> RetCode:
         if self.ftol < 0.0:
             return RetCode.ERR_INVALID_FTOL
         if self.past < 0:

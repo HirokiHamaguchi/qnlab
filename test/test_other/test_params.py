@@ -2,9 +2,9 @@ import numpy as np
 import pytest
 
 from qnlab.parameter import (
-    HamaguchiParameter,
     LineParameter,
     NtqnParameter,
+    NTRQNParameter,
     OwlParameter,
 )
 from qnlab.util import linesearch
@@ -37,8 +37,8 @@ def test_owl_requires_backtracking_linesearch():
     assert param.linesearch_kind == linesearch.LINESEARCH_BACKTRACKING
 
 
-def test_hamaguchi_uses_shared_eps():
-    param = HamaguchiParameter(4, {})
+def test_ntrqn_uses_shared_eps():
+    param = NTRQNParameter(4, {})
     assert param.eps > 0
 
 
@@ -46,5 +46,5 @@ if __name__ == "__main__":
     test_line_parameter_defaults_include_eps()
     test_ntqn_rejects_negative_gtol()
     test_owl_requires_backtracking_linesearch()
-    test_hamaguchi_uses_shared_eps()
+    test_ntrqn_uses_shared_eps()
     print("All tests passed.")

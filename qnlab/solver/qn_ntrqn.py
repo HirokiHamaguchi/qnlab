@@ -5,7 +5,7 @@ import numpy as np
 import numpy.typing as npt
 from scipy.optimize._linesearch import _cubicmin, _quadmin
 
-from qnlab.parameter import HamaguchiParameter
+from qnlab.parameter import NTRQNParameter
 from qnlab.problem.base import BaseProblem
 from qnlab.update.update import get_direction_reg
 from qnlab.util.callback import Callback
@@ -21,7 +21,7 @@ def line_search_relaxed_armijo(
     g: npt.NDArray[np.float64],
     d: npt.NDArray[np.float64],
     prob: BaseProblem,
-    param: HamaguchiParameter,
+    param: NTRQNParameter,
     eps: np.float64,
     ref_fx: np.float64,
     verbose: bool,
@@ -158,9 +158,9 @@ def line_search_relaxed_armijo(
         )
 
 
-def qn_hamaguchi(
+def qn_ntrqn(
     prob: BaseProblem,
-    param: HamaguchiParameter,
+    param: NTRQNParameter,
     method: Method,
     callback: Union[Callback, None] = None,
     verbose: bool = False,

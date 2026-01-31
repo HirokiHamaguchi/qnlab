@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 BaseType = Literal[
     "Line",
     "Kanzow",
-    "Hamaguchi",
+    "NTRQN",
     "SciPy",
     "NTQN",
     "GradientDescent",
@@ -63,7 +63,7 @@ class Method:
             assert update in get_args(UpdateType), update
 
     def __repr__(self) -> str:
-        if "Hamaguchi" in self.base:
+        if "NTRQN" in self.base:
             return f"Method(base={self.base}, store={self.store}, secant={self.secant}, update={self.update})"
         else:
             scipy_str = (
@@ -83,7 +83,7 @@ class Method:
         elif self.base == "Newton":
             return "Newton"
         else:
-            label = "Hamaguchi"
+            label = "NTRQN"
 
             if self.store == "cautious":
                 label += "_StoreC"
@@ -115,13 +115,11 @@ def get_methods(
 
     methods = [
         (
-            Method("Hamaguchi", "cautious", "damped", "bfgs", label="Hamaguchi"),
+            Method("NTRQN", "cautious", "damped", "bfgs", label="NTRQN"),
             {"m": m, "max_iterations": MI},
         ),
         (
-            Method(
-                "Hamaguchi", "cautious", "damped_modified", "bfgs", label="Hamaguchi-MS"
-            ),
+            Method("NTRQN", "cautious", "damped_modified", "bfgs", label="NTRQN-MS"),
             {"m": m, "max_iterations": MI},
         ),
         (
@@ -149,8 +147,8 @@ def get_methods(
     TAB20 = plt.colormaps.get_cmap("tab20")
 
     COLORS = {
-        "Hamaguchi": TAB20(0),
-        "Hamaguchi-MS": TAB20(1),
+        "NTRQN": TAB20(0),
+        "NTRQN-MS": TAB20(1),
         "Line": TAB20(2),
         "Line-MS": TAB20(3),
         "SciPy": TAB20(6),
@@ -159,8 +157,8 @@ def get_methods(
     }
 
     LINE_STYLES = {
-        "Hamaguchi": "o-",
-        "Hamaguchi-MS": "o--",
+        "NTRQN": "o-",
+        "NTRQN-MS": "o--",
         "Line": "^--",
         "Line-MS": "^-.",
         "SciPy": "v:",

@@ -51,7 +51,7 @@ def run_benchmark():
             if run_idx < warmup_count:
                 continue
 
-            results["method"].append(method_name.replace("Hamaguchi", "Ours"))
+            results["method"].append(method_name.replace("NTRQN", "Ours"))
             results["run"].append(run_idx - warmup_count + 1)
             results["time"].append(elapsed_time)
             results["num_of_calls"].append(prob.count_calls())
@@ -107,7 +107,7 @@ def vis_benchmark(stats: pd.DataFrame):
     fig, ax = plt.subplots(figsize=(5.5, 3.5))
 
     methods_list = stats["Method"].tolist()
-    methods_list = [m.replace("Hamaguchi", "Ours") for m in methods_list]
+    methods_list = [m.replace("NTRQN", "Ours") for m in methods_list]
     means = stats["Mean Time (s)"].tolist()
     stds = stats["Std Dev (s)"].tolist()
 
