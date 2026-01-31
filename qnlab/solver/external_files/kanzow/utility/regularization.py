@@ -23,7 +23,7 @@ def genericMonotone(lmData, updateCalculator, directionCalculator, f, Df, x):
     if stoppingTest(iter, mu, gx):
         return [x, iter]
 
-    # Edited by Hamaguchi to pass ruff
+    # Edited by Hamaguchi to pass the ruff check
     # fun = lambda x: (f(x), Df(x))
     def fun(x):
         return (f(x), Df(x))
@@ -75,7 +75,7 @@ def genericNonmonotone(lmData, updateCalculator, directionCalculator, f, Df, x):
     if stoppingTest(iter, mu, gx):
         return [x, iter]
 
-    # Edited by Hamaguchi to pass ruff
+    # Edited by Hamaguchi to pass the ruff check
     # fun = lambda x: (f(x), Df(x))
     def fun(x):
         return (f(x), Df(x))
