@@ -1,4 +1,4 @@
-\documentclass[0_en]{subfiles}
+\documentclass[0_main]{subfiles}
 
 \begin{document}
 
@@ -19,27 +19,27 @@ Define the step and the gradient difference as
     y_k = \nabla f(x_{k+1}) - \nabla f(x_k).
 \end{equation*}
 The standard approach is to update $B_k$ to satisfy the secant condition:
-\begin{equation}\label{eq:secant_condition}
+\begin{equation*}
     B_{k+1} s_k = y_k.
-\end{equation}
+\end{equation*}
 To justify this condition, consider a quadratic approximation model around $x_{k+1}$:
-\begin{equation}\label{eq:def_m_kp1}
+\begin{equation*}
     m_{k+1}(x) = f(x_{k+1}) + \nabla f(x_{k+1})^\top (x - x_{k+1}) + \frac{1}{2} (x - x_{k+1})^\top B_{k+1} (x - x_{k+1}).
-\end{equation}
+\end{equation*}
 By construction, this model satisfies
-\begin{equation}\label{eq:two_auto_matches}
+\begin{equation*}
     \begin{cases}
         m_{k+1}(x_{k+1}) = f(x_{k+1}) \\
         \nabla m_{k+1}(x_{k+1}) = \nabla f(x_{k+1})
     \end{cases}
-\end{equation}
+\end{equation*}
 regardless of the choice of $B_{k+1}$.
-Additionally, the secant condition \cref{eq:secant_condition} ensures that the model satisfies
-\begin{align}\label{eq:grad_k_match}
-    \nabla m_{k+1}(x_k) & = \nabla f(x_{k+1}) - B_{k+1} (x_{k+1} - x_k)             &  & (\text{by \cref{eq:def_m_kp1}})                          \\
-                        & = \nabla f(x_{k+1}) - (\nabla f(x_{k+1}) - \nabla f(x_k)) &  & \text{(by secant condition \eqref{eq:secant_condition})} \\
+Additionally, the secant condition ensures that the model satisfies
+\begin{align*}
+    \nabla m_{k+1}(x_k) & = \nabla f(x_{k+1}) - B_{k+1} (x_{k+1} - x_k)             &  & (\text{definition of model}) \\
+                        & = \nabla f(x_{k+1}) - (\nabla f(x_{k+1}) - \nabla f(x_k)) &  & \text{(secant condition)}    \\
                         & = \nabla f(x_k)
-\end{align}
+\end{align*}
 which matches the gradient information from the previous iteration.
 Thus, by using the secant condition, we ensure that the quadratic model $m_{k+1}(x)$ accurately reflects the gradient information at both $x_{k+1}$ and $x_k$, except for the previous function value $f(x_k)$.
 
@@ -94,49 +94,44 @@ In the following, we present two well-known modified secant conditions.
 
 The first modification incorporates the function value at the previous point into the quadratic model \citep{yuanModifiedBFGSAlgorithm1991,weiNewQuasiNewtonMethods2006, babaie-kafakiModifiedBFGSAlgorithm2011}.
 Let us consider an alternate model with a different approximate Hessian $B^{\mathrm{F}}_{k+1}$:
-\begin{equation}
+\begin{equation*}
     m_{k+1}^{\mathrm{F}}(x) = f(x_{k+1}) + \nabla f(x_{k+1})^\top (x - x_{k+1}) + \frac{1}{2} (x - x_{k+1})^\top B^{\mathrm{F}}_{k+1} (x - x_{k+1}).
-    \label{eq:model_Y}
-\end{equation}
-In addition to \cref{eq:two_auto_matches}, we require this model to satisfy
-\begin{equation}
+\end{equation*}
+We require this model to satisfy
+\begin{equation*}
     m^{\mathrm{F}}_{k+1}(x_k) = f(x_k),
-    \label{eq:msecY_fxk}
-\end{equation}
+\end{equation*}
 which enforces that the function value at the previous point is correctly modeled.
 This is the key idea behind function-value-based modified secant conditions.
 
 Let us derive the corresponding modified secant condition for $B^{\mathrm{F}}_{k+1}$.
-Substituting the definition of $m^{\mathrm{F}}_{k+1}$ from \cref{eq:model_Y} and using $s_k = x_{k+1} - x_k$ into \cref{eq:msecY_fxk}, the condition becomes
-\begin{align}
-    f(x_k) & = f(x_{k+1}) + \nabla f(x_{k+1})^\top (x_k - x_{k+1}) + \frac{1}{2} (x_k - x_{k+1})^\top B^{\mathrm{F}}_{k+1} (x_k - x_{k+1}) \notag \\
-           & = f(x_{k+1}) - \nabla f(x_{k+1})^\top s_k + \frac{1}{2} s_k^\top B^{\mathrm{F}}_{k+1} s_k. \label{eq:yuan_rearranged}
-\end{align}
+Substituting the definition of $m^{\mathrm{F}}_{k+1}$ and using $s_k = x_{k+1} - x_k$, the condition becomes
+\begin{align*}
+    f(x_k) & = f(x_{k+1}) + \nabla f(x_{k+1})^\top (x_k - x_{k+1}) + \frac{1}{2} (x_k - x_{k+1})^\top B^{\mathrm{F}}_{k+1} (x_k - x_{k+1}) \\
+           & = f(x_{k+1}) - \nabla f(x_{k+1})^\top s_k + \frac{1}{2} s_k^\top B^{\mathrm{F}}_{k+1} s_k.
+\end{align*}
 Now, assume that the updated matrix has the form
-\begin{equation}\label{eq:yuan_ansatz}
+\begin{equation*}
     B^{\mathrm{F}}_{k+1} s_k = y_k - \sigma^\mathrm{F}_k s_k,
-\end{equation}
+\end{equation*}
 where $\sigma^\mathrm{F}_k \in \mathbb{R}$ is a scalar to be determined.
-Substituting \cref{eq:yuan_ansatz} into \cref{eq:yuan_rearranged} and using $s_k^\top B^{\mathrm{F}}_{k+1} s_k = s_k^\top y_k - \sigma^\mathrm{F}_k \norm{s_k}^2$ gives
-\begin{equation}\label{eq:yuan_substituted}
+Substituting this equation and using $s_k^\top B^{\mathrm{F}}_{k+1} s_k = s_k^\top y_k - \sigma^\mathrm{F}_k \norm{s_k}^2$ gives
+\begin{equation*}
     f(x_k) = f(x_{k+1}) - \nabla f(x_{k+1})^\top s_k + \frac{1}{2} s_k^\top y_k - \frac{\sigma^\mathrm{F}_k}{2} \norm{s_k}^2.
-\end{equation}
+\end{equation*}
 Solving for $\sigma^\mathrm{F}_k$ and using $y_k = \nabla f(x_{k+1}) - \nabla f(x_k)$, we obtain
-\begin{align}
+\begin{align*}
     \sigma^\mathrm{F}_k & = \frac{2(f(x_{k+1}) - f(x_k)) - (2\nabla f(x_{k+1}) - y_k)^\top s_k}{\norm{s_k}^2}           \\
                         & = \frac{2(f(x_{k+1}) - f(x_k)) - (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k}{\norm{s_k}^2}.
-    \label{eq:C_simplified}
-\end{align}
-Therefore, the modified secant condition \cref{eq:yuan_ansatz} becomes
-\begin{equation}
+\end{align*}
+Therefore, the modified secant condition becomes
+\begin{equation*}
     B^{\mathrm{F}}_{k+1} s_k = y_k + \frac{2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k}{\norm{s_k}^2} s_k.
-    \label{eq:msecY_raw}
-\end{equation}
+\end{equation*}
 To preserve the possibility of maintaining positive definiteness under a BFGS-type update when $s_k^\top y_k > 0$, we can modify the formula by taking the maximum with zero in the numerator.
-\begin{equation}
+\begin{equation*}
     B^{\mathrm{F}'}_{k+1} s_k = y_k + \frac{\max(0, 2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k)}{\norm{s_k}^2} s_k.
-    \label{eq:msecY_final}
-\end{equation}
+\end{equation*}
 
 This is the function-value-based modified secant condition.
 Unlike the standard secant condition, this formulation ensures that the quadratic model matches not only the function value at the previous point but also the gradients at both points.
@@ -154,54 +149,50 @@ Refer to \cref{fig:yuan_msec} for an illustration.
 
 The second modification introduces a cubic term to the model, allowing simultaneous satisfaction of both function value and gradient matching at the previous point \citep{zhangNewQuasiNewtonEquation1999, zhangPropertiesNumericalPerformance2001,yabeLocalSuperlinearConvergence2007}.
 Let $T_{k+1} \in \mathbb{R}^{n \times n \times n}$ be the third-order derivative tensor of $f$ at $x_{k+1}$ such that
-\begin{equation}
+\begin{equation*}
     s_k^\top (T_{k+1} s_k) s_k = \sum_{i,j,l=1}^n \partial_{x_i x_j x_l} f(x_{k+1}) s_k^{(i)} s_k^{(j)} s_k^{(l)},
-\end{equation}
+\end{equation*}
 where $\partial_{x_i x_j x_l} f$ denotes the third derivative of $f$ with respect to $x_i$, $x_j$, and $x_l$, and $s_k^{(i)}$ is the $i$-th component of the vector $s_k$.
 We introduced this tensor solely for analysis purposes, and it will be eliminated from the final formula.
 
 By incorporating this tensor term, we can define the following cubic-augmented model:
-\begin{multline}
-    m^\mathrm{C}_{k+1}(x) = f(x_{k+1}) + \nabla f(x_{k+1})^\top (x - x_{k+1}) + \frac{1}{2} (x - x_{k+1})^\top B_{k+1}^{\mathrm{C}} (x - x_{k+1})\\ + \frac{1}{6}(x - x_{k+1})^\top (T_{k+1} (x - x_{k+1})) (x - x_{k+1}).
-    \label{eq:model_Z}
-\end{multline}
+\begin{align*}
+    m^\mathrm{C}_{k+1}(x) ={} & f(x_{k+1}) + \nabla f(x_{k+1})^\top (x - x_{k+1}) + \frac{1}{2} (x - x_{k+1})^\top B_{k+1}^{\mathrm{C}} (x - x_{k+1}) \\
+                              & + \frac{1}{6}(x - x_{k+1})^\top (T_{k+1} (x - x_{k+1})) (x - x_{k+1}).
+\end{align*}
 With this model, we can enforce both function value and gradient matching at the previous point $x_k$.
 Specifically, we require
-\begin{equation}
+\begin{equation*}
     \begin{dcases}
         m^\mathrm{C}_{k+1}(x_k) = f(x_k) \\
         \nabla m^\mathrm{C}_{k+1}(x_k) = \nabla f(x_k)
     \end{dcases}
-    \label{eq:msecZ_xk}
-\end{equation}
-By substituting the definition of $m^\mathrm{C}_{k+1}$ from \cref{eq:model_Z} and using $s_k = x_{k+1} - x_k$, we can rewrite these conditions as
-\begin{align}
-    f(x_k)        & = f(x_{k+1}) - s_k^\top \nabla f(x_{k+1}) + \frac{1}{2} s_k^\top B^\mathrm{C}_{k+1} s_k - \frac{1}{6} s_k^\top (T_{k+1} s_k) s_k,  \label{eq:zhang_func_eq} \\
+\end{equation*}
+By substituting the definition of $m^\mathrm{C}_{k+1}$ and using $s_k = x_{k+1} - x_k$, we can rewrite these conditions as
+\begin{align*}
+    f(x_k)        & = f(x_{k+1}) - s_k^\top \nabla f(x_{k+1}) + \frac{1}{2} s_k^\top B^\mathrm{C}_{k+1} s_k - \frac{1}{6} s_k^\top (T_{k+1} s_k) s_k, \\
     \nabla f(x_k) & = \nabla f(x_{k+1}) - B^\mathrm{C}_{k+1} s_k + \frac{1}{2} (T_{k+1} s_k) s_k.
-    \label{eq:zhang_grad_eq}
-\end{align}
-Rearranging \cref{eq:zhang_func_eq} and projecting \cref{eq:zhang_grad_eq} onto $s_k$ gives
-\begin{align}
-    3(f(x_k) - f(x_{k+1})) +3 s_k^\top \nabla f(x_{k+1}) & = \frac{3}{2} s_k^\top B^{\mathrm{C}}_{k+1} s_k - \frac{1}{2} s_k^\top (T_{k+1} s_k) s_k, \label{eq:zhang_func_rearranged} \\
-    -s_k^\top y_k                                        & = -s_k^\top B^{\mathrm{C}}_{k+1} s_k + \frac{1}{2} s_k^\top (T_{k+1} s_k) s_k. \label{eq:zhang_grad_projected}
-\end{align}
-By summing up \cref{eq:zhang_func_rearranged,eq:zhang_grad_projected} and using $y_k = \nabla f(x_{k+1}) - \nabla f(x_k)$, we eliminate the tensor term and obtain the scalar identity
-\begin{equation}
+\end{align*}
+Rearranging and multiplying both sides by $3$ for the first equation, and taking the inner product with $s_k$ for the second equation, we have
+\begin{align*}
+    3(f(x_k) - f(x_{k+1})) +3 s_k^\top \nabla f(x_{k+1}) & = \frac{3}{2} s_k^\top B^{\mathrm{C}}_{k+1} s_k - \frac{1}{2} s_k^\top (T_{k+1} s_k) s_k, \\
+    -s_k^\top y_k                                        & = -s_k^\top B^{\mathrm{C}}_{k+1} s_k + \frac{1}{2} s_k^\top (T_{k+1} s_k) s_k.
+\end{align*}
+By summing up and using $y_k = \nabla f(x_{k+1}) - \nabla f(x_k)$, we eliminate the tensor term and obtain the scalar identity
+\begin{equation*}
     3(f(x_k) - f(x_{k+1}))
     + \frac{3}{2} s_k^\top (\nabla f(x_{k+1}) + \nabla f(x_k)) + \frac{1}{2} s_k^\top y_k
     = \frac{1}{2} s_k^\top B^{\mathrm{C}}_{k+1} s_k.
-    \label{eq:zhang_scalar_identity}
-\end{equation}
+\end{equation*}
 Assume again that $B^{\mathrm{C}}_{k+1} s_k$ is a linear combination of $y_k$ and $s_k$, i.e., $B^{\mathrm{C}}_{k+1} s_k = y_k + \sigma^\mathrm{C}_k s_k$ for some scalar $\sigma^\mathrm{C}_k$.
-Then, \cref{eq:zhang_scalar_identity} yields
-\begin{equation}
+Then, the previous equation yields
+\begin{equation*}
     \sigma^\mathrm{C}_k = \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nabla f(x_k) + \nabla f(x_{k+1}))}{\norm{s_k}^2}.
-    \label{eq:sigma_scalar}
-\end{equation}
-Plugging \cref{eq:sigma_scalar} back into the ansatz yields the cubic-augmented modified secant condition:
-\begin{equation}\label{eq:msecZ_final}
+\end{equation*}
+Thus, the modified secant condition becomes
+\begin{equation*}
     B^{\mathrm{C}}_{k+1} s_k = y_k + \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nabla f(x_k) + \nabla f(x_{k+1}))}{\norm{s_k}^2} s_k.
-\end{equation}
+\end{equation*}
 
 This is a cubic-augmented modified secant condition. Unlike the function-value-based quadratic modification, this formulation allows simultaneous satisfaction of both the function value and gradient conditions at the previous point through the introduction of the tensor term.
 Refer to \cref{fig:zhang_models} for an illustration.

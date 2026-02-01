@@ -129,10 +129,19 @@ def extract_braced_content(block: str, command: str) -> str:
 def preprocess_latex(content: str) -> str:
     r"""Preprocess LaTeX content.
 
+    Removes \ifEn...\else...\fi blocks (keeps the \else part).
     Removes \ifSubfilesClassLoaded{...}{} blocks (ignoring whitespace).
     Keeps \label{...} commands for label tracking,
     they will be removed during environment block processing.
     """
+    # Remove \ifEn...\else...\fi blocks (delete from \ifEn to \else, then delete \fi)
+    # This removes the first branch and keeps the second branch
+    pattern = r"^\s*\\ifEn\s*$.*?^\s*\\else\s*$"
+    content = re.sub(pattern, "", content, flags=re.MULTILINE | re.DOTALL)
+    # Remove the \fi command
+    pattern = r"^\s*\\fi\s*$"
+    content = re.sub(pattern, "", content, flags=re.MULTILINE)
+
     # Remove \ifSubfilesClassLoaded{...}{} blocks
     pattern = r"\\ifSubfilesClassLoaded\s*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}\s*\{\}"
     return re.sub(pattern, "", content, flags=re.DOTALL)
@@ -240,7 +249,7 @@ def convert_figure_to_md(block: str, counter: int) -> str:
 
     result = f"![{image_path}]({url})\n"
 
-    caption_text = extract_braced_content(block, "caption")
+    caption_text = extract_braced_content(block, "caption").replace("\n", " ").strip()
     if caption_text:
         print(f"Figure {counter} caption: {caption_text}")
         caption_text = post_process_content(caption_text)
@@ -250,14 +259,50 @@ def convert_figure_to_md(block: str, counter: int) -> str:
 
 
 def convert_table_to_md(block: str, counter: int) -> str:
-    """Convert LaTeX table block to Markdown table."""
-    lines = [
-        line.strip()
-        for line in block.split("\n")
-        if line.strip() and not line.strip().startswith(("\\begin", "\\end"))
-    ]
+    """Convert LaTeX table block to Markdown table.
 
-    table_content = "\n".join(lines) + "\n" if lines else ""
+    Handles tabular environments and converts them to Markdown table format.
+    """
+    # Extract tabular content
+    tabular_match = re.search(
+        r"\\begin\{tabular\}.*?\{([^}]+)\}(.*?)\\end\{tabular\}", block, re.DOTALL
+    )
+    assert tabular_match is not None, "No tabular environment found in table block."
+
+    col_spec = tabular_match.group(1)
+    tabular_content = tabular_match.group(2).replace("\\hline", "")
+
+    # Parse rows (split by \\)
+    rows = []
+    for row_str in tabular_content.split("\\\\"):
+        row_str = row_str.strip()
+        if row_str:
+            # Split cells by & and clean up
+            cells = [cell.strip() for cell in row_str.split("&")]
+            rows.append(cells)
+
+    if rows:
+        # Determine number of columns from column spec or first row
+        num_cols = len(col_spec.replace("|", ""))
+
+        # Build markdown table
+        md_rows = []
+        for i, row in enumerate(rows):
+            # Pad row if necessary
+            while len(row) < num_cols:
+                row.append("")
+            # Limit to num_cols
+            row = row[:num_cols]
+            md_rows.append("| " + " | ".join(row) + " |")
+
+        # Add header separator after first row
+        if md_rows:
+            separator = "| " + " | ".join([":--:"] * num_cols) + " |"
+            md_rows.insert(1, separator)
+
+        table_content = "\n".join(md_rows) + "\n"
+    else:
+        table_content = ""
 
     caption_text = extract_braced_content(block, "caption")
     if caption_text:
@@ -453,20 +498,6 @@ class LatexToMarkdownConverter:
         else:
             return convert_math_env_to_md(block, env_name, counter)
 
-    def should_skip_line(self, line: str) -> bool:
-        """Check if a line should be skipped (metadata commands, etc.)."""
-        skip_commands = [
-            "\\title",
-            "\\author",
-            "\\date",
-            "\\maketitle",
-            "\\orcidlink",
-        ]
-        for cmd in skip_commands:
-            if line.startswith(cmd):
-                return True
-        return False
-
     def preregister_labels(self) -> None:
         """Pre-scan the file to register all labels before processing.
 
@@ -544,11 +575,6 @@ class LatexToMarkdownConverter:
 
     def process_normal_line(self, line: str) -> None:
         """Process a normal (non-environment) line."""
-        # Skip metadata commands
-        if self.should_skip_line(line):
-            self.i += 1
-            return
-
         # Convert \cref references
         line = convert_cref(line)
 
@@ -607,16 +633,22 @@ def main() -> None:
     reset_global_counters()
 
     current_dir = Path(__file__).parent
-    exclude_files = {"0_en.tex"}
-    tex_files = [
-        f for f in sorted(current_dir.glob("*.tex")) if f.name not in exclude_files
-    ]
+    main_file = "0_main.tex"
+    tex_files = [f for f in sorted(current_dir.glob("*.tex")) if f.name != main_file]
 
-    if not tex_files:
-        print("No .tex files found in current directory.")
-        return
+    assert tex_files, "No .tex files found in current directory."
 
-    all_markdown_lines = ["# Study of Quasi-Newton Methods\n"]
+    title = ""
+    main_content = process_latex_file(current_dir / main_file)
+    title = ""
+    for line in main_content:
+        print(line)
+        title_match = re.match(r"\\title\{(.+)\}", line.strip())
+        if title_match:
+            title = title_match.group(1)
+            break
+
+    all_markdown_lines = [f"# {title}\n"]
 
     for tex_file in tex_files:
         print(f"Processing {tex_file.name}...")

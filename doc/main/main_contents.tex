@@ -1048,9 +1048,9 @@ The proposed method maintains stability even when traditional line-search method
 
 In this subsection, we present an experiment to compare the per-iteration computational cost of each method. Since the previous experiments focused on the number of function and gradient evaluations, they did not directly reflect the computational overhead of each algorithm. Here, we measured the total execution time required to perform a fixed number of iterations on a simple problem.
 We conducted experiments on the ill-conditioned quadratic problem
-\begin{mini*}
-    {x \in \bbR^n}{\frac{1}{2}\sum_{i=1}^n i x_i^2}{}{}
-\end{mini*}
+\begin{equation*}
+    \underset{x \in \bbR^n}{\mathrm{minimize}} \quad \frac{1}{2} \sum_{i=1}^n i x_i^2
+\end{equation*}
 with $n=10{,}000$, and measured the total execution time. Timing data were collected after three warm-up runs, followed by $100$ recorded trials.
 The initial point $x_0$ was chosen as the all-ones vector.
 We used memory size $m=10$ and maximum iterations $k_{\max}=100$, and we did not set any stopping criteria other than reaching $k_{\max}$.

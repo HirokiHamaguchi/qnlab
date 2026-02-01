@@ -1,17 +1,17 @@
-# Study of Quasi-Newton Methods
+# 準ニュートン法に関する基礎知識
 
 
-<!-- From 1_basic_en.tex -->
+<!-- From 1_basic.tex -->
 
 
-## Basic Concepts
+## 連続最適化の基本概念
 
-One of the central goals of numerical optimization is to determine decision variables that optimize a given quantitative performance measure.
-Examples include design performance, control stability, operational efficiency, and prediction error, each quantifying the quality of various phenomena or systems.
-These performance measures are typically modeled by an objective function that maps decision variables to real numbers.
+数理最適化の中心的な意義の一つは、与えられた定量的な指標を最適化する決定変数を求めることである。
+そのような指標の例としては制御の安定性、運用の効率性、予測誤差など、さまざまな現象やシステムの品質を定量化したものが挙げられる。
+これらの指標は通常、決定変数を実数に写像する目的関数としてモデル化される。
 
-In this chapter, we define $f \colon \mathbb{R}^n \to \mathbb{R}$ as an objective function of class $C^2$, where $n$ denotes the dimension of the decision variables.
-We consider the following unconstrained optimization problem:
+本章では、目的関数を $C^2$ 級の関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ とし、また $n$ を決定変数の次元と定める。 この時、次の無制約最適化問題を考える:
+
 
 $$
 \begin{equation}
@@ -19,12 +19,15 @@ $$
 \end{equation}
 $$
 
-In this section, we provide fundamental definitions and properties related to \cref{eq:unconstrained-optimization}.
 
-### Convexity and Strong Convexity
+本節では、この最適化問題に関する基本的な定義と性質をまとめる。
 
-The notions of convexity and strong convexity are fundamental in optimization theory.
-Convexity and strong convexity of a function $f$ can be characterized by the following inequalities:
+### 凸性と強凸性
+
+凸性(convexity)と強凸性(strong convexity)は最適化理論の基本概念である。
+$f$ は $C^2$ 級と仮定する。
+関数 $f$ が凸あるいは強凸であることは、任意の $x,y \in \mathbb{R}^n$ について次の定義が成り立つこととそれぞれ同値である:
+
 
 $$
 \begin{align}
@@ -35,24 +38,21 @@ f(y) & \ge f(x)+\nabla f(x)^\top (y-x)+\frac{\mu}{2}\norm{y-x}^2,
 \end{align}
 $$
 
-for any $x,y \in \mathbb{R}^n$, where $\mu>0$ is a constant.
-Strong convexity indicates that, in addition to convexity, the objective function has uniformly positive curvature.
-Examples of convex and strongly convex functions are shown in Fig. 1.
+
+ただし、 $\mu>0$ は定数である。
+強凸性は、凸性に加えて目的関数が一様に正の曲率を持つことを意味する。
+凸関数と強凸関数の例を Fig. 1 に示した。
 
 ![../imgs/quasi_newton/convexity_comparison_convex.png](../imgs/quasi_newton/convexity_comparison_convex.png)
 
-(Fig. 1
-Comparison of convex and strongly convex functions.
-The dashed line shows the quadratic approximation at $x=0$.
-The upper two functions are convex but not strongly convex, and no constant $\mu>0$ satisfies \cref{eq:strongly-convex-def}.
-The lower two functions are strongly convex, and there exists $\mu>0$ that satisfies \cref{eq:strongly-convex-def}.
-)
+(Fig. 1 凸関数と強凸関数の例。 破線は $x=0$ における二次近似を示す。 上の2つの関数は凸であるが強凸ではない。 下の2つの関数は強凸であり、強凸性の定義を満たす $\mu>0$ が存在する。)
 
 
 ### Positive Definiteness of the Hessian
 
-Next, we show how convexity and strong convexity relate to the definiteness of the Hessian matrix $\nabla^2 f(x)$.
-Let $A$ be a symmetric matrix in $\mathbb{R}^{n \times n}$. A matrix $A$ is called positive or negative definite (or semi-definite) based on the following conditions:
+次に、凸性および強凸性がヘッセ行列 $\nabla^2 f(x)$ の正定値性とどのように関係するかを示す。
+$A$ を $\mathbb{R}^{n \times n}$ の対称行列とする。行列 $A$ が正定値(positive definite)・負定値(negative definite) (または半正定値(positive semi-definite)・半負定値(negative semi-definite))であるとは、次の条件で定義される:
+
 
 $$
 \begin{align*}
@@ -63,48 +63,51 @@ $$
 \end{align*}
 $$
 
-A matrix is indefinite if it is neither positive nor negative definite.
-For matrices $A,B \in \mathbb{R}^{n \times n}$, the notation $A \succeq B$ indicates that $A-B$ is positive semi-definite.
-For $\mu > 0$, the condition $A \succeq \mu I$ is equivalent to $v^\top A v \ge \mu \norm{v}^2$ for all $v \in \mathbb{R}^n$.
-It directly implies that all eigenvalues of $A$ are at least $\mu$, which in turn implies that the operator norm $\norm{A}$ is at least $\mu$, i.e., $\norm{A} \geq \mu$.
-In particular, if $B$ is a zero matrix, we simply write $A \succeq 0$.
-We similarly define $\preceq$ for negative semi-definiteness.
 
-We can relate convexity and strong convexity to the definiteness of the Hessian as follows.
+正定値でも負定値でもない行列は不定値(indefinite)と呼ぶ。
+行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表す。
+特に $B$ が零行列のときは $A \succeq 0$ と書く。
+同様に、$\preceq$ は半負定値に対して定義する。
+$\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \norm{v}^2$ と同値である。
+これは $A$ のすべての固有値が少なくとも $\mu$ であることを意味し、さらに作用素ノルムについて $\norm{A} \geq \mu$ であることを導く。
+
+凸性および強凸性とヘッセ行列の正定値性との関係は次のとおりである。
+
 
 
 **Proposition 1**
 
-Let $f \colon \mathbb{R}^n \to \mathbb{R}$ be of class $C^2$. Then
-\item $f$ is convex if and only if $\nabla^2 f(x)\succeq0$ holds for all $x \in \mathbb{R}^n$.
-\item $f$ is $\mu$-strongly convex if and only if $\nabla^2 f(x)\succeq\mu I$ holds for all $x \in \mathbb{R}^n$.
+$f \colon \mathbb{R}^n \to \mathbb{R}$ を $C^2$ 級とする。このとき
+\item $f$ が凸であることと、任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\succeq0$ が成り立つことは同値である。
+\item $f$ が $\mu$-強凸であることと、任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\succeq\mu I$ が成り立つことは同値である。
 
 <details>
 <summary>Proof</summary>
 
-First, let $\mu>0$ and assume $\nabla^2 f(x)\succeq \mu I$ for all $x \in \mathbb{R}^n$.
-By the fundamental theorem of calculus, for any $x,y \in \mathbb{R}^n$, we have
+まず $\mu>0$ とし、任意の $x \in \mathbb{R}^n$ に対して $\nabla^2 f(x)\succeq \mu I$ が成り立つと仮定する。
+微分積分学の基本定理より、任意の $x,y \in \mathbb{R}^n$ について次が成り立つ:
 
 $$
-\begin{equation}
+\begin{equation*}
 f(y)
 = f(x)+\nabla f(x)^\top (y-x)
-+\frac{1}{2} \int_0^1 (y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \dd{t}.
-\end{equation}
++\frac{1}{2} \int_0^1 (y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t.
+\end{equation*}
 $$
 
-Then, we obtain
+また、仮定 $\nabla^2 f(x)\succeq \mu I$ から次が得られる:
 
 $$
-\begin{equation}
-\int_0^1 (y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \dd{t}
-\ge \int_0^1 \mu\norm{y-x}^2 \dd{t}
+\begin{equation*}
+\int_0^1 (y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t
+\ge \int_0^1 \mu\norm{y-x}^2 \mathrm{d}t
 = \mu\norm{y-x}^2.
-\end{equation}
+\end{equation*}
 $$
 
-Thus, substituting \cref{eq:hessian-strongly-convex} into \cref{eq:y_x_nabla_hess} yields \cref{eq:strongly-convex-def}, the definition of $\mu$-strong convexity.
-Conversely, if $f$ is $\mu$-strongly convex, for any $x \in \mathbb{R}^n$, $v \in \mathbb{R}^n$ and $t > 0$, letting $y=x \pm tv$ gives
+以上の結果を合わせると、$\mu$-強凸性の定義が導かれる。
+逆に、$f$ が $\mu$-強凸であると仮定する。
+任意の $x \in \mathbb{R}^n, \, v \in \mathbb{R}^n$ および $t>0$ に対し、$y=x \pm tv$ とおくと次を得る:
 
 $$
 \begin{equation}
@@ -115,7 +118,7 @@ f(x - tv)\ge f(x) - t\nabla f(x)^\top v+\frac{\mu}{2}t^2\norm{v}^2.
 \end{equation}
 $$
 
-By Taylor's theorem, there exists $s_\pm \in (0,1)$ such that
+テイラーの定理より、ある $s_\pm \in (0,1)$ が存在して次が成り立つ:
 
 $$
 \begin{equation}
@@ -126,7 +129,7 @@ f(x - tv) = f(x) - t\nabla f(x)^\top v + \frac{1}{2} t^2 v^\top \nabla^2 f(x - s
 \end{equation}
 $$
 
-Substituting \cref{eq:strongly-convex-finite-diff} into \cref{eq:strongly-convex-taylor} and rearranging yields
+これらの結果を合わせると次を得る:
 
 $$
 \begin{equation}
@@ -134,7 +137,7 @@ v^\top \frac{\nabla^2 f(x+ s_+ t v) + \nabla^2 f(x - s_- t v)}{2} v \ge \mu \nor
 \end{equation}
 $$
 
-Letting $t \to 0$ in \cref{eq:strongly-convex-hessian-bound} and using the continuity of $\nabla^2 f$ from the $C^2$ assumption gives
+$t \to 0$ とし、$f$が $C^2$ 級という仮定による $\nabla^2 f$ の連続性を用いると次を得る:
 
 $$
 \begin{equation*}
@@ -142,76 +145,77 @@ v^\top \nabla^2 f(x) v \ge \mu \norm{v}^2.
 \end{equation*}
 $$
 
-Because $v \in \mathbb{R}^n$ is arbitrary, we obtain $\nabla^2 f(x)\succeq \mu I$.
-Setting $\mu=0$ in the above shows the convex case corresponding to \cref{eq:convex-def} in the same way.
+$v \in \mathbb{R}^n$ は任意なので、$\nabla^2 f(x)\succeq \mu I$ を得る。
+上記の議論で $\mu=0$ とすれば、同様に凸の場合も示される。
 
 </details>
 
 
-Quadratic functions whose Hessians are positive definite, indefinite, and negative definite are illustrated in Fig. 2. One can visually confirm the correspondence between positive definiteness and convexity.
+ヘッセ行列が正定値・不定値・負定値である二次関数を Fig. 2 に示す。正定値性と凸性の対応関係を視覚的に確認できる。
 
 ![../imgs/quasi_newton/pd.png](../imgs/quasi_newton/pd.png)
 
-(Fig. 2 Quadratic model
-$f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ in 2-dimensional space with Hessians $H$ which is  (left) positive definite, (center) indefinite, (right) negative definite.)
+(Fig. 2 二次モデル $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ を2次元空間で示したもの。 ヘッセ行列 $H$ が (左)正定値、(中央)不定値、(右)負定値の場合を示す。)
 
 
+### $L$-平滑性
 
-### $L$-smoothness
+最後に、関数の $L$-平滑性 ($L$-smoothness)を導入する。
+関数 $f$ が $L$-平滑であるとは、ある定数 $L>0$ が存在して
 
-Finally, we introduce $L$-smoothness of functions.
-A function $f$ is $L$-smooth if
 
 $$
-\begin{equation}
+\begin{equation*}
 \norm{\nabla f(x)-\nabla f(y)} \le L\norm{x-y}
-\end{equation}
+\end{equation*}
 $$
 
-holds for all $x,y$.
 
-The next proposition shows that $L$-smoothness can be characterized by the upper bound of the Hessian.
+が任意の $x,y$ について成り立つことと同値である。
+
+次の命題は、$L$-平滑性がヘッセ行列の上界で特徴づけられることを示す。
+
 
 
 **Proposition 2**
 
-Let $f \colon \mathbb{R}^n \to \mathbb{R}$ be of class $C^2$. Then $f$ is $L$-smooth if and only if $\nabla^2 f(x)\preceq L I$ holds for all $x \in \mathbb{R}^n$.
+$f \colon \mathbb{R}^n \to \mathbb{R}$ を $C^2$ 級とする。このとき $f$ が $L$-平滑であることと、任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\preceq L I$ が成り立つことは同値である。
 
 <details>
 <summary>Proof</summary>
 
-Since $f$ is of class $C^2$, by the fundamental theorem of calculus, for any $x,y \in \mathbb{R}^n$, we have
+$f$ は $C^2$ 級なので、微分積分学の基本定理より任意の $x,y \in \mathbb{R}^n$ について次が成り立つ:
 
 $$
 \begin{equation}
 \nabla f(y) - \nabla f(x)
-= \int_0^1 \nabla^2 f(x+t(y-x))(y-x) \dd{t}.
+= \int_0^1 \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t.
 \end{equation}
 $$
 
-Assume $\nabla^2 f(x)\preceq L I$ for all $x \in \mathbb{R}^n$.
-It implies that the operator norm of $\nabla^2 f(x)$ satisfies $\norm{\nabla^2 f(x)} \le L$, and thus
+任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\preceq L I$ と仮定する。
+このとき $\norm{\nabla^2 f(x)} \le L$ が成り立つので、
 
 $$
 \begin{align*}
 \norm{\nabla f(y) - \nabla f(x)}
-& = \norm{\int_0^1 \nabla^2 f(x+t(y-x))(y-x) \dd{t}}   &  & (\text{by \cref{eq:fundamental-theorem-calculus}}) \\
-& \le \int_0^1 \norm{\nabla^2 f(x+t(y-x))(y-x)} \dd{t} &  & (\text{triangle inequality})                       \\
-& \le \int_0^1 L\norm{y-x} \dd{t}                      &  & (\text{by assumption})                             \\
+& = \norm{\int_0^1 \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t}   &  & (\text{previous equation})   \\
+& \le \int_0^1 \norm{\nabla^2 f(x+t(y-x))(y-x)} \mathrm{d}t &  & (\text{triangle inequality}) \\
+& \le \int_0^1 L\norm{y-x} \mathrm{d}t                      &  & (\text{by assumption})       \\
 & = L\norm{y-x},
 \end{align*}
 $$
 
-which shows \cref{eq:def_LSmooth}.
-Conversely, if $f$ is $L$-smooth, then for any $x \in \mathbb{R}^n$ and $v \in \mathbb{R}^n$, we have
+つまり、 $f$ の $L$-平滑性が示された。
+逆に、$f$ が $L$-平滑であるとすると、任意の $x \in \mathbb{R}^n$ と $v \in \mathbb{R}^n$ に対して次が成り立つ:
 
 $$
-\begin{equation}
-\norm{\nabla f(x+tv)-\nabla f(x)} \le L\norm{tv} = Lt\norm{v}
-\end{equation}
+\begin{equation*}
+\norm{\nabla f(x+tv)-\nabla f(x)} \le L\norm{tv} = Lt\norm{v}.
+\end{equation*}
 $$
 
-By Taylor's theorem, we also have
+さらにテイラーの定理より次が成り立つ:
 
 $$
 \begin{equation*}
@@ -219,7 +223,7 @@ $$
 \end{equation*}
 $$
 
-where $r(t)$ satisfies $\norm{r(t)}/t \to 0$ as $t \to 0$, and we can rewrite it as
+ただし、$r(t)$ は $t \to 0$ のとき $\norm{r(t)}/t \to 0$ を満たす。そして、これは次のように書き換えられる:
 
 $$
 \begin{equation}
@@ -227,35 +231,40 @@ $$
 \end{equation}
 $$
 
-Taking the inner product  with $v$ gives
+$v$ との内積を取ると次が得られる:
 
 $$
 \begin{align*}
-v^\top \nabla^2 f(x) v & = \lim_{t \to 0} \qty(\frac{\nabla f(x+tv)-\nabla f(x)}{t})^\top v                                                   \\
-& \leq \lim_{t \to 0} \frac{\norm{\nabla f(x+tv)-\nabla f(x)}}{t} \norm{v} &  & (\text{Cauchy--Schwarz inequality})    \\
-& \leq L\norm{v}^2.                                                        &  & (\text{by \cref{eq:smoothness-bound}})
+v^\top \nabla^2 f(x) v & = \lim_{t \to 0} \qty(\frac{\nabla f(x+tv)-\nabla f(x)}{t})^\top v                                                  \\
+& \leq \lim_{t \to 0} \frac{\norm{\nabla f(x+tv)-\nabla f(x)}}{t} \norm{v} &  & (\text{Cauchy--Schwarz inequality})   \\
+& \leq \lim_{t \to 0} \frac{L\norm{tv}}{t} \norm{v}                        &  & (\text{by $L$-smoothness definition}) \\
+& = L \norm{v}^2.
 \end{align*}
 $$
 
-Because $v \in \mathbb{R}^n$ is arbitrary, we obtain $\nabla^2 f(x)\preceq L I$.
+$v \in \mathbb{R}^n$ は任意なので、$\nabla^2 f(x)\preceq L I$ を得る。
 
 </details>
 
 
 #### Baillon--Haddad Theorem
 
-One of the useful properties of $L$-smooth functions is given by the following Baillon--Haddad theorem.
-Note that only $C^1$ differentiability is required here.
+{$L$-smooth 関数の有用な性質の一つが次の Baillon--Haddad 定理である。
+ここでは $C^1$ の微分可能性だけを仮定する点に注意する。}
+
 
 
 **Proposition 3** (Baillon--Haddad theorem)
 
-Let $f \colon \mathbb{R}^n \to \mathbb{R}$ be of class $C^1$. If $f$ is $L$-smooth and convex, then for all $x,y \in \mathbb{R}^n$, $\nabla f$ is $1/L$-cocoercive, i.e.,
+{$f \colon \mathbb{R}^n \to \mathbb{R}$ を $C^1$ 級とする。$f$ が $L$-smooth かつ凸であれば、任意の $x,y \in \mathbb{R}^n$ に対して $\nabla f$ は $1/L$-cocoercive であり、すなわち
 (\nabla f(x)-\nabla f(y))^\top (x-y) \ge \frac{1}{L} \norm{\nabla f(x)-\nabla f(y)}^2
-for all $x,y \in \mathbb{R}^n$.
+が任意の $x,y \in \mathbb{R}^n$ について成り立つ。}
 
-We refer to other literature for the proof \citep{bauschkeBaillonHaddadTheoremRevisited2009} \citep[Proposition 12.60]{rockafellarVariationalAnalysis1998}.
-One consequence of this theorem is that, for the sequences $\{x_k\}$ generated by an optimization algorithm, defining
+
+{証明は他の文献に譲る \citep{bauschkeBaillonHaddadTheoremRevisited2009} \citep[Proposition 12.60]{rockafellarVariationalAnalysis1998}。}
+
+この定理の帰結として、最適化アルゴリズムが生成する列 $\{x_k\}$ に対し、次を定義すると:
+
 
 $$
 \begin{equation*}
@@ -263,7 +272,9 @@ s_k \coloneqq x_{k+1}-x_k, \quad y_k \coloneqq \nabla f(x_{k+1}) - \nabla f(x_k)
 \end{equation*}
 $$
 
-and applying Proposition 3 with $x=x_{k+1}$ and $y=x_k$ yields
+
+Baillon--Haddad 定理を $x=x_{k+1}$、$y=x_k$ に適用して次を得る:
+
 
 $$
 \begin{equation*}
@@ -271,41 +282,44 @@ s_k^\top y_k \ge \frac{1}{L} \norm{y_k}^2.
 \end{equation*}
 $$
 
-This inequality is sometimes used in the analysis of update formulas in methods such as BFGS and L-BFGS, and we will also use it in a later chapter.
 
-#### Bound on Hessian Eigenvalues
+この不等式は BFGS や L-BFGS などの更新公式の解析で用いられることがある。
 
-The $L$-smoothness combined with $\mu$-strong convexity also provides bounds on the eigenvalues of the Hessian.
+#### ヘッセ行列の固有値のバウンド
+
+$L$-smoothness と $\mu$-強凸性を組み合わせると、ヘッセ行列の固有値に対するバウンドも得られる。
+
 
 
 **Proposition 4**
 
-Let $f \colon \mathbb{R}^n \to \mathbb{R}$ be of class $C^2$.
-If $f$ is $L$-smooth and $\mu$-strongly convex, then the eigenvalues of the Hessian $\nabla^2 f(x)$ are contained in the interval $[\mu, L]$ for all $x \in \mathbb{R}^n$.
+$f \colon \mathbb{R}^n \to \mathbb{R}$ を $C^2$ 級とする。
+$f$ が $L$-smooth かつ $\mu$-強凸であれば、任意の $x \in \mathbb{R}^n$ に対してヘッセ行列 $\nabla^2 f(x)$ の固有値は区間 $[\mu, L]$ に含まれる。
 
 <details>
 <summary>Proof</summary>
 
-By \cref{prop:convexity-hessian,prop:smoothness-hessian}, we have
+\cref{prop:convexity-hessian,prop:smoothness-hessian} より次が成り立つ:
 
 $$
 \begin{equation*}
-\mu I \preceq \nabla^2 f(x) \preceq L I,
+\mu I \preceq \nabla^2 f(x) \preceq L I.
 \end{equation*}
 $$
 
-which directly implies that the eigenvalues of $\nabla^2 f(x)$ are contained in the interval $[\mu, L]$.
+これより $\nabla^2 f(x)$ の固有値が区間 $[\mu, L]$ に含まれることが直ちに従う。
 
 </details>
 
-As shown in Proposition 4,  the $L$-smoothness and $\mu$-strong convexity impose upper and lower bounds on the eigenvalues of the Hessian, respectively.
+
+Proposition 4 で示したように、$L$-smoothness と $\mu$-強凸性はそれぞれヘッセ行列の固有値に上界と下界を与える。
 
 
 
 
 
 
-<!-- From 2_newton_en.tex -->
+<!-- From 2_newton.tex -->
 
 
 ## Newton's Method
@@ -329,20 +343,20 @@ The derivation of this update rule is as follows.
 The quadratic Taylor approximation of $f$ around $x_k$ is given by
 
 $$
-\begin{equation}
+\begin{equation*}
 m^*_{k}(x) \coloneqq f(x_k) + g_k^\top (x - x_k) + \frac{1}{2} (x - x_k)^\top \nabla^2 f(x_k) (x - x_k).
-\end{equation}
+\end{equation*}
 $$
 
 The gradient of this model is
 
 $$
-\begin{equation}
+\begin{equation*}
 \nabla m^*_k(x) = g_k + \nabla^2 f(x_k)(x - x_k).
-\end{equation}
+\end{equation*}
 $$
 
-Since the quadratic model \cref{eq:newton-model} is strongly convex by assumption, $x^* \in \mathbb{R}^n$ is the minimizer of $m^*_k$ if and only if $\nabla m^*_k(x) = 0$, so solving $\nabla^2 f(x_k)(x - x_k) = -g_k$ yields
+Since the quadratic model is strongly convex by assumption, a point $x^* \in \mathbb{R}^n$ is the minimizer of $m^*_k$ if and only if $\nabla m^*_k(x) = 0$. Thus, solving this equation yields
 
 $$
 \begin{equation*}
@@ -350,7 +364,7 @@ $$
 \end{equation*}
 $$
 
-Although this choice appears natural, it does not in general guarantee global convergence, as we will see in \cref{sec:newton-fullstep}.
+Although this choice appears natural, it does not in general guarantee global convergence, as we will see later.
 Thus, we introduce a step size $\alpha_k > 0$ determined by line search to ensure a sufficient decrease in the function value.
 This is the basic procedure of Newton's method.
 
@@ -394,19 +408,19 @@ where $d_k$ is a descent direction satisfying $g_k^\top d_k < 0$ and $\alpha_k >
 We employ the Wolfe conditions \citep[Sec. 3.1]{nocedal1999numerical} to determine the step size $\alpha_k$ as follows:
 
 $$
-\begin{align}
-f(x_k + \alpha_k d_k) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k,  \\
+\begin{align*}
+f(x_k + \alpha_k d_k) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k, \\
 g_{k+1}^\top d_k      & \geq c_2 g_k^\top d_k,
-\end{align}
+\end{align*}
 $$
 
 where $0 < c_1 < c_2 < 1$ are constants.
-We also define the angle between the direction $d_k$ and the negative gradient $-g_k$ as
+We also define $\theta_k \in [0, \pi]$ as the angle between the direction $d_k$ and the negative gradient $-g_k$, satisfying
 
 $$
-\begin{equation}
-\cos \theta_k \coloneqq \frac{-g_k^\top d_k}{\norm{g_k}\norm{d_k}}.
-\end{equation}
+\begin{equation*}
+\cos \theta_k = \frac{-g_k^\top d_k}{\norm{g_k}\norm{d_k}}.
+\end{equation*}
 $$
 
 The following theorem is a simplified version of the classical result.
@@ -418,8 +432,8 @@ The following theorem is a simplified version of the classical result.
 Suppose that $f$ is of class $C^1$ and bounded below in $\mathbb{R}^n$, and $L$-smooth.
 Consider the iterative method defined by
 x_{k+1} \gets x_k + \alpha_k d_k,
-starting from an initial point $x_0 \in \mathbb{R}^n$, and the step size $\alpha_k$ is determined by the Wolfe conditions \cref{eq:wolfe-1,eq:wolfe-2}.
-For the angle $\theta_k$ defined in \cref{eq:angle-definition}, if there exists a positive constant $\delta$ such that
+starting from an initial point $x_0 \in \mathbb{R}^n$, and the step size $\alpha_k$ is determined by the Wolfe conditions.
+For the angle $\theta_k$, if there exists a positive constant $\delta$ such that
 $\cos \theta_k \geq \delta > 0$ for all $k$,
 then, the method generates a sequence $\{x_k\}$ satisfying
 \lim_{k \to \infty} \norm{g_k} = 0.
@@ -427,7 +441,7 @@ then, the method generates a sequence $\{x_k\}$ satisfying
 <details>
 <summary>Proof</summary>
 
-From the Wolfe condition \eqref{eq:wolfe-2}, we have
+From the Wolfe condition, we have
 
 $$
 \begin{equation*}
@@ -451,36 +465,36 @@ $$
 By combining these two relations, we obtain
 
 $$
-\begin{equation}
-\alpha_k \geq \frac{c_2 - 1}{L} \frac{g_k^\top d_k}{\norm{d_k}^2}.
-\end{equation}
+\begin{equation*}
+\alpha_k \geq \frac{c_2 - 1}{L} \frac{g_k^\top d_k}{\norm{d_k}^2},
+\end{equation*}
 $$
 
 and thus
 
 $$
 \begin{align*}
-f(x_{k+1}) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k                                   &  & \text{(Wolfe condition \eqref{eq:wolfe-1})}           \\
-& \leq f(x_k) - c_1 \frac{1 - c_2}{L} \frac{(g_k^\top d_k)^2}{\norm{d_k}^2} &  & \text{(by \eqref{eq:step-size-lower-bound-in-Wolfe})} \\
-& = f(x_k) - c_1 \frac{1 - c_2}{L} \cos^2 \theta_k \norm{g_k}^2.            &  & \text{(definition in \eqref{eq:angle-definition})}
+f(x_{k+1}) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k                                   &  & \text{(Wolfe condition)}          \\
+& \leq f(x_k) - c_1 \frac{1 - c_2}{L} \frac{(g_k^\top d_k)^2}{\norm{d_k}^2} &  & \text{(previous inequality)}      \\
+& = f(x_k) - c_1 \frac{1 - c_2}{L} \cos^2 \theta_k \norm{g_k}^2.            &  & \text{(definition of $\theta_k$)}
 \end{align*}
 $$
 
 By summing this expression over all indices less than or equal to $k$, we obtain
 
 $$
-\begin{equation}
+\begin{equation*}
 f(x_{k+1}) \leq f(x_0) - c_1 \frac{1 - c_2}{L} \sum_{j=0}^k \cos^2 \theta_j \norm{g_j}^2.
-\end{equation}
+\end{equation*}
 $$
 
 Since $f$ is bounded below, we have that $f(x_0) - f(x_{k+1})$ is less than some positive constant for all $k$.
-Hence, by taking limits in \eqref{eq:telescoping-sum-Wolfe}, we obtain the Zoutendijk condition:
+Hence, by taking limits, we obtain the Zoutendijk condition:
 
 $$
-\begin{equation}
+\begin{equation*}
 \sum_{k=0}^\infty \cos^2 \theta_k \norm{g_k}^2 < \infty.
-\end{equation}
+\end{equation*}
 $$
 
 This condition implies that
@@ -549,9 +563,9 @@ By Taylor's theorem and the triangle inequality, we have
 
 $$
 \begin{align*}
-& \norm{\nabla^2 f(x_k)(x_k-x^*)-\qty(\nabla f(x_k)-\nabla f(x^*))}                     \\
-=   {}  & \norm{\nabla^2 f(x_k)(x_k-x^*)-\int_0^1 \nabla^2 f(x_k+t(x^*-x_k)) (x_k - x^*)\dd{t}} \\
-\leq {} & \int_0^1 \norm{\nabla^2 f(x_k)-\nabla^2 f(x_k+t(x^*-x_k))}\norm{x_k-x^*}\dd t.
+& \norm{\nabla^2 f(x_k)(x_k-x^*)-\qty(\nabla f(x_k)-\nabla f(x^*))}                          \\
+=   {}  & \norm{\nabla^2 f(x_k)(x_k-x^*)-\int_0^1 \nabla^2 f(x_k+t(x^*-x_k)) (x_k - x^*)\mathrm{d}t} \\
+\leq {} & \int_0^1 \norm{\nabla^2 f(x_k)-\nabla^2 f(x_k+t(x^*-x_k))}\norm{x_k-x^*}\mathrm{d}t.
 \end{align*}
 $$
 
@@ -587,10 +601,10 @@ $\nabla f(x_k)+\nabla^2 f(x_k)\qty(x_{k+1}-x_k)=0$, yielding
 $$
 \begin{align*}
 \norm{\nabla f(x_{k+1})}
-& = \norm{\nabla f(x_{k+1})-\nabla f(x_k)-\nabla^2 f(x_k)\qty(x_{k+1}-x_k)}                  \\
-& \le \int_0^1 \norm{\nabla^2 f(x_k+t (x_{k+1}-x_k))-\nabla^2 f(x_k)}\norm{x_{k+1}-x_k}\dd t \\
-& \le \frac{1}{2}L^{\mathrm{H}}\norm{x_{k+1}-x_k}^2                                          \\
-& \le \frac{1}{2}L^{\mathrm{H}}\norm{\qty(\nabla^2 f(x_k))^{-1}}^2\norm{\nabla f(x_k)}^2     \\
+& = \norm{\nabla f(x_{k+1})-\nabla f(x_k)-\nabla^2 f(x_k)\qty(x_{k+1}-x_k)}                        \\
+& \le \int_0^1 \norm{\nabla^2 f(x_k+t (x_{k+1}-x_k))-\nabla^2 f(x_k)}\norm{x_{k+1}-x_k}\mathrm{d}t \\
+& \le \frac{1}{2}L^{\mathrm{H}}\norm{x_{k+1}-x_k}^2                                                \\
+& \le \frac{1}{2}L^{\mathrm{H}}\norm{\qty(\nabla^2 f(x_k))^{-1}}^2\norm{\nabla f(x_k)}^2           \\
 & \le 2 L^{\mathrm{H}} \norm{\qty(\nabla^2 f(x^*))^{-1}}^2\norm{\nabla f(x_k)}^2.
 \end{align*}
 $$
@@ -766,7 +780,7 @@ In what follows, we consider only the optimization formulation.
 
 
 
-<!-- From 3_quasi_newton_en.tex -->
+<!-- From 3_quasi_newton.tex -->
 
 
 ## Quasi-Newton Methods
@@ -793,12 +807,7 @@ Here, $\alpha_k > 0$ is the step size determined by line search, $B_k$ is an app
 
 ![../imgs/quasi_newton/quasi_newton_1.png](../imgs/quasi_newton/quasi_newton_1.png)
 
-(Fig. 7
-Conceptual illustration of quasi-Newton methods.
-(1) The objective function $f$ (blue surface) and the current point $x_k$ (red dot).
-(2) The quadratic model induced by the current Hessian approximation (orange surface) and its minimizer $x_{k+1}$ (yellow cross).
-(3) The updated quadratic model based on the new point $x_{k+1}$ (green surface).
-)
+(Fig. 7 Conceptual illustration of quasi-Newton methods. (1) The objective function $f$ (blue surface) and the current point $x_k$ (red dot). (2) The quadratic model induced by the current Hessian approximation (orange surface) and its minimizer $x_{k+1}$ (yellow cross). (3) The updated quadratic model based on the new point $x_{k+1}$ (green surface).)
 
 
 The core of quasi-Newton methods lies in how to update $B_k$ (or its inverse $H_k$) at each iteration so that it approaches the Hessian matrix $\nabla^2 f(x_k)$. \Cref{fig:quasi_newton_overview} illustrates this concept. First, around the current point $x_k$, a quadratic approximation model of the objective function $f$ is constructed using $B_k$. Next, this quadratic model is minimized to obtain the next point $x_{k+1}$. After obtaining $x_{k+1}$, the approximation matrix $B_k$ is updated to $B_{k+1}$ using the gradient information at $x_k$ and $x_{k+1}$. This procedure is repeated until convergence, which constitutes the quasi-Newton method.
@@ -841,12 +850,12 @@ $$
 or equivalently,
 
 $$
-\begin{equation}
+\begin{equation*}
 B_{k+1} s_k = y_k.
-\end{equation}
+\end{equation*}
 $$
 
-The relation in \cref{eq:secant-condition} is called the secant condition, or the quasi-Newton equation.
+This relation is called the secant condition, or the quasi-Newton equation.
 
 ### Representative Quasi-Newton Update Rules
 
@@ -859,10 +868,10 @@ Broyden's update is one of the most fundamental quasi-Newton update formulas, bu
 The update formulas are given by
 
 $$
-\begin{align}
-\bar{B}_{\mathrm{Broyden}} & = B + \frac{(y - Bs)s^\top}{s^\top s},            \\
+\begin{align*}
+\bar{B}_{\mathrm{Broyden}} & = B + \frac{(y - Bs)s^\top}{s^\top s},   \\
 \bar{H}_{\mathrm{Broyden}} & = H + \frac{s - Hy}{s^\top Hy} s^\top H.
-\end{align}
+\end{align*}
 $$
 
 
@@ -878,13 +887,15 @@ Assume that $\bar{B}$ satisfies the secant condition
 and the action constraint
 \bar{B}z = Bz
 \quad\text{for all } z\in\mathbb{R}^n \text{ such that } z^\top s = 0.
-Then $\bar{B}$ is uniquely determined and it is $\bar{B}_{\mathrm{Broyden}}$ defined by \cref{eq:broyden-update}.
+Then $\bar{B}$ is uniquely determined and it is $\bar{B}_{\mathrm{Broyden}}$.
 
 <details>
 <summary>Proof</summary>
 
-A basis for $\mathbb{R}^n$ can be constructed from $s$ and a basis for the orthogonal complement of $s$. Since \cref{eq:secant-broyden,eq:action-constraint} completely determine the action of $\bar{B}$ with respect to this basis, $\bar{B}$ is uniquely determined.
-We now show that $\bar{B}_{\mathrm{Broyden}}$ defined by \cref{eq:broyden-update} satisfies \cref{eq:secant-broyden,eq:action-constraint}. Let $z$ be any vector satisfying $z^\top s = 0$. Then
+A vector $s$ and a basis for the orthogonal complement of $s$ form a basis of $\mathbb{R}^n$.
+Since the conditions of $\bar{B}$ completely determine the action of $\bar{B}$ with respect to this basis, $\bar{B}$ is uniquely determined.
+We now show that $\bar{B}_{\mathrm{Broyden}}$ satisfies the conditions imposed on $\bar{B}$.
+Let $z$ be any vector satisfying $z^\top s = 0$. Then
 
 $$
 \begin{align*}
@@ -899,7 +910,8 @@ $$
 \end{align*}
 $$
 
-Hence $\bar{B}_{\mathrm{Broyden}}$ indeed satisfies \cref{eq:secant-broyden,eq:action-constraint}. Therefore, by uniqueness, we have $\bar{B} = \bar{B}_{\mathrm{Broyden}}$.
+Hence $\bar{B}_{\mathrm{Broyden}}$ indeed satisfies the conditions imposed on $\bar{B}$.
+Therefore, by uniqueness, we have $\bar{B} = \bar{B}_{\mathrm{Broyden}}$. \myQED
 
 </details>
 
@@ -911,12 +923,9 @@ Broyden's update can also be characterized as a minimal-change update in the Fro
 **Proposition 6** (\citep{dennisjr.QuasiNewtonMethodsMotivation1977a}, Theorem~4.1)
 
 Let $B\in\mathbb{R}^{n\times n}$, $y\in\mathbb{R}^n$, and $s\in\mathbb{R}^n\setminus\{0\}$ be given.
-Then the matrix $\bar{B}$ defined by \cref{eq:broyden-update} is the unique solution of
-{\tilde{B} \in \mathbb{R}^{n \times n}}
-{\norm{\tilde{B} - B}_F}
-{}
-{}
-\addConstraint{\tilde{B} s}{= y.}
+Then the matrix $\bar{B}_{\mathrm{Broyden}}$ is the unique solution of
+\underset{\tilde{B} \in \mathbb{R}^{n \times n}}{\mathrm{minimize}} & \quad \norm{\tilde{B} - B}_F \\
+\mathrm{subject to}                                                 & \quad \tilde{B} s = y.
 
 <details>
 <summary>Proof</summary>
@@ -925,14 +934,15 @@ The function $\tilde{B}\mapsto\norm{\tilde{B}-B}_F$ is strictly convex on $\math
 The constraint set
 
 $$
-\begin{equation}
+\begin{equation*}
 \{\tilde{B}\in\mathbb{R}^{n\times n}:\tilde{B}s=y\}
-\end{equation}
+\end{equation*}
 $$
 
 is affine and hence convex.
 Therefore, the optimization problem admits at most one minimizer.
-To show that $\bar{B}=\bar{B}_{\mathrm{Broyden}}$ defined by \cref{eq:broyden-update} is indeed the minimizer, we compute:
+We show that $\bar{B}_{\mathrm{Broyden}}$ is indeed the minimizer.
+For any $\tilde{B}$ satisfying the constraint $\tilde{B}s=y$, we have
 
 $$
 \begin{equation*}
@@ -944,7 +954,7 @@ $$
 $$
 
 where we used the sub-multiplicativity of Frobenius norm and the fact that $\norm{ss^\top/(s^\top s)}_F=1$ in the last inequality.
-Thus, $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$.
+Thus, $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$. \myQED
 
 </details>
 
@@ -956,69 +966,67 @@ Broyden's update is characterized by two properties: it satisfies the secant con
 The Symmetric Rank-One (SR1) update \citep{nocedal1999numerical} is a fundamental quasi-Newton method that maintains symmetry throughout the update process. The update formulas are given by
 
 $$
-\begin{align}
-\bar{B}_{\mathrm{SR1}} & = B + \frac{(y - B s)(y - B s)^\top}{(y - B s)^\top s},  \\
+\begin{align*}
+\bar{B}_{\mathrm{SR1}} & = B + \frac{(y - B s)(y - B s)^\top}{(y - B s)^\top s}, \\
 \bar{H}_{\mathrm{SR1}} & = H + \frac{(s - H y)(s - H y)^\top}{(s - H y)^\top y}.
-\end{align}
+\end{align*}
 $$
 
 
 ##### Derivation
 
-To derive \cref{eq:sr1-b-update}, we construct the updated matrix $\bar{B}$ as a rank-one update. That is, we assume that for some vector $z \in \mathbb{R}^n$,
+To derive SR1 update, we construct the updated matrix $\bar{B}$ as a rank-one update. That is, we assume that for some vector $z \in \mathbb{R}^n$,
 
 $$
-\begin{equation}
+\begin{equation*}
 \bar{B}_{\mathrm{SR1}} = B + z z^\top.
-\end{equation}
+\end{equation*}
 $$
 
-For this update to satisfy the secant condition $\bar{B}_{\mathrm{SR1}} s = y$, assuming $z^\top s \neq 0$, we require
+To satisfy the secant condition $\bar{B}_{\mathrm{SR1}} s = y$, when $z^\top s \neq 0$, we need
 
 $$
-\begin{equation}
+\begin{equation*}
 B s + z z^\top s = y,
-\end{equation}
+\end{equation*}
 $$
 
 which yields
 
 $$
-\begin{equation}
+\begin{equation*}
 z = \frac{y - B s}{z^\top s}.
-\end{equation}
+\end{equation*}
 $$
 
-
-To determine $z^\top s$, we take the inner product of both sides of \cref{eq:sr1-z-formula} with $s$:
+To determine $z^\top s$, we take the inner product with $s$:
 
 $$
-\begin{equation}
+\begin{equation*}
 z^\top s = \frac{(y - B s)^\top s}{z^\top s}.
-\end{equation}
+\end{equation*}
 $$
 
-Rearranging \cref{eq:sr1-self-consistency} yields the key relation
+Rearranging this equation yields the key relation
 
 $$
-\begin{equation}
+\begin{equation*}
 (z^\top s)^2 = (y - B s)^\top s.
-\end{equation}
+\end{equation*}
 $$
 
-
-Substituting \cref{eq:sr1-zs-squared} into \cref{eq:sr1-z-formula} and using \cref{eq:sr1-symmetric-form}, we obtain
+Thus, we obtain
 
 $$
-\begin{align}
+\begin{equation*}
 \bar{B}_{\mathrm{SR1}}
-& = B + z z^\top                                          \\
-& = B + \frac{(y - B s)(y - B s)^\top}{(z^\top s)^2}      \\
-& = B + \frac{(y - B s)(y - B s)^\top}{(y - B s)^\top s},
-\end{align}
+= B + z z^\top
+= B + \frac{(y - B s)(y - B s)^\top}{(z^\top s)^2}
+= B + \frac{(y - B s)(y - B s)^\top}{(y - B s)^\top s},
+\end{equation*}
 $$
 
-which is the SR1 update formula stated in \cref{eq:sr1-b-update}.
+which reproduces the SR1 update formula.
 
 ##### Remarks
 
@@ -1029,10 +1037,10 @@ The SR1 update requires $(y - Bs)^\top s \neq 0$ to be well-defined. When $(y - 
 The Powell Symmetric Broyden (PSB) update \cite{haeltermanAnalyticalStudyLeast2009} is one of the most important quasi-Newton update rules. The update formulas are given by
 
 $$
-\begin{align}
-\bar{B}_{\mathrm{PSB}} & = B + \frac{(y - B s) s^\top + s (y - B s)^\top}{s^\top s} - \frac{s^\top (y - B s)}{(s^\top s)^2} s s^\top,  \\
+\begin{align*}
+\bar{B}_{\mathrm{PSB}} & = B + \frac{(y - B s) s^\top + s (y - B s)^\top}{s^\top s} - \frac{s^\top (y - B s)}{(s^\top s)^2} s s^\top, \\
 \bar{H}_{\mathrm{PSB}} & = H + \frac{(s - H y) y^\top + y (s - H y)^\top}{y^\top y} - \frac{y^\top (s - H y)}{(y^\top y)^2} y y^\top.
-\end{align}
+\end{align*}
 $$
 
 
@@ -1044,39 +1052,38 @@ We may relax the requirement of maintaining symmetry throughout the update proce
 For a given vector $c \in \mathbb{R}^n$ with $c^\top s \neq 0$, we define
 
 $$
-\begin{equation}
+\begin{equation*}
 z = \frac{y - B s}{c^\top s}
-\end{equation}
+\end{equation*}
 $$
 
 and perform the asymmetric update
 
 $$
-\begin{equation}
+\begin{equation*}
 C_1 \coloneqq B + \frac{(y - B s)c^\top}{c^\top s}.
-\end{equation}
+\end{equation*}
 $$
 
 Since $C_1$ is generally not symmetric, we symmetrize it via
 
 $$
-\begin{equation}
+\begin{equation*}
 C_2 = \frac{C_1 + C_1^\top}{2}.
-\end{equation}
+\end{equation*}
 $$
 
 However, the symmetrized matrix $C_2$ may not satisfy the secant condition $C_2 s = y$. Therefore, we iterate this process:
 
 $$
-\begin{equation}
+\begin{equation*}
 \begin{dcases}
 C_0 = B                                                                               \\
 C_{2t+1} = C_{2t} + \frac{(y - C_{2t}s)c^\top}{c^\top s} & \text{(asymmetric update)} \\
 C_{2t+2} = \frac{C_{2t+1} + C_{2t+1}^\top}{2}            & \text{(symmetrization)}
 \end{dcases}
-\end{equation}
+\end{equation*}
 $$
-
 
 The key result is that the sequence $\{ C_{2t} \}_{t=0}^{\infty}$ converges to a symmetric matrix satisfying the secant condition, as formalized in the following proposition.
 
@@ -1084,9 +1091,12 @@ The key result is that the sequence $\{ C_{2t} \}_{t=0}^{\infty}$ converges to a
 
 **Proposition 7** (\citep{dennisjr.QuasiNewtonMethodsMotivation1977a}, Lemma~7.2)
 
-The sequence $\{ C_{2t} \}_{t=0}^{\infty}$ defined by \cref{eq:psb-iteration} converges, and the limit is given by
+The sequence $\{ C_{2t} \}_{t=0}^{\infty}$ converges, and the limit is given by
 \lim_{t \to \infty} C_{2t}
-= B + \frac{(y - Bs)c^\top + c(y - Bs)^\top}{c^\top s} - \frac{(y - Bs)^\top s}{(c^\top s)^2} c c^\top.
+=
+C_{\infty}
+\coloneqq
+B + \frac{(y - Bs)c^\top + c(y - Bs)^\top}{c^\top s} - \frac{(y - Bs)^\top s}{(c^\top s)^2} c c^\top.
 
 <details>
 <summary>Proof</summary>
@@ -1102,7 +1112,7 @@ $$
 
 for $k=0,1,2,\dots$.
 By construction, each $G_k$ is symmetric.
-From \cref{eq:psb-iteration} and the definition, we have
+From the definitions, we have
 
 $$
 \begin{equation*}
@@ -1113,39 +1123,39 @@ $$
 Let us introduce the error vector
 
 $$
-\begin{equation}
-w_k \coloneqq y-G_k s
-\end{equation}
+\begin{equation*}
+w_k \coloneqq y-G_k s.
+\end{equation*}
 $$
 
-and then we have
+Then, we have
 
 $$
-\begin{equation}
+\begin{equation*}
 G_{k+1} = G_k+\frac{1}{2c^\top s}(w_k c^\top+cw_k^\top).
-\end{equation}
+\end{equation*}
 $$
 
-Substituting \cref{eq:Gupdate} into \cref{eq:wk-definition} yields
+Substituting the above equation into the definition of $w_k$ yields
 
 $$
-\begin{align}
+\begin{align*}
 w_{k+1} & = y-\qty(G_k+\frac{1}{2c^\top s}(w_k c^\top+cw_k^\top))s \\
 & =
 w_k-\frac12w_k-\frac{w_k^\top s}{2c^\top s}c                       \\
 & =
 \frac{1}{2}\qty(w_k-\frac{w_k^\top s}{c^\top s}c).
-\end{align}
+\end{align*}
 $$
 
 Hence
 
 $$
-\begin{equation}
+\begin{equation*}
 w_{k+1}=Pw_k,
 \qquad
 P \coloneqq \frac{1}{2}\left(I-\frac{cs^\top}{c^\top s}\right).
-\end{equation}
+\end{equation*}
 $$
 
 The matrix $cs^\top/c^\top s$ has rank one and eigenvalues $1,0,\dots,0$.
@@ -1154,11 +1164,11 @@ In particular, its spectral radius is $1/2<1$.
 Thus, the Neumann series converges and
 
 $$
-\begin{align}
-\sum_{k=0}^{\infty}w_k & =        \sum_{k=0}^{\infty}P^k(y-Bs)                  &  & (\text{from } w_0=y-Bs)                               \\
-& =  (I-P)^{-1}(y-Bs)                                                                                               \\
-& = 2\qty(I-\frac{1}{2}\frac{cs^\top}{c^\top s}) (y-Bs). &  & (\text{from the definition of } P)
-\end{align}
+\begin{align*}
+\sum_{k=0}^{\infty}w_k & =        \sum_{k=0}^{\infty}P^k(y-Bs)                  &  & (w_0=y-Bs)                \\
+& =  (I-P)^{-1}(y-Bs)                                                                   \\
+& = 2\qty(I-\frac{1}{2}\frac{cs^\top}{c^\top s}) (y-Bs). &  & (\text{definition of } P)
+\end{align*}
 $$
 
 Note that the last equation follows from
@@ -1170,45 +1180,46 @@ $$
 $$
 
 In particular, $\norm{w_k}\to0$ as $k\to\infty$.
-Hence, from \cref{eq:Gupdate}, we have
+Hence, we have
 
 $$
-\begin{align}
+\begin{align*}
 \lim_{k\to\infty}G_k
 & =
 B+\frac{1}{2c^\top s}
-\sum_{k=0}^{\infty}(w_k c^\top+c w_k^\top)                                                                                     \\
-& = B+ \qty(\sum_{k=0}^{\infty}w_k) \frac{c^\top}{2c^\top s} + \frac{c}{2c^\top s} \qty(\sum_{k=0}^{\infty}w_k)^\top          \\
-& = B + \frac{(y - Bs)c^\top + c(y - Bs)^\top}{c^\top s} - \frac{(y - Bs)^\top s}{(c^\top s)^2} c c^\top.
-\end{align}
+\sum_{k=0}^{\infty}(w_k c^\top+c w_k^\top)                                                                                                                          \\
+& = B+ \qty(\sum_{k=0}^{\infty}w_k) \frac{c^\top}{2c^\top s} + \frac{c}{2c^\top s} \qty(\sum_{k=0}^{\infty}w_k)^\top                                               \\
+& = B+ 2\qty(I-\frac{1}{2}\frac{cs^\top}{c^\top s}) (y-Bs) \frac{c^\top}{2c^\top s} + \frac{c}{2c^\top s} 2(y-Bs)^\top \qty(I-\frac{1}{2}\frac{sc^\top}{c^\top s}) \\
+& = B + \frac{(y - Bs)c^\top + c(y - Bs)^\top}{c^\top s} - \frac{(y - Bs)^\top s}{(c^\top s)^2} c c^\top                                                           \\
+& = C_{\infty}.
+\end{align*}
 $$
 
-Thus $G_k\to\bar B$.
-Finally,
+Next, for the odd subsequence, we have
 
 $$
-\begin{equation}
+\begin{equation*}
 C_{2k+1}
 =
 G_k+\frac{w_k c^\top}{c^\top s}.
-\end{equation}
+\end{equation*}
 $$
 
 Since $G_k\to\bar B$ and $\norm{w_k}\to0$, we obtain
 
 $$
-\begin{equation}
+\begin{equation*}
 C_{2k+1}-G_k\to0.
-\end{equation}
+\end{equation*}
 $$
 
 Therefore both subsequences $\{C_{2k}\}$ and $\{C_{2k+1}\}$ converge to $\bar B$,
 and hence
 
 $$
-\begin{equation}
+\begin{equation*}
 C_k\to\bar B.
-\end{equation}
+\end{equation*}
 $$
 
 This completes the proof.
@@ -1216,15 +1227,14 @@ This completes the proof.
 </details>
 
 
-\noindent When $c = s$, the general formula in Proposition 7 simplifies to the standard PSB update formula:
+When $c = s$, the general formula of $C_{\infty}$ simplifies to the standard PSB update formula:
 
 $$
-\begin{equation}
-\bar{B}_{\mathrm{PSB}} = B + \frac{(y - Bs)s^\top + s(y - Bs)^\top}{s^\top s} - \frac{(y - Bs)^\top s}{(s^\top s)^2} ss^\top,
-\end{equation}
+\begin{equation*}
+\bar{B}_{\mathrm{PSB}} = B + \frac{(y - Bs)s^\top + s(y - Bs)^\top}{s^\top s} - \frac{(y - Bs)^\top s}{(s^\top s)^2} ss^\top.
+\end{equation*}
 $$
 
-which matches \cref{eq:psb-b-update}.
 
 ##### Remarks
 
@@ -1235,10 +1245,10 @@ The choice of $c = s$ is motivated by ensuring positive definiteness of the resu
 The Davidon--Fletcher--Powell (DFP) update \cite{nocedal1999numerical} is a classical quasi-Newton update formula. The update formulas are given by
 
 $$
-\begin{align}
-\bar{B}_{\mathrm{DFP}} & = (I - \frac{y s^\top}{y^\top s}) B (I - \frac{s y^\top}{y^\top s}) + \frac{y y^\top}{y^\top s},  \\
+\begin{align*}
+\bar{B}_{\mathrm{DFP}} & = (I - \frac{y s^\top}{y^\top s}) B (I - \frac{s y^\top}{y^\top s}) + \frac{y y^\top}{y^\top s}, \\
 \bar{H}_{\mathrm{DFP}} & = H - \frac{H y y^\top H}{y^\top H y} + \frac{s s^\top}{y^\top s}.
-\end{align}
+\end{align*}
 $$
 
 
@@ -1247,12 +1257,10 @@ $$
 In the PSB update rule discussed earlier, we substituted $c=s$, but we can consider taking a different $c$. Specifically, we consider choosing $c$ such that $B_{k+1}$ becomes positive definite. Substituting $c=y$ yields the alternative form:
 
 $$
-\begin{equation}
+\begin{equation*}
 \bar{B}_{\mathrm{DFP}} = B + \frac{(y - Bs)y^\top + y(y - Bs)^\top}{y^\top s} - \frac{(y - Bs)^\top s}{(y^\top s)^2} yy^\top.
-\end{equation}
+\end{equation*}
 $$
-
-
 
 
 #### BFGS Update
@@ -1260,10 +1268,10 @@ $$
 The Broyden--Fletcher--Goldfarb--Shanno (BFGS) update is one of the most widely used quasi-Newton methods. The update formulas are given by
 
 $$
-\begin{align}
-\bar{B}_{\mathrm{BFGS}} & = B - \frac{B s s^\top B}{s^\top B s} + \frac{y y^\top}{y^\top s},                                        \\
+\begin{align*}
+\bar{B}_{\mathrm{BFGS}} & = B - \frac{B s s^\top B}{s^\top B s} + \frac{y y^\top}{y^\top s},                                       \\
 \bar{H}_{\mathrm{BFGS}} & = \qty(I - \frac{s y^\top}{y^\top s}) H \qty(I - \frac{y s^\top}{y^\top s}) + \frac{s s^\top}{y^\top s}.
-\end{align}
+\end{align*}
 $$
 
 
@@ -1278,29 +1286,29 @@ BFGS update is known as one of the most successful quasi-Newton update rules in 
 Recall that the BFGS update formula is given by
 
 $$
-\begin{equation}
+\begin{equation*}
 B_{k+1}   = B_k - \frac{B_k s_k s_k^\top B_k}{s_k^\top B_k s_k} + \frac{y_k y_k^\top}{y_k^\top s_k}.
-\end{equation}
+\end{equation*}
 $$
 
 
-#### Formula for \texorpdfstring{$H_k${Hk}}
+#### Formula for the Inverse Update
 
 The inverse of the BFGS update $H_k \coloneqq B_k^{-1}$ is given by
 
 $$
-\begin{equation}
+\begin{equation*}
 H_{k+1} = \qty(I - \frac{s_k y_k^\top}{y_k^\top s_k}) H_k \qty(I - \frac{y_k s_k^\top}{y_k^\top s_k}) + \frac{s_k s_k^\top}{y_k^\top s_k}.
-\end{equation}
+\end{equation*}
 $$
 
-We now prove that \cref{eq:Hk_rank} indeed gives the inverse of the BFGS update.
+We now prove that this equation indeed gives the inverse of the BFGS update.
 
 
 
 **Proposition 8**
 
-\Cref{eq:Hk_rank} gives the exact inverse of the BFGS update, i.e., $H_{k+1} = B_{k+1}^{-1}$.
+The matrix $H_{k+1}$ is the inverse of $B_{k+1}$.
 
 <details>
 <summary>Proof</summary>
@@ -1308,9 +1316,9 @@ We now prove that \cref{eq:Hk_rank} indeed gives the inverse of the BFGS update.
 The BFGS update can be rewritten in a compact rank-two form
 
 $$
-\begin{equation}
+\begin{equation*}
 B_{k+1} = B_k + UCV^\top
-\end{equation}
+\end{equation*}
 $$
 
 where
@@ -1326,10 +1334,10 @@ $$
 since
 
 $$
-\begin{equation}
+\begin{equation*}
 U C V^\top   = \mqty[ -\frac{B_k s_k}{s_k^\top B_k s_k}&    \frac{y_k}{y_k^\top s_k} ] \mqty[ s_k^\top B_k  \\  y_k^\top ]
 = -\frac{B_k s_k s_k^\top B_k}{s_k^\top B_k s_k} + \frac{y_k y_k^\top}{y_k^\top s_k}.
-\end{equation}
+\end{equation*}
 $$
 
 By the Sherman--Morrison--Woodbury identity, we have
@@ -1352,7 +1360,7 @@ which completes the proof.
 </details>
 
 
-#### Positive Definiteness of \texorpdfstring{$B_{k+1$}{Bk+1}}
+#### Positive Definiteness of the BFGS Update
 
 An important property of the BFGS update is that if the current approximation $B_k$ is positive definite and the curvature condition $y_k^\top s_k > 0$ holds, then the updated approximation $B_{k+1}$ is also guaranteed to be positive definite.
 
@@ -1360,7 +1368,7 @@ An important property of the BFGS update is that if the current approximation $B
 
 **Proposition 9**
 
-If $B_k$ is positive definite and $y_k^\top s_k > 0$, then $B_{k+1}$ defined by \cref{eq:Bk_rank} is also positive definite.
+If $B_k$ is positive definite and $y_k^\top s_k > 0$, then $B_{k+1}$ is also positive definite.
 
 <details>
 <summary>Proof</summary>
@@ -1395,12 +1403,14 @@ $$
 
 coincides with the KL divergence up to the additive constant $-n$, so minimizing $\psi$ is equivalent to minimizing the KL distance.
 Then, the BFGS update is given by the solution to the optimization problem
-\begin{mini*}
-{B \in \mathrm{PD}(n)}
-{\psi(B_k^{-1/2} B B_k^{-1/2})}
-{}{}
-\addConstraint{Bs_k}{= y_k}
-\end{mini*}
+
+$$
+\begin{align*}
+\underset{B \in \mathrm{PD}(n)}{\mathrm{minimize}} & \quad \psi(B_k^{-1/2} B B_k^{-1/2}) \\
+\mathrm{subject\ to}                               & \quad B s_k = y_k.
+\end{align*}
+$$
+
 The constraint $B s_k = y_k$ in the optimization problem is precisely the secant condition discussed earlier, ensuring that the updated matrix interpolates the latest curvature pair.
 
 
@@ -1430,28 +1440,28 @@ Let $B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ be the
 Applying the trace to the BFGS update formula, we have
 
 $$
-\begin{equation}
+\begin{equation*}
 \tr(B_{+}) = \tr(B) - \tr\qty(\frac{Bss^\top B}{s^\top Bs}) + \tr\qty(\frac{yy^\top}{y^\top s}).
-\end{equation}
+\end{equation*}
 $$
 
-For the second term in \cref{eq:trace-bfgs-step1}, note that
+For the second term, note that
 
 $$
-\begin{equation}
+\begin{equation*}
 \tr\qty(\frac{Bss^\top B}{s^\top Bs}) = \frac{1}{s^\top Bs}\tr((Bs)(Bs)^\top) = \frac{\norm{B s}^2}{s^\top Bs}.
-\end{equation}
+\end{equation*}
 $$
 
-For the third term in \cref{eq:trace-bfgs-step1}, we have
+For the third term, we have
 
 $$
-\begin{equation}
+\begin{equation*}
 \tr\qty(\frac{yy^\top}{y^\top s}) = \frac{1}{y^\top s}\tr(yy^\top) = \frac{\norm{y}^2}{y^\top s}.
-\end{equation}
+\end{equation*}
 $$
 
-Substituting \cref{eq:trace-middle-term,eq:trace-last-term} into \cref{eq:trace-bfgs-step1} yields Proposition 10.
+Combining these results yields the desired formula.
 
 </details>
 
@@ -1470,13 +1480,14 @@ Let $B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ be the
 <details>
 <summary>Proof</summary>
 
-Recall the rank-two formulation of the BFGS update defined in \cref{eq:bfgs-ucv}.
-By the matrix determinant lemma, the matrices $U, C, V$ in \cref{eq:bfgs-ucv} satisfy
+Recall the rank-two formulation of the BFGS update.
+By the matrix determinant lemma, the matrices $U, C, V$ satisfy
+% https://en.wikipedia.org/wiki/Matrix_determinant_lemma
 
 $$
-\begin{equation}
+\begin{equation*}
 \det(B_{k+1}) =\det(B_k + U C V^\top)=\det(B_k)\det(C) \det \qty(C^{-1} + V^\top B_k^{-1} U),
-\end{equation}
+\end{equation*}
 $$
 
 where $I_2$ is the $2\times 2$ identity matrix.
@@ -1491,17 +1502,17 @@ $$
 and thus
 
 $$
-\begin{equation}
+\begin{equation*}
 C^{-1} + V^\top B_k^{-1} U
 =
 \mqty[-s_k^\top B_k s_k & 0 \\ 0 & y_k^\top s_k] +
 \mqty[ s_k^\top B_k s_k & s_k^\top y_k \\ y_k^\top s_k     & y_k^\top B_k^{-1} y_k ]
 =
 \mqty[0 & s_k^\top y_k \\ y_k^\top s_k & y_k^\top B_k^{-1} y_k ].
-\end{equation}
+\end{equation*}
 $$
 
-Thus, combining \cref{eq:bfgs-determinant-lemma,eq:bfgs-det-inner}, we have
+Thus, combining these results, we obtain
 
 $$
 \begin{equation*}
@@ -1525,9 +1536,9 @@ Although BFGS and DFP are quite symmetric in structure, they exhibit remarkably 
 Following Powell's framework, we consider the quadratic function
 
 $$
-\begin{equation}
+\begin{equation*}
 f(x, y) = \frac{1}{2}(x^2 + y^2),
-\end{equation}
+\end{equation*}
 $$
 
 with both BFGS and DFP methods using a fixed step size of $\alpha_k = 1$ at every iteration. This choice of unit step size is practical for quadratic functions, where it often satisfies standard line search criteria.
@@ -1536,9 +1547,9 @@ The initial Hessian approximation $B_0$ is chosen to have eigenvalues 1 and $\la
 The initial point $x_0$ is selected as
 
 $$
-\begin{equation}
+\begin{equation*}
 \theta = \arctan(\sqrt{\lambda_1}), \quad x_0 = \mqty[\cos(\theta) \\ \sin(\theta)],
-\end{equation}
+\end{equation*}
 $$
 
 which aligns with Powell's original analysis.
@@ -1550,20 +1561,16 @@ The iteration continues until the norm of the current point falls below a tolera
 
 The numerical results are presented in Table 1, which partially reproduces the content of Powell's original tables. The convergence behavior depends critically on the initial eigenvalue $\lambda_1$:
 
-\centering
-\hline
-$\lambda_1$ & BFGS & DFP  \\
-\hline
-0.001       & 4    & 3    \\
-0.01        & 5    & 3    \\
-0.1         & 6    & 4    \\
-1           & 1    & 1    \\
-10          & 8    & 16   \\
-100         & 10   & 107  \\
-1000        & 12   & 1006 \\
-10000       & 15   & 9987 \\
-\hline
-\caption{Convergence comparison between BFGS and DFP methods for different initial eigenvalues $\lambda_1$}
+| $\lambda_1$ | BFGS | DFP |
+| :--: | :--: | :--: |
+| 0.001 | 4 | 3 |
+| 0.01 | 5 | 3 |
+| 0.1 | 6 | 4 |
+| 1 | 1 | 1 |
+| 10 | 8 | 16 |
+| 100 | 10 | 107 |
+| 1000 | 12 | 1006 |
+| 10000 | 15 | 9987 |
 
 (Table 1 Convergence comparison between BFGS and DFP methods for different initial eigenvalues $\lambda_1$)
 
@@ -1629,7 +1636,7 @@ $$
 where $H_\ell$ denotes the inverse Hessian approximation obtained after $\ell$ BFGS updates applied to a given initial matrix $H_0$.
 Note that this is not the same as the iterates in an optimization algorithm. Here, we focus solely on the structure of the BFGS updates.
 
-#### Compact Representation of \texorpdfstring{$H_m${Hm}}
+#### Compact Representation of the inverse BFGS Update
 
 Let $\{(s_i,y_i)\}_{i=0}^{m-1}$ be the stored correction pairs, and define
 
@@ -1640,7 +1647,7 @@ V_i = I - \rho_i y_i s_i^\top.
 \end{equation}
 $$
 
-From \cref{eq:Hk_rank}, the BFGS update for the inverse Hessian can be expressed as
+The inverse BFGS update can be expressed as
 
 $$
 \begin{equation}
@@ -1652,7 +1659,7 @@ for $i = 0,\dots,m-1$.
 By recursively expanding this relation, we obtain the compact representation
 
 $$
-\begin{equation}
+\begin{equation*}
 H_m
 =
 V_{m-1}^\top \cdots V_0^\top H_0 V_0 \cdots V_{m-1}
@@ -1661,7 +1668,7 @@ V_{m-1}^\top \cdots V_0^\top H_0 V_0 \cdots V_{m-1}
 (V_{m-1}^\top \cdots V_{j+1}^\top)
 \rho_j s_j s_j^\top
 (V_{j+1} \cdots V_{m-1}),
-\end{equation}
+\end{equation*}
 $$
 
 where $H_0$ denotes the chosen initial inverse Hessian approximation, typically a scaled identity matrix.
@@ -1807,9 +1814,7 @@ To justify this scaling, assume that the objective function $f$ is twice continu
 
 $$
 \begin{equation}
-\bar{G}
-=
-\int_0^1 \nabla^2 f(x + \tau s_{m-1}) \dd \tau ,
+\bar{G} = \int_0^1 \nabla^2 f(x + \tau s_{m-1}) \mathrm{d}\tau,
 \end{equation}
 $$
 
@@ -1848,7 +1853,7 @@ This observation further supports the effectiveness of the scaled-identity initi
 
 
 
-<!-- From 4_modified_secant_en.tex -->
+<!-- From 4_modified_secant.tex -->
 
 
 ## Modified Secant Condition
@@ -1932,8 +1937,7 @@ This observation motivates the modified secant condition, which incorporates fun
 
 ![../imgs/modified_secant/cubic_interpolation.png](../imgs/modified_secant/cubic_interpolation.png)
 
-(Fig. 11 Interpolation with identical gradients at $x_k$ and $x_{k+1}$ but different function values.
-This leads to distinct interpolants, highlighting the importance of incorporating function value information in Hessian approximation.)
+(Fig. 11 Interpolation with identical gradients at $x_k$ and $x_{k+1}$ but different function values. This leads to distinct interpolants, highlighting the importance of incorporating function value information in Hessian approximation.)
 
 
 In the following, we present two well-known modified secant conditions.
@@ -2106,9 +2110,7 @@ Refer to Fig. 13 for an illustration.
 
 ![../imgs/modified_secant/trial_1_cubic.png](../imgs/modified_secant/trial_1_cubic.png)
 
-(Fig. 13 Cubic-augmented modified secant equation.
-In Fig. 13, by incorporating a cubic term $\eta \norm{x - x_k}^3$ in the model, the modified secant equation $B^\mathrm{C}_k s_k = y_k + \sigma^\mathrm{C}_k s_k$ enables simultaneous satisfaction of both conditions at the previous point.
-In Fig. 13, while the cubic model satisfies both function value and gradient conditions, its underlying quadratic component may be indefinite or negative definite.)
+(Fig. 13 Cubic-augmented modified secant equation. In Fig. 13, by incorporating a cubic term $\eta \norm{x - x_k}^3$ in the model, the modified secant equation $B^\mathrm{C}_k s_k = y_k + \sigma^\mathrm{C}_k s_k$ enables simultaneous satisfaction of both conditions at the previous point. In Fig. 13, while the cubic model satisfies both function value and gradient conditions, its underlying quadratic component may be indefinite or negative definite.)
 
 
 ### Other Curvature Storage Methods

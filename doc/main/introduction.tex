@@ -3,9 +3,10 @@
 \begin{document}
 
 This paper considers the unconstrained optimization problem
-\begin{mini}
-    {x}{f(x)}{\label{prob:main_problem}}{},
-\end{mini}
+\begin{equation}
+    \underset{x \in \bbR^{n}}{\mathrm{minimize}} \quad f(x),
+    \label{prob:main_problem}
+\end{equation}
 where $f\colon \mathbb{R}^n \to \mathbb{R}$ is a continuously differentiable nonconvex function, and $x \in \mathbb{R}^n$ is the optimization variable.
 We focus on an optimization setting in which objective function evaluations are contaminated by bounded, non-diminishing numerical noise \citep{sunTrustRegionMethod2023}.
 Specifically, only inexact function values $\overline{f}(x)$ are available, while gradient information can be computed with comparatively high accuracy.

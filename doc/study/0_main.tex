@@ -38,6 +38,10 @@
 
 \hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
 
+% Language switch
+\newif\ifEn
+\Enfalse
+
 % Theorem Environments
 \newtheorem{theorem}{Theorem}
 \newtheorem{proposition}{Proposition}
@@ -64,20 +68,28 @@
 % https://qiita.com/rityo_masu/items/efd44bc8f9229e014237
 \allowdisplaybreaks[4]
 
+\newcommand{\myQED}{}
+
 \begin{document}
 
-\title{Study of Quasi-Newton Methods}
-\author{Hiroki Hamaguchi \orcidlink{0009-0005-7348-1356}}
+\ifEn
+    \title{Fundamental Knowledge on Quasi-Newton Methods}
+    \author{Hiroki Hamaguchi \orcidlink{0009-0005-7348-1356}}
+\else
+    \title{準ニュートン法に関する基礎知識}
+    \author{浜口 広樹 \orcidlink{0009-0005-7348-1356}}
+\fi
+
 \date{\today}
 \maketitle
 
-\subfile{1_basic_en.tex}
+\subfile{1_basic.tex}
 
-\subfile{2_newton_en.tex}
+\subfile{2_newton.tex}
 
-\subfile{3_quasi_newton_en.tex}
+\subfile{3_quasi_newton.tex}
 
-\subfile{4_modified_secant_en.tex}
+\subfile{4_modified_secant.tex}
 
 \bibliographystyle{unsrtnat}
 \bibliography{../L-BFGS.bib}

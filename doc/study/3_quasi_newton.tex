@@ -1,4 +1,4 @@
-\documentclass[0_en]{subfiles}
+\documentclass[0_main]{subfiles}
 
 \begin{document}
 
@@ -70,10 +70,10 @@ Requiring the above approximation to hold as an equality yields
     B_{k+1}(x_{k+1} - x_k) = \nabla f(x_{k+1}) - \nabla f(x_k),
 \end{equation*}
 or equivalently,
-\begin{equation}\label{eq:secant-condition}
+\begin{equation*}
     B_{k+1} s_k = y_k.
-\end{equation}
-The relation in \cref{eq:secant-condition} is called the secant condition, or the quasi-Newton equation.
+\end{equation*}
+This relation is called the secant condition, or the quasi-Newton equation.
 
 \subsection{Representative Quasi-Newton Update Rules}
 
@@ -85,30 +85,32 @@ In this subsection only, for brevity, we abbreviate $B_k$, $B_{k+1}$, $s_k$, and
 
 Broyden's update is one of the most fundamental quasi-Newton update formulas, but it is not popular in practice due to its lack of symmetry preservation.
 The update formulas are given by
-\begin{align}
-    \bar{B}_{\mathrm{Broyden}} & = B + \frac{(y - Bs)s^\top}{s^\top s}, \label{eq:broyden-update}           \\
-    \bar{H}_{\mathrm{Broyden}} & = H + \frac{s - Hy}{s^\top Hy} s^\top H. \label{eq:broyden-inverse-update}
-\end{align}
+\begin{align*}
+    \bar{B}_{\mathrm{Broyden}} & = B + \frac{(y - Bs)s^\top}{s^\top s},   \\
+    \bar{H}_{\mathrm{Broyden}} & = H + \frac{s - Hy}{s^\top Hy} s^\top H.
+\end{align*}
 
 \paragraph{Derivation}
 
 We derive this formula from simple structural assumptions \citep[Section 4]{dennisjr.QuasiNewtonMethodsMotivation1977a}.
 \begin{proposition}
     Assume that $\bar{B}$ satisfies the secant condition
-    \begin{equation}\label{eq:secant-broyden}
+    \begin{equation*}
         \bar{B}s = y,
-    \end{equation}
+    \end{equation*}
     and the action constraint
-    \begin{equation}\label{eq:action-constraint}
+    \begin{equation*}
         \bar{B}z = Bz
         \quad\text{for all } z\in\mathbb{R}^n \text{ such that } z^\top s = 0.
-    \end{equation}
-    Then $\bar{B}$ is uniquely determined and it is $\bar{B}_{\mathrm{Broyden}}$ defined by \cref{eq:broyden-update}.
+    \end{equation*}
+    Then $\bar{B}$ is uniquely determined and it is $\bar{B}_{\mathrm{Broyden}}$.
 \end{proposition}
 \begin{proof}
-    A basis for $\mathbb{R}^n$ can be constructed from $s$ and a basis for the orthogonal complement of $s$. Since \cref{eq:secant-broyden,eq:action-constraint} completely determine the action of $\bar{B}$ with respect to this basis, $\bar{B}$ is uniquely determined.
+    A vector $s$ and a basis for the orthogonal complement of $s$ form a basis of $\mathbb{R}^n$.
+    Since the conditions of $\bar{B}$ completely determine the action of $\bar{B}$ with respect to this basis, $\bar{B}$ is uniquely determined.
 
-    We now show that $\bar{B}_{\mathrm{Broyden}}$ defined by \cref{eq:broyden-update} satisfies \cref{eq:secant-broyden,eq:action-constraint}. Let $z$ be any vector satisfying $z^\top s = 0$. Then
+    We now show that $\bar{B}_{\mathrm{Broyden}}$ satisfies the conditions imposed on $\bar{B}$.
+    Let $z$ be any vector satisfying $z^\top s = 0$. Then
     \begin{align*}
         \bar{B}_{\mathrm{Broyden}} s
          & = \qty(B + \frac{(y - Bs)s^\top}{s^\top s}) s
@@ -119,32 +121,31 @@ We derive this formula from simple structural assumptions \citep[Section 4]{denn
         = Bz + (z^\top s) \frac{y - Bs}{s^\top s}
         = Bz.
     \end{align*}
-    Hence $\bar{B}_{\mathrm{Broyden}}$ indeed satisfies \cref{eq:secant-broyden,eq:action-constraint}. Therefore, by uniqueness, we have $\bar{B} = \bar{B}_{\mathrm{Broyden}}$.
+    Hence $\bar{B}_{\mathrm{Broyden}}$ indeed satisfies the conditions imposed on $\bar{B}$.
+    Therefore, by uniqueness, we have $\bar{B} = \bar{B}_{\mathrm{Broyden}}$. \myQED
 \end{proof}
 
 Broyden's update can also be characterized as a minimal-change update in the Frobenius norm.
 
 \begin{proposition}[\citep{dennisjr.QuasiNewtonMethodsMotivation1977a}, Theorem~4.1]
     Let $B\in\mathbb{R}^{n\times n}$, $y\in\mathbb{R}^n$, and $s\in\mathbb{R}^n\setminus\{0\}$ be given.
-    Then the matrix $\bar{B}$ defined by \cref{eq:broyden-update} is the unique solution of
-    \begin{mini*}
-        {\tilde{B} \in \mathbb{R}^{n \times n}}
-        {\norm{\tilde{B} - B}_F}
-        {}
-        {\label{eq:broyden-minimal-change}}
-        \addConstraint{\tilde{B} s}{= y.}
-    \end{mini*}
+    Then the matrix $\bar{B}_{\mathrm{Broyden}}$ is the unique solution of
+    \begin{align*}
+        \underset{\tilde{B} \in \mathbb{R}^{n \times n}}{\mathrm{minimize}} & \quad \norm{\tilde{B} - B}_F \\
+        \mathrm{subject to}                                                 & \quad \tilde{B} s = y.
+    \end{align*}
 \end{proposition}
 \begin{proof}
     The function $\tilde{B}\mapsto\norm{\tilde{B}-B}_F$ is strictly convex on $\mathbb{R}^{n\times n}$.
     The constraint set
-    \begin{equation}
+    \begin{equation*}
         \{\tilde{B}\in\mathbb{R}^{n\times n}:\tilde{B}s=y\}
-    \end{equation}
+    \end{equation*}
     is affine and hence convex.
     Therefore, the optimization problem admits at most one minimizer.
 
-    To show that $\bar{B}=\bar{B}_{\mathrm{Broyden}}$ defined by \cref{eq:broyden-update} is indeed the minimizer, we compute:
+    We show that $\bar{B}_{\mathrm{Broyden}}$ is indeed the minimizer.
+    For any $\tilde{B}$ satisfying the constraint $\tilde{B}s=y$, we have
     \begin{equation*}
         \norm{\bar{B}_{\mathrm{Broyden}} - B}_F^2
         = \norm{\frac{(y-Bs)s^\top}{s^\top s}}_F^2
@@ -152,7 +153,7 @@ Broyden's update can also be characterized as a minimal-change update in the Fro
         \leq \norm{\tilde{B}-B}_F^2,
     \end{equation*}
     where we used the sub-multiplicativity of Frobenius norm and the fact that $\norm{ss^\top/(s^\top s)}_F=1$ in the last inequality.
-    Thus, $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$.
+    Thus, $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$. \myQED
 \end{proof}
 
 Broyden's update is characterized by two properties: it satisfies the secant condition and preserves the action on vectors orthogonal to $s$. Additionally, it is the unique minimal-change update in the Frobenius norm subject to the secant constraint.
@@ -161,55 +162,53 @@ Broyden's update is characterized by two properties: it satisfies the secant con
 % https://en.wikipedia.org/wiki/Symmetric_rank-one
 
 The Symmetric Rank-One (SR1) update \citep{nocedal1999numerical} is a fundamental quasi-Newton method that maintains symmetry throughout the update process. The update formulas are given by
-\begin{align}
-    \bar{B}_{\mathrm{SR1}} & = B + \frac{(y - B s)(y - B s)^\top}{(y - B s)^\top s}, \label{eq:sr1-b-update} \\
-    \bar{H}_{\mathrm{SR1}} & = H + \frac{(s - H y)(s - H y)^\top}{(s - H y)^\top y}. \label{eq:sr1-h-update}
-\end{align}
+\begin{align*}
+    \bar{B}_{\mathrm{SR1}} & = B + \frac{(y - B s)(y - B s)^\top}{(y - B s)^\top s}, \\
+    \bar{H}_{\mathrm{SR1}} & = H + \frac{(s - H y)(s - H y)^\top}{(s - H y)^\top y}.
+\end{align*}
 
 \paragraph{Derivation}
 
-To derive \cref{eq:sr1-b-update}, we construct the updated matrix $\bar{B}$ as a rank-one update. That is, we assume that for some vector $z \in \mathbb{R}^n$,
-\begin{equation}\label{eq:sr1-symmetric-form}
+To derive SR1 update, we construct the updated matrix $\bar{B}$ as a rank-one update. That is, we assume that for some vector $z \in \mathbb{R}^n$,
+\begin{equation*}
     \bar{B}_{\mathrm{SR1}} = B + z z^\top.
-\end{equation}
-For this update to satisfy the secant condition $\bar{B}_{\mathrm{SR1}} s = y$, assuming $z^\top s \neq 0$, we require
-\begin{equation}\label{eq:sr1-secant-condition}
+\end{equation*}
+To satisfy the secant condition $\bar{B}_{\mathrm{SR1}} s = y$, when $z^\top s \neq 0$, we need
+\begin{equation*}
     B s + z z^\top s = y,
-\end{equation}
+\end{equation*}
 which yields
-\begin{equation}\label{eq:sr1-z-formula}
+\begin{equation*}
     z = \frac{y - B s}{z^\top s}.
-\end{equation}
-
-To determine $z^\top s$, we take the inner product of both sides of \cref{eq:sr1-z-formula} with $s$:
-\begin{equation}\label{eq:sr1-self-consistency}
+\end{equation*}
+To determine $z^\top s$, we take the inner product with $s$:
+\begin{equation*}
     z^\top s = \frac{(y - B s)^\top s}{z^\top s}.
-\end{equation}
-Rearranging \cref{eq:sr1-self-consistency} yields the key relation
-\begin{equation}\label{eq:sr1-zs-squared}
+\end{equation*}
+Rearranging this equation yields the key relation
+\begin{equation*}
     (z^\top s)^2 = (y - B s)^\top s.
-\end{equation}
-
-Substituting \cref{eq:sr1-zs-squared} into \cref{eq:sr1-z-formula} and using \cref{eq:sr1-symmetric-form}, we obtain
-\begin{align}\label{eq:sr1-derivation-final}
+\end{equation*}
+Thus, we obtain
+\begin{equation*}
     \bar{B}_{\mathrm{SR1}}
-     & = B + z z^\top                                          \\
-     & = B + \frac{(y - B s)(y - B s)^\top}{(z^\top s)^2}      \\
-     & = B + \frac{(y - B s)(y - B s)^\top}{(y - B s)^\top s},
-\end{align}
-which is the SR1 update formula stated in \cref{eq:sr1-b-update}.
+    = B + z z^\top
+    = B + \frac{(y - B s)(y - B s)^\top}{(z^\top s)^2}
+    = B + \frac{(y - B s)(y - B s)^\top}{(y - B s)^\top s},
+\end{equation*}
+which reproduces the SR1 update formula.
 
 \paragraph{Remarks}
 
-The SR1 update requires $(y - Bs)^\top s \neq 0$ to be well-defined. When $(y - Bs)^\top s = 0$, the denominator in \cref{eq:sr1-b-update} vanishes, and the update is typically skipped in practice. This situation can occur when the secant condition cannot be satisfied by a symmetric rank-one update, indicating that more sophisticated update strategies are needed.
+The SR1 update requires $(y - Bs)^\top s \neq 0$ to be well-defined. When $(y - Bs)^\top s = 0$, the denominator of the SR1 update vanishes, and the update is typically skipped in practice. This situation can occur when the secant condition cannot be satisfied by a symmetric rank-one update, indicating that more sophisticated update strategies are needed.
 
 \subsubsection{Powell Symmetric Broyden (PSB) Update}
 
 The Powell Symmetric Broyden (PSB) update \cite{haeltermanAnalyticalStudyLeast2009} is one of the most important quasi-Newton update rules. The update formulas are given by
-\begin{align}
-    \bar{B}_{\mathrm{PSB}} & = B + \frac{(y - B s) s^\top + s (y - B s)^\top}{s^\top s} - \frac{s^\top (y - B s)}{(s^\top s)^2} s s^\top, \label{eq:psb-b-update} \\
-    \bar{H}_{\mathrm{PSB}} & = H + \frac{(s - H y) y^\top + y (s - H y)^\top}{y^\top y} - \frac{y^\top (s - H y)}{(y^\top y)^2} y y^\top. \label{eq:psb-h-update}
-\end{align}
+\begin{align*}
+    \bar{B}_{\mathrm{PSB}} & = B + \frac{(y - B s) s^\top + s (y - B s)^\top}{s^\top s} - \frac{s^\top (y - B s)}{(s^\top s)^2} s s^\top, \\
+    \bar{H}_{\mathrm{PSB}} & = H + \frac{(s - H y) y^\top + y (s - H y)^\top}{y^\top y} - \frac{y^\top (s - H y)}{(y^\top y)^2} y y^\top.
+\end{align*}
 
 \paragraph{Derivation}
 
@@ -217,34 +216,36 @@ To understand the motivation behind this formula, we note that in the SR1 update
 We may relax the requirement of maintaining symmetry throughout the update process. Instead, we can consider an asymmetric rank-one update of the form $z c^\top$, where the final result is symmetrized afterward.
 
 For a given vector $c \in \mathbb{R}^n$ with $c^\top s \neq 0$, we define
-\begin{equation}\label{eq:z-definition}
+\begin{equation*}
     z = \frac{y - B s}{c^\top s}
-\end{equation}
+\end{equation*}
 and perform the asymmetric update
-\begin{equation}\label{eq:asymmetric-update}
+\begin{equation*}
     C_1 \coloneqq B + \frac{(y - B s)c^\top}{c^\top s}.
-\end{equation}
+\end{equation*}
 Since $C_1$ is generally not symmetric, we symmetrize it via
-\begin{equation}\label{eq:symmetrization}
+\begin{equation*}
     C_2 = \frac{C_1 + C_1^\top}{2}.
-\end{equation}
+\end{equation*}
 However, the symmetrized matrix $C_2$ may not satisfy the secant condition $C_2 s = y$. Therefore, we iterate this process:
-\begin{equation}\label{eq:psb-iteration}
+\begin{equation*}
     \begin{dcases}
         C_0 = B                                                                               \\
         C_{2t+1} = C_{2t} + \frac{(y - C_{2t}s)c^\top}{c^\top s} & \text{(asymmetric update)} \\
         C_{2t+2} = \frac{C_{2t+1} + C_{2t+1}^\top}{2}            & \text{(symmetrization)}
     \end{dcases}
-\end{equation}
-
+\end{equation*}
 The key result is that the sequence $\{ C_{2t} \}_{t=0}^{\infty}$ converges to a symmetric matrix satisfying the secant condition, as formalized in the following proposition.
 
 \begin{proposition}[\citep{dennisjr.QuasiNewtonMethodsMotivation1977a}, Lemma~7.2]\label{prop:psb-convergence}
-    The sequence $\{ C_{2t} \}_{t=0}^{\infty}$ defined by \cref{eq:psb-iteration} converges, and the limit is given by
-    \begin{equation}\label{eq:psb-limit}
+    The sequence $\{ C_{2t} \}_{t=0}^{\infty}$ converges, and the limit is given by
+    \begin{equation*}
         \lim_{t \to \infty} C_{2t}
-        = B + \frac{(y - Bs)c^\top + c(y - Bs)^\top}{c^\top s} - \frac{(y - Bs)^\top s}{(c^\top s)^2} c c^\top.
-    \end{equation}
+        =
+        C_{\infty}
+        \coloneqq
+        B + \frac{(y - Bs)c^\top + c(y - Bs)^\top}{c^\top s} - \frac{(y - Bs)^\top s}{(c^\top s)^2} c c^\top.
+    \end{equation*}
 \end{proposition}
 \begin{proof}
     We first analyze the even subsequence.
@@ -254,79 +255,80 @@ The key result is that the sequence $\{ C_{2t} \}_{t=0}^{\infty}$ converges to a
     \end{equation*}
     for $k=0,1,2,\dots$.
     By construction, each $G_k$ is symmetric.
-    From \cref{eq:psb-iteration} and the definition, we have
+    From the definitions, we have
     \begin{equation*}
         G_{k+1} = G_k +\frac{1}{2c^\top s}\qty((y-G_k s)c^\top+c(y-G_k s)^\top).
     \end{equation*}
     Let us introduce the error vector
-    \begin{equation}\label{eq:wk-definition}
-        w_k \coloneqq y-G_k s
-    \end{equation}
-    and then we have
-    \begin{equation}\label{eq:Gupdate}
+    \begin{equation*}
+        w_k \coloneqq y-G_k s.
+    \end{equation*}
+    Then, we have
+    \begin{equation*}
         G_{k+1} = G_k+\frac{1}{2c^\top s}(w_k c^\top+cw_k^\top).
-    \end{equation}
-    Substituting \cref{eq:Gupdate} into \cref{eq:wk-definition} yields
-    \begin{align}
+    \end{equation*}
+    Substituting the above equation into the definition of $w_k$ yields
+    \begin{align*}
         w_{k+1} & = y-\qty(G_k+\frac{1}{2c^\top s}(w_k c^\top+cw_k^\top))s \\
                 & =
         w_k-\frac12w_k-\frac{w_k^\top s}{2c^\top s}c                       \\
                 & =
         \frac{1}{2}\qty(w_k-\frac{w_k^\top s}{c^\top s}c).
-    \end{align}
+    \end{align*}
     Hence
-    \begin{equation}
+    \begin{equation*}
         w_{k+1}=Pw_k,
         \qquad
         P \coloneqq \frac{1}{2}\left(I-\frac{cs^\top}{c^\top s}\right).
-    \end{equation}
+    \end{equation*}
     The matrix $cs^\top/c^\top s$ has rank one and eigenvalues $1,0,\dots,0$.
     Therefore, $P$ has one eigenvalue $0$ and all remaining eigenvalues equal to $1/2$.
     In particular, its spectral radius is $1/2<1$.
     Thus, the Neumann series converges and
-    \begin{align}
-        \sum_{k=0}^{\infty}w_k & =        \sum_{k=0}^{\infty}P^k(y-Bs)                  &  & (\text{from } w_0=y-Bs)                               \\
-                               & =  (I-P)^{-1}(y-Bs)                                                                                               \\
-                               & = 2\qty(I-\frac{1}{2}\frac{cs^\top}{c^\top s}) (y-Bs). &  & (\text{from the definition of } P) \label{eq:wseries}
-    \end{align}
+    \begin{align*}
+        \sum_{k=0}^{\infty}w_k & =        \sum_{k=0}^{\infty}P^k(y-Bs)                  &  & (w_0=y-Bs)                \\
+                               & =  (I-P)^{-1}(y-Bs)                                                                   \\
+                               & = 2\qty(I-\frac{1}{2}\frac{cs^\top}{c^\top s}) (y-Bs). &  & (\text{definition of } P)
+    \end{align*}
     Note that the last equation follows from
     \begin{equation*}
         2(I-P) \qty(I-\frac{1}{2}\frac{cs^\top}{c^\top s}) = \qty(I + \frac{cs^\top}{c^\top s}) \qty(I-\frac{1}{2}\frac{cs^\top}{c^\top s}) = I.
     \end{equation*}
     In particular, $\norm{w_k}\to0$ as $k\to\infty$.
-    Hence, from \cref{eq:Gupdate}, we have
-    \begin{align}
+    Hence, we have
+    \begin{align*}
         \lim_{k\to\infty}G_k
          & =
         B+\frac{1}{2c^\top s}
-        \sum_{k=0}^{\infty}(w_k c^\top+c w_k^\top)                                                                                     \\
-         & = B+ \qty(\sum_{k=0}^{\infty}w_k) \frac{c^\top}{2c^\top s} + \frac{c}{2c^\top s} \qty(\sum_{k=0}^{\infty}w_k)^\top          \\
-         & = B + \frac{(y - Bs)c^\top + c(y - Bs)^\top}{c^\top s} - \frac{(y - Bs)^\top s}{(c^\top s)^2} c c^\top.  \label{eq:G-limit}
-    \end{align}
-    Thus $G_k\to\bar B$.
-    Finally,
-    \begin{equation}
+        \sum_{k=0}^{\infty}(w_k c^\top+c w_k^\top)                                                                                                                          \\
+         & = B+ \qty(\sum_{k=0}^{\infty}w_k) \frac{c^\top}{2c^\top s} + \frac{c}{2c^\top s} \qty(\sum_{k=0}^{\infty}w_k)^\top                                               \\
+         & = B+ 2\qty(I-\frac{1}{2}\frac{cs^\top}{c^\top s}) (y-Bs) \frac{c^\top}{2c^\top s} + \frac{c}{2c^\top s} 2(y-Bs)^\top \qty(I-\frac{1}{2}\frac{sc^\top}{c^\top s}) \\
+         & = B + \frac{(y - Bs)c^\top + c(y - Bs)^\top}{c^\top s} - \frac{(y - Bs)^\top s}{(c^\top s)^2} c c^\top                                                           \\
+         & = C_{\infty}.
+    \end{align*}
+    Next, for the odd subsequence, we have
+    \begin{equation*}
         C_{2k+1}
         =
         G_k+\frac{w_k c^\top}{c^\top s}.
-    \end{equation}
+    \end{equation*}
     Since $G_k\to\bar B$ and $\norm{w_k}\to0$, we obtain
-    \begin{equation}
+    \begin{equation*}
         C_{2k+1}-G_k\to0.
-    \end{equation}
+    \end{equation*}
     Therefore both subsequences $\{C_{2k}\}$ and $\{C_{2k+1}\}$ converge to $\bar B$,
     and hence
-    \begin{equation}
+    \begin{equation*}
         C_k\to\bar B.
-    \end{equation}
+    \end{equation*}
     This completes the proof.
+    \myQED
 \end{proof}
 
-\noindent When $c = s$, the general formula in \cref{eq:psb-limit} simplifies to the standard PSB update formula:
-\begin{equation}\label{eq:psb-standard}
-    \bar{B}_{\mathrm{PSB}} = B + \frac{(y - Bs)s^\top + s(y - Bs)^\top}{s^\top s} - \frac{(y - Bs)^\top s}{(s^\top s)^2} ss^\top,
-\end{equation}
-which matches \cref{eq:psb-b-update}.
+When $c = s$, the general formula of $C_{\infty}$ simplifies to the standard PSB update formula:
+\begin{equation*}
+    \bar{B}_{\mathrm{PSB}} = B + \frac{(y - Bs)s^\top + s(y - Bs)^\top}{s^\top s} - \frac{(y - Bs)^\top s}{(s^\top s)^2} ss^\top.
+\end{equation*}
 
 \paragraph{Remarks}
 
@@ -336,30 +338,26 @@ The choice of $c = s$ is motivated by ensuring positive definiteness of the resu
 % https://en.wikipedia.org/wiki/Davidon%E2%80%93Fletcher%E2%80%93Powell_formula
 
 The Davidon--Fletcher--Powell (DFP) update \cite{nocedal1999numerical} is a classical quasi-Newton update formula. The update formulas are given by
-\begin{align}
-    \bar{B}_{\mathrm{DFP}} & = (I - \frac{y s^\top}{y^\top s}) B (I - \frac{s y^\top}{y^\top s}) + \frac{y y^\top}{y^\top s}, \label{eq:dfp-b-update} \\
-    \bar{H}_{\mathrm{DFP}} & = H - \frac{H y y^\top H}{y^\top H y} + \frac{s s^\top}{y^\top s}. \label{eq:dfp-h-update}
-\end{align}
+\begin{align*}
+    \bar{B}_{\mathrm{DFP}} & = (I - \frac{y s^\top}{y^\top s}) B (I - \frac{s y^\top}{y^\top s}) + \frac{y y^\top}{y^\top s}, \\
+    \bar{H}_{\mathrm{DFP}} & = H - \frac{H y y^\top H}{y^\top H y} + \frac{s s^\top}{y^\top s}.
+\end{align*}
 
 \paragraph{Derivation}
 
 In the PSB update rule discussed earlier, we substituted $c=s$, but we can consider taking a different $c$. Specifically, we consider choosing $c$ such that $B_{k+1}$ becomes positive definite. Substituting $c=y$ yields the alternative form:
-\begin{equation}\label{eq:dfp-b-alternative}
+\begin{equation*}
     \bar{B}_{\mathrm{DFP}} = B + \frac{(y - Bs)y^\top + y(y - Bs)^\top}{y^\top s} - \frac{(y - Bs)^\top s}{(y^\top s)^2} yy^\top.
-\end{equation}
-
-% Cauchy's Interlacing Theoremの亜種として知られているようです。
-
-% https://simple-complexities.github.io/eigenvalue/interlacing/2020/02/10/interlacing.html
+\end{equation*}
 
 \subsubsection{BFGS Update}
 % https://en.wikipedia.org/wiki/Broyden%E2%80%93Fletcher%E2%80%93Goldfarb%E2%80%93Shanno_algorithm
 
 The Broyden--Fletcher--Goldfarb--Shanno (BFGS) update is one of the most widely used quasi-Newton methods. The update formulas are given by
-\begin{align}
-    \bar{B}_{\mathrm{BFGS}} & = B - \frac{B s s^\top B}{s^\top B s} + \frac{y y^\top}{y^\top s}, \label{eq:bfgs-b-update-brief}                                       \\
-    \bar{H}_{\mathrm{BFGS}} & = \qty(I - \frac{s y^\top}{y^\top s}) H \qty(I - \frac{y s^\top}{y^\top s}) + \frac{s s^\top}{y^\top s}. \label{eq:bfgs-h-update-brief}
-\end{align}
+\begin{align*}
+    \bar{B}_{\mathrm{BFGS}} & = B - \frac{B s s^\top B}{s^\top B s} + \frac{y y^\top}{y^\top s},                                       \\
+    \bar{H}_{\mathrm{BFGS}} & = \qty(I - \frac{s y^\top}{y^\top s}) H \qty(I - \frac{y s^\top}{y^\top s}) + \frac{s s^\top}{y^\top s}.
+\end{align*}
 
 \paragraph{Derivation}
 
@@ -370,26 +368,26 @@ This update can be derived by considering the dual of the DFP update. Specifical
 In this subsection, we focus on the BFGS update and provide a detailed derivation of its formula.
 BFGS update is known as one of the most successful quasi-Newton update rules in practice.
 Recall that the BFGS update formula is given by
-\begin{equation}
-    B_{k+1}   = B_k - \frac{B_k s_k s_k^\top B_k}{s_k^\top B_k s_k} + \frac{y_k y_k^\top}{y_k^\top s_k}. \label{eq:Bk_rank}
-\end{equation}
+\begin{equation*}
+    B_{k+1}   = B_k - \frac{B_k s_k s_k^\top B_k}{s_k^\top B_k s_k} + \frac{y_k y_k^\top}{y_k^\top s_k}.
+\end{equation*}
 
-\subsubsection{Formula for \texorpdfstring{$H_k$}{Hk}}
+\subsubsection{Formula for the Inverse Update}
 
 The inverse of the BFGS update $H_k \coloneqq B_k^{-1}$ is given by
-\begin{equation}
-    H_{k+1} = \qty(I - \frac{s_k y_k^\top}{y_k^\top s_k}) H_k \qty(I - \frac{y_k s_k^\top}{y_k^\top s_k}) + \frac{s_k s_k^\top}{y_k^\top s_k}. \label{eq:Hk_rank}
-\end{equation}
-We now prove that \cref{eq:Hk_rank} indeed gives the inverse of the BFGS update.
+\begin{equation*}
+    H_{k+1} = \qty(I - \frac{s_k y_k^\top}{y_k^\top s_k}) H_k \qty(I - \frac{y_k s_k^\top}{y_k^\top s_k}) + \frac{s_k s_k^\top}{y_k^\top s_k}.
+\end{equation*}
+We now prove that this equation indeed gives the inverse of the BFGS update.
 
 \begin{proposition}
-    \Cref{eq:Hk_rank} gives the exact inverse of the BFGS update, i.e., $H_{k+1} = B_{k+1}^{-1}$.
+    The matrix $H_{k+1}$ is the inverse of $B_{k+1}$.
 \end{proposition}
 \begin{proof}
     The BFGS update can be rewritten in a compact rank-two form
-    \begin{equation}\label{eq:bfgs-ucv}
+    \begin{equation*}
         B_{k+1} = B_k + UCV^\top
-    \end{equation}
+    \end{equation*}
     where
     \begin{equation*}
         U = \mqty[B_k s_k & y_k],\qquad
@@ -397,10 +395,10 @@ We now prove that \cref{eq:Hk_rank} indeed gives the inverse of the BFGS update.
         V = \mqty[B_k s_k & y_k]
     \end{equation*}
     since
-    \begin{equation}
+    \begin{equation*}
         U C V^\top   = \mqty[ -\frac{B_k s_k}{s_k^\top B_k s_k}&    \frac{y_k}{y_k^\top s_k} ] \mqty[ s_k^\top B_k  \\  y_k^\top ]
         = -\frac{B_k s_k s_k^\top B_k}{s_k^\top B_k s_k} + \frac{y_k y_k^\top}{y_k^\top s_k}.
-    \end{equation}
+    \end{equation*}
     By the Sherman--Morrison--Woodbury identity, we have
     \begin{align*}
         H_{k+1} & = (B_k + U C V^\top)^{-1}                                                                                                                                                                                                                    \\
@@ -413,14 +411,15 @@ We now prove that \cref{eq:Hk_rank} indeed gives the inverse of the BFGS update.
                 & = \qty(I - \frac{s_k y_k^\top}{y_k^\top s_k}) H_k \qty(I - \frac{y_k s_k^\top}{y_k^\top s_k}) + \frac{s_k s_k^\top}{y_k^\top s_k}.
     \end{align*}
     which completes the proof.
+    \myQED
 \end{proof}
 
-\subsubsection{Positive Definiteness of \texorpdfstring{$B_{k+1}$}{Bk+1}}
+\subsubsection{Positive Definiteness of the BFGS Update}
 
 An important property of the BFGS update is that if the current approximation $B_k$ is positive definite and the curvature condition $y_k^\top s_k > 0$ holds, then the updated approximation $B_{k+1}$ is also guaranteed to be positive definite.
 
 \begin{proposition}
-    If $B_k$ is positive definite and $y_k^\top s_k > 0$, then $B_{k+1}$ defined by \cref{eq:Bk_rank} is also positive definite.
+    If $B_k$ is positive definite and $y_k^\top s_k > 0$, then $B_{k+1}$ is also positive definite.
 \end{proposition}
 \begin{proof}
     By assumption, $B_k$ and its inverse $H_k$ are positive definite.
@@ -432,6 +431,7 @@ An important property of the BFGS update is that if the current approximation $B
     \end{align*}
     where the first term is nonnegative since $H_k$ is positive definite, and the second term is positive due to the curvature condition $y_k^\top s_k > 0$.
     Thus, $H_{k+1}$ is positive definite, and consequently, $B_{k+1} = H_{k+1}^{-1}$ is also positive definite.
+    \myQED
 \end{proof}
 
 \subsubsection{KL}
@@ -443,12 +443,10 @@ For zero-mean multivariate Gaussians $\mathcal{N}(0,A^{-1})$ and $\mathcal{N}(0,
 \end{equation*}
 coincides with the KL divergence up to the additive constant $-n$, so minimizing $\psi$ is equivalent to minimizing the KL distance.
 Then, the BFGS update is given by the solution to the optimization problem
-\begin{mini*}
-    {B \in \mathrm{PD}(n)}
-    {\psi(B_k^{-1/2} B B_k^{-1/2})}
-    {\label{eq:bfgs-kl}}{}
-    \addConstraint{Bs_k}{= y_k}
-\end{mini*}
+\begin{align*}
+    \underset{B \in \mathrm{PD}(n)}{\mathrm{minimize}} & \quad \psi(B_k^{-1/2} B B_k^{-1/2}) \\
+    \mathrm{subject\ to}                               & \quad B s_k = y_k.
+\end{align*}
 The constraint $B s_k = y_k$ in the optimization problem is precisely the secant condition discussed earlier, ensuring that the updated matrix interpolates the latest curvature pair.
 
 % todo: prove
@@ -468,25 +466,26 @@ The trace of the BFGS-updated matrix has an explicit formula.
 
 \begin{proposition}[{\citep[(6.44)]{nocedal1999numerical}}]\label{prop:bfgs-trace}
     Let $B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ be the BFGS update. Then
-    \begin{equation}\label{eq:bfgs-trace}
+    \begin{equation*}
         \tr(B_{+}) = \tr(B) - \frac{\norm{B s}^2}{s^\top Bs} + \frac{\norm{y}^2}{y^\top s}.
-    \end{equation}
+    \end{equation*}
 \end{proposition}
 
 \begin{proof}
     Applying the trace to the BFGS update formula, we have
-    \begin{equation}\label{eq:trace-bfgs-step1}
+    \begin{equation*}
         \tr(B_{+}) = \tr(B) - \tr\qty(\frac{Bss^\top B}{s^\top Bs}) + \tr\qty(\frac{yy^\top}{y^\top s}).
-    \end{equation}
-    For the second term in \cref{eq:trace-bfgs-step1}, note that
-    \begin{equation}\label{eq:trace-middle-term}
+    \end{equation*}
+    For the second term, note that
+    \begin{equation*}
         \tr\qty(\frac{Bss^\top B}{s^\top Bs}) = \frac{1}{s^\top Bs}\tr((Bs)(Bs)^\top) = \frac{\norm{B s}^2}{s^\top Bs}.
-    \end{equation}
-    For the third term in \cref{eq:trace-bfgs-step1}, we have
-    \begin{equation}\label{eq:trace-last-term}
+    \end{equation*}
+    For the third term, we have
+    \begin{equation*}
         \tr\qty(\frac{yy^\top}{y^\top s}) = \frac{1}{y^\top s}\tr(yy^\top) = \frac{\norm{y}^2}{y^\top s}.
-    \end{equation}
-    Substituting \cref{eq:trace-middle-term,eq:trace-last-term} into \cref{eq:trace-bfgs-step1} yields \cref{eq:bfgs-trace}.
+    \end{equation*}
+    Combining these results yields the desired formula.
+    \myQED
 \end{proof}
 
 \paragraph{Determinant Formula}
@@ -495,37 +494,39 @@ The determinant of the BFGS-updated matrix also admits a closed-form expression.
 
 \begin{proposition}[{\citep[(6.45)]{nocedal1999numerical}}]\label{prop:bfgs-determinant}
     Let $B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ be the BFGS update and assume that $B$ is nonsingular. Then
-    \begin{equation}\label{eq:bfgs-determinant}
+    \begin{equation*}
         \det(B_{+}) = \det(B) \frac{y^\top s}{s^\top Bs}.
-    \end{equation}
+    \end{equation*}
 \end{proposition}
 \begin{proof}
-    Recall the rank-two formulation of the BFGS update defined in \cref{eq:bfgs-ucv}.
-    By the matrix determinant lemma, the matrices $U, C, V$ in \cref{eq:bfgs-ucv} satisfy
-    \begin{equation}\label{eq:bfgs-determinant-lemma}
+    Recall the rank-two formulation of the BFGS update.
+    By the matrix determinant lemma, the matrices $U, C, V$ satisfy
+    % https://en.wikipedia.org/wiki/Matrix_determinant_lemma
+    \begin{equation*}
         \det(B_{k+1}) =\det(B_k + U C V^\top)=\det(B_k)\det(C) \det \qty(C^{-1} + V^\top B_k^{-1} U),
-    \end{equation}
+    \end{equation*}
     where $I_2$ is the $2\times 2$ identity matrix.
     Since $U=V=\mqty[B_k s_k & y_k]$, we have
     \begin{equation*}
         V^\top B_k^{-1} U = \mqty[ s_k^\top B_k s_k & s_k^\top y_k \\ y_k^\top s_k     & y_k^\top B_k^{-1} y_k ]
     \end{equation*}
     and thus
-    \begin{equation}\label{eq:bfgs-det-inner}
+    \begin{equation*}
         C^{-1} + V^\top B_k^{-1} U
         =
         \mqty[-s_k^\top B_k s_k & 0 \\ 0 & y_k^\top s_k] +
         \mqty[ s_k^\top B_k s_k & s_k^\top y_k \\ y_k^\top s_k     & y_k^\top B_k^{-1} y_k ]
         =
         \mqty[0 & s_k^\top y_k \\ y_k^\top s_k & y_k^\top B_k^{-1} y_k ].
-    \end{equation}
-    Thus, combining \cref{eq:bfgs-determinant-lemma,eq:bfgs-det-inner}, we have
+    \end{equation*}
+    Thus, combining these results, we obtain
     \begin{equation*}
         \det(B_{k+1})
         = \det(B_k) \qty(-\frac{1}{s_k^\top B_k s_k} \cdot \frac{1}{y_k^\top s_k}) \qty(- (s_k^\top y_k)(y_k^\top s_k))
         = \det(B_k) \frac{y_k^\top s_k}{s_k^\top B_k s_k},
     \end{equation*}
     which completes the proof.
+    \myQED
 \end{proof}
 
 \subsection{BFGS vs DFP}
@@ -535,16 +536,16 @@ Although BFGS and DFP are quite symmetric in structure, they exhibit remarkably 
 \subsubsection{Problem Setup}
 
 Following Powell's framework, we consider the quadratic function
-\begin{equation}
+\begin{equation*}
     f(x, y) = \frac{1}{2}(x^2 + y^2),
-\end{equation}
+\end{equation*}
 with both BFGS and DFP methods using a fixed step size of $\alpha_k = 1$ at every iteration. This choice of unit step size is practical for quadratic functions, where it often satisfies standard line search criteria.
 
 The initial Hessian approximation $B_0$ is chosen to have eigenvalues 1 and $\lambda_1$, where $\lambda_1$ represents the degree of error in the initial approximation.
 The initial point $x_0$ is selected as
-\begin{equation}
+\begin{equation*}
     \theta = \arctan(\sqrt{\lambda_1}), \quad x_0 = \mqty[\cos(\theta) \\ \sin(\theta)],
-\end{equation}
+\end{equation*}
 which aligns with Powell's original analysis.
 See \citep{powellHowBadAre1986} for details on this choice.
 
@@ -635,20 +636,20 @@ Throughout this subsection, we work with a finite sequence of matrices
 where $H_\ell$ denotes the inverse Hessian approximation obtained after $\ell$ BFGS updates applied to a given initial matrix $H_0$.
 Note that this is not the same as the iterates in an optimization algorithm. Here, we focus solely on the structure of the BFGS updates.
 
-\subsubsection{Compact Representation of \texorpdfstring{$H_m$}{Hm}}
+\subsubsection{Compact Representation of the Inverse BFGS Update}
 
 Let $\{(s_i,y_i)\}_{i=0}^{m-1}$ be the stored correction pairs, and define
-\begin{equation}\label{eq:rho-V-def}
+\begin{equation*}
     \rho_i = \frac{1}{y_i^\top s_i}, \qquad
     V_i = I - \rho_i y_i s_i^\top.
-\end{equation}
-From \cref{eq:Hk_rank}, the BFGS update for the inverse Hessian can be expressed as
-\begin{equation}\label{eq:Hk-bfgs-rank}
+\end{equation*}
+The inverse BFGS update can be expressed as
+\begin{equation*}
     H_{i+1} = V_i^\top H_i V_i + \rho_i s_i s_i^\top,
-\end{equation}
+\end{equation*}
 for $i = 0,\dots,m-1$.
 By recursively expanding this relation, we obtain the compact representation
-\begin{equation}\label{eq:Hm-compact}
+\begin{equation*}
     H_m
     =
     V_{m-1}^\top \cdots V_0^\top H_0 V_0 \cdots V_{m-1}
@@ -657,20 +658,19 @@ By recursively expanding this relation, we obtain the compact representation
     (V_{m-1}^\top \cdots V_{j+1}^\top)
     \rho_j s_j s_j^\top
     (V_{j+1} \cdots V_{m-1}),
-\end{equation}
+\end{equation*}
 where $H_0$ denotes the chosen initial inverse Hessian approximation, typically a scaled identity matrix.
 
 \subsubsection{Two-Loop Recursion}
 
 The compact representation above can be applied to any vector $q$ without explicitly forming $H_m$.
 Let $r = H_m q$.
-Exploiting the associative structure of the matrix products, this operation can be carried out using two short loops of length $m$, leading to the well-known L-BFGS two-loop recursion~\citep[Algorithm 7.4]{nocedal1999numerical}. The pseudocode is provided in \cref{alg:two-loop-recursion}.
+Exploiting the associative structure of the matrix products, this operation can be carried out using two short loops of length $m$, leading to the well-known L-BFGS two-loop recursion~\citep[Algorithm 7.4]{nocedal1999numerical}.
 This algorithm requires $\order{md}$ arithmetic operations and $\order{md}$ storage, where $d$ denotes the problem dimension.
 
 \DontPrintSemicolon
 \begin{algorithm}[t]
     \caption{L-BFGS Two-Loop Recursion for $r = H_m q$ \citep[Algorithm 7.4]{nocedal1999numerical}}
-    \label{alg:two-loop-recursion}
     \KwIn{$q$, stored pairs $\{(s_i, y_i)\}_{i=0}^{m-1}$, initial matrix $H_0$}
     \KwOut{$r = H_m q$}
     \For{$i = m-1, m-2, \dots, 0$}{
@@ -686,18 +686,17 @@ This algorithm requires $\order{md}$ arithmetic operations and $\order{md}$ stor
     \Return $r$\;
 \end{algorithm}
 
-Now, we verify that the output of \cref{alg:two-loop-recursion} indeed computes $r = H_m q$.
+Now, we verify that the output of the two-loop recursion algorithm indeed computes $r = H_m q$.
 \begin{proposition}
-    The output of the two-loop recursion \cref{alg:two-loop-recursion} satisfies $r = H_m q$.
+    The output of the two-loop recursion algorithm satisfies $r = H_m q$.
 \end{proposition}
 \begin{proof}
     In the backward recursion, for $i = m-1, m-2, \dots, 0$, from the input vector $q^{(m)} \coloneqq q$, the algorithm computes
-    \begin{equation}
+    \begin{equation*}
         \alpha_i   = \rho_i s_i^\top q^{(i+1)}, \qquad
         q^{(i)} \coloneqq q^{(i+1)} - \alpha_i y_i.
-    \end{equation}
-    % Using the definition of $V_i$ and $\alpha_i$, we have
-    Substituting the definition of $\alpha_i$ and using \cref{eq:rho-V-def}, we find
+    \end{equation*}
+    Substituting the definition of $\alpha_i$ and using the definition of $V_i$, we find
     \begin{equation*}
         q^{(i)} = q^{(i+1)} - \rho_i \qty(s_i^\top q^{(i+1)}) y_i = \qty(I - \rho_i y_i s_i^\top) q^{(i+1)} = V_i q^{(i+1)}.
     \end{equation*}
@@ -727,7 +726,7 @@ Now, we verify that the output of \cref{alg:two-loop-recursion} indeed computes 
         \qty(V_{i+1} V_{i+2} \cdots V_{m-1}) q.
     \end{align*}
     By recursively expanding this relation from the initial value $r^{(0)} = H_0 q^{(0)}$, we obtain
-    \begin{equation}
+    \begin{equation*}
         r^{(m)}
         =
         V_{m-1}^\top \cdots V_0^\top H_0 V_0 \cdots V_{m-1} q
@@ -736,8 +735,9 @@ Now, we verify that the output of \cref{alg:two-loop-recursion} indeed computes 
         (V_{m-1}^\top \cdots V_{j+1}^\top)
         \rho_j s_j s_j^\top
         (V_{j+1} \cdots V_{m-1}) q,
-    \end{equation}
-    which matches the compact representation of $H_m$ in \cref{eq:Hm-compact} applied to $q$, completing the proof.
+    \end{equation*}
+    which matches the compact representation of $H_m$ applied to $q$, completing the proof.
+    \myQED
 \end{proof}
 
 Thus, the two-loop recursion exactly evaluates the action of $H_m$ on a vector while avoiding explicit matrix construction, achieving both mathematical rigor and computational efficiency.
@@ -746,21 +746,18 @@ Thus, the two-loop recursion exactly evaluates the action of $H_m$ on a vector w
 
 A crucial component of the L-BFGS method is the choice of the initial matrix $H_0$.
 A widely used and well-justified option is a scaled identity,
-\begin{equation}
+\begin{equation*}
     H_0 = \gamma I,
-\end{equation}
+\end{equation*}
 where the scaling parameter is chosen as
-\begin{equation}
+\begin{equation*}
     \gamma = \frac{s_{m-1}^\top y_{m-1}}{y_{m-1}^\top y_{m-1}}.
-    \label{eq:gamma_k_initial}
-\end{equation}
+\end{equation*}
 This choice is motivated by the relationship between the approximate inverse Hessian and the local curvature of the objective function \citep{liuLimitedMemoryBFGS1989a,shannoMatrixConditioningNonlinear1978}.
 To justify this scaling, assume that the objective function $f$ is twice continuously differentiable and consider the mean Hessian along the most recent step:
-\begin{equation}
-    \bar{G}
-    =
-    \int_0^1 \nabla^2 f(x + \tau s_{m-1}) \dd \tau ,
-\end{equation}
+\begin{equation*}
+    \bar{G} = \int_0^1 \nabla^2 f(x + \tau s_{m-1}) \mathrm{d}\tau,
+\end{equation*}
 where $s_{m-1}$ denotes the most recent displacement.
 By the mean value theorem,
 \begin{equation*}
@@ -771,17 +768,16 @@ By the mean value theorem,
     \bar{G} s_{m-1}.
 \end{equation*}
 Using this relation, the scaling factor can be written as
-\begin{equation}
+\begin{equation*}
     \frac{s_{m-1}^\top y_{m-1}}{y_{m-1}^\top y_{m-1}}
     =
     \frac{(\bar{G}^{1/2} s_{m-1})^\top (\bar{G}^{1/2} s_{m-1})}
     {(\bar{G}^{1/2} s_{m-1})^\top \bar{G} (\bar{G}^{1/2} s_{m-1})},
-    \label{eq:rayleigh_form}
-\end{equation}
+\end{equation*}
 which is a Rayleigh quotient.
 If $\bar{G}^{1/2} s_{m-1}$ happens to be an eigenvector of $\bar{G}$, then the reciprocal of this quantity equals the corresponding eigenvalue.
 
-Moreover, the choice \eqref{eq:gamma_k_initial} coincides with the short step size of the Barzilai--Borwein method \citep{barzilaiTwoPointStepSize1988}, highlighting a close connection between L-BFGS initialization and classical step-length selection strategies.
+Moreover, the choice of $\gamma$ coincides with the short step size of the Barzilai--Borwein method \citep{barzilaiTwoPointStepSize1988}, highlighting a close connection between L-BFGS initialization and classical step-length selection strategies.
 This observation further supports the effectiveness of the scaled-identity initialization in practice.
 
 \ifSubfilesClassLoaded{
