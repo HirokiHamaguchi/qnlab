@@ -17,18 +17,18 @@ Using the gradient $g_k \coloneqq \nabla f(x_k)$ and Hessian $\nabla^2 f(x_k)$ a
 with a step size $\alpha_k > 0$ determined by line search.
 The derivation of this update rule is as follows.
 The quadratic Taylor approximation of $f$ around $x_k$ is given by
-\begin{equation}\label{eq:newton-model}
+\begin{equation*}
     m^*_{k}(x) \coloneqq f(x_k) + g_k^\top (x - x_k) + \frac{1}{2} (x - x_k)^\top \nabla^2 f(x_k) (x - x_k).
-\end{equation}
+\end{equation*}
 The gradient of this model is
-\begin{equation}\label{eq:newton-model-gradient}
+\begin{equation*}
     \nabla m^*_k(x) = g_k + \nabla^2 f(x_k)(x - x_k).
-\end{equation}
-Since the quadratic model \cref{eq:newton-model} is strongly convex by assumption, $x^* \in \mathbb{R}^n$ is the minimizer of $m^*_k$ if and only if $\nabla m^*_k(x) = 0$, so solving $\nabla^2 f(x_k)(x - x_k) = -g_k$ yields
+\end{equation*}
+Since the quadratic model is strongly convex by assumption, a point $x^* \in \mathbb{R}^n$ is the minimizer of $m^*_k$ if and only if $\nabla m^*_k(x) = 0$. Thus, solving this equation yields
 \begin{equation*}
     \mathrm{arg\,min}_{x\in\mathbb{R}^n} m^*_{k}(x) = x_k -\nabla^2 f(x_k)^{-1} g_k.
 \end{equation*}
-Although this choice appears natural, it does not in general guarantee global convergence, as we will see in \cref{sec:newton-fullstep}.
+Although this choice appears natural, it does not in general guarantee global convergence, as we will see later.
 Thus, we introduce a step size $\alpha_k > 0$ determined by line search to ensure a sufficient decrease in the function value.
 This is the basic procedure of Newton's method.
 
@@ -58,15 +58,15 @@ We consider a general iterative method of the form
 \end{equation*}
 where $d_k$ is a descent direction satisfying $g_k^\top d_k < 0$ and $\alpha_k > 0$ is the step size determined by line search.
 We employ the Wolfe conditions \citep[Sec. 3.1]{nocedal1999numerical} to determine the step size $\alpha_k$ as follows:
-\begin{align}
-    f(x_k + \alpha_k d_k) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k, \label{eq:wolfe-1} \\
-    g_{k+1}^\top d_k      & \geq c_2 g_k^\top d_k, \label{eq:wolfe-2}
-\end{align}
+\begin{align*}
+    f(x_k + \alpha_k d_k) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k, \\
+    g_{k+1}^\top d_k      & \geq c_2 g_k^\top d_k,
+\end{align*}
 where $0 < c_1 < c_2 < 1$ are constants.
-We also define the angle between the direction $d_k$ and the negative gradient $-g_k$ as
-\begin{equation}\label{eq:angle-definition}
-    \cos \theta_k \coloneqq \frac{-g_k^\top d_k}{\norm{g_k}\norm{d_k}}.
-\end{equation}
+We also define $\theta_k \in [0, \pi]$ as the angle between the direction $d_k$ and the negative gradient $-g_k$, satisfying
+\begin{equation*}
+    \cos \theta_k = \frac{-g_k^\top d_k}{\norm{g_k}\norm{d_k}}.
+\end{equation*}
 The following theorem is a simplified version of the classical result.
 
 \begin{theorem}[{\cite[Theorem 3.2]{nocedal1999numerical}}]
@@ -76,16 +76,16 @@ The following theorem is a simplified version of the classical result.
     \begin{equation*}
         x_{k+1} \gets x_k + \alpha_k d_k,
     \end{equation*}
-    starting from an initial point $x_0 \in \mathbb{R}^n$, and the step size $\alpha_k$ is determined by the Wolfe conditions \cref{eq:wolfe-1,eq:wolfe-2}.
-    For the angle $\theta_k$ defined in \cref{eq:angle-definition}, if there exists a positive constant $\delta$ such that
+    starting from an initial point $x_0 \in \mathbb{R}^n$, and the step size $\alpha_k$ is determined by the Wolfe conditions.
+    For the angle $\theta_k$, if there exists a positive constant $\delta$ such that
     $\cos \theta_k \geq \delta > 0$ for all $k$,
     then, the method generates a sequence $\{x_k\}$ satisfying
-    \begin{equation}\label{eq:gradient-convergence}
+    \begin{equation*}
         \lim_{k \to \infty} \norm{g_k} = 0.
-    \end{equation}
+    \end{equation*}
 \end{theorem}
 \begin{proof}
-    From the Wolfe condition \eqref{eq:wolfe-2}, we have
+    From the Wolfe condition, we have
     \begin{equation*}
         (g_{k+1} - g_k)^\top d_k
         = g_{k+1}^\top d_k - g_k^\top d_k
@@ -99,24 +99,24 @@ The following theorem is a simplified version of the classical result.
                                         & = \alpha_k L \norm{d_k}^2.
     \end{align*}
     By combining these two relations, we obtain
-    \begin{equation}\label{eq:step-size-lower-bound-in-Wolfe}
-        \alpha_k \geq \frac{c_2 - 1}{L} \frac{g_k^\top d_k}{\norm{d_k}^2}.
-    \end{equation}
+    \begin{equation*}
+        \alpha_k \geq \frac{c_2 - 1}{L} \frac{g_k^\top d_k}{\norm{d_k}^2},
+    \end{equation*}
     and thus
     \begin{align*}
-        f(x_{k+1}) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k                                   &  & \text{(Wolfe condition \eqref{eq:wolfe-1})}           \\
-                   & \leq f(x_k) - c_1 \frac{1 - c_2}{L} \frac{(g_k^\top d_k)^2}{\norm{d_k}^2} &  & \text{(by \eqref{eq:step-size-lower-bound-in-Wolfe})} \\
-                   & = f(x_k) - c_1 \frac{1 - c_2}{L} \cos^2 \theta_k \norm{g_k}^2.            &  & \text{(definition in \eqref{eq:angle-definition})}
+        f(x_{k+1}) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k                                   &  & \text{(Wolfe condition)}          \\
+                   & \leq f(x_k) - c_1 \frac{1 - c_2}{L} \frac{(g_k^\top d_k)^2}{\norm{d_k}^2} &  & \text{(previous inequality)}      \\
+                   & = f(x_k) - c_1 \frac{1 - c_2}{L} \cos^2 \theta_k \norm{g_k}^2.            &  & \text{(definition of $\theta_k$)}
     \end{align*}
     By summing this expression over all indices less than or equal to $k$, we obtain
-    \begin{equation}\label{eq:telescoping-sum-Wolfe}
+    \begin{equation*}
         f(x_{k+1}) \leq f(x_0) - c_1 \frac{1 - c_2}{L} \sum_{j=0}^k \cos^2 \theta_j \norm{g_j}^2.
-    \end{equation}
+    \end{equation*}
     Since $f$ is bounded below, we have that $f(x_0) - f(x_{k+1})$ is less than some positive constant for all $k$.
-    Hence, by taking limits in \eqref{eq:telescoping-sum-Wolfe}, we obtain the Zoutendijk condition:
-    \begin{equation}\label{eq:zoutendijk}
+    Hence, by taking limits, we obtain the Zoutendijk condition:
+    \begin{equation*}
         \sum_{k=0}^\infty \cos^2 \theta_k \norm{g_k}^2 < \infty.
-    \end{equation}
+    \end{equation*}
     This condition implies that
     \begin{equation*}
         \cos^2 \theta_k \norm{g_k}^2 \to 0.
