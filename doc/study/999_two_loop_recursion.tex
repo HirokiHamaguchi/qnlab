@@ -1,0 +1,25 @@
+%!LW recipe=uplatex
+\documentclass{standalone}
+
+\usepackage[linesnumbered, ruled]{algorithm2e}
+\usepackage{amsmath}
+
+\begin{document}
+\DontPrintSemicolon
+\begin{algorithm}[H]
+    \caption{L-BFGS Two-Loop Recursion for $r = H_m q$}
+    \KwIn{$q$, stored pairs $\{(s_i, y_i)\}_{i=0}^{m-1}$, initial matrix $H_0$}
+    \KwOut{$r = H_m q$}
+    \For{$i = m-1, m-2, \dots, 0$}{
+        $\rho_i \gets 1/(y_i^\top s_i)$\;
+        $\alpha_i \gets \rho_i s_i^\top q$\;
+        $q \gets q - \alpha_i y_i$\;
+    }
+    $r \gets H_0 q$\;
+    \For{$i = 0, \dots, m-1$}{
+        $\beta_i \gets \rho_i y_i^\top r$\;
+        $r \gets r + s_i (\alpha_i - \beta_i)$\;
+    }
+    \Return $r$\;
+\end{algorithm}
+\end{document}
