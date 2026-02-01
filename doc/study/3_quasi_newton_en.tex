@@ -1,4 +1,4 @@
-\documentclass[en]{subfiles}
+\documentclass[0_en]{subfiles}
 
 \begin{document}
 
@@ -250,7 +250,7 @@ The key result is that the sequence $\{ C_{2t} \}_{t=0}^{\infty}$ converges to a
     We first analyze the even subsequence.
     Define
     \begin{equation*}
-        G_k \defeq C_{2k}
+        G_k \coloneqq C_{2k}
     \end{equation*}
     for $k=0,1,2,\dots$.
     By construction, each $G_k$ is symmetric.
@@ -260,7 +260,7 @@ The key result is that the sequence $\{ C_{2t} \}_{t=0}^{\infty}$ converges to a
     \end{equation*}
     Let us introduce the error vector
     \begin{equation}\label{eq:wk-definition}
-        w_k \defeq y-G_k s
+        w_k \coloneqq y-G_k s
     \end{equation}
     and then we have
     \begin{equation}\label{eq:Gupdate}
@@ -278,7 +278,7 @@ The key result is that the sequence $\{ C_{2t} \}_{t=0}^{\infty}$ converges to a
     \begin{equation}
         w_{k+1}=Pw_k,
         \qquad
-        P \defeq \frac{1}{2}\left(I-\frac{cs^\top}{c^\top s}\right).
+        P \coloneqq \frac{1}{2}\left(I-\frac{cs^\top}{c^\top s}\right).
     \end{equation}
     The matrix $cs^\top/c^\top s$ has rank one and eigenvalues $1,0,\dots,0$.
     Therefore, $P$ has one eigenvalue $0$ and all remaining eigenvalues equal to $1/2$.
@@ -348,24 +348,6 @@ In the PSB update rule discussed earlier, we substituted $c=s$, but we can consi
     \bar{B}_{\mathrm{DFP}} = B + \frac{(y - Bs)y^\top + y(y - Bs)^\top}{y^\top s} - \frac{(y - Bs)^\top s}{(y^\top s)^2} yy^\top.
 \end{equation}
 
-% Lemma 7.4.
-
-% 対称行列 $A \in \mathbb{R}^n$が
-% $$
-%     \lambda_1 \leq \lambda_2 \leq \dots \leq \lambda_n
-% $$
-% と固有値を持つとします。
-% ある $u \in \mathbb{R}^n$ に対して $A^* = A + \sigma uu^\top$ とし、その固有値を$\lambda_i^*$とします。
-% この時、$\sigma > 0$ ならば
-% $$
-%     \lambda_1 \leq \lambda_1^{*} \leq \lambda_2 \dots \leq \lambda_n \leq \lambda_n^{*}
-% $$
-% であり、$\sigma < 0$ ならば
-% $$
-%     \lambda_1^{*} \leq \lambda_1 \leq \lambda_2^* \dots \leq \lambda_n^{*} \leq \lambda_n
-% $$
-% が成り立つ。
-
 % Cauchy's Interlacing Theoremの亜種として知られているようです。
 
 % https://simple-complexities.github.io/eigenvalue/interlacing/2020/02/10/interlacing.html
@@ -394,7 +376,7 @@ Recall that the BFGS update formula is given by
 
 \subsubsection{Formula for \texorpdfstring{$H_k$}{Hk}}
 
-The inverse of the BFGS update $H_k \defeq B_k^{-1}$ is given by
+The inverse of the BFGS update $H_k \coloneqq B_k^{-1}$ is given by
 \begin{equation}
     H_{k+1} = \qty(I - \frac{s_k y_k^\top}{y_k^\top s_k}) H_k \qty(I - \frac{y_k s_k^\top}{y_k^\top s_k}) + \frac{s_k s_k^\top}{y_k^\top s_k}. \label{eq:Hk_rank}
 \end{equation}
@@ -709,10 +691,10 @@ Now, we verify that the output of \cref{alg:two-loop-recursion} indeed computes 
     The output of the two-loop recursion \cref{alg:two-loop-recursion} satisfies $r = H_m q$.
 \end{proposition}
 \begin{proof}
-    In the backward recursion, for $i = m-1, m-2, \dots, 0$, from the input vector $q^{(m)} \defeq q$, the algorithm computes
+    In the backward recursion, for $i = m-1, m-2, \dots, 0$, from the input vector $q^{(m)} \coloneqq q$, the algorithm computes
     \begin{equation}
         \alpha_i   = \rho_i s_i^\top q^{(i+1)}, \qquad
-        q^{(i)} \defeq q^{(i+1)} - \alpha_i y_i.
+        q^{(i)} \coloneqq q^{(i+1)} - \alpha_i y_i.
     \end{equation}
     % Using the definition of $V_i$ and $\alpha_i$, we have
     Substituting the definition of $\alpha_i$ and using \cref{eq:rho-V-def}, we find

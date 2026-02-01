@@ -1,4 +1,4 @@
-\documentclass[en]{subfiles}
+\documentclass[0_en]{subfiles}
 
 \begin{document}
 
@@ -9,8 +9,8 @@
 In this subsection, we outline Newton's method, which is a fundamental optimization algorithm for an unconstrained optimization problem.
 Newton's method is a representative iterative algorithm that starts from an initial point $x_0$, successively updates the current point, and generates a sequence $\{x_k\}_{k=0}^\infty$.
 
-We assume that $f$ is of class $C^2$ and strongly convex, so that the Hessian matrix $\nabla^2 f(x)$ is positive definite for all $x \in \bbR^n$, and thus invertible.
-Using the gradient $g_k \defeq \nabla f(x_k)$ and Hessian $\nabla^2 f(x_k)$ at the $k$-th iterate $x_k$, the base procedure of Newton's method is to iteratively update
+We assume that $f$ is of class $C^2$ and strongly convex, so that the Hessian matrix $\nabla^2 f(x)$ is positive definite for all $x \in \mathbb{R}^n$, and thus invertible.
+Using the gradient $g_k \coloneqq \nabla f(x_k)$ and Hessian $\nabla^2 f(x_k)$ at the $k$-th iterate $x_k$, the base procedure of Newton's method is to iteratively update
 \begin{equation*}
     x_{k+1} \gets x_k - \alpha_k \nabla^2 f(x_k)^{-1} g_k
 \end{equation*}
@@ -24,9 +24,9 @@ The gradient of this model is
 \begin{equation}\label{eq:newton-model-gradient}
     \nabla m^*_k(x) = g_k + \nabla^2 f(x_k)(x - x_k).
 \end{equation}
-Since the quadratic model \cref{eq:newton-model} is strongly convex by assumption, $x^* \in \bbR^n$ is the minimizer of $m^*_k$ if and only if $\nabla m^*_k(x) = 0$, so solving $\nabla^2 f(x_k)(x - x_k) = -g_k$ yields
+Since the quadratic model \cref{eq:newton-model} is strongly convex by assumption, $x^* \in \mathbb{R}^n$ is the minimizer of $m^*_k$ if and only if $\nabla m^*_k(x) = 0$, so solving $\nabla^2 f(x_k)(x - x_k) = -g_k$ yields
 \begin{equation*}
-    \argmin_{x\in\bbR^n} m^*_{k}(x) = x_k -\nabla^2 f(x_k)^{-1} g_k.
+    \mathrm{arg\,min}_{x\in\mathbb{R}^n} m^*_{k}(x) = x_k -\nabla^2 f(x_k)^{-1} g_k.
 \end{equation*}
 Although this choice appears natural, it does not in general guarantee global convergence, as we will see in \cref{sec:newton-fullstep}.
 Thus, we introduce a step size $\alpha_k > 0$ determined by line search to ensure a sufficient decrease in the function value.
@@ -71,12 +71,12 @@ The following theorem is a simplified version of the classical result.
 
 \begin{theorem}[{\cite[Theorem 3.2]{nocedal1999numerical}}]
     \label{thm:line-search-global-convergence}
-    Suppose that $f$ is of class $C^1$ and bounded below in $\bbR^n$, and $L$-smooth.
+    Suppose that $f$ is of class $C^1$ and bounded below in $\mathbb{R}^n$, and $L$-smooth.
     Consider the iterative method defined by
     \begin{equation*}
         x_{k+1} \gets x_k + \alpha_k d_k,
     \end{equation*}
-    starting from an initial point $x_0 \in \bbR^n$, and the step size $\alpha_k$ is determined by the Wolfe conditions \cref{eq:wolfe-1,eq:wolfe-2}.
+    starting from an initial point $x_0 \in \mathbb{R}^n$, and the step size $\alpha_k$ is determined by the Wolfe conditions \cref{eq:wolfe-1,eq:wolfe-2}.
     For the angle $\theta_k$ defined in \cref{eq:angle-definition}, if there exists a positive constant $\delta$ such that
     $\cos \theta_k \geq \delta > 0$ for all $k$,
     then, the method generates a sequence $\{x_k\}$ satisfying
@@ -179,7 +179,7 @@ We again provide a simplified version for brevity as follows.
         \norm{x_{k+1} - x^*}
         \le L^{\mathrm{H}}\norm{\qty(\nabla^2 f(x^*))^{-1}} \norm{x_k-x^*}^2.
     \end{equation*}
-    Let $\widetilde L  \defeq  L^{\mathrm{H}}\norm{\qty(\nabla^2 f(x^*))^{-1}}$.
+    Let $\widetilde L  \coloneqq  L^{\mathrm{H}}\norm{\qty(\nabla^2 f(x^*))^{-1}}$.
     If the initial point is chosen such that $\norm{x_0-x^*}\le \min\{r,1/(2\widetilde L)\}$, then by induction $\{x_k\}$ remains within the neighborhood and converges to $x^*$.
     The above error bound implies quadratic convergence of $\{x_k\}$.
 
@@ -198,7 +198,7 @@ We again provide a simplified version for brevity as follows.
 
 These propositions \cref{thm:line-search-global-convergence,thm:newton-quadratic} indicate that Newton's method equipped with line search has both global convergence and local quadratic convergence properties under appropriate conditions.
 This rapid convergence is a significant advantage of Newton's method compared to first-order methods such as gradient descent, which typically exhibit only linear convergence.
-However, computing the Hessian $\nabla^2 f(x_k) \in \bbR^{n \times n}$ and solving the linear system $\nabla^2 f(x_k) d_k = -\nabla f(x_k)$ require $\order{n^3}$ time, which is prohibitively expensive for large-scale problems.
+However, computing the Hessian $\nabla^2 f(x_k) \in \mathbb{R}^{n \times n}$ and solving the linear system $\nabla^2 f(x_k) d_k = -\nabla f(x_k)$ require $\order{n^3}$ time, which is prohibitively expensive for large-scale problems.
 Other optimization methods, such as quasi-Newton methods, are also used for such methods, as we will discuss later.
 
 \subsection{Elements for Global Convergence}

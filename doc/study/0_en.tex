@@ -1,6 +1,6 @@
-\documentclass[12pt,a4paper,dvipdfmx]{article}
+\documentclass[dvipdfmx]{article}
 
-\usepackage{graphicx}
+\usepackage[dvipdfmx]{graphicx}
 \usepackage{mathptmx}
 
 \usepackage{ascmac}
@@ -15,7 +15,7 @@
 \usepackage{enumitem}
 \usepackage{fancybox}
 \usepackage{floatrow}
-\usepackage{geometry}
+\usepackage[margin=25mm]{geometry}
 \usepackage[breaklinks]{hyperref}
 \usepackage{ifthen}
 \usepackage{lipsum}
@@ -37,53 +37,6 @@
 \usepackage[numbers,sort&compress]{natbib}
 
 \hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
-
-\definecolor{cA}{HTML}{0072BD}
-\definecolor{cB}{HTML}{EDB120}
-\definecolor{cC}{HTML}{77AC30}
-\definecolor{cD}{HTML}{D95319}
-
-\newcommand{\red}[1]{\textcolor{red}{#1}}
-\newcommand{\blue}[1]{\textcolor{blue}{#1}}
-\newcommand{\cyan}[1]{\textcolor{cyan}{#1}}
-\newcommand{\gray}[1]{\textcolor{gray}{#1}}
-\newcommand{\green}[1]{\textcolor{green}{#1}}
-\newcommand{\brown}[1]{\textcolor{brown}{#1}}
-\newcommand{\black}[1]{\textcolor{black}{#1}}
-\newcommand{\orange}[1]{\textcolor{orange}{#1}}
-\newcommand{\st}{\text{ s.t. }}
-\newcommand{\Img}[1]{\mathrm{Im}\qty(#1)}
-\newcommand{\Ker}[1]{\mathrm{Ker}\qty(#1)}
-\newcommand{\Supp}[1]{\mathrm{supp}\qty(#1)}
-\newcommand{\Rank}[1]{\mathrm{rank}\qty(#1)}
-\DeclareMathOperator*{\argmax}{arg\,max}
-\DeclareMathOperator*{\argmin}{arg\,min}
-\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
-\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
-% C++ (https://tex.stackexchange.com/questions/4302/prettiest-way-to-typeset-c-cplusplus)
-\newcommand{\Cpp}{C\nolinebreak[4]\hspace{-.05em}\raisebox{.4ex}{\relsize{-3}{\textbf{++}}}}
-% https://tex.stackexchange.com/questions/28836/typesetting-the-define-equals-symbol
-\newcommand{\defeq}{\coloneqq}
-\newcommand{\eqdef}{\eqqcolon}
-% https://tex.stackexchange.com/questions/5502/how-to-get-a-mid-binary-relation-that-grows
-\newcommand{\relmiddle}[1]{\mathrel{}\middle#1\mathrel{}}
-
-% https://tex.stackexchange.com/questions/564216/newcommand-for-each-letter
-\ExplSyntaxOn
-\NewDocumentCommand{\definealphabet}{mmmm}{
-    \int_step_inline:nnn{`#3}{`#4}{
-        \cs_new_protected:cpx{#1 \char_generate:nn{##1}{11}}{
-            \exp_not:N #2{\char_generate:nn{##1}{11}}}}}
-\ExplSyntaxOff
-
-% cleveref fails to accurately capture pseudo-code line numbers. We define a custom reference command for lines in algorithms.
-\newcommand{\refLine}[1]{Line~\ref{#1}}
-\newcommand{\refLines}[2]{Lines~\ref{#1}--\ref{#2}}
-
-\definealphabet{bb}{\mathbb}{A}{Z}
-\definealphabet{rm}{\mathrm}{A}{Z}
-\definealphabet{cal}{\mathcal}{A}{Z}
-\definealphabet{frak}{\mathfrak}{a}{z}
 
 % Theorem Environments
 \newtheorem{theorem}{Theorem}
@@ -111,19 +64,6 @@
 % https://qiita.com/rityo_masu/items/efd44bc8f9229e014237
 \allowdisplaybreaks[4]
 
-\NewDocumentCommand{\ared}{O{k}}{\mathrm{ared}_{#1}}
-\NewDocumentCommand{\ered}{O{k}}{\overline{\mathrm{ared}}_{#1}}
-\NewDocumentCommand{\pred}{O{k}}{\mathrm{pred}_{#1}}
-\NewDocumentCommand{\ep}{O{k}}{\frac{\ered[#1]}{\pred[#1]}}
-\NewDocumentCommand{\inep}{O{k}}{\ered[#1]/\pred[#1]}
-\NewDocumentCommand{\ap}{O{k}}{\frac{\ared[#1]}{\pred[#1]}}
-\NewDocumentCommand{\inap}{O{k}}{\ared[#1]/\pred[#1]}
-\newcommand{\feps}{\varepsilon_\mathrm{f}}
-\newcommand{\gtol}{\epsilon_{\mathrm{gtol}}}
-\newcommand{\AdaGrad}{\textsc{AdaGrad} }
-\newcommand{\Adam}{\textsc{Adam} }
-\newcommand{\AdaGradNorm}{\textsc{AdaGrad-Norm} }
-
 \begin{document}
 
 \title{Study of Quasi-Newton Methods}
@@ -131,13 +71,13 @@
 \date{\today}
 \maketitle
 
-\subfile{en_basic.tex}
+\subfile{1_basic_en.tex}
 
-\subfile{en_newton.tex}
+\subfile{2_newton_en.tex}
 
-\subfile{en_quasi_newton.tex}
+\subfile{3_quasi_newton_en.tex}
 
-\subfile{en_modified_secant.tex}
+\subfile{4_modified_secant_en.tex}
 
 \bibliographystyle{unsrtnat}
 \bibliography{../L-BFGS.bib}
