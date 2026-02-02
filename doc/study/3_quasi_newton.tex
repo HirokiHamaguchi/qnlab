@@ -120,8 +120,8 @@
     $\nabla f(x_k)$ のテイラー展開を用いると次が成り立つ。
 \fi
 \begin{align*}
-    \nabla f(x_k) & = \nabla f(x_{k+1}) + \nabla^2 f(x_{k+1})(x_k - x_{k+1}) + \order{\norm{x_k - x_{k+1}}^2} \\
-                  & \approx \nabla f(x_{k+1}) + \nabla^2 f(x_{k+1})(x_k - x_{k+1})                            \\
+    \nabla f(x_k) & = \nabla f(x_{k+1}) + \nabla^2 f(x_{k+1})(x_k - x_{k+1}) + \order{\lVert x_k - x_{k+1} \rVert^2} \\
+                  & \approx \nabla f(x_{k+1}) + \nabla^2 f(x_{k+1})(x_k - x_{k+1})                                   \\
                   & \approx \nabla f(x_{k+1}) + B_{k+1}(x_k - x_{k+1})
 \end{align*}
 \ifEn
@@ -230,11 +230,11 @@
     \fi
     \begin{align*}
         \bar{B}_{\mathrm{Broyden}} s
-         & = \qty(B + \frac{(y - Bs)s^\top}{s^\top s}) s
+         & = \left(B + \frac{(y - Bs)s^\top}{s^\top s}\right) s
         = Bs + (y - Bs)
-        = y,                                             \\
+        = y,                                                    \\
         \bar{B}_{\mathrm{Broyden}} z
-         & = \qty(B + \frac{(y - Bs)s^\top}{s^\top s}) z
+         & = \left(B + \frac{(y - Bs)s^\top}{s^\top s}\right) z
         = Bz + (z^\top s) \frac{y - Bs}{s^\top s}
         = Bz.
     \end{align*}
@@ -259,13 +259,13 @@
         Let $B\in\mathbb{R}^{n\times n}$, $y\in\mathbb{R}^n$, and $s\in\mathbb{R}^n\setminus\{ 0 \}$ be given.
         Then the matrix $\bar{B}_{\mathrm{Broyden}}$ is the unique solution of
         \begin{align*}
-            \underset{\tilde{B} \in \mathbb{R}^{n \times n}}{\mathrm{minimize}} & \quad \norm{\tilde{B} - B}_F \\
+            \underset{\tilde{B} \in \mathbb{R}^{n \times n}}{\mathrm{minimize}} & \quad \lVert \tilde{B} - B \rVert_F \\
             \mathrm{subject to}                                                 & \quad \tilde{B} s = y.
         \end{align*}
     \else
         $B\in\mathbb{R}^{n\times n}$, $y\in\mathbb{R}^n$, $s\in\mathbb{R}^n\setminus\{ 0 \}$ を与える。このとき行列 $\bar{B}_{\mathrm{Broyden}}$ は
         \begin{align*}
-            \underset{\tilde{B} \in \mathbb{R}^{n \times n}}{\mathrm{minimize}} & \quad \norm{\tilde{B} - B}_F \\
+            \underset{\tilde{B} \in \mathbb{R}^{n \times n}}{\mathrm{minimize}} & \quad \lVert \tilde{B} - B \rVert_F \\
             \mathrm{subject to}                                                 & \quad \tilde{B} s = y
         \end{align*}
         の一意解である。
@@ -273,7 +273,7 @@
 \end{proposition}
 \begin{proof}
     \ifEn
-        The function $\tilde{B}\mapsto\norm{\tilde{B}-B}_F$ is strictly convex on $\mathbb{R}^{n\times n}$.
+        The function $\tilde{B}\mapsto\lVert \tilde{B}-B \rVert_F$ is strictly convex on $\mathbb{R}^{n\times n}$.
         The constraint set
         \begin{equation*}
             \{\tilde{B}\in\mathbb{R}^{n\times n}:\tilde{B}s=y\}
@@ -284,7 +284,7 @@
         We show that $\bar{B}_{\mathrm{Broyden}}$ is indeed the minimizer.
         For any $\tilde{B}$ satisfying the constraint $\tilde{B}s=y$, we have
     \else
-        関数 $\tilde{B}\mapsto\norm{\tilde{B}-B}_F$ は $\mathbb{R}^{n\times n}$ 上で厳密凸である。
+        関数 $\tilde{B}\mapsto\lVert \tilde{B}-B \rVert_F$ は $\mathbb{R}^{n\times n}$ 上で厳密凸である。
         制約集合
         \begin{equation*}
             \{\tilde{B}\in\mathbb{R}^{n\times n}:\tilde{B}s=y\}
@@ -295,16 +295,16 @@
         $\bar{B}_{\mathrm{Broyden}}$ が実際に最小解であることを示す。制約 $\tilde{B}s=y$ を満たす任意の $\tilde{B}$ に対して
     \fi
     \begin{equation*}
-        \norm{\bar{B}_{\mathrm{Broyden}} - B}_F^2
-        = \norm{\frac{(y-Bs)s^\top}{s^\top s}}_F^2
-        = \norm{(\tilde{B}-B) \frac{s s^\top}{s^\top s}}_F^2
-        \leq \norm{\tilde{B}-B}_F^2,
+        \lVert \bar{B}_{\mathrm{Broyden}} - B \rVert_F^2
+        = \lVert \frac{(y-Bs)s^\top}{s^\top s} \rVert_F^2
+        = \lVert (\tilde{B}-B) \frac{s s^\top}{s^\top s} \rVert_F^2
+        \leq \lVert \tilde{B}-B \rVert_F^2,
     \end{equation*}
     \ifEn
-        where we used the sub-multiplicativity of Frobenius norm and the fact that $\norm{ss^\top/(s^\top s)}_F=1$ in the last inequality.
+        where we used the sub-multiplicativity of Frobenius norm and the fact that $\lVert ss^\top/(s^\top s) \rVert_F=1$ in the last inequality.
         Thus, $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$.
     \else
-        最後の不等式ではフロベニウスノルムの劣乗法性と $\norm{ss^\top/(s^\top s)}_F=1$ を用いた。
+        最後の不等式ではフロベニウスノルムの劣乗法性と $\lVert ss^\top/(s^\top s) \rVert_F=1$ を用いた。
         したがって $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$ である。
     \fi
     \myQED
@@ -514,7 +514,7 @@
         定義から次を得る。
     \fi
     \begin{equation*}
-        G_{k+1} = G_k +\frac{1}{2c^\top s}\qty((y-G_k s)c^\top+c(y-G_k s)^\top).
+        G_{k+1} = G_k +\frac{1}{2c^\top s}\left((y-G_k s)c^\top+c(y-G_k s)^\top\right).
     \end{equation*}
     \ifEn
         Let us introduce the error vector
@@ -538,11 +538,11 @@
         上式を $w_k$ の定義に代入すると
     \fi
     \begin{align*}
-        w_{k+1} & = y-\qty(G_k+\frac{1}{2c^\top s}(w_k c^\top+cw_k^\top))s \\
+        w_{k+1} & = y-\left(G_k+\frac{1}{2c^\top s}(w_k c^\top+cw_k^\top)\right)s \\
                 & =
-        w_k-\frac12w_k-\frac{w_k^\top s}{2c^\top s}c                       \\
+        w_k-\frac12w_k-\frac{w_k^\top s}{2c^\top s}c                              \\
                 & =
-        \frac{1}{2}\qty(w_k-\frac{w_k^\top s}{c^\top s}c).
+        \frac{1}{2}\left(w_k-\frac{w_k^\top s}{c^\top s}c\right).
     \end{align*}
     \ifEn
         Hence
@@ -566,9 +566,9 @@
         したがってノイマン級数が収束し、次が成り立つ。
     \fi
     \begin{align*}
-        \sum_{k=0}^{\infty}w_k & =        \sum_{k=0}^{\infty}P^k(y-Bs)                  &  & (w_0=y-Bs)                \\
-                               & =  (I-P)^{-1}(y-Bs)                                                                   \\
-                               & = 2\qty(I-\frac{1}{2}\frac{cs^\top}{c^\top s}) (y-Bs). &  & (\text{definition of } P)
+        \sum_{k=0}^{\infty}w_k & =        \sum_{k=0}^{\infty}P^k(y-Bs)                         &  & (w_0=y-Bs)                \\
+                               & =  (I-P)^{-1}(y-Bs)                                                                          \\
+                               & = 2\left(I-\frac{1}{2}\frac{cs^\top}{c^\top s}\right) (y-Bs). &  & (\text{definition of } P)
     \end{align*}
     \ifEn
         Note that the last equation follows from
@@ -576,23 +576,23 @@
         最後の式は次から従う。
     \fi
     \begin{equation*}
-        2(I-P) \qty(I-\frac{1}{2}\frac{cs^\top}{c^\top s}) = \qty(I + \frac{cs^\top}{c^\top s}) \qty(I-\frac{1}{2}\frac{cs^\top}{c^\top s}) = I.
+        2(I-P) \left(I-\frac{1}{2}\frac{cs^\top}{c^\top s}\right) = \left(I + \frac{cs^\top}{c^\top s}\right) \left(I-\frac{1}{2}\frac{cs^\top}{c^\top s}\right) = I.
     \end{equation*}
     \ifEn
-        In particular, $\norm{w_k}\to0$ as $k\to\infty$.
+        In particular, $\lVert w_k \rVert\to0$ as $k\to\infty$.
         Hence, we have
     \else
-        特に $k\to\infty$ で $\norm{w_k}\to0$ となる。
+        特に $k\to\infty$ で $\lVert w_k \rVert\to0$ となる。
         よって
     \fi
     \begin{align*}
         \lim_{k\to\infty}G_k
          & =
         B+\frac{1}{2c^\top s}
-        \sum_{k=0}^{\infty}(w_k c^\top+c w_k^\top)                                                                                                                          \\
-         & = B+ \qty(\sum_{k=0}^{\infty}w_k) \frac{c^\top}{2c^\top s} + \frac{c}{2c^\top s} \qty(\sum_{k=0}^{\infty}w_k)^\top                                               \\
-         & = B+ 2\qty(I-\frac{1}{2}\frac{cs^\top}{c^\top s}) (y-Bs) \frac{c^\top}{2c^\top s} + \frac{c}{2c^\top s} 2(y-Bs)^\top \qty(I-\frac{1}{2}\frac{sc^\top}{c^\top s}) \\
-         & = B + \frac{(y - Bs)c^\top + c(y - Bs)^\top}{c^\top s} - \frac{(y - Bs)^\top s}{(c^\top s)^2} c c^\top                                                           \\
+        \sum_{k=0}^{\infty}(w_k c^\top+c w_k^\top)                                                                                                                                        \\
+         & = B+ \left(\sum_{k=0}^{\infty}w_k\right) \frac{c^\top}{2c^\top s} + \frac{c}{2c^\top s} \left(\sum_{k=0}^{\infty}w_k\right)^\top                                               \\
+         & = B+ 2\left(I-\frac{1}{2}\frac{cs^\top}{c^\top s}\right) (y-Bs) \frac{c^\top}{2c^\top s} + \frac{c}{2c^\top s} 2(y-Bs)^\top \left(I-\frac{1}{2}\frac{sc^\top}{c^\top s}\right) \\
+         & = B + \frac{(y - Bs)c^\top + c(y - Bs)^\top}{c^\top s} - \frac{(y - Bs)^\top s}{(c^\top s)^2} c c^\top                                                                         \\
          & = C_{\infty}.
     \end{align*}
     \ifEn
@@ -606,18 +606,18 @@
         G_k+\frac{w_k c^\top}{c^\top s}.
     \end{equation*}
     \ifEn
-        Since $G_k\to\bar B$ and $\norm{w_k}\to0$, we obtain
+        Since $G_k\to\bar B$ and $\lVert w_k \rVert\to0$, we obtain
     \else
-        $G_k\to\bar B$ かつ $\norm{w_k}\to0$ なので
+        $G_k\to\bar B$ かつ $\lVert w_k \rVert\to0$ なので
     \fi
     \begin{equation*}
         C_{2k+1}-G_k\to0.
     \end{equation*}
     \ifEn
-        Therefore both subsequences $\{C_{2k}\}$ and $\{C_{2k+1}\}$ converge to $\bar B$,
+        Therefore both subsequences $\{ C_{2k} \}$ and $\{ C_{2k+1} \}$ converge to $\bar B$,
         and hence
     \else
-        したがって部分列 $\{C_{2k}\}$ と $\{C_{2k+1}\}$ はどちらも $\bar B$ に収束し、よって
+        したがって部分列 $\{ C_{2k} \}$ と $\{ C_{2k+1} \}$ はどちらも $\bar B$ に収束し、よって
     \fi
     \begin{equation*}
         C_k\to\bar B.
@@ -694,8 +694,8 @@
     \href{https://en.wikipedia.org/wiki/Broyden%E2%80%93Fletcher%E2%80%93Goldfarb%E2%80%93Shanno_algorithm}{Broyden--Fletcher--Goldfarb--Shanno (BFGS) 更新}は最も広く使われる準ニュートン法の一つである。更新公式は次で与えられる。
 \fi
 \begin{align*}
-    \bar{B}_{\mathrm{BFGS}} & = B - \frac{B s s^\top B}{s^\top B s} + \frac{y y^\top}{y^\top s},                                       \\
-    \bar{H}_{\mathrm{BFGS}} & = \qty(I - \frac{s y^\top}{y^\top s}) H \qty(I - \frac{y s^\top}{y^\top s}) + \frac{s s^\top}{y^\top s}.
+    \bar{B}_{\mathrm{BFGS}} & = B - \frac{B s s^\top B}{s^\top B s} + \frac{y y^\top}{y^\top s},                                                     \\
+    \bar{H}_{\mathrm{BFGS}} & = \left(I - \frac{s y^\top}{y^\top s}\right) H \left(I - \frac{y s^\top}{y^\top s}\right) + \frac{s s^\top}{y^\top s}.
 \end{align*}
 
 \ifEn
@@ -741,7 +741,7 @@
     BFGS 更新の逆行列 $H_k \coloneqq B_k^{-1}$ は次式で与えられる。
 \fi
 \begin{equation*}
-    H_{k+1} = \qty(I - \frac{s_k y_k^\top}{y_k^\top s_k}) H_k \qty(I - \frac{y_k s_k^\top}{y_k^\top s_k}) + \frac{s_k s_k^\top}{y_k^\top s_k}.
+    H_{k+1} = \left(I - \frac{s_k y_k^\top}{y_k^\top s_k}\right) H_k \left(I - \frac{y_k s_k^\top}{y_k^\top s_k}\right) + \frac{s_k s_k^\top}{y_k^\top s_k}.
 \end{equation*}
 \ifEn
     We now prove that this equation indeed gives the inverse of the BFGS update.
@@ -771,9 +771,9 @@
         ここで
     \fi
     \begin{equation*}
-        U = \mqty[B_k s_k & y_k],\qquad
-        C = \mqty(-\frac{1}{s_k^\top B_k s_k} & 0 \\ 0 & \frac{1}{y_k^\top s_k}),\qquad
-        V = \mqty[B_k s_k & y_k]
+        U = \begin{bmatrix}B_k s_k & y_k\end{bmatrix},\qquad
+        C = \begin{pmatrix}-\frac{1}{s_k^\top B_k s_k} & 0 \\ 0 & \frac{1}{y_k^\top s_k}\end{pmatrix},\qquad
+        V = \begin{bmatrix}B_k s_k & y_k\end{bmatrix}
     \end{equation*}
     \ifEn
         since
@@ -781,7 +781,7 @@
         である。実際
     \fi
     \begin{equation*}
-        U C V^\top   = \mqty[ -\frac{B_k s_k}{s_k^\top B_k s_k}&    \frac{y_k}{y_k^\top s_k} ] \mqty[ s_k^\top B_k  \\  y_k^\top ]
+        U C V^\top   = \begin{bmatrix} -\frac{B_k s_k}{s_k^\top B_k s_k}&    \frac{y_k}{y_k^\top s_k} \end{bmatrix} \begin{bmatrix} s_k^\top B_k  \\  y_k^\top \end{bmatrix}
         = -\frac{B_k s_k s_k^\top B_k}{s_k^\top B_k s_k} + \frac{y_k y_k^\top}{y_k^\top s_k}.
     \end{equation*}
     \ifEn
@@ -790,14 +790,14 @@
         Sherman--Morrison--Woodbury の恒等式より
     \fi
     \begin{align*}
-        H_{k+1} & = (B_k + U C V^\top)^{-1}                                                                                                                                                                                                                    \\
-                & = B_k^{-1}- B_k^{-1}U\qty(C^{-1}+V^\top B_k^{-1}U)^{-1}V^\top B_k^{-1}                                                                                                                                                                       \\
-                & = H_k- \mqty[s_k                                                                                                                             & H_k y_k]\qty(\mqty(- s_k^\top B_k s_k                                         & 0             \\0    & y_k^\top s_k)+\mqty(s_k^\top B_k s_k   & s_k^\top y_k      \\y_k^\top s_k & y_k^\top H_k y_k))^{-1}\mqty[s_k^\top   \\ y_k^\top H_k] \\
-                & = H_k- \mqty[s_k                                                                                                                             & H_k y_k]\mqty(0                                                               & y_k^\top s_k  \\y_k^\top s_k       & y_k^\top H_k y_k + y_k^\top s_k)^{-1}\mqty[s_k^\top                         \\     y_k^\top H_k]                 \\
-                & = H_k- \mqty[s_k                                                                                                                             & H_k y_k]\qty(-\frac{1}{(y_k^\top s_k)^2}\mqty(y_k^\top H_k y_k + y_k^\top s_k & -y_k^\top s_k \\-y_k^\top s_k                 & 0    )) \mqty[ s_k^\top                                                      \\     y_k^\top H_k]  \\
-                & = H_k+\frac{1}{(y_k^\top s_k)^2}\mqty[s_k                                                                                                    & H_k y_k] \mqty(y_k^\top H_k y_k + y_k^\top s_k                                & -y_k^\top s_k \\-y_k^\top s_k                 & 0) \mqty[s_k^\top                                                             \\    y_k^\top H_k]\\
-                & = H_k+\frac{1}{(y_k^\top s_k)^2} \qty((y_k^\top H_k y_k + y_k^\top s_k) s_k s_k^\top - (y_k^\top s_k)(s_k y_k^\top H_k + H_k y_k s_k^\top) )                                                                                                 \\
-                & = \qty(I - \frac{s_k y_k^\top}{y_k^\top s_k}) H_k \qty(I - \frac{y_k s_k^\top}{y_k^\top s_k}) + \frac{s_k s_k^\top}{y_k^\top s_k}.
+        H_{k+1} & = (B_k + U C V^\top)^{-1}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      \\
+                & = B_k^{-1}- B_k^{-1}U\left(C^{-1}+V^\top B_k^{-1}U\right)^{-1}V^\top B_k^{-1}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \\
+                & = H_k- \begin{bmatrix}s_k & H_k y_k\end{bmatrix} \left(\begin{pmatrix}- s_k^\top B_k s_k & 0                                                                                                                                                                                                                                            \\0    & y_k^\top s_k\end{pmatrix}+\begin{pmatrix}s_k^\top B_k s_k   & s_k^\top y_k      \\y_k^\top s_k & y_k^\top H_k y_k\end{pmatrix}\right)^{-1}\begin{bmatrix}s_k^\top \\ y_k^\top H_k\end{bmatrix}                                                                                                                                                \\
+                & = H_k- \begin{bmatrix}s_k                                                                                                                             & H_k y_k\end{bmatrix}\begin{pmatrix}0                                                               & y_k^\top s_k                                                                                                                                                                                                                                          \\y_k^\top s_k       & y_k^\top H_k y_k + y_k^\top s_k\end{pmatrix}^{-1}\begin{bmatrix}s_k^\top                         \\     y_k^\top H_k\end{bmatrix}                    \\
+                & = H_k- \begin{bmatrix}s_k                                                                                                                             & H_k y_k\end{bmatrix}\left(-\frac{1}{(y_k^\top s_k)^2}\begin{pmatrix}y_k^\top H_k y_k + y_k^\top s_k & -y_k^\top s_k                                                                                                                                                                                                                                         \\-y_k^\top s_k                 & 0    \end{pmatrix}\right) \begin{bmatrix} s_k^\top                                                      \\     y_k^\top H_k\end{bmatrix} \\
+                & = H_k+\frac{1}{(y_k^\top s_k)^2}\begin{bmatrix}s_k                                                                                                    & H_k y_k\end{bmatrix} \begin{pmatrix}y_k^\top H_k y_k + y_k^\top s_k                                & -y_k^\top s_k                                                                                                                                                                                                                                         \\-y_k^\top s_k                 & 0\end{pmatrix} \begin{bmatrix}s_k^\top                                                             \\    y_k^\top H_k\end{bmatrix}        \\
+                & = H_k+\frac{1}{(y_k^\top s_k)^2} \left((y_k^\top H_k y_k + y_k^\top s_k) s_k s_k^\top - (y_k^\top s_k)(s_k y_k^\top H_k + H_k y_k s_k^\top) \right)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            \\
+                & = \left(I - \frac{s_k y_k^\top}{y_k^\top s_k}\right) H_k \left(I - \frac{y_k s_k^\top}{y_k^\top s_k}\right) + \frac{s_k s_k^\top}{y_k^\top s_k}.
     \end{align*}
     \ifEn
         which completes the proof.
@@ -836,7 +836,7 @@
     \fi
     \begin{align*}
         v^\top H_{k+1} v
-         & = v^\top \qty(I - \frac{s_k y_k^\top}{y_k^\top s_k}) H_k \qty(I - \frac{y_k s_k^\top}{y_k^\top s_k}) v + v^\top \frac{s_k s_k^\top}{y_k^\top s_k} v \\
+         & = v^\top \left(I - \frac{s_k y_k^\top}{y_k^\top s_k}\right) H_k \left(I - \frac{y_k s_k^\top}{y_k^\top s_k}\right) v + v^\top \frac{s_k s_k^\top}{y_k^\top s_k} v \\
          & \geq 0 + \frac{(s_k^\top v)^2}{y_k^\top s_k} > 0,
     \end{align*}
     \ifEn
@@ -922,12 +922,12 @@
     \ifEn
         Let $B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ be the BFGS update. Then
         \begin{equation*}
-            \tr(B_{+}) = \tr(B) - \frac{\norm{B s}^2}{s^\top Bs} + \frac{\norm{y}^2}{y^\top s}.
+            \tr(B_{+}) = \tr(B) - \frac{\lVert B s \rVert^2}{s^\top Bs} + \frac{\lVert y \rVert^2}{y^\top s}.
         \end{equation*}
     \else
         $B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ を BFGS 更新とする。このとき
         \begin{equation*}
-            \tr(B_{+}) = \tr(B) - \frac{\norm{B s}^2}{s^\top Bs} + \frac{\norm{y}^2}{y^\top s}
+            \tr(B_{+}) = \tr(B) - \frac{\lVert B s \rVert^2}{s^\top Bs} + \frac{\lVert y \rVert^2}{y^\top s}
         \end{equation*}
         が成り立つ。
     \fi
@@ -940,7 +940,7 @@
         BFGS 更新公式にトレースを適用すると
     \fi
     \begin{equation*}
-        \tr(B_{+}) = \tr(B) - \tr\qty(\frac{Bss^\top B}{s^\top Bs}) + \tr\qty(\frac{yy^\top}{y^\top s}).
+        \tr(B_{+}) = \tr(B) - \tr\left(\frac{Bss^\top B}{s^\top Bs}\right) + \tr\left(\frac{yy^\top}{y^\top s}\right).
     \end{equation*}
     \ifEn
         For the second term, note that
@@ -948,7 +948,7 @@
         第2項について
     \fi
     \begin{equation*}
-        \tr\qty(\frac{Bss^\top B}{s^\top Bs}) = \frac{1}{s^\top Bs}\tr((Bs)(Bs)^\top) = \frac{\norm{B s}^2}{s^\top Bs}.
+        \tr\left(\frac{Bss^\top B}{s^\top Bs}\right) = \frac{1}{s^\top Bs}\tr((Bs)(Bs)^\top) = \frac{\lVert B s \rVert^2}{s^\top Bs}.
     \end{equation*}
     \ifEn
         For the third term, we have
@@ -956,7 +956,7 @@
         第3項について
     \fi
     \begin{equation*}
-        \tr\qty(\frac{yy^\top}{y^\top s}) = \frac{1}{y^\top s}\tr(yy^\top) = \frac{\norm{y}^2}{y^\top s}.
+        \tr\left(\frac{yy^\top}{y^\top s}\right) = \frac{1}{y^\top s}\tr(yy^\top) = \frac{\lVert y \rVert^2}{y^\top s}.
     \end{equation*}
     \ifEn
         Combining these results yields the desired formula.
@@ -1001,7 +1001,7 @@
         \href{https://en.wikipedia.org/wiki/Matrix_determinant_lemma}{行列式補題}より、$U, C, V$ は次を満たす。
     \fi
     \begin{equation*}
-        \det(B_{k+1}) =\det(B_k + U C V^\top)=\det(B_k)\det(C) \det \qty(C^{-1} + V^\top B_k^{-1} U),
+        \det(B_{k+1}) =\det(B_k + U C V^\top)=\det(B_k)\det(C) \det \left(C^{-1} + V^\top B_k^{-1} U\right),
     \end{equation*}
     \ifEn
         where $I_2$ is the $2\times 2$ identity matrix.
@@ -1009,12 +1009,12 @@
         ここで $I_2$ は $2\times 2$ の単位行列である。
     \fi
     \ifEn
-        Since $U=V=\mqty[B_k s_k & y_k]$, we have
+        Since $U=V=\begin{bmatrix}B_k s_k & y_k\end{bmatrix}$, we have
     \else
-        $U=V=\mqty[B_k s_k & y_k]$ なので
+        $U=V=\begin{bmatrix}B_k s_k & y_k\end{bmatrix}$ なので
     \fi
     \begin{equation*}
-        V^\top B_k^{-1} U = \mqty[ s_k^\top B_k s_k & s_k^\top y_k \\ y_k^\top s_k     & y_k^\top B_k^{-1} y_k ]
+        V^\top B_k^{-1} U = \begin{bmatrix} s_k^\top B_k s_k & s_k^\top y_k \\ y_k^\top s_k     & y_k^\top B_k^{-1} y_k \end{bmatrix}
     \end{equation*}
     \ifEn
         and thus
@@ -1024,10 +1024,10 @@
     \begin{equation*}
         C^{-1} + V^\top B_k^{-1} U
         =
-        \mqty[-s_k^\top B_k s_k & 0 \\ 0 & y_k^\top s_k] +
-        \mqty[ s_k^\top B_k s_k & s_k^\top y_k \\ y_k^\top s_k     & y_k^\top B_k^{-1} y_k ]
+        \begin{bmatrix}-s_k^\top B_k s_k & 0 \\ 0 & y_k^\top s_k\end{bmatrix} +
+        \begin{bmatrix} s_k^\top B_k s_k & s_k^\top y_k \\ y_k^\top s_k     & y_k^\top B_k^{-1} y_k \end{bmatrix}
         =
-        \mqty[0 & s_k^\top y_k \\ y_k^\top s_k & y_k^\top B_k^{-1} y_k ].
+        \begin{bmatrix}0 & s_k^\top y_k \\ y_k^\top s_k & y_k^\top B_k^{-1} y_k \end{bmatrix}.
     \end{equation*}
     \ifEn
         Thus, combining these results, we obtain
@@ -1036,7 +1036,7 @@
     \fi
     \begin{equation*}
         \det(B_{k+1})
-        = \det(B_k) \qty(-\frac{1}{s_k^\top B_k s_k} \cdot \frac{1}{y_k^\top s_k}) \qty(- (s_k^\top y_k)(y_k^\top s_k))
+        = \det(B_k) \left(-\frac{1}{s_k^\top B_k s_k} \cdot \frac{1}{y_k^\top s_k}\right) \left(- (s_k^\top y_k)(y_k^\top s_k)\right)
         = \det(B_k) \frac{y_k^\top s_k}{s_k^\top B_k s_k},
     \end{equation*}
     \ifEn
@@ -1087,7 +1087,7 @@
     初期点 $x_0$ は次で選ぶ。
 \fi
 \begin{equation*}
-    \theta = \arctan(\sqrt{\lambda_1}), \quad x_0 = \mqty[\cos(\theta) \\ \sin(\theta)],
+    \theta = \arctan(\sqrt{\lambda_1}), \quad x_0 = \begin{bmatrix}\cos(\theta) \\ \sin(\theta)\end{bmatrix},
 \end{equation*}
 \ifEn
     which aligns with Powell's original analysis.
@@ -1376,7 +1376,7 @@
         $\alpha_i$ の定義を代入し $V_i$ の定義を用いると
     \fi
     \begin{equation*}
-        q^{(i)} = q^{(i+1)} - \rho_i \qty(s_i^\top q^{(i+1)}) y_i = \qty(I - \rho_i y_i s_i^\top) q^{(i+1)} = V_i q^{(i+1)}.
+        q^{(i)} = q^{(i+1)} - \rho_i \left(s_i^\top q^{(i+1)}\right) y_i = \left(I - \rho_i y_i s_i^\top\right) q^{(i+1)} = V_i q^{(i+1)}.
     \end{equation*}
     \ifEn
         Thus, for all $i = 0, 1, \dots, m-1$, we have
@@ -1401,7 +1401,7 @@
     \fi
     \begin{equation*}
         \beta_i     = \rho_i y_i^\top r^{(i)}, \qquad
-        r^{(i+1)}   = r^{(i)} + s_i \qty(\alpha_i - \beta_i).
+        r^{(i+1)}   = r^{(i)} + s_i \left(\alpha_i - \beta_i\right).
     \end{equation*}
     \ifEn
         Substituting the definitions of $\alpha_i$, $\beta_i$, and $q^{(i+1)}$, we have
@@ -1411,13 +1411,13 @@
     \begin{align*}
         r^{(i+1)}
          & =
-        r^{(i)} + \rho_i s_i s_i^\top \qty(V_{i+1} V_{i+2} \cdots V_{m-1}) q - \rho_i s_i y_i^\top r^{(i)}     \\
-         & = \qty(I- \rho_i y_i s_i^\top) r^{(i)} + \rho_i s_i s_i^\top \qty(V_{i+1} V_{i+2} \cdots V_{m-1}) q \\
+        r^{(i)} + \rho_i s_i s_i^\top \left(V_{i+1} V_{i+2} \cdots V_{m-1}\right) q - \rho_i s_i y_i^\top r^{(i)}            \\
+         & = \left(I- \rho_i y_i s_i^\top\right) r^{(i)} + \rho_i s_i s_i^\top \left(V_{i+1} V_{i+2} \cdots V_{m-1}\right) q \\
          & =
         V_i^\top r^{(i)}
         +
         \rho_i s_i s_i^\top
-        \qty(V_{i+1} V_{i+2} \cdots V_{m-1}) q.
+        \left(V_{i+1} V_{i+2} \cdots V_{m-1}\right) q.
     \end{align*}
     \ifEn
         By recursively expanding this relation from the initial value $r^{(0)} = H_0 q^{(0)}$, we obtain

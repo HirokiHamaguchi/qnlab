@@ -59,7 +59,7 @@
     仮定よりこの二次モデルは強凸であるため、点 $x^* \in \mathbb{R}^n$ が $m^*_k$ の最小点であることと $\nabla m^*_k(x) = 0$ が成り立つことは同値である。したがって、この方程式を解くと次を得る。
 \fi
 \begin{equation*}
-    \mathrm{arg\,min}_{x\in\mathbb{R}^n} m^*_{k}(x) = x_k -\nabla^2 f(x_k)^{-1} g_k.
+    \underset{x \in \mathbb{R}^n}{\mathrm{arg \ min}} \ m^*_{k}(x) = x_k -\left(\nabla^2 f(x_k)\right)^{-1} g_k.
 \end{equation*}
 \ifEn
     Although this choice appears natural, it does not in general guarantee global convergence, as we will see later.
@@ -113,7 +113,7 @@
     まず、一般的な大域収束の結果
 \fi
 \begin{equation*}
-    \lim_{k \to \infty} \norm{g_k} = 0
+    \lim_{k \to \infty} \lVert g_k \rVert = 0
 \end{equation*}
 \ifEn
     for methods with line search, and then explain its application to Newton's method.
@@ -144,7 +144,7 @@
     また、方向 $d_k$ と負の勾配 $-g_k$ のなす角を $\theta_k \in [0, \pi]$ とし、次式を満たすように定める。
 \fi
 \begin{equation*}
-    \cos \theta_k = \frac{-g_k^\top d_k}{\norm{g_k}\norm{d_k}}.
+    \cos \theta_k = \frac{-g_k^\top d_k}{\lVert g_k \rVert\lVert d_k \rVert}.
 \end{equation*}
 \ifEn
     The following theorem is a simplified version of the classical result.
@@ -176,7 +176,7 @@
         この反復法は次を満たす列 $\{ x_k \}$ を生成する。
     \fi
     \begin{equation*}
-        \lim_{k \to \infty} \norm{g_k} = 0.
+        \lim_{k \to \infty} \lVert g_k \rVert = 0.
     \end{equation*}
 \end{theorem}
 \begin{proof}
@@ -196,10 +196,10 @@
         また
     \fi
     \begin{align*}
-        (g_{k+1} - g_k)^\top d_k        & \leq
-        \norm{g_{k+1} - g_k} \norm{d_k} &                                        & \text{(Cauchy--Schwarz inequality)}                           \\
-                                        & \leq L \norm{x_{k+1} - x_k} \norm{d_k} &                                     & \text{($L$-smoothness)} \\
-                                        & = \alpha_k L \norm{d_k}^2.
+        (g_{k+1} - g_k)^\top d_k                      & \leq
+        \lVert g_{k+1} - g_k \rVert \lVert d_k \rVert &                                                      & \text{(Cauchy--Schwarz inequality)}                           \\
+                                                      & \leq L \lVert x_{k+1} - x_k \rVert \lVert d_k \rVert &                                     & \text{($L$-smoothness)} \\
+                                                      & = \alpha_k L \lVert d_k \rVert^2.
     \end{align*}
     \ifEn
         By combining these two relations, we obtain
@@ -207,7 +207,7 @@
         これらを組み合わせると次を得る。
     \fi
     \begin{equation*}
-        \alpha_k \geq \frac{c_2 - 1}{L} \frac{g_k^\top d_k}{\norm{d_k}^2},
+        \alpha_k \geq \frac{c_2 - 1}{L} \frac{g_k^\top d_k}{\lVert d_k \rVert^2},
     \end{equation*}
     \ifEn
         and thus
@@ -215,9 +215,9 @@
         よって
     \fi
     \begin{align*}
-        f(x_{k+1}) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k                                   &  & \text{(Wolfe condition)}          \\
-                   & \leq f(x_k) - c_1 \frac{1 - c_2}{L} \frac{(g_k^\top d_k)^2}{\norm{d_k}^2} &  & \text{(previous inequality)}      \\
-                   & = f(x_k) - c_1 \frac{1 - c_2}{L} \cos^2 \theta_k \norm{g_k}^2.            &  & \text{(definition of $\theta_k$)}
+        f(x_{k+1}) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k                                          &  & \text{(Wolfe condition)}          \\
+                   & \leq f(x_k) - c_1 \frac{1 - c_2}{L} \frac{(g_k^\top d_k)^2}{\lVert d_k \rVert^2} &  & \text{(previous inequality)}      \\
+                   & = f(x_k) - c_1 \frac{1 - c_2}{L} \cos^2 \theta_k \lVert g_k \rVert^2.            &  & \text{(definition of $\theta_k$)}
     \end{align*}
     \ifEn
         By summing this expression over all indices less than or equal to $k$, we obtain
@@ -225,7 +225,7 @@
         この式を $k$ 以下のすべての添字について和を取ると次を得る。
     \fi
     \begin{equation*}
-        f(x_{k+1}) \leq f(x_0) - c_1 \frac{1 - c_2}{L} \sum_{j=0}^k \cos^2 \theta_j \norm{g_j}^2.
+        f(x_{k+1}) \leq f(x_0) - c_1 \frac{1 - c_2}{L} \sum_{j=0}^k \cos^2 \theta_j \lVert g_j \rVert^2.
     \end{equation*}
     \ifEn
         Since $f$ is bounded below, we have that $f(x_0) - f(x_{k+1})$ is less than some positive constant for all $k$.
@@ -235,7 +235,7 @@
         したがって、極限を取ることで Zoutendijk 条件が得られる。
     \fi
     \begin{equation*}
-        \sum_{k=0}^\infty \cos^2 \theta_k \norm{g_k}^2 < \infty.
+        \sum_{k=0}^\infty \cos^2 \theta_k \lVert g_k \rVert^2 < \infty.
     \end{equation*}
     \ifEn
         This condition implies that
@@ -243,7 +243,7 @@
         この条件は次を含意する。
     \fi
     \begin{equation*}
-        \cos^2 \theta_k \norm{g_k}^2 \to 0.
+        \cos^2 \theta_k \lVert g_k \rVert^2 \to 0.
     \end{equation*}
     \ifEn
         Combined with the assumption that $\cos \theta_k \geq \delta > 0$ for all $k$, it follows immediately that
@@ -251,7 +251,7 @@
         $\cos \theta_k \geq \delta > 0$ がすべての $k$ で成り立つという仮定と合わせると、直ちに次が従う。
     \fi
     \begin{equation*}
-        \lim_{k \to \infty} \norm{g_k} = 0,
+        \lim_{k \to \infty} \lVert g_k \rVert = 0,
     \end{equation*}
     \ifEn
         which completes the proof.
@@ -269,8 +269,8 @@
 \fi
 \begin{equation*}
     \cos \theta_k
-    = \frac{g_k^\top \nabla^2 f(x_k)^{-1} g_k}{\norm{g_k}\norm{\nabla^2 f(x_k)^{-1} g_k}}
-    \geq \frac{\norm{g_k}^2 \lambda_{\min}(\nabla^2 f(x_k)^{-1})}{\norm{g_k}^2 \lambda_{\max}(\nabla^2 f(x_k)^{-1})}
+    = \frac{g_k^\top \nabla^2 f(x_k)^{-1} g_k}{\lVert g_k \rVert\lVert \nabla^2 f(x_k)^{-1} g_k \rVert}
+    \geq \frac{\lVert g_k \rVert^2 \lambda_{\min}(\nabla^2 f(x_k)^{-1})}{\lVert g_k \rVert^2 \lambda_{\max}(\nabla^2 f(x_k)^{-1})}
     \geq \frac{\mu}{L},
 \end{equation*}
 \ifEn
@@ -300,10 +300,10 @@
     \ifEn
         Suppose that the Hessian matrix $\nabla^2 f(x)$ is Lipschitz continuous in a neighborhood of the solution $x^*$, and that sufficient second-order optimality conditions hold (i.e., $\nabla f(x^*)=0$ and $\nabla^2 f(x^*)$ is positive definite).
         If $\alpha_k=1$ for all $k$ and the initial point $x_0$ is sufficiently close to $x^*$,
-        then the sequence of gradient norms $\{\norm{\nabla f(x_k)}\}$ converges quadratically.
+        then the sequence of gradient norms $\{\lVert \nabla f(x_k) \rVert\}$ converges quadratically.
     \else
         ヘッセ行列 $\nabla^2 f(x)$ が解 $x^*$ の近傍で Lipschitz 連続であり、十分な二次の最適性条件が成り立つとする。すなわち $\nabla f(x^*)=0$ かつ $\nabla^2 f(x^*)$ は正定値である。
-        すべての $k$ で $\alpha_k=1$ とし、初期点 $x_0$ が $x^*$ に十分近いとき、勾配ノルム列 $\{\norm{\nabla f(x_k)}\}$ は二次収束する。
+        すべての $k$ で $\alpha_k=1$ とし、初期点 $x_0$ が $x^*$ に十分近いとき、勾配ノルム列 $\{\lVert \nabla f(x_k) \rVert\}$ は二次収束する。
     \fi
 \end{theorem}
 \begin{proof}
@@ -314,8 +314,8 @@
     \fi
     \begin{align*}
         x_{k+1} - x^*
-         & = x_k - x^* - \qty(\nabla^2 f(x_k))^{-1}\nabla f(x_k)                                          \\
-         & = \qty(\nabla^2 f(x_k))^{-1} \qty(\nabla^2 f(x_k)(x_k-x^*)-\qty(\nabla f(x_k)-\nabla f(x^*))).
+         & = x_k - x^* - \left(\nabla^2 f(x_k)\right)^{-1}\nabla f(x_k)                                                        \\
+         & = \left(\nabla^2 f(x_k)\right)^{-1} \left(\nabla^2 f(x_k)(x_k-x^*)-\left(\nabla f(x_k)-\nabla f(x^*)\right)\right).
     \end{align*}
     \ifEn
         By Taylor's theorem and the triangle inequality, we have
@@ -323,65 +323,65 @@
         テイラーの定理と三角不等式より次が成り立つ。
     \fi
     \begin{align*}
-                & \norm{\nabla^2 f(x_k)(x_k-x^*)-\qty(\nabla f(x_k)-\nabla f(x^*))}                          \\
-        =   {}  & \norm{\nabla^2 f(x_k)(x_k-x^*)-\int_0^1 \nabla^2 f(x_k+t(x^*-x_k)) (x_k - x^*)\mathrm{d}t} \\
-        \leq {} & \int_0^1 \norm{\nabla^2 f(x_k)-\nabla^2 f(x_k+t(x^*-x_k))}\norm{x_k-x^*}\mathrm{d}t.
+                & \lVert \nabla^2 f(x_k)(x_k-x^*)-\left(\nabla f(x_k)-\nabla f(x^*)\right) \rVert                    \\
+        =   {}  & \lVert \nabla^2 f(x_k)(x_k-x^*)-\int_0^1 \nabla^2 f(x_k+t(x^*-x_k)) (x_k - x^*)\mathrm{d}t \rVert  \\
+        \leq {} & \int_0^1 \lVert \nabla^2 f(x_k)-\nabla^2 f(x_k+t(x^*-x_k)) \rVert\lVert x_k-x^* \rVert\mathrm{d}t.
     \end{align*}
     \ifEn
-        If $\nabla^2 f$ is Lipschitz continuous with constant $L^{\mathrm{H}}$, then the integrand is bounded by $L^{\mathrm{H}}t\norm{x_k-x^*}$, and integrating yields
+        If $\nabla^2 f$ is Lipschitz continuous with constant $L^{\mathrm{H}}$, then the integrand is bounded by $L^{\mathrm{H}}t\lVert x_k-x^* \rVert$, and integrating yields
     \else
-        $\nabla^2 f$ が定数 $L^{\mathrm{H}}$ を持つ Lipschitz 連続であれば、被積分関数は $L^{\mathrm{H}}t\norm{x_k-x^*}$ で上から抑えられ、積分により次を得る。
+        $\nabla^2 f$ が定数 $L^{\mathrm{H}}$ を持つ Lipschitz 連続であれば、被積分関数は $L^{\mathrm{H}}t\lVert x_k-x^* \rVert$ で上から抑えられ、積分により次を得る。
     \fi
     \begin{equation*}
-        \norm{\nabla^2 f(x_k)(x_k-x^*)-\qty(\nabla f(x_k)-\nabla f(x^*))}
-        \le \frac{1}{2}L^{\mathrm{H}}\norm{x_k-x^*}^2.
+        \lVert \nabla^2 f(x_k)(x_k-x^*)-\left(\nabla f(x_k)-\nabla f(x^*)\right) \rVert
+        \le \frac{1}{2}L^{\mathrm{H}}\lVert x_k-x^* \rVert^2.
     \end{equation*}
     \ifEn
-        Since $\nabla^2 f(x^*)$ is non-singular, there exists a radius $r>0$ such that for all $x_k$ satisfying $\norm{x_k-x^*}\le r$,
+        Since $\nabla^2 f(x^*)$ is non-singular, there exists a radius $r>0$ such that for all $x_k$ satisfying $\lVert x_k-x^* \rVert\le r$,
         \[
-            \norm{\qty(\nabla^2 f(x_k))^{-1}}\le 2\norm{\qty(\nabla^2 f(x^*))^{-1}}
+            \lVert \left(\nabla^2 f(x_k)\right)^{-1} \rVert\le 2\lVert \left(\nabla^2 f(x^*)\right)^{-1} \rVert
         \]
         holds.
         Combining these results, we obtain
     \else
-        $\nabla^2 f(x^*)$ は非特異なので、ある半径 $r>0$ が存在して $\norm{x_k-x^*}\le r$ を満たすすべての $x_k$ について
+        $\nabla^2 f(x^*)$ は非特異なので、ある半径 $r>0$ が存在して $\lVert x_k-x^* \rVert\le r$ を満たすすべての $x_k$ について
         \[
-            \norm{\qty(\nabla^2 f(x_k))^{-1}}\le 2\norm{\qty(\nabla^2 f(x^*))^{-1}}
+            \lVert \left(\nabla^2 f(x_k)\right)^{-1} \rVert\le 2\lVert \left(\nabla^2 f(x^*)\right)^{-1} \rVert
         \]
         が成り立つ。
         これらを合わせると次を得る。
     \fi
     \begin{equation*}
-        \norm{x_{k+1} - x^*}
-        \le L^{\mathrm{H}}\norm{\qty(\nabla^2 f(x^*))^{-1}} \norm{x_k-x^*}^2.
+        \lVert x_{k+1} - x^* \rVert
+        \le L^{\mathrm{H}}\lVert \left(\nabla^2 f(x^*)\right)^{-1} \rVert \lVert x_k-x^* \rVert^2.
     \end{equation*}
     \ifEn
-        Let $\widetilde L  \coloneqq  L^{\mathrm{H}}\norm{\qty(\nabla^2 f(x^*))^{-1}}$.
-        If the initial point is chosen such that $\norm{x_0-x^*}\le \min\{r,1/(2\widetilde L)\}$, then by induction $\{ x_k \}$ remains within the neighborhood and converges to $x^*$.
+        Let $\widetilde L  \coloneqq  L^{\mathrm{H}}\lVert \left(\nabla^2 f(x^*)\right)^{-1} \rVert$.
+        If the initial point is chosen such that $\lVert x_0-x^* \rVert\le \min\{ r, 1/(2\widetilde L) \}$, then by induction $\{ x_k \}$ remains within the neighborhood and converges to $x^*$.
         The above error bound implies quadratic convergence of $\{ x_k \}$.
 
-        To show quadratic convergence of the gradient norm, we use $x_{k+1}-x_k=-\qty(\nabla^2 f(x_k))^{-1}\nabla f(x_k)$ and
-        $\nabla f(x_k)+\nabla^2 f(x_k)\qty(x_{k+1}-x_k)=0$, yielding
+        To show quadratic convergence of the gradient norm, we use $x_{k+1}-x_k=-\left(\nabla^2 f(x_k)\right)^{-1}\nabla f(x_k)$ and
+        $\nabla f(x_k)+\nabla^2 f(x_k)(x_{k+1}-x_k)=0$, yielding
     \else
-        $\widetilde L  \coloneqq  L^{\mathrm{H}}\norm{\qty(\nabla^2 f(x^*))^{-1}}$ とおく。
-        初期点が $\norm{x_0-x^*}\le \min\{r,1/(2\widetilde L)\}$ を満たすように選ばれていれば、帰納法により $\{ x_k \}$ は近傍内に留まり $x^*$ に収束する。
+        $\widetilde L  \coloneqq  L^{\mathrm{H}}\lVert \left(\nabla^2 f(x^*)\right)^{-1} \rVert$ とおく。
+        初期点が $\lVert x_0-x^* \rVert\le \min\{ r, 1/(2\widetilde L) \}$ を満たすように選ばれていれば、帰納法により $\{ x_k \}$ は近傍内に留まり $x^*$ に収束する。
         上の誤差評価は $\{ x_k \}$ の二次収束を示す。
 
-        勾配ノルムの二次収束を示すために、$x_{k+1}-x_k=-\qty(\nabla^2 f(x_k))^{-1}\nabla f(x_k)$ と
-        $\nabla f(x_k)+\nabla^2 f(x_k)\qty(x_{k+1}-x_k)=0$ を用いると次を得る。
+        勾配ノルムの二次収束を示すために、$x_{k+1}-x_k=-\left(\nabla^2 f(x_k)\right)^{-1}\nabla f(x_k)$ と
+        $\nabla f(x_k)+\nabla^2 f(x_k)(x_{k+1}-x_k)=0$ を用いると次を得る。
     \fi
     \begin{align*}
-        \norm{\nabla f(x_{k+1})}
-         & = \norm{\nabla f(x_{k+1})-\nabla f(x_k)-\nabla^2 f(x_k)\qty(x_{k+1}-x_k)}                        \\
-         & \le \int_0^1 \norm{\nabla^2 f(x_k+t (x_{k+1}-x_k))-\nabla^2 f(x_k)}\norm{x_{k+1}-x_k}\mathrm{d}t \\
-         & \le \frac{1}{2}L^{\mathrm{H}}\norm{x_{k+1}-x_k}^2                                                \\
-         & \le \frac{1}{2}L^{\mathrm{H}}\norm{\qty(\nabla^2 f(x_k))^{-1}}^2\norm{\nabla f(x_k)}^2           \\
-         & \le 2 L^{\mathrm{H}} \norm{\qty(\nabla^2 f(x^*))^{-1}}^2\norm{\nabla f(x_k)}^2.
+        \lVert \nabla f(x_{k+1}) \rVert
+         & = \lVert \nabla f(x_{k+1})-\nabla f(x_k)-\nabla^2 f(x_k)(x_{k+1}-x_k) \rVert                                   \\
+         & \le \int_0^1 \lVert \nabla^2 f(x_k+t (x_{k+1}-x_k))-\nabla^2 f(x_k) \rVert\lVert x_{k+1}-x_k \rVert\mathrm{d}t \\
+         & \le \frac{1}{2}L^{\mathrm{H}}\lVert x_{k+1}-x_k \rVert^2                                                       \\
+         & \le \frac{1}{2}L^{\mathrm{H}}\lVert \left(\nabla^2 f(x_k)\right)^{-1} \rVert^2\lVert \nabla f(x_k) \rVert^2    \\
+         & \le 2 L^{\mathrm{H}} \lVert \left(\nabla^2 f(x^*)\right)^{-1} \rVert^2\lVert \nabla f(x_k) \rVert^2.
     \end{align*}
     \ifEn
-        Therefore, $\norm{\nabla f(x_k)}$ converges quadratically to zero.
+        Therefore, $\lVert \nabla f(x_k) \rVert$ converges quadratically to zero.
     \else
-        よって $\norm{\nabla f(x_k)}$ は0へ二次収束する。
+        よって $\lVert \nabla f(x_k) \rVert$ は0へ二次収束する。
     \fi
     \myQED
 \end{proof}
@@ -428,7 +428,7 @@
 \fi
 \begin{equation*}
     \nabla f(x_k)^\top d_k
-    = -\nabla f(x_k)^\top \qty(\nabla^2 f(x_k))^{-1} \nabla f(x_k)
+    = -\nabla f(x_k)^\top \left(\nabla^2 f(x_k)\right)^{-1} \nabla f(x_k)
     < 0.
 \end{equation*}
 \ifEn

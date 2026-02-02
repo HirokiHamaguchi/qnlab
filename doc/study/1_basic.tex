@@ -50,9 +50,9 @@
 \fi
 \begin{align*}
     \text{(convex)} \quad
-    f(y) & \ge f(x)+\nabla f(x)^\top (y-x),                           \\
+    f(y) & \ge f(x)+\nabla f(x)^\top (y-x),                                  \\
     \text{($\mu$-strongly convex)} \quad
-    f(y) & \ge f(x)+\nabla f(x)^\top (y-x)+\frac{\mu}{2}\norm{y-x}^2,
+    f(y) & \ge f(x)+\nabla f(x)^\top (y-x)+\frac{\mu}{2}\lVert y-x \rVert^2,
 \end{align*}
 \ifEn
     where $\mu>0$ is a constant.
@@ -104,15 +104,15 @@
     For matrices $A,B \in \mathbb{R}^{n \times n}$, the notation $A \succeq B$ indicates that $A-B$ is positive semi-definite.
     In particular, if $B$ is a zero matrix, we simply write $A \succeq 0$.
     We similarly define $\preceq$ for negative semi-definiteness.
-    For $\mu \geq 0$, the condition $A \succeq \mu I$ is equivalent to $v^\top A v \ge \mu \norm{v}^2$ for all $v \in \mathbb{R}^n$.
-    It directly implies that all eigenvalues of $A$ are at least $\mu$, which in turn implies that the operator norm $\norm{A}$ is at least $\mu$, i.e., $\norm{A} \geq \mu$.
+    For $\mu \geq 0$, the condition $A \succeq \mu I$ is equivalent to $v^\top A v \ge \mu \lVert v \rVert^2$ for all $v \in \mathbb{R}^n$.
+    It directly implies that all eigenvalues of $A$ are at least $\mu$, which in turn implies that the operator norm $\lVert A \rVert$ is at least $\mu$, i.e., $\lVert A \rVert \geq \mu$.
 \else
     正定値でも負定値でもない行列は不定値(indefinite)と呼ぶ。
     行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表す。
     特に $B$ が零行列のときは $A \succeq 0$ と書く。
     同様に、$\preceq$ は半負定値に対して定義する。
-    $\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \norm{v}^2$ と同値である。
-    これは $A$ のすべての固有値が少なくとも $\mu$ であることを意味し、さらに作用素ノルムについて $\norm{A} \geq \mu$ であることを導く。
+    $\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \lVert v \rVert^2$ と同値である。
+    これは $A$ のすべての固有値が少なくとも $\mu$ であることを意味し、さらに作用素ノルムについて $\lVert A \rVert \geq \mu$ であることを導く。
 \fi
 
 \ifEn
@@ -155,8 +155,8 @@
     \fi
     \begin{equation*}
         \int_0^1 (y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t
-        \ge \int_0^1 \mu\norm{y-x}^2 \mathrm{d}t
-        = \mu\norm{y-x}^2.
+        \ge \int_0^1 \mu\lVert y-x \rVert^2 \mathrm{d}t
+        = \mu\lVert y-x \rVert^2.
     \end{equation*}
     \ifEn
         Thus, combining these results gives the definition of $\mu$-strong convexity.
@@ -166,15 +166,15 @@
 
     \ifEn
         Conversely, assume that $f$ is $\mu$-strongly convex.
-        For any $x \in \mathbb{R}^n, \, v \in \mathbb{R}^n$ and $t > 0$, letting $y=x \pm tv$ gives
+        For any $x \in \mathbb{R}^n, \ v \in \mathbb{R}^n$ and $t > 0$, letting $y=x \pm tv$ gives
     \else
         逆に、$f$ が $\mu$-強凸であると仮定する。
-        任意の $x \in \mathbb{R}^n, \, v \in \mathbb{R}^n$ および $t>0$ に対し、$y=x \pm tv$ とおくと次を得る:
+        任意の $x \in \mathbb{R}^n, \ v \in \mathbb{R}^n$ および $t>0$ に対し、$y=x \pm tv$ とおくと次を得る:
     \fi
     \begin{equation*}
         \begin{dcases}
-            f(x + tv)\ge f(x) + t\nabla f(x)^\top v+\frac{\mu}{2}t^2\norm{v}^2, \\
-            f(x - tv)\ge f(x) - t\nabla f(x)^\top v+\frac{\mu}{2}t^2\norm{v}^2.
+            f(x + tv)\ge f(x) + t\nabla f(x)^\top v+\frac{\mu}{2}t^2\lVert v \rVert^2, \\
+            f(x - tv)\ge f(x) - t\nabla f(x)^\top v+\frac{\mu}{2}t^2\lVert v \rVert^2.
         \end{dcases}
     \end{equation*}
     \ifEn
@@ -194,7 +194,7 @@
         これらの結果を合わせると次を得る:
     \fi
     \begin{equation*}
-        v^\top \frac{\nabla^2 f(x+ s_+ t v) + \nabla^2 f(x - s_- t v)}{2} v \ge \mu \norm{v}^2.
+        v^\top \frac{\nabla^2 f(x+ s_+ t v) + \nabla^2 f(x - s_- t v)}{2} v \ge \mu \lVert v \rVert^2.
     \end{equation*}
     \ifEn
         Letting $t \to 0$ and using the continuity of $\nabla^2 f$ from the $C^2$ assumption gives
@@ -202,7 +202,7 @@
         $t \to 0$ とし、$f$ が $C^2$ 級という仮定による $\nabla^2 f$ の連続性を用いると次を得る:
     \fi
     \begin{equation*}
-        v^\top \nabla^2 f(x) v \ge \mu \norm{v}^2.
+        v^\top \nabla^2 f(x) v \ge \mu \lVert v \rVert^2.
     \end{equation*}
     \ifEn
         Because $v \in \mathbb{R}^n$ is arbitrary, we obtain $\nabla^2 f(x)\succeq \mu I$.
@@ -254,7 +254,7 @@
     関数 $f$ が $L$-平滑であるとは、ある定数 $L>0$ が存在して
 \fi
 \begin{equation*}
-    \norm{\nabla f(x)-\nabla f(y)} \le L\norm{x-y}
+    \lVert \nabla f(x)-\nabla f(y) \rVert \le L\lVert x-y \rVert
 \end{equation*}
 \ifEn
     holds for all $x,y$.
@@ -286,17 +286,17 @@
     \end{equation*}
     \ifEn
         Assume $\nabla^2 f(x)\preceq L I$ for all $x \in \mathbb{R}^n$.
-        It implies that the operator norm of $\nabla^2 f(x)$ satisfies $\norm{\nabla^2 f(x)} \le L$, and thus
+        It implies that the operator norm of $\nabla^2 f(x)$ satisfies $\lVert \nabla^2 f(x) \rVert \le L$, and thus
     \else
         任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\preceq L I$ と仮定する。
-        このとき $\norm{\nabla^2 f(x)} \le L$ が成り立つので、
+        このとき $\lVert \nabla^2 f(x) \rVert \le L$ が成り立つので、
     \fi
     \begin{align*}
-        \norm{\nabla f(y) - \nabla f(x)}
-         & = \norm{\int_0^1 \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t}   &  & (\text{previous equation})   \\
-         & \le \int_0^1 \norm{\nabla^2 f(x+t(y-x))(y-x)} \mathrm{d}t &  & (\text{triangle inequality}) \\
-         & \le \int_0^1 L\norm{y-x} \mathrm{d}t                      &  & (\text{by assumption})       \\
-         & = L\norm{y-x},
+        \lVert \nabla f(y) - \nabla f(x) \rVert
+         & = \lVert \int_0^1 \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t \rVert   &  & (\text{previous equation})   \\
+         & \le \int_0^1 \lVert \nabla^2 f(x+t(y-x))(y-x) \rVert \mathrm{d}t &  & (\text{triangle inequality}) \\
+         & \le \int_0^1 L\lVert y-x \rVert \mathrm{d}t                      &  & (\text{by assumption})       \\
+         & = L\lVert y-x \rVert,
     \end{align*}
     \ifEn
         which proves the $L$-smoothness of $f$.
@@ -306,7 +306,7 @@
         逆に、$f$ が $L$-平滑であるとすると、任意の $x \in \mathbb{R}^n$ と $v \in \mathbb{R}^n$ に対して次が成り立つ:
     \fi
     \begin{equation*}
-        \norm{\nabla f(x+tv)-\nabla f(x)} \le L\norm{tv} = Lt\norm{v}.
+        \lVert \nabla f(x+tv)-\nabla f(x) \rVert \le L\lVert tv \rVert = Lt\lVert v \rVert.
     \end{equation*}
     \ifEn
         By Taylor's theorem, we also have
@@ -317,9 +317,9 @@
         \nabla f(x+tv)-\nabla f(x) = t \nabla^2 f(x) v + r(t),
     \end{equation*}
     \ifEn
-        where $r(t)$ satisfies $\norm{r(t)}/t \to 0$ as $t \to 0$, and we can rewrite it as
+        where $r(t)$ satisfies $\lVert r(t) \rVert/t \to 0$ as $t \to 0$, and we can rewrite it as
     \else
-        ただし、$r(t)$ は $t \to 0$ のとき $\norm{r(t)}/t \to 0$ を満たす。そして、これは次のように書き換えられる:
+        ただし、$r(t)$ は $t \to 0$ のとき $\lVert r(t) \rVert/t \to 0$ を満たす。そして、これは次のように書き換えられる:
     \fi
     \begin{equation*}
         \nabla^2 f(x) v = \lim_{t \to 0} \frac{\nabla f(x+tv)-\nabla f(x) -r(t)}{t} = \lim_{t \to 0} \frac{\nabla f(x+tv)-\nabla f(x)}{t}.
@@ -330,10 +330,10 @@
         $v$ との内積を取ると次が得られる:
     \fi
     \begin{align*}
-        v^\top \nabla^2 f(x) v & = \lim_{t \to 0} \qty(\frac{\nabla f(x+tv)-\nabla f(x)}{t})^\top v                                                  \\
-                               & \leq \lim_{t \to 0} \frac{\norm{\nabla f(x+tv)-\nabla f(x)}}{t} \norm{v} &  & (\text{Cauchy--Schwarz inequality})   \\
-                               & \leq \lim_{t \to 0} \frac{L\norm{tv}}{t} \norm{v}                        &  & (\text{by $L$-smoothness definition}) \\
-                               & = L \norm{v}^2.
+        v^\top \nabla^2 f(x) v & = \lim_{t \to 0} \left(\frac{\nabla f(x+tv)-\nabla f(x)}{t}\right)^\top v                                                         \\
+                               & \leq \lim_{t \to 0} \frac{\lVert \nabla f(x+tv)-\nabla f(x) \rVert}{t} \lVert v \rVert &  & (\text{Cauchy--Schwarz inequality})   \\
+                               & \leq \lim_{t \to 0} \frac{L\lVert tv \rVert}{t} \lVert v \rVert                        &  & (\text{by $L$-smoothness definition}) \\
+                               & = L \lVert v \rVert^2.
     \end{align*}
     \ifEn
         Because $v \in \mathbb{R}^n$ is arbitrary, we obtain $\nabla^2 f(x)\preceq L I$.
@@ -346,31 +346,31 @@
 \subsubsection{Baillon--Haddad Theorem}
 
 \ifEn
-{One of the useful properties of $L$-smooth functions is given by the following Baillon--Haddad theorem.
-    Note that only $C^1$ differentiability is required here.}
+    One of the useful properties of $L$-smooth functions is given by the following Baillon--Haddad theorem.
+    Note that only $C^1$ differentiability is required here.
 \else
-{$L$-smooth 関数の有用な性質の一つが次の Baillon--Haddad 定理である。
-    ここでは $C^1$ の微分可能性だけを仮定する点に注意する。}
+    $L$-smooth 関数の有用な性質の一つが次の Baillon--Haddad 定理である。
+    ここでは $C^1$ の微分可能性だけを仮定する点に注意する。
 \fi
 \begin{proposition}[Baillon--Haddad theorem]\label{prop:baillon_haddad}
     \ifEn
-    {Let $f \colon \mathbb{R}^n \to \mathbb{R}$ be of class $C^1$. If $f$ is $L$-smooth and convex, then for all $x,y \in \mathbb{R}^n$, $\nabla f$ is $1/L$-cocoercive, i.e.,
+        Let $f \colon \mathbb{R}^n \to \mathbb{R}$ be of class $C^1$. If $f$ is $L$-smooth and convex, then for all $x,y \in \mathbb{R}^n$, $\nabla f$ is $1/L$-cocoercive, i.e.,
         \begin{equation*}
-            (\nabla f(x)-\nabla f(y))^\top (x-y) \ge \frac{1}{L} \norm{\nabla f(x)-\nabla f(y)}^2
+            (\nabla f(x)-\nabla f(y))^\top (x-y) \ge \frac{1}{L} \lVert \nabla f(x)-\nabla f(y) \rVert^2
         \end{equation*}
-        for all $x,y \in \mathbb{R}^n$.}
+        for all $x,y \in \mathbb{R}^n$.
     \else
-    {$f \colon \mathbb{R}^n \to \mathbb{R}$ を $C^1$ 級とする。$f$ が $L$-smooth かつ凸であれば、任意の $x,y \in \mathbb{R}^n$ に対して $\nabla f$ は $1/L$-cocoercive であり、すなわち
+        $f \colon \mathbb{R}^n \to \mathbb{R}$ を $C^1$ 級とする。$f$ が $L$-smooth かつ凸であれば、任意の $x,y \in \mathbb{R}^n$ に対して $\nabla f$ は $1/L$-cocoercive であり、すなわち
         \begin{equation*}
-            (\nabla f(x)-\nabla f(y))^\top (x-y) \ge \frac{1}{L} \norm{\nabla f(x)-\nabla f(y)}^2
+            (\nabla f(x)-\nabla f(y))^\top (x-y) \ge \frac{1}{L} \lVert \nabla f(x)-\nabla f(y) \rVert^2
         \end{equation*}
-        が任意の $x,y \in \mathbb{R}^n$ について成り立つ。}
+        が任意の $x,y \in \mathbb{R}^n$ について成り立つ。
     \fi
 \end{proposition}
 \ifEn
-{We refer to other literature for the proof \citep{bauschkeBaillonHaddadTheoremRevisited2009} \citep[Proposition 12.60]{rockafellarVariationalAnalysis1998}.}
+    We refer to other literature for the proof \citep{bauschkeBaillonHaddadTheoremRevisited2009} \citep[Proposition 12.60]{rockafellarVariationalAnalysis1998}.
 \else
-{証明は他の文献に譲る \citep{bauschkeBaillonHaddadTheoremRevisited2009} \citep[Proposition 12.60]{rockafellarVariationalAnalysis1998}。}
+    証明は他の文献に譲る \citep{bauschkeBaillonHaddadTheoremRevisited2009} \citep[Proposition 12.60]{rockafellarVariationalAnalysis1998}。
 \fi
 \ifEn
     One consequence of this theorem is that, for the sequences $\{ x_k \}$ generated by an optimization algorithm, defining
@@ -386,7 +386,7 @@
     Baillon--Haddad 定理を $x=x_{k+1}$、$y=x_k$ に適用して次を得る:
 \fi
 \begin{equation*}
-    s_k^\top y_k \ge \frac{1}{L} \norm{y_k}^2.
+    s_k^\top y_k \ge \frac{1}{L} \lVert y_k \rVert^2.
 \end{equation*}
 \ifEn
     This inequality is sometimes used in the analysis of update formulas in methods such as BFGS and L-BFGS.

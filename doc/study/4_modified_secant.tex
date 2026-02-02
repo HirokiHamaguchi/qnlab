@@ -190,9 +190,9 @@ However, in \cref{fig:standard_secant}, the standard secant update only matches 
 \else
     ここで、$\sigma^\mathrm{F}_k \in \mathbb{R}$ は決定する必要があるスカラーです。
 \fi
-Substituting this equation and using $s_k^\top B^{\mathrm{F}}_{k+1} s_k = s_k^\top y_k - \sigma^\mathrm{F}_k \norm{s_k}^2$ gives
+Substituting this equation and using $s_k^\top B^{\mathrm{F}}_{k+1} s_k = s_k^\top y_k - \sigma^\mathrm{F}_k \lVert s_k \rVert^2$ gives
 \begin{equation*}
-    f(x_k) = f(x_{k+1}) - \nabla f(x_{k+1})^\top s_k + \frac{1}{2} s_k^\top y_k - \frac{\sigma^\mathrm{F}_k}{2} \norm{s_k}^2.
+    f(x_k) = f(x_{k+1}) - \nabla f(x_{k+1})^\top s_k + \frac{1}{2} s_k^\top y_k - \frac{\sigma^\mathrm{F}_k}{2} \lVert s_k \rVert^2.
 \end{equation*}
 \ifEn
     Solving for $\sigma^\mathrm{F}_k$ and using $y_k = \nabla f(x_{k+1}) - \nabla f(x_k)$, we obtain
@@ -200,8 +200,8 @@ Substituting this equation and using $s_k^\top B^{\mathrm{F}}_{k+1} s_k = s_k^\t
     $\sigma^\mathrm{F}_k$ について解き、$y_k = \nabla f(x_{k+1}) - \nabla f(x_k)$ を使用することで、以下を得ます
 \fi
 \begin{align*}
-    \sigma^\mathrm{F}_k & = \frac{2(f(x_{k+1}) - f(x_k)) - (2\nabla f(x_{k+1}) - y_k)^\top s_k}{\norm{s_k}^2}           \\
-                        & = \frac{2(f(x_{k+1}) - f(x_k)) - (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k}{\norm{s_k}^2}.
+    \sigma^\mathrm{F}_k & = \frac{2(f(x_{k+1}) - f(x_k)) - (2\nabla f(x_{k+1}) - y_k)^\top s_k}{\lVert s_k \rVert^2}           \\
+                        & = \frac{2(f(x_{k+1}) - f(x_k)) - (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k}{\lVert s_k \rVert^2}.
 \end{align*}
 \ifEn
     Therefore, the modified secant condition becomes
@@ -209,7 +209,7 @@ Substituting this equation and using $s_k^\top B^{\mathrm{F}}_{k+1} s_k = s_k^\t
     したがって、修正セカント条件は以下になります
 \fi
 \begin{equation*}
-    B^{\mathrm{F}}_{k+1} s_k = y_k + \frac{2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k}{\norm{s_k}^2} s_k.
+    B^{\mathrm{F}}_{k+1} s_k = y_k + \frac{2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k}{\lVert s_k \rVert^2} s_k.
 \end{equation*}
 \ifEn
     To preserve the possibility of maintaining positive definiteness under a BFGS-type update when $s_k^\top y_k > 0$, we can modify the formula by taking the maximum with zero in the numerator.
@@ -217,7 +217,7 @@ Substituting this equation and using $s_k^\top B^{\mathrm{F}}_{k+1} s_k = s_k^\t
     $s_k^\top y_k > 0$ の場合に BFGS 型更新の下で正定性を保つ可能性を保存するために、分子でゼロとの最大値を取ることでこの公式を修正できます。
 \fi
 \begin{equation*}
-    B^{\mathrm{F}'}_{k+1} s_k = y_k + \frac{\max(0, 2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k)}{\norm{s_k}^2} s_k.
+    B^{\mathrm{F}'}_{k+1} s_k = y_k + \frac{\max(0, 2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k)}{\lVert s_k \rVert^2} s_k.
 \end{equation*}
 
 \ifEn
@@ -319,7 +319,7 @@ Substituting this equation and using $s_k^\top B^{\mathrm{F}}_{k+1} s_k = s_k^\t
     そうすると、前の方程式は以下を与えます
 \fi
 \begin{equation*}
-    \sigma^\mathrm{C}_k = \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nabla f(x_k) + \nabla f(x_{k+1}))}{\norm{s_k}^2}.
+    \sigma^\mathrm{C}_k = \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nabla f(x_k) + \nabla f(x_{k+1}))}{\lVert s_k \rVert^2}.
 \end{equation*}
 \ifEn
     Thus, the modified secant condition becomes
@@ -327,7 +327,7 @@ Substituting this equation and using $s_k^\top B^{\mathrm{F}}_{k+1} s_k = s_k^\t
     したがって、修正セカント条件は以下になります
 \fi
 \begin{equation*}
-    B^{\mathrm{C}}_{k+1} s_k = y_k + \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nabla f(x_k) + \nabla f(x_{k+1}))}{\norm{s_k}^2} s_k.
+    B^{\mathrm{C}}_{k+1} s_k = y_k + \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nabla f(x_k) + \nabla f(x_{k+1}))}{\lVert s_k \rVert^2} s_k.
 \end{equation*}
 
 \ifEn
@@ -353,9 +353,9 @@ Substituting this equation and using $s_k^\top B^{\mathrm{F}}_{k+1} s_k = s_k^\t
     \end{subfigure}
     \caption{
         \ifEn
-            Cubic-augmented modified secant equation. In \cref{fig:zhang_cubic}, by incorporating a cubic term $\eta \norm{x - x_k}^3$ in the model, the modified secant equation $B^\mathrm{C}_k s_k = y_k + \sigma^\mathrm{C}_k s_k$ enables simultaneous satisfaction of both conditions at the previous point. In \cref{fig:zhang_quadratic}, while the cubic model satisfies both function value and gradient conditions, its underlying quadratic component may be indefinite or negative definite.
+            Cubic-augmented modified secant equation. In \cref{fig:zhang_cubic}, by incorporating a cubic term $\eta \lVert x - x_k \rVert^3$ in the model, the modified secant equation $B^\mathrm{C}_k s_k = y_k + \sigma^\mathrm{C}_k s_k$ enables simultaneous satisfaction of both conditions at the previous point. In \cref{fig:zhang_quadratic}, while the cubic model satisfies both function value and gradient conditions, its underlying quadratic component may be indefinite or negative definite.
         \else
-            3次拡張修正セカント方程式。\cref{fig:zhang_cubic} では、3次項 $\eta \norm{x - x_k}^3$ をモデルに組み込むことにより、修正セカント方程式 $B^\mathrm{C}_k s_k = y_k + \sigma^\mathrm{C}_k s_k$ は前の点での両方の条件を同時に満たすことを可能にします。\cref{fig:zhang_quadratic} では、3次モデルは関数値と勾配の条件の両方を満たしていますが、その基礎となる二次成分は不定値または負定値である可能性があります。
+            3次拡張修正セカント方程式。\cref{fig:zhang_cubic} では、3次項 $\eta \lVert x - x_k \rVert^3$ をモデルに組み込むことにより、修正セカント方程式 $B^\mathrm{C}_k s_k = y_k + \sigma^\mathrm{C}_k s_k$ は前の点での両方の条件を同時に満たすことを可能にします。\cref{fig:zhang_quadratic} では、3次モデルは関数値と勾配の条件の両方を満たしていますが、その基礎となる二次成分は不定値または負定値である可能性があります。
         \fi
     }
     \label{fig:zhang_models}

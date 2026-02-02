@@ -182,17 +182,76 @@ def convert_section_commands(line: str) -> str:
     return line
 
 
+def convert_nested_itemize_enumerate(content: str) -> str:
+    """Convert nested itemize and enumerate environments within content.
+
+    This function handles itemize/enumerate blocks that appear inside other
+    environments (e.g., theorem, proposition).
+
+    Args:
+        content: The content string potentially containing itemize/enumerate blocks
+
+    Returns:
+        Content with itemize/enumerate blocks converted to Markdown
+    """
+    result = []
+    i = 0
+    lines = content.split("\n")
+
+    while i < len(lines):
+        line = lines[i]
+        stripped = line.strip()
+
+        # Check for beginning of itemize or enumerate
+        if stripped.startswith("\\begin{itemize}"):
+            # Collect the entire itemize block
+            block_lines = [line]
+            i += 1
+            while i < len(lines):
+                block_lines.append(lines[i])
+                if lines[i].strip().startswith("\\end{itemize}"):
+                    i += 1
+                    break
+                i += 1
+            # Convert and add
+            converted = convert_itemize_to_md("\n".join(block_lines))
+            if converted:
+                result.append(converted.rstrip())
+        elif stripped.startswith("\\begin{enumerate}"):
+            # Collect the entire enumerate block
+            block_lines = [line]
+            i += 1
+            while i < len(lines):
+                block_lines.append(lines[i])
+                if lines[i].strip().startswith("\\end{enumerate}"):
+                    i += 1
+                    break
+                i += 1
+            # Convert and add
+            converted = convert_enumerate_to_md("\n".join(block_lines))
+            if converted:
+                result.append(converted.rstrip())
+        else:
+            result.append(line)
+            i += 1
+
+    return "\n".join(result)
+
+
 def post_process_content(content: str) -> str:
     """Apply post-processing conversions to content.
 
     This is applied after main environment processing to handle conversions
     that should apply recursively inside other environments (like proof).
 
-    Order matters: equation conversion first, then cref conversion.
+    Order matters: equation conversion first, then nested list environments,
+    then cref conversion.
     """
     # First apply equation environment conversion
     content = convert_equation_environments(content)
-    # Then apply cref conversion
+    # Then convert nested itemize/enumerate
+    content = convert_nested_itemize_enumerate(content)
+    # Finally apply cref conversion
     content = convert_cref(content)
     return content
 
@@ -390,8 +449,16 @@ def convert_math_env_to_md(block: str, env_name: str, counter: int) -> str:
         line.strip()
         for i, line in enumerate(lines)
         if line.strip()
-        and not (i == 0 or (i == len(lines) - 1 and line.strip().startswith("\\end")))
-        and not line.strip().startswith(("\\begin", "\\end"))
+        and not (
+            i == 0
+            or (
+                i == len(lines) - 1
+                and line.strip().startswith("\\end{" + env_name + "}")
+            )
+        )
+        and not line.strip().startswith(
+            ("\\begin{" + env_name + "}", "\\end{" + env_name + "}")
+        )
     ]
 
     content = post_process_content("\n".join(content_lines))
@@ -628,13 +695,58 @@ def process_latex_file(filepath: Path) -> List[str]:
     return converter.process_file()
 
 
+def for_qiita_post_process(content: str) -> str:
+    lines = content.splitlines()
+    resList = ["<!-- markdownlint-disable MD041 -->", ""]
+    mathBlockOpen = False
+    for line in lines:
+        if line.strip() == "$$":
+            resList.append("\n```math" if not mathBlockOpen else "```\n")
+            mathBlockOpen = not mathBlockOpen
+        elif line.strip() == "> $$":
+            resList.append(">" if not mathBlockOpen else "> ```")
+            resList.append("> ```math" if not mathBlockOpen else ">")
+            mathBlockOpen = not mathBlockOpen
+        else:
+            resList.append(line)
+    res = "\n".join(resList) + "\n"
+    res = (
+        res.replace("\n\n\n", "\n\n")
+        .replace("\n\n\n", "\n\n")
+        .replace("\n\n\n", "\n\n")
+    )
+    res = res.replace("\\coloneqq", "\\mathrel{\\vcenter{:}}=").replace(
+        "{dcases}", "{cases}"
+    )
+    for line in res.splitlines():
+        if re.search(r"\\{[a-zA-Z0-9]", line):
+            print(r"Warning: Add space after \{[a-zA-Z0-9] in line: " + line)
+    res = res.replace("\\{", "\\lbrace").replace("\\}", "\\rbrace")
+    if res.count("\\,"):
+        print("Warning: \\, found. Use \\ instead.")
+
+    cnt = res.count("\\|")
+    if cnt % 2 == 1:
+        raise ValueError(f"Odd number of \\| found: {cnt}")
+    lastIdx = 0
+    res2 = ""
+    for vertNum, resIdx in enumerate(re.finditer(r"\\\|", res)):
+        res2 += res[lastIdx : resIdx.start()]
+        res2 += "\\lVert" if vertNum % 2 == 0 else "\\rVert"
+        lastIdx = resIdx.end()
+    res2 += res[lastIdx:]
+    return res2
+
+
 def main() -> None:
     """Main function to process all .tex files in current directory."""
     reset_global_counters()
 
     current_dir = Path(__file__).parent
     main_file = "0_main.tex"
-    tex_files = [f for f in sorted(current_dir.glob("*.tex")) if f.name != main_file]
+    tex_files = [
+        f for f in sorted(current_dir.glob("[1-4]*.tex")) if f.name != main_file
+    ]
 
     assert tex_files, "No .tex files found in current directory."
 
@@ -662,6 +774,7 @@ def main() -> None:
     output_file = current_dir / "combined_output.md"
     output_content = "\n".join(all_markdown_lines)
     output_content = re.sub(r"\\label\{[^}]+\}", "", output_content)
+    output_content = for_qiita_post_process(output_content)
 
     output_file.write_text(output_content, encoding="utf-8")
 
