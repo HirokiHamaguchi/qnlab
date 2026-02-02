@@ -120,8 +120,8 @@
     $\nabla f(x_k)$ のテイラー展開を用いると次が成り立つ。
 \fi
 \begin{align*}
-    \nabla f(x_k) & = \nabla f(x_{k+1}) + \nabla^2 f(x_{k+1})(x_k - x_{k+1}) + \order{\lVert x_k - x_{k+1} \rVert^2} \\
-                  & \approx \nabla f(x_{k+1}) + \nabla^2 f(x_{k+1})(x_k - x_{k+1})                                   \\
+    \nabla f(x_k) & = \nabla f(x_{k+1}) + \nabla^2 f(x_{k+1})(x_k - x_{k+1}) + \mathcal{O}(\lVert x_k - x_{k+1} \rVert^2) \\
+                  & \approx \nabla f(x_{k+1}) + \nabla^2 f(x_{k+1})(x_k - x_{k+1})                                        \\
                   & \approx \nabla f(x_{k+1}) + B_{k+1}(x_k - x_{k+1})
 \end{align*}
 \ifEn
@@ -481,12 +481,12 @@
 
 \begin{proposition}[\citep{dennisjr.QuasiNewtonMethodsMotivation1977a}, Lemma~7.2]\label{prop:psb-convergence}
     \ifEn
-        The sequence $\{ C_{2t} \}_{t=0}^{\infty}$ converges, and the limit is given by
+        The sequence $\{ C_{t} \}_{t=0}^{\infty}$ converges, and the limit is given by
     \else
-        行列の列 $\{ C_{2t} \}_{t=0}^{\infty}$ は収束し、その極限は次で与えられる:
+        行列の列 $\{ C_{t} \}_{t=0}^{\infty}$ は収束し、その極限は次で与えられる:
     \fi
     \begin{equation*}
-        \lim_{t \to \infty} C_{2t}
+        \lim_{t \to \infty} C_{t}
         =
         C_{\infty}
         \coloneqq
@@ -502,19 +502,19 @@
         次で定義する。
     \fi
     \begin{equation*}
-        G_k \coloneqq C_{2k}
+        G_t \coloneqq C_{2t}
     \end{equation*}
     \ifEn
-        for $k=0,1,2,\dots$.
-        By construction, each $G_k$ is symmetric.
+        for $t=0,1,2,\dots$.
+        By construction, each $G_t$ is symmetric.
         From the definitions, we have
     \else
-        ここで $k=0,1,2,\dots$ である。
-        構成より各 $G_k$ は対称である。
+        ここで $t=0,1,2,\dots$ である。
+        構成より各 $G_t$ は対称である。
         定義から次を得る。
     \fi
     \begin{equation*}
-        G_{k+1} = G_k +\frac{1}{2c^\top s}\left((y-G_k s)c^\top+c(y-G_k s)^\top\right).
+        G_{t+1} = G_t +\frac{1}{2c^\top s}\left((y-G_t s)c^\top+c(y-G_t s)^\top\right).
     \end{equation*}
     \ifEn
         Let us introduce the error vector
@@ -522,7 +522,7 @@
         誤差ベクトルを次で導入する。
     \fi
     \begin{equation*}
-        w_k \coloneqq y-G_k s.
+        w_t \coloneqq y-G_t s.
     \end{equation*}
     \ifEn
         Then, we have
@@ -530,19 +530,19 @@
         このとき
     \fi
     \begin{equation*}
-        G_{k+1} = G_k+\frac{1}{2c^\top s}(w_k c^\top+cw_k^\top).
+        G_{t+1} = G_t+\frac{1}{2c^\top s}(w_t c^\top+cw_t^\top).
     \end{equation*}
     \ifEn
-        Substituting the above equation into the definition of $w_k$ yields
+        Substituting the above equation into the definition of $w_t$ yields
     \else
-        上式を $w_k$ の定義に代入すると
+        上式を $w_t$ の定義に代入すると
     \fi
     \begin{align*}
-        w_{k+1} & = y-\left(G_k+\frac{1}{2c^\top s}(w_k c^\top+cw_k^\top)\right)s \\
+        w_{t+1} & = y-\left(G_t+\frac{1}{2c^\top s}(w_t c^\top+cw_t^\top)\right)s \\
                 & =
-        w_k-\frac12w_k-\frac{w_k^\top s}{2c^\top s}c                              \\
+        w_t-\frac12w_t-\frac{w_t^\top s}{2c^\top s}c                              \\
                 & =
-        \frac{1}{2}\left(w_k-\frac{w_k^\top s}{c^\top s}c\right).
+        \frac{1}{2}\left(w_t-\frac{w_t^\top s}{c^\top s}c\right).
     \end{align*}
     \ifEn
         Hence
@@ -550,7 +550,7 @@
         よって
     \fi
     \begin{equation*}
-        w_{k+1}=Pw_k,
+        w_{t+1}=Pw_t,
         \qquad
         P \coloneqq \frac{1}{2}\left(I-\frac{cs^\top}{c^\top s}\right).
     \end{equation*}
@@ -566,7 +566,7 @@
         したがってノイマン級数が収束し、次が成り立つ。
     \fi
     \begin{align*}
-        \sum_{k=0}^{\infty}w_k & =        \sum_{k=0}^{\infty}P^k(y-Bs)                         &  & (w_0=y-Bs)                \\
+        \sum_{t=0}^{\infty}w_t & =        \sum_{t=0}^{\infty}P^t(y-Bs)                         &  & (w_0=y-Bs)                \\
                                & =  (I-P)^{-1}(y-Bs)                                                                          \\
                                & = 2\left(I-\frac{1}{2}\frac{cs^\top}{c^\top s}\right) (y-Bs). &  & (\text{definition of } P)
     \end{align*}
@@ -579,18 +579,18 @@
         2(I-P) \left(I-\frac{1}{2}\frac{cs^\top}{c^\top s}\right) = \left(I + \frac{cs^\top}{c^\top s}\right) \left(I-\frac{1}{2}\frac{cs^\top}{c^\top s}\right) = I.
     \end{equation*}
     \ifEn
-        In particular, $\lVert w_k \rVert\to0$ as $k\to\infty$.
+        In particular, $\lVert w_t \rVert\to0$ as $t\to\infty$.
         Hence, we have
     \else
-        特に $k\to\infty$ で $\lVert w_k \rVert\to0$ となる。
+        特に $t\to\infty$ で $\lVert w_t \rVert\to0$ となる。
         よって
     \fi
     \begin{align*}
-        \lim_{k\to\infty}G_k
+        \lim_{t\to\infty}G_t
          & =
         B+\frac{1}{2c^\top s}
-        \sum_{k=0}^{\infty}(w_k c^\top+c w_k^\top)                                                                                                                                        \\
-         & = B+ \left(\sum_{k=0}^{\infty}w_k\right) \frac{c^\top}{2c^\top s} + \frac{c}{2c^\top s} \left(\sum_{k=0}^{\infty}w_k\right)^\top                                               \\
+        \sum_{t=0}^{\infty}(w_t c^\top+c w_t^\top)                                                                                                                                        \\
+         & = B+ \left(\sum_{t=0}^{\infty}w_t\right) \frac{c^\top}{2c^\top s} + \frac{c}{2c^\top s} \left(\sum_{t=0}^{\infty}w_t\right)^\top                                               \\
          & = B+ 2\left(I-\frac{1}{2}\frac{cs^\top}{c^\top s}\right) (y-Bs) \frac{c^\top}{2c^\top s} + \frac{c}{2c^\top s} 2(y-Bs)^\top \left(I-\frac{1}{2}\frac{sc^\top}{c^\top s}\right) \\
          & = B + \frac{(y - Bs)c^\top + c(y - Bs)^\top}{c^\top s} - \frac{(y - Bs)^\top s}{(c^\top s)^2} c c^\top                                                                         \\
          & = C_{\infty}.
@@ -601,31 +601,23 @@
         次に奇数部分列について
     \fi
     \begin{equation*}
-        C_{2k+1}
+        C_{2t+1}
         =
-        G_k+\frac{w_k c^\top}{c^\top s}.
+        G_t+\frac{w_t c^\top}{c^\top s}.
     \end{equation*}
     \ifEn
-        Since $G_k\to\bar B$ and $\lVert w_k \rVert\to0$, we obtain
+        Since $G_t\to C_{\infty}$ and $\lVert w_t \rVert\to0$, we obtain
     \else
-        $G_k\to\bar B$ かつ $\lVert w_k \rVert\to0$ なので
+        $G_t\to C_{\infty}$ かつ $\lVert w_t \rVert\to0$ なので
     \fi
     \begin{equation*}
-        C_{2k+1}-G_k\to0.
+        C_{2t+1} \to C_{\infty}.
     \end{equation*}
     \ifEn
-        Therefore both subsequences $\{ C_{2k} \}$ and $\{ C_{2k+1} \}$ converge to $\bar B$,
-        and hence
+        Therefore both subsequences $\{ C_{2t} \}$ and $\{ C_{2t+1} \}$ converge to $C_{\infty}$,
+        completing the proof.
     \else
-        したがって部分列 $\{ C_{2k} \}$ と $\{ C_{2k+1} \}$ はどちらも $\bar B$ に収束し、よって
-    \fi
-    \begin{equation*}
-        C_k\to\bar B.
-    \end{equation*}
-    \ifEn
-        This completes the proof.
-    \else
-        以上で証明が完了する。
+        したがって部分列 $\{ C_{2t} \}$ と $\{ C_{2t+1} \}$ はどちらも $C_{\infty}$ に収束し、証明を完了する。
     \fi
     \myQED
 \end{proof}
@@ -683,9 +675,15 @@
 \end{equation*}
 
 \ifEn
+    There are several other ways to derive the DFP update, some of which can be understood as dual versions of the derivation for the subsequent BFGS update.
+\else
+    DFP更新を導出する他の方法もいくつか存在し、それらの一部は、次のBFGS更新における導出の双対版として理解できる。
+\fi
+
+\ifEn
     \subsubsection{BFGS Update}
 \else
-    \subsubsection{BFGS 更新}
+    \subsubsection{BFGS更新}
 \fi
 
 \ifEn
@@ -699,16 +697,131 @@
 \end{align*}
 
 \ifEn
-    \paragraph{Derivation}
+    \paragraph{Derivation by Duality}
 \else
-    \paragraph{導出}
+    \paragraph{双対による導出}
 \fi
 
 \ifEn
-    This update can be derived by considering the dual of the DFP update. Specifically, we seek an update that minimizes the change in the inverse Hessian approximation $H$ while satisfying the secant condition. Further details are provided in the following subsection.
+    This update can be derived by considering the dual of the DFP update.
+    Note that the BFGS update for $B$ is the same as the DFP update for $H$.
 \else
-    この更新は DFP 更新の双対を考えることで導出できる。具体的には、セカント条件を満たしつつ逆ヘッセ近似 $H$ の変化を最小化する更新を求める。詳細は次小節で述べる。
+    この更新はDFP更新の双対を考えることで導出できる。
+    $B$ に対する BFGS 更新は $H$ に対する DFP 更新と同じであることに注意する。
 \fi
+
+\ifEn
+    \paragraph{Derivation by KL Divergence Minimization}
+\else
+    \paragraph{KL ダイバージェンス最小化による導出}
+\fi
+
+KLダイバージェンスとは、行列間の近さを測る一種の非対称な尺度であり、正定値行列 $P,Q \in \mathbb{R}^{n \times n}$ に対して次で定義される:
+\begin{equation*}
+    \mathrm{KL}(P,Q) \coloneqq \mathrm{tr}(P Q^{-1}) - \log\det(P Q^{-1}) - n.
+\end{equation*}
+行列 $T \in \mathbb{R}^{n \times n}$ を任意の正則行列とする。
+一般に、$\mathrm{tr}$ は2つの行列の積に対して可換性を持つため、KLダイバージェンスは次の不変性を持つ。
+\begin{align*}
+    \mathrm{KL}(T P T^\top, T Q T^\top) & = \mathrm{tr}(T P T^\top (T Q T^\top)^{-1}) - \log\det(T P T^\top (T Q T^\top)^{-1}) - n \\
+                                        & = \mathrm{tr}(P Q^{-1} T^{-1} T) - \log (\det(T) \det(P Q^{-1}) \det(T^{-1})) - n        \\
+                                        & = \mathrm{tr}(P Q^{-1}) - \log\det(P Q^{-1}) - n                                         \\
+                                        & = \mathrm{KL}(P, Q).
+\end{align*}
+BFGS 更新はKLダイバージェンスを用いた次の最適化問題の解としても得られる。
+\begin{align*}
+    \underset{\bar{B} \succ 0}{\text{minimize}} & \quad \mathrm{KL}(\bar{B}, B) \\
+    \text{subject to}                           & \quad \bar{B} s = y
+\end{align*}
+ここではそれを証明する。
+
+\begin{proposition}[{\citep[Section 7.2.4]{kanamori2016continuous}}]
+    \ifEn
+        Let $B \succ 0$ be a symmetric positive definite matrix.
+        The solution to the above optimization problem is given by the BFGS update formula.
+    \else
+        $B \succ 0$ を正定値対称行列とする。
+        上記の最適化問題の解は BFGS 更新公式で与えられる。
+    \fi
+\end{proposition}
+\begin{proof}
+    $B$ が正定値対称行列であることに注意して、
+    \begin{equation*}
+        s' \coloneqq B^{\frac{1}{2}} s, \quad y' \coloneqq B^{-\frac{1}{2}} y, \quad B' \coloneqq B^{-\frac{1}{2}} \bar{B} B^{-\frac{1}{2}}
+    \end{equation*}
+    と置くと、最適化問題は次のように書き直せる:
+    \begin{align*}
+        \underset{B' \succ 0}{\text{minimize}} & \quad \mathrm{KL}(B', I) \\
+        \text{subject to}                      & \quad B' s' = y'.
+    \end{align*}
+    ただし、KLダイバージェンスの不変性より、$\mathrm{KL}(\bar{B}, B) = \mathrm{KL}(B^{-\frac{1}{2}} \bar{B} B^{-\frac{1}{2}}, B^{-\frac{1}{2}} B B^{-\frac{1}{2}}) = \mathrm{KL}(\bar{B}, I)$ であることを用いた。
+    なお、本最適化問題において$B' \succ 0$という制約は自動的に対称性を含むため、$B' = B'^\top$ を制約として陽に課しても解は変わらない。
+
+    この問題の解を、ラグランジュの未定乗数法を用いて求める。
+    ラグランジュ乗数 $\lambda\in\mathbb{R}^n$ および行列乗数 $\Lambda\in\mathbb{R}^{n\times n}$ を用いて、ラグランジアンを
+    \begin{equation*}
+        \mathcal{L}(B',\lambda,\Lambda) = \mathrm{tr}(B') -\log\det(B') -n +2\lambda^\top(B's'-y') +\mathrm{tr}\left(\Lambda(B'-B'^\top)\right)
+    \end{equation*}
+    と定義する。
+    KKT条件のうち停留性に関する条件は、行列微分の公式 ($X \succ 0$ に対して、$\log\det(X)$ の微分が $X^{-\top}$ かつ、 $\mathrm{tr}(AX)$ の微分が $A^\top$) を用いて $B'$ で微分し、$B'=B'^\top$ を用いることで次のように書ける:
+    \begin{equation*}
+        I-B'^{-1}
+        +2\lambda s'^\top
+        +\Lambda^\top-\Lambda
+        =0.
+    \end{equation*}
+    この式とその転置を加えて2で割り、再び $B' = B'^\top$ を用いると次を得る:
+    \begin{equation*}
+        B'^{-1} = I+\lambda s'^\top+s'\lambda^\top.
+    \end{equation*}
+    制約条件 $B's'=y'$ より $B'^{-1}y'=s'$ であるから、
+    上式に右から $y'$ を掛けた式と、さらに左から $y'^\top$ を掛けた式はそれぞれ
+    \begin{align*}
+        s'         & = y' +(s'^\top y')\lambda +(\lambda^\top y')s'                               \\
+        y'^\top s' & = y'^\top y' + (s'^\top y')(y'^\top \lambda) + (\lambda^\top y')(y'^\top s')
+    \end{align*}
+    となる。
+    第2式より、
+    \begin{equation*}
+        \lambda^\top y'
+        =
+        \frac{y'^\top s'-y'^\top y'}{2(s'^\top y')}
+    \end{equation*}
+    であるので、これを第1式に代入すると、
+    \begin{equation*}
+        \lambda
+        = \frac{s'-y'}{s'^\top y'} - \frac{\lambda^\top y'}{s'^\top y'}s'
+        =
+        \frac{s'^\top y'+y'^\top y'}{2(s'^\top y')^2}s'
+        -\frac{1}{s'^\top y'}y'
+    \end{equation*}
+    が得られる。
+    この $\lambda$ を $B'^{-1}$ の表式に代入して整理すると，
+    \begin{align*}
+        B'^{-1} & = I + 2\frac{s'^\top y'+y'^\top y'}{2(s'^\top y')^2}(s' s'^\top)
+        -\frac{1}{s'^\top y'}(y' s'^\top + s' y'^\top)                                                                                        \\
+                & = \left( I-\frac{s'y'^\top}{s'^\top y'} \right) \left( I-\frac{y's'^\top}{s'^\top y'} \right) +\frac{s's'^\top}{s'^\top y'}
+    \end{align*}
+    を得る。
+    最後に $B' = B^{-\frac{1}{2}} \bar{B} B^{-\frac{1}{2}}$ より、$\bar{B} = B^{\frac{1}{2}} B' B^{\frac{1}{2}}$ であるため、$\bar{B}^{-1}$ を計算すると、
+    \begin{align*}
+        \bar{B}^{-1} & = B^{-\frac{1}{2}} B'^{-1} B^{-\frac{1}{2}}                                                                                                                                                                          \\
+                     & = B^{-\frac{1}{2}} \left( I-\frac{s'y'^\top}{s'^\top y'} \right) \left( I-\frac{y's'^\top}{s'^\top y'} \right) B^{-\frac{1}{2}} + \frac{(B^{-\frac{1}{2}}s')(B^{-\frac{1}{2}}s')^\top}{s'^\top y'}                   \\
+                     & = B^{-\frac{1}{2}} \left( I-\frac{B^{\frac{1}{2}}s y^\top B^{-\frac{1}{2}}}{s^\top y} \right) \left( I-\frac{B^{-\frac{1}{2}}y s^\top B^{\frac{1}{2}}}{s^\top y} \right) B^{-\frac{1}{2}} + \frac{ss^\top}{s^\top y} \\
+                     & = \left( I - \frac{s y^\top}{y^\top s} \right) B^{-1} \left( I - \frac{y s^\top}{y^\top s} \right) + \frac{s s^\top}{y^\top s}.
+    \end{align*}
+    となり、確かに $\bar{B}^{-1} = \bar{H}_{\mathrm{BFGS}}$ が得られる。
+    後述の通り、$\bar{H}_{\mathrm{BFGS}}$ の逆行列は $\bar{B}_{\mathrm{BFGS}}$ であるため、命題が示された。
+    \myQED
+\end{proof}
+
+\ifEn
+    See literature for proof of these formulations \citep{kanamoriBregmanExtensionQuasiNewton2010,kanamoriBregmanExtensionQuasiNewton2010a}.
+\else
+    これらの定式化の証明は文献を参照されたい \citep{kanamoriBregmanExtensionQuasiNewton2010,kanamoriBregmanExtensionQuasiNewton2010a}。
+    \href{http://matsuzoe.web.nitech.ac.jp/infogeo/OCAMI2010/kanamori.pdf}{こちらのスライド}も参照されたい。
+\fi
+
 
 \ifEn
     \subsection{BFGS Method}
@@ -834,11 +947,11 @@
         仮定より $B_k$ とその逆行列 $H_k$ は正定値である。
         任意の非零ベクトル $v \in \mathbb{R}^n$ に対して
     \fi
-    \begin{align*}
+    \begin{equation*}
         v^\top H_{k+1} v
-         & = v^\top \left(I - \frac{s_k y_k^\top}{y_k^\top s_k}\right) H_k \left(I - \frac{y_k s_k^\top}{y_k^\top s_k}\right) v + v^\top \frac{s_k s_k^\top}{y_k^\top s_k} v \\
-         & \geq 0 + \frac{(s_k^\top v)^2}{y_k^\top s_k} > 0,
-    \end{align*}
+        = v^\top \left(I - \frac{s_k y_k^\top}{y_k^\top s_k}\right) H_k \left(I - \frac{y_k s_k^\top}{y_k^\top s_k}\right) v + v^\top \frac{s_k s_k^\top}{y_k^\top s_k} v
+        \geq 0 + \frac{(s_k^\top v)^2}{y_k^\top s_k} > 0,
+    \end{equation*}
     \ifEn
         where the first term is nonnegative since $H_k$ is positive definite, and the second term is positive due to the curvature condition $y_k^\top s_k > 0$.
         Thus, $H_{k+1}$ is positive definite, and consequently, $B_{k+1} = H_{k+1}^{-1}$ is also positive definite.
@@ -848,47 +961,6 @@
     \fi
     \myQED
 \end{proof}
-
-\ifEn
-    \subsubsection{KL}
-\else
-    \subsubsection{KL}
-\fi
-
-\ifEn
-    We next present a variational characterization of the BFGS update via the Kullback--Leibler (KL) divergence.
-    For zero-mean multivariate Gaussians $\mathcal{N}(0,A^{-1})$ and $\mathcal{N}(0,B^{-1})$, the expression
-\else
-    次に、Kullback--Leibler (KL) ダイバージェンスによる BFGS 更新の変分的特徴付けを示す。
-    平均零の多変量ガウス分布 $\mathcal{N}(0,A^{-1})$ と $\mathcal{N}(0,B^{-1})$ に対して、次の式
-\fi
-\begin{equation*}
-    \psi(A) = \operatorname{tr}(A) - \log \det(A)
-\end{equation*}
-\ifEn
-    coincides with the KL divergence up to the additive constant $-n$, so minimizing $\psi$ is equivalent to minimizing the KL distance.
-    Then, the BFGS update is given by the solution to the optimization problem
-\else
-    は加法定数 $-n$ を除いて KL ダイバージェンスに一致するため、$\psi$ の最小化は KL 距離の最小化と同値である。
-    このとき BFGS 更新は次の最適化問題の解として与えられる。
-\fi
-\begin{align*}
-    \underset{B \in \mathrm{PD}(n)}{\mathrm{minimize}} & \quad \psi(B_k^{-1/2} B B_k^{-1/2}) \\
-    \mathrm{subject\ to}                               & \quad B s_k = y_k.
-\end{align*}
-\ifEn
-    The constraint $B s_k = y_k$ in the optimization problem is precisely the secant condition discussed earlier, ensuring that the updated matrix interpolates the latest curvature pair.
-\else
-    この最適化問題の制約 $B s_k = y_k$ は先に述べたセカント条件そのものであり、更新行列が最新の曲率対を内挿することを保証する。
-\fi
-
-\ifEn
-    See literature for proof of these formulations \citep{kanamoriBregmanExtensionQuasiNewton2010,kanamoriBregmanExtensionQuasiNewton2010a}.
-\else
-    \textcolor{red}{todo:prove}
-    これらの定式化の証明は文献を参照されたい \citep{kanamoriBregmanExtensionQuasiNewton2010,kanamoriBregmanExtensionQuasiNewton2010a}。
-    \href{http://matsuzoe.web.nitech.ac.jp/infogeo/OCAMI2010/kanamori.pdf}{こちらのスライド}も参照されたい。
-\fi
 
 \ifEn
     \subsubsection{Trace and Determinant Formulas for the BFGS Update}
@@ -922,12 +994,12 @@
     \ifEn
         Let $B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ be the BFGS update. Then
         \begin{equation*}
-            \tr(B_{+}) = \tr(B) - \frac{\lVert B s \rVert^2}{s^\top Bs} + \frac{\lVert y \rVert^2}{y^\top s}.
+            \mathrm{tr}(B_{+}) = \mathrm{tr}(B) - \frac{\lVert B s \rVert^2}{s^\top Bs} + \frac{\lVert y \rVert^2}{y^\top s}.
         \end{equation*}
     \else
         $B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ を BFGS 更新とする。このとき
         \begin{equation*}
-            \tr(B_{+}) = \tr(B) - \frac{\lVert B s \rVert^2}{s^\top Bs} + \frac{\lVert y \rVert^2}{y^\top s}
+            \mathrm{tr}(B_{+}) = \mathrm{tr}(B) - \frac{\lVert B s \rVert^2}{s^\top Bs} + \frac{\lVert y \rVert^2}{y^\top s}
         \end{equation*}
         が成り立つ。
     \fi
@@ -940,7 +1012,7 @@
         BFGS 更新公式にトレースを適用すると
     \fi
     \begin{equation*}
-        \tr(B_{+}) = \tr(B) - \tr\left(\frac{Bss^\top B}{s^\top Bs}\right) + \tr\left(\frac{yy^\top}{y^\top s}\right).
+        \mathrm{tr}(B_{+}) = \mathrm{tr}(B) - \mathrm{tr}\left(\frac{Bss^\top B}{s^\top Bs}\right) + \mathrm{tr}\left(\frac{yy^\top}{y^\top s}\right).
     \end{equation*}
     \ifEn
         For the second term, note that
@@ -948,7 +1020,7 @@
         第2項について
     \fi
     \begin{equation*}
-        \tr\left(\frac{Bss^\top B}{s^\top Bs}\right) = \frac{1}{s^\top Bs}\tr((Bs)(Bs)^\top) = \frac{\lVert B s \rVert^2}{s^\top Bs}.
+        \mathrm{tr}\left(\frac{Bss^\top B}{s^\top Bs}\right) = \frac{1}{s^\top Bs}\mathrm{tr}((Bs)(Bs)^\top) = \frac{\lVert B s \rVert^2}{s^\top Bs}.
     \end{equation*}
     \ifEn
         For the third term, we have
@@ -956,7 +1028,7 @@
         第3項について
     \fi
     \begin{equation*}
-        \tr\left(\frac{yy^\top}{y^\top s}\right) = \frac{1}{y^\top s}\tr(yy^\top) = \frac{\lVert y \rVert^2}{y^\top s}.
+        \mathrm{tr}\left(\frac{yy^\top}{y^\top s}\right) = \frac{1}{y^\top s}\mathrm{tr}(yy^\top) = \frac{\lVert y \rVert^2}{y^\top s}.
     \end{equation*}
     \ifEn
         Combining these results yields the desired formula.
@@ -1250,20 +1322,20 @@
 
 \ifEn
     Limited-memory quasi-Newton methods extend classical quasi-Newton methods to large-scale optimization problems.
-    In standard quasi-Newton methods, the approximate Hessian or inverse Hessian matrix is stored and updated as a dense matrix, requiring $\order{n^2}$ memory for $n$ variables.
+    In standard quasi-Newton methods, the approximate Hessian or inverse Hessian matrix is stored and updated as a dense matrix, requiring $\mathcal{O}(n^2)$ memory for $n$ variables.
 \else
     限定記憶準ニュートン法は、古典的な準ニュートン法を大規模最適化問題へ拡張する手法である。
-    標準的な準ニュートン法では近似ヘッセ行列またはその逆行列を密行列として保存し更新するため、$n$ 変数に対して $\order{n^2}$ のメモリを要する。
+    標準的な準ニュートン法では近似ヘッセ行列またはその逆行列を密行列として保存し更新するため、$n$ 変数に対して $\mathcal{O}(n^2)$ のメモリを要する。
 \fi
 
 \ifEn
     The L-BFGS method \citep{liuLimitedMemoryBFGS1989a}, which is based on the BFGS update, avoids storing the full matrix explicitly.
     Instead, it maintains only the most recent $m$ vector pairs $\{(s_i,y_i)\}$.
-    This reduces the storage requirement to $\order{nm}$, which is a dramatic improvement when $m$ is a small constant (typically $m\le 10$).
+    This reduces the storage requirement to $\mathcal{O}(nm)$, which is a dramatic improvement when $m$ is a small constant (typically $m\le 10$).
 \else
     BFGS 更新に基づく L-BFGS 法 \citep{liuLimitedMemoryBFGS1989a} は、行列全体を明示的に保存しない。
     代わりに最新の $m$ 組のベクトル対 $\{(s_i,y_i)\}$ のみを保持する。
-    これにより記憶量は $\order{nm}$ に減少し、$m$ が小さな定数(通常 $m\le 10$) のとき大幅な改善となる。
+    これにより記憶量は $\mathcal{O}(nm)$ に減少し、$m$ が小さな定数(通常 $m\le 10$) のとき大幅な改善となる。
 \fi
 
 \ifEn
@@ -1338,12 +1410,12 @@
     The compact representation above can be applied to any vector $q$ without explicitly forming $H_m$.
     Let $r = H_m q$.
     Exploiting the associative structure of the matrix products, this operation can be carried out using two short loops of length $m$, leading to the well-known L-BFGS two-loop recursion~\citep[Algorithm 7.4]{nocedal1999numerical}.
-    This algorithm requires $\order{md}$ arithmetic operations and $\order{md}$ storage, where $d$ denotes the problem dimension.
+    This algorithm requires $\mathcal{O}(md)$ arithmetic operations and $\mathcal{O}(md)$ storage, where $d$ denotes the problem dimension.
 \else
     上のコンパクト表現は、$H_m$ を明示的に形成せずに任意のベクトル $q$ に適用できる。
     $r = H_m q$ とおく。
     行列積の結合性を利用すると、この計算は長さ $m$ の短いループを二回回すだけで実行でき、よく知られた L-BFGS の二重ループ再帰につながる \citep[Algorithm 7.4]{nocedal1999numerical}。
-    このアルゴリズムは $\order{md}$ の演算量と $\order{md}$ の記憶量を要する。ここで $d$ は問題次元である。
+    このアルゴリズムは $\mathcal{O}(md)$ の演算量と $\mathcal{O}(md)$ の記憶量を要する。ここで $d$ は問題次元である。
 \fi
 
 \subfile{999_two_loop_recursion.tex}

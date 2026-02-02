@@ -8,6 +8,8 @@ import re
 from pathlib import Path
 from typing import Dict, List, Tuple
 
+import fitz
+
 # Constants
 USE_GITHUB_URL = False
 GITHUB_RAW_URL_BASE = "https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/"
@@ -66,19 +68,30 @@ def reset_global_counters() -> None:
     LABEL_MAP.clear()
 
 
-def find_matching_brace(s: str, start_pos: int) -> int:
-    r"""Find the position of the closing brace matching the opening brace at start_pos.
+def find_matching(s: str, start_pos: int, bracket_type: str = "brace") -> int:
+    r"""Find the position of the closing bracket matching the opening bracket at start_pos.
 
-    Handles nested braces correctly by counting brace pairs.
+    Handles nested brackets correctly by counting bracket pairs.
 
     Args:
         s: The string to search
-        start_pos: Position of the opening brace {
+        start_pos: Position of the opening bracket
+        bracket_type: Type of bracket to match - "brace" for {} or "bracket" for []
 
     Returns:
-        Position of the matching closing brace, or -1 if not found
+        Position of the matching closing bracket, or -1 if not found
     """
-    if start_pos >= len(s) or s[start_pos] != "{":
+    bracket_pairs = {
+        "brace": ("{", "}"),
+        "bracket": ("[", "]"),
+    }
+
+    if bracket_type not in bracket_pairs:
+        return -1
+
+    open_char, close_char = bracket_pairs[bracket_type]
+
+    if start_pos >= len(s) or s[start_pos] != open_char:
         return -1
 
     count = 1
@@ -89,9 +102,9 @@ def find_matching_brace(s: str, start_pos: int) -> int:
             # Skip escaped characters
             i += 2
             continue
-        elif s[i] == "{":
+        elif s[i] == open_char:
             count += 1
-        elif s[i] == "}":
+        elif s[i] == close_char:
             count -= 1
         i += 1
 
@@ -118,7 +131,7 @@ def extract_braced_content(block: str, command: str) -> str:
         return ""
 
     start_brace = match.end() - 1  # Position of the opening brace
-    end_brace = find_matching_brace(block, start_brace)
+    end_brace = find_matching(block, start_brace, "brace")
 
     if end_brace == -1:
         return ""
@@ -249,11 +262,63 @@ def post_process_content(content: str) -> str:
     """
     # First apply equation environment conversion
     content = convert_equation_environments(content)
+    # Convert \href{url}{alt} to Markdown links
+    content = convert_href_to_md(content)
     # Then convert nested itemize/enumerate
     content = convert_nested_itemize_enumerate(content)
     # Finally apply cref conversion
     content = convert_cref(content)
     return content
+
+
+def convert_href_to_md(content: str) -> str:
+    r"""Convert \href{url}{alt} to Markdown [alt](url)."""
+
+    def href_replace(match: re.Match[str]) -> str:
+        url = match.group(1)
+        alt = match.group(2)
+        return f"[{alt}]({url})"
+
+    return re.sub(r"\\href\{([^}]+)\}\{([^}]+)\}", href_replace, content)
+
+
+def convert_subfile_to_md(content: str) -> str:
+    r"""Convert \subfile{filename.tex} to ![filename](filename.png)."""
+
+    def subfile_replace(match: re.Match[str]) -> str:
+        filepath = match.group(1)
+        # Extract filename without extension
+        filename = Path(filepath).stem
+        # Build image path
+        image_path = filename + ".png"
+        if USE_GITHUB_URL:
+            url = f"{GITHUB_RAW_URL_BASE}doc/study/{image_path}"
+        else:
+            url = image_path
+        return f"![{filename}]({url})"
+
+    return re.sub(r"\\subfile\{([^}]+)\}", subfile_replace, content)
+
+
+def convert_pdf_to_png(current_dir: Path) -> None:
+    pdf_files = list(current_dir.glob("999_*.pdf"))
+    if not pdf_files:
+        return
+
+    print(f"Converting {len(pdf_files)} PDF files to PNG...")
+    for pdf_path in pdf_files:
+        png_path = pdf_path.with_suffix(".png")
+        try:
+            doc = fitz.open(str(pdf_path))
+            # Render first page with good DPI
+            pix = doc[0].get_pixmap(
+                matrix=fitz.Matrix(5, 5)
+            )  # 2x zoom for better quality
+            pix.save(str(png_path))
+            doc.close()
+            print(f"  Converted: {pdf_path.name} -> {png_path.name}")
+        except Exception as e:
+            print(f"  Error converting {pdf_path.name}: {e}")
 
 
 def convert_equation_environments(block: str) -> str:
@@ -294,19 +359,33 @@ def convert_figure_to_md(block: str, counter: int) -> str:
     Converts \includegraphics paths to GitHub raw content URLs and PDF to PNG.
     Extracts caption and adds it below the figure.
     """
-    match = re.search(r"\\includegraphics(?:\[[^\]]*\])?\{([^}]+)\}", block)
-    if not match:
+    image_entries = extract_figure_images(block)
+    if not image_entries:
         return ""
 
-    image_path = match.group(1).replace(".pdf", ".png")
-
-    if USE_GITHUB_URL:
-        assert image_path.startswith("../")
-        url = f"{GITHUB_RAW_URL_BASE}{image_path.replace('../', '')}"
+    if len(image_entries) == 1:
+        image_path = image_entries[0]["path"].replace(".pdf", ".png")
+        if USE_GITHUB_URL:
+            assert image_path.startswith("../")
+            url = f"{GITHUB_RAW_URL_BASE}{image_path.replace('../', '')}"
+        else:
+            url = image_path
+        result = f"![{image_path}]({url})\n"
     else:
-        url = image_path
-
-    result = f"![{image_path}]({url})\n"
+        img_tags = []
+        for entry in image_entries:
+            image_path = entry["path"].replace(".pdf", ".png")
+            if USE_GITHUB_URL:
+                assert image_path.startswith("../")
+                url = f"{GITHUB_RAW_URL_BASE}{image_path.replace('../', '')}"
+            else:
+                url = image_path
+            width = entry.get("width_percent")
+            if width is not None:
+                img_tags.append(f'<img width="{width}%" src="{url}" />')
+            else:
+                img_tags.append(f'<img src="{url}" />')
+        result = "".join(img_tags) + "\n"
 
     caption_text = extract_braced_content(block, "caption").replace("\n", " ").strip()
     if caption_text:
@@ -315,6 +394,45 @@ def convert_figure_to_md(block: str, counter: int) -> str:
         result += f"\n({ENV_DISPLAY_NAMES['figure']} {counter} {caption_text})\n"
 
     return post_process_content(result)
+
+
+def extract_figure_images(block: str) -> List[Dict[str, str]]:
+    r"""Extract image paths and widths from figure blocks.
+
+    Supports simplified patterns with minipage widths like 0.5\textwidth or 0.33\textwidth.
+    Returns a list of dicts with keys: path, width_percent (optional).
+    """
+    images: List[Dict[str, str]] = []
+
+    # Find minipage blocks with includegraphics inside
+    minipage_pattern = re.compile(
+        r"\\begin\{minipage\}\{([0-9.]+)\\textwidth\}(.*?)\\end\{minipage\}",
+        re.DOTALL,
+    )
+    include_pattern = re.compile(r"\\includegraphics(?:\[[^\]]*\])?\{([^}]+)\}")
+
+    for match in minipage_pattern.finditer(block):
+        width_str = match.group(1)
+        inner = match.group(2)
+        img_match = include_pattern.search(inner)
+        if not img_match:
+            continue
+        path = img_match.group(1)
+        try:
+            width_percent = int(round(float(width_str) * 100))
+        except ValueError:
+            width_percent = None
+        entry: Dict[str, str] = {"path": path}
+        if width_percent is not None:
+            entry["width_percent"] = str(width_percent)
+        images.append(entry)
+
+    # Fallback: if no minipage matches, collect all includegraphics
+    if not images:
+        for img_match in include_pattern.finditer(block):
+            images.append({"path": img_match.group(1)})
+
+    return images
 
 
 def convert_table_to_md(block: str, counter: int) -> str:
@@ -363,7 +481,7 @@ def convert_table_to_md(block: str, counter: int) -> str:
     else:
         table_content = ""
 
-    caption_text = extract_braced_content(block, "caption")
+    caption_text = extract_braced_content(block, "caption").replace("\n", " ").strip()
     if caption_text:
         caption_text = post_process_content(caption_text)
         table_content += f"\n({ENV_DISPLAY_NAMES['table']} {counter} {caption_text})\n"
@@ -434,16 +552,25 @@ def convert_math_env_to_md(block: str, env_name: str, counter: int) -> str:
         return ""
 
     first_line = lines[0].strip()
-    optional_match = re.search(
-        r"\\begin\{" + re.escape(env_name) + r"\}\[([^\]]+)\]", first_line
-    )
 
-    env_display = env_name.capitalize()
-    header = (
-        f"**{env_display} {counter}** ({optional_match.group(1)})"
-        if optional_match
-        else f"**{env_display} {counter}**"
-    )
+    # Find the opening bracket after \begin{env_name}
+    begin_pattern = r"\\begin\{" + re.escape(env_name) + r"\}"
+    begin_match = re.search(begin_pattern, first_line)
+    assert begin_match is not None, "Invalid environment block."
+    start_pos = begin_match.end()
+    if start_pos < len(first_line) and first_line[start_pos] == "[":
+        # Find matching closing bracket, handling nested brackets
+        end_pos = find_matching(first_line, start_pos, "bracket")
+        bracket_content = first_line[start_pos + 1 : end_pos] if end_pos != -1 else ""
+        if bracket_content:
+            env_display = env_name.capitalize()
+            header = f"**{env_display} {counter}** ({bracket_content})"
+        else:
+            env_display = env_name.capitalize()
+            header = f"**{env_display} {counter}**"
+    else:
+        env_display = env_name.capitalize()
+        header = f"**{env_display} {counter}**"
 
     content_lines = [
         line.strip()
@@ -642,6 +769,10 @@ class LatexToMarkdownConverter:
 
     def process_normal_line(self, line: str) -> None:
         """Process a normal (non-environment) line."""
+        # Convert \subfile{...} commands first
+        line = convert_subfile_to_md(line)
+        # Convert \href{url}{alt}
+        line = convert_href_to_md(line)
         # Convert \cref references
         line = convert_cref(line)
 
@@ -697,7 +828,7 @@ def process_latex_file(filepath: Path) -> List[str]:
 
 def for_qiita_post_process(content: str) -> str:
     lines = content.splitlines()
-    resList = ["<!-- markdownlint-disable MD041 -->", ""]
+    resList = []
     mathBlockOpen = False
     for line in lines:
         if line.strip() == "$$":
@@ -743,6 +874,9 @@ def main() -> None:
     reset_global_counters()
 
     current_dir = Path(__file__).parent
+
+    # Convert PDFs to PNGs
+    convert_pdf_to_png(current_dir)
     main_file = "0_main.tex"
     tex_files = [
         f for f in sorted(current_dir.glob("[1-4]*.tex")) if f.name != main_file
@@ -750,36 +884,34 @@ def main() -> None:
 
     assert tex_files, "No .tex files found in current directory."
 
-    title = ""
-    main_content = process_latex_file(current_dir / main_file)
-    title = ""
-    for line in main_content:
-        print(line)
-        title_match = re.match(r"\\title\{(.+)\}", line.strip())
-        if title_match:
-            title = title_match.group(1)
-            break
-
-    all_markdown_lines = [f"# {title}\n"]
+    all_markdown_lines = ["<!-- markdownlint-disable MD041 -->"]
+    each_markdown_lines = []
 
     for tex_file in tex_files:
         print(f"Processing {tex_file.name}...")
         markdown_lines = process_latex_file(tex_file)
 
-        if markdown_lines:
-            all_markdown_lines.extend(
-                [f"\n<!-- From {tex_file.name} -->\n", *markdown_lines, "\n"]
-            )
+        all_markdown_lines.extend(
+            [f"\n<!-- From {tex_file.name} -->\n", *markdown_lines, "\n"]
+        )
+        each_markdown_lines.append((tex_file.name, markdown_lines))
 
     output_file = current_dir / "combined_output.md"
     output_content = "\n".join(all_markdown_lines)
     output_content = re.sub(r"\\label\{[^}]+\}", "", output_content)
     output_content = for_qiita_post_process(output_content)
-
     output_file.write_text(output_content, encoding="utf-8")
-
     print(f"\nConversion complete! Output written to {output_file}")
     print(f"Processed {len(tex_files)} files.")
+
+    for filename, md_lines in each_markdown_lines:
+        print(f"  {filename}: {len(md_lines)} lines")
+        output_file = current_dir / f"{filename}_output.md"
+        file_content = "\n".join(md_lines)
+        file_content = re.sub(r"\\label\{[^}]+\}", "", file_content)
+        file_content = for_qiita_post_process(file_content)
+        output_file.write_text(file_content, encoding="utf-8")
+        print(f"    Output written to {output_file}")
 
 
 if __name__ == "__main__":

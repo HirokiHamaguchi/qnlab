@@ -2,7 +2,12 @@
 
 \begin{document}
 
-\section{\ifEn Modified Secant Condition \else 修正セカント条件 \fi}\label{sec:background_modified_secant}
+\ifEn
+    \section{Modified Secant Condition}
+\else
+    \section{修正セカント条件}
+\fi
+\label{sec:background_modified_secant}
 
 \ifEn
     This section explains the modified secant condition, a modification of the standard secant condition used in quasi-Newton methods.
@@ -12,7 +17,11 @@
     修正セカント条件は勾配情報に加えて関数値情報を取り込み、より正確なヘッセ行列の近似を実現します。
 \fi
 
-\subsection{\ifEn Standard Secant Condition \else 標準セカント条件 \fi}
+\ifEn
+    \subsection{Standard Secant Condition}
+\else
+    \subsection{標準的なセカント条件}
+\fi
 \label{subsec:standard_secant}
 
 \ifEn
@@ -60,7 +69,11 @@ Additionally, the secant condition ensures that the model satisfies
     したがって、セカント条件を使用することにより、二次モデル $m_{k+1}(x)$ が前の関数値 $f(x_k)$ を除いて、$x_{k+1}$ と $x_k$ の両方での勾配情報を正確に反映することが保証されます。
 \fi
 
-\subsection{\ifEn Modified Secant Condition \else 修正セカント条件 \fi}
+\ifEn
+    \subsection{Modified Secant Condition}
+\else
+    \subsection{修正セカント条件}
+\fi
 
 \ifEn
     Although the secant condition is widely used, it can fail to capture the curvature of the objective function accurately because it only matches gradient information.
@@ -69,9 +82,16 @@ Additionally, the secant condition ensures that the model satisfies
     セカント条件は広く使用されていますが、勾配情報のみを照合するため、目的関数の曲率を正確に捕捉できない場合があります。
     この制限を \cref{fig:msec_overview} で説明します。
 \fi
-In \cref{fig:msec_explain}, we have two points $x_k$ and $x_{k+1}$ with their corresponding function values and gradients.
-In \cref{fig:ideal_model}, we see that the ideal quadratic model constructed from the exact Hessian fits well around the new point $x_{k+1}$, leading to a better convergence behavior.
-However, in \cref{fig:standard_secant}, the standard secant update only matches the gradients at these points, neglecting the function value at $x_k$. It can severely misestimate the curvature, leading to a poor approximation of the true objective function.
+
+\ifEn
+    In \cref{fig:msec_explain}, we have two points $x_k$ and $x_{k+1}$ with their corresponding function values and gradients.
+    In \cref{fig:ideal_model}, we see that the ideal quadratic model constructed from the exact Hessian fits well around the new point $x_{k+1}$, leading to a better convergence behavior.
+    However, in \cref{fig:standard_secant}, the standard secant update only matches the gradients at these points, neglecting the function value at $x_k$. It can severely misestimate the curvature, leading to a poor approximation of the true objective function.
+\else
+    \cref{fig:msec_explain} では、対応する関数値と勾配を持つ2つの点 $x_k$ と $x_{k+1}$ があります。
+    \cref{fig:ideal_model} では、正確なヘッセ行列から構築された理想的な二次モデルが新しい点 $x_{k+1}$ の周りでよくフィットし、より良い収束性能をもたらすことが見られます。
+    しかし、\cref{fig:standard_secant} では、標準的なセカント更新はこれらの点での勾配のみを照合し、$x_k$ での関数値を無視します。曲率を大きく誤推定する可能性があり、真の目的関数の近似が悪くなります。
+\fi
 
 \begin{figure}[t]
     \centering
@@ -233,11 +253,21 @@ Substituting this equation and using $s_k^\top B^{\mathrm{F}}_{k+1} s_k = s_k^\t
 \begin{figure}[t]
     \centering
     \includegraphics[width=0.7\textwidth]{../imgs/modified_secant/trial_2.pdf}
-    \caption{\ifEn Function-value-based modified secant equation. The modified secant equation $B^\mathrm{F}_k s_k = y_k + \sigma^\mathrm{F}_k s_k$ constructs a quadratic model that satisfies the function value condition $m^{\mathrm{F}}_k(x_{k-1}) = f(x_{k-1})$ at the previous point. This differs from the standard secant equation, which only matches gradients but not function values. \else 関数値ベースの修正セカント方程式。修正セカント方程式 $B^\mathrm{F}_k s_k = y_k + \sigma^\mathrm{F}_k s_k$ は、前の点での関数値条件 $m^{\mathrm{F}}_k(x_{k-1}) = f(x_{k-1})$ を満たす二次モデルを構築します。これは勾配のみを照合し、関数値を照合しない標準的なセカント方程式とは異なります。 \fi}
+    \caption{
+        \ifEn
+            Function-value-based modified secant equation. The modified secant equation $B^\mathrm{F}_k s_k = y_k + \sigma^\mathrm{F}_k s_k$ constructs a quadratic model that satisfies the function value condition $m^{\mathrm{F}}_k(x_{k-1}) = f(x_{k-1})$ at the previous point. This differs from the standard secant equation, which only matches gradients but not function values.
+        \else
+            関数値ベースの修正セカント方程式。修正セカント方程式 $B^\mathrm{F}_k s_k = y_k + \sigma^\mathrm{F}_k s_k$ は、前の点での関数値条件 $m^{\mathrm{F}}_k(x_{k-1}) = f(x_{k-1})$ を満たす二次モデルを構築します。これは勾配のみを照合し、関数値を照合しない標準的なセカント方程式とは異なります。
+        \fi
+    }
     \label{fig:yuan_msec}
 \end{figure}
 
-\subsubsection{\ifEn Cubic-Augmented Modified Secant Condition \else 3次拡張修正セカント条件 \fi}
+\ifEn
+    \subsubsection{Cubic-Augmented Modified Secant Condition}
+\else
+    \subsubsection{3次項付き修正セカント条件}
+\fi
 \label{subsubsec:zhang}
 
 \ifEn
