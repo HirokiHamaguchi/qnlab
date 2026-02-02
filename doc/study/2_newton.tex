@@ -17,10 +17,10 @@
 
 \ifEn
     In this subsection, we outline Newton's method, which is a fundamental optimization algorithm for an unconstrained optimization problem.
-    Newton's method is a representative iterative algorithm that starts from an initial point $x_0$, successively updates the current point, and generates a sequence $\{x_k\}_{k=0}^\infty$.
+    Newton's method is a representative iterative algorithm that starts from an initial point $x_0$, successively updates the current point, and generates a sequence $\{ x_k \}_{k=0}^\infty$.
 \else
     本小節では、無制約最適化問題に対する基本的な最適化アルゴリズムであるニュートン法の概要を示す。
-    ニュートン法は、初期点 $x_0$ から出発し、現在点を逐次更新して列 $\{x_k\}_{k=0}^\infty$ を生成する代表的な反復アルゴリズムである。
+    ニュートン法は、初期点 $x_0$ から出発し、現在点を逐次更新して列 $\{ x_k \}_{k=0}^\infty$ を生成する代表的な反復アルゴリズムである。
 \fi
 
 \ifEn
@@ -168,12 +168,12 @@
         starting from an initial point $x_0 \in \mathbb{R}^n$, and the step size $\alpha_k$ is determined by the Wolfe conditions.
         For the angle $\theta_k$, if there exists a positive constant $\delta$ such that
         $\cos \theta_k \geq \delta > 0$ for all $k$,
-        then, the method generates a sequence $\{x_k\}$ satisfying
+        then, the method generates a sequence $\{ x_k \}$ satisfying
     \else
         初期点 $x_0 \in \mathbb{R}^n$ から開始し、ステップサイズ $\alpha_k$ は Wolfe 条件で定められるとする。
         角 $\theta_k$ に対して、ある正の定数 $\delta$ が存在して
         $\cos \theta_k \geq \delta > 0$ がすべての $k$ で成り立つならば、
-        この反復法は次を満たす列 $\{x_k\}$ を生成する。
+        この反復法は次を満たす列 $\{ x_k \}$ を生成する。
     \fi
     \begin{equation*}
         \lim_{k \to \infty} \norm{g_k} = 0.
@@ -357,15 +357,15 @@
     \end{equation*}
     \ifEn
         Let $\widetilde L  \coloneqq  L^{\mathrm{H}}\norm{\qty(\nabla^2 f(x^*))^{-1}}$.
-        If the initial point is chosen such that $\norm{x_0-x^*}\le \min\{r,1/(2\widetilde L)\}$, then by induction $\{x_k\}$ remains within the neighborhood and converges to $x^*$.
-        The above error bound implies quadratic convergence of $\{x_k\}$.
+        If the initial point is chosen such that $\norm{x_0-x^*}\le \min\{r,1/(2\widetilde L)\}$, then by induction $\{ x_k \}$ remains within the neighborhood and converges to $x^*$.
+        The above error bound implies quadratic convergence of $\{ x_k \}$.
 
         To show quadratic convergence of the gradient norm, we use $x_{k+1}-x_k=-\qty(\nabla^2 f(x_k))^{-1}\nabla f(x_k)$ and
         $\nabla f(x_k)+\nabla^2 f(x_k)\qty(x_{k+1}-x_k)=0$, yielding
     \else
         $\widetilde L  \coloneqq  L^{\mathrm{H}}\norm{\qty(\nabla^2 f(x^*))^{-1}}$ とおく。
-        初期点が $\norm{x_0-x^*}\le \min\{r,1/(2\widetilde L)\}$ を満たすように選ばれていれば、帰納法により $\{x_k\}$ は近傍内に留まり $x^*$ に収束する。
-        上の誤差評価は $\{x_k\}$ の二次収束を示す。
+        初期点が $\norm{x_0-x^*}\le \min\{r,1/(2\widetilde L)\}$ を満たすように選ばれていれば、帰納法により $\{ x_k \}$ は近傍内に留まり $x^*$ に収束する。
+        上の誤差評価は $\{ x_k \}$ の二次収束を示す。
 
         勾配ノルムの二次収束を示すために、$x_{k+1}-x_k=-\qty(\nabla^2 f(x_k))^{-1}\nabla f(x_k)$ と
         $\nabla f(x_k)+\nabla^2 f(x_k)\qty(x_{k+1}-x_k)=0$ を用いると次を得る。
