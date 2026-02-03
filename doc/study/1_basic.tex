@@ -12,11 +12,11 @@
 \ifEn
     One of the central goals of numerical optimization is to determine decision variables that optimize a given quantitative measure.
     Examples of such measures include control stability, operational efficiency, and prediction error, each quantifying the quality of various phenomena or systems.
-    These measures are typically modeled by an objective function that maps decision variables to real numbers.
+    These measures are typically modeled as objective functions, which are mappings from decision variables to real numbers.
 \else
     数理最適化の中心的な意義の一つは、与えられた定量的な指標を最適化する決定変数を求めることである。
     そのような指標の例としては制御の安定性、運用の効率性、予測誤差など、さまざまな現象やシステムの品質を定量化したものが挙げられる。
-    これらの指標は通常、決定変数を実数に写像する目的関数としてモデル化される。
+    これらの指標は通常、決定変数から実数への写像である目的関数としてモデル化される。
 \fi
 
 \ifEn
@@ -41,27 +41,27 @@
 
 \ifEn
     The notions of convexity and strong convexity are fundamental in optimization theory.
-    Assume that $f$ is of class $C^2$.
-    The function $f$ is convex and strongly convex if and only if the following definitions hold for any two points $x,y \in \mathbb{R}^n$:
+    For simplicity, let us assume that $f$ is a real-valued function defined over the entire space $\mathbb{R}^n$, i.e., $f \colon \mathbb{R}^n \to \mathbb{R}$.
+    Also, let $\mu>0$ be a constant.
+    The function $f$ is convex and $\mu$-strongly convex if and only if the following hold for any two points $x,y \in \mathbb{R}^n$ and $\lambda \in [0,1]$:
 \else
     凸性(convexity)と強凸性(strong convexity)は最適化理論の基本概念である。
-    $f$ は $C^2$ 級と仮定する。
-    関数 $f$ が凸あるいは強凸であることは、任意の $x,y \in \mathbb{R}^n$ について次の定義が成り立つこととそれぞれ同値である:
+    簡単のため、$f$ は $\mathbb{R}^n$ 全域で実数値を取る関数である、つまり、$f \colon \mathbb{R}^n \to \mathbb{R}$ とする。また、$\mu>0$ を定数とする。
+    この時、関数 $f$ が凸あるいは $\mu$-強凸であることは、任意の $x,y \in \mathbb{R}^n$ と $\lambda \in [0,1]$ について次が成り立つこととそれぞれ同値である:
 \fi
 \begin{align*}
-    \text{(convex)} \quad
-    f(y) & \ge f(x)+\nabla f(x)^\top (y-x),                                  \\
-    \text{($\mu$-strongly convex)} \quad
-    f(y) & \ge f(x)+\nabla f(x)^\top (y-x)+\frac{\mu}{2}\lVert y-x \rVert^2,
+    \textrm{(convex)} \quad
+    f((1-\lambda) x + \lambda y)                                        & \le (1-\lambda) f(x) + \lambda f(y)                                                          \\
+    \textrm{($\mu$-strongly convex)} \quad f((1-\lambda) x + \lambda y) & \le (1-\lambda) f(x) + \lambda f(y) - \frac{\mu}{2} \lambda (1-\lambda) \lVert x-y \rVert^2.
 \end{align*}
 \ifEn
-    where $\mu>0$ is a constant.
     Strong convexity indicates that, in addition to convexity, the objective function has uniformly positive curvature.
     Examples of convex and strongly convex functions are shown in \cref{fig:convexity_comparison}.
+    Such definitions may vary slightly in the literature; for example, see \citep{nesterovIntroductoryLecturesConvex2014,kanamori2016continuous}.
 \else
-    ただし、 $\mu>0$ は定数である。
     強凸性は、凸性に加えて目的関数が一様に正の曲率を持つことを意味する。
     凸関数と強凸関数の例を \cref{fig:convexity_comparison} に示した。
+    このような定義は、文献によって多少の揺れがあるが、例えば\citep{nesterovIntroductoryLecturesConvex2014,kanamori2016continuous}などを参照されたい。
 \fi
 
 \begin{figure}[t]
@@ -84,20 +84,93 @@
     \label{fig:convexity_comparison}
 \end{figure}
 
+\ifEn
+    There are alternative definitions of convexity and strong convexity using the gradient of $f$.
+    Assume that $f$ is at least of class $C^1$ and it takes real values over the domain $\mathbb{R}^n$.
+    The function $f$ is convex and $\mu$-strongly convex if and only if the following hold for any $x,y \in \mathbb{R}^n$:
+\else
+    関数 $f$ の勾配を用いた凸性および強凸性の別の定義も存在する。
+    $f$ が少なくとも $C^1$ 級で、その定義域 $\mathbb{R}^n$ 全体で実数値を取ると仮定する。
+    関数 $f$ が凸あるいは $\mu$-強凸であることは、任意の $x,y \in \mathbb{R}^n$ について次が成り立つこととそれぞれ同値である:
+\fi
+\begin{align*}
+    \textrm{(convex)} \quad
+    f(y) & \ge f(x)+\nabla f(x)^\top (y-x),                                  \\
+    \textrm{($\mu$-strongly convex)} \quad
+    f(y) & \ge f(x)+\nabla f(x)^\top (y-x)+\frac{\mu}{2}\lVert y-x \rVert^2.
+\end{align*}
+
+\begin{proposition}
+    \ifEn
+        Let $f \colon \mathbb{R}^n \to \mathbb{R}$ be of class $C^1$. Then the two definitions of convexity and $\mu$-strong convexity are equivalent, respectively.
+    \else
+        $f$ が $C^1$ 級かつ定義域が $\mathbb{R}^n$ であるとき、
+        凸と $\mu$-強凸に関する二つの定義はそれぞれ同値である。
+    \fi
+\end{proposition}
+\begin{proof}
+    \ifEn
+        We show the case of $\mu$-strong convexity.
+        First, assume that the former definition holds.
+        By the definition of the gradient and the $C^1$ assumption on $f$, we have
+    \else
+        $\mu$-強凸性の場合について示す。
+        まず、前者の定義が成立することを仮定する。勾配の定義と、$f$ が $C^1$ 級であることから、
+    \fi
+    \begin{align*}
+        \nabla f(x)^\top (y-x)
+         & =\lim_{\lambda \to 0} \frac{f(x+ \lambda (y-x)) - f(x)}{\lambda}                                                                                         \\
+         & \le \lim_{\lambda \to 0} \frac{1}{\lambda} \left( (1-\lambda) f(x) + \lambda f(y) - \frac{\mu}{2} \lambda (1-\lambda) \lVert x-y \rVert^2 - f(x) \right) \\
+         & = f(y) - f(x) - \frac{\mu}{2} \lVert x-y \rVert^2.
+    \end{align*}
+    \ifEn
+        Thus, the latter definition holds.
+
+        Conversely, assume that the latter definition holds.
+        Let $z \coloneqq (1-\lambda)x + \lambda y$. Then we have
+    \else
+        したがって、後者の定義が成立する。
+
+        続いて、後者の定義が成立することを仮定する。$z \coloneqq (1-\lambda)x + \lambda y$ とおくと、
+    \fi
+    \begin{align*}
+        f(x) \geq f(z) + \nabla f(z)^\top (x-z) + \frac{\mu}{2} \lVert x-z \rVert^2, \\
+        f(y) \geq f(z) + \nabla f(z)^\top (y-z) + \frac{\mu}{2} \lVert y-z \rVert^2.
+    \end{align*}
+    \ifEn
+        Multiplying the first inequality by $1-\lambda$ and the second by $\lambda$, and adding them together, we obtain
+    \else
+        これらを、それぞれ $1-\lambda$ 倍、$\lambda$ 倍して足し合わせると、
+    \fi
+    \begin{align*}
+        (1-\lambda) f(x) + \lambda f(y)
+         & \geq f(z) + \nabla f(z)^\top \left( (1-\lambda)(x-z) + \lambda (y-z) \right)
+        + \frac{\mu}{2} \left( (1-\lambda) \lVert x-z \rVert^2 + \lambda \lVert y-z \rVert^2 \right)                                   \\
+         & = f(z) + \frac{\mu}{2} \left( (1-\lambda) \lambda^2 \lVert x-y \rVert^2 + \lambda (1-\lambda)^2 \lVert y-x \rVert^2 \right) \\
+         & = f(z) + \frac{\mu}{2} \lambda (1-\lambda) \lVert x-y \rVert^2.
+    \end{align*}
+    \ifEn
+        Thus, the former definition holds.
+    \else
+        したがって、前者の定義が成立する。
+    \fi
+    \myQED
+\end{proof}
+
 \subsection{Positive Definiteness of the Hessian}
 
 \ifEn
-    Next, we show how convexity and strong convexity relate to the definiteness of the Hessian matrix $\nabla^2 f(x)$.
+    Next, assuming that $f$ is of class $C^2$, we show how convexity and strong convexity relate to the definiteness of the Hessian matrix $\nabla^2 f(x)$.
     Let $A$ be a symmetric matrix in $\mathbb{R}^{n \times n}$. A matrix $A$ is called positive or negative definite (or semi-definite) based on the following conditions:
 \else
-    次に、凸性および強凸性がヘッセ行列 $\nabla^2 f(x)$ の正定値性とどのように関係するかを示す。
+    次に、$f$ が $C^2$ 級であるとして、凸性および強凸性がヘッセ行列 $\nabla^2 f(x)$ の正定値性とどのように関係するかを示す。
     $A$ を $\mathbb{R}^{n \times n}$ の対称行列とする。行列 $A$ が正定値(positive definite)・負定値(negative definite) (または半正定値(positive semi-definite)・半負定値(negative semi-definite))であるとは、次の条件で定義される:
 \fi
 \begin{align*}
-    \text{(positive definite)} \quad      & v^\top A v > 0 \quad \forall v \in \mathbb{R}^n \setminus \{ 0 \}, \\
-    \text{(positive semi-definite)} \quad & v^\top A v \ge 0 \quad \forall v \in \mathbb{R}^n,                 \\
-    \text{(negative definite)} \quad      & v^\top A v < 0 \quad \forall v \in \mathbb{R}^n \setminus \{ 0 \}, \\
-    \text{(negative semi-definite)} \quad & v^\top A v \le 0 \quad \forall v \in \mathbb{R}^n.
+    \textrm{(positive definite)} \quad      & v^\top A v > 0 \quad \forall v \in \mathbb{R}^n \setminus \{ 0 \}, \\
+    \textrm{(positive semi-definite)} \quad & v^\top A v \ge 0 \quad \forall v \in \mathbb{R}^n,                 \\
+    \textrm{(negative definite)} \quad      & v^\top A v < 0 \quad \forall v \in \mathbb{R}^n \setminus \{ 0 \}, \\
+    \textrm{(negative semi-definite)} \quad & v^\top A v \le 0 \quad \forall v \in \mathbb{R}^n.
 \end{align*}
 \ifEn
     A matrix is indefinite if it is neither positive nor negative definite.
