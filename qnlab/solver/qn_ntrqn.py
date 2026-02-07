@@ -51,26 +51,7 @@ def line_search_relaxed_armijo(
     for _ in range(param.max_linesearch):
         x_try = x + alpha * d
 
-        # g_try, g: always finite
-        # g_try_norm, g_norm: might be inf
-        # f_try: may be inf or nan
         f_try = prob.f(x_try)
-
-        if not np.isfinite(f_try):
-            if verbose:
-                print("  ⚠️  Rejected due to Inf/NaN in function/gradient value.")
-            alpha /= 4
-            rejection_counter += 1
-            if rejection_counter >= param.max_inf_nan_rejections:
-                return (
-                    RetCode.ERR_NUMERICAL_INSTABILITY,
-                    x_try,
-                    f_try,
-                    prob.g(x_try),
-                    np.float64(np.inf),
-                    rejection_counter,
-                )
-            continue
 
         if np.all(x_try == x):
             if verbose:
