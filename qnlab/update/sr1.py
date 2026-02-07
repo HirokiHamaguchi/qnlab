@@ -52,12 +52,12 @@ def compute_H(
 
 class SR1UpdateRule(BaseUpdateRule):
     @staticmethod
-    def compute_dir(x, fx, g, lm) -> npt.NDArray[np.float64]:
+    def compute_dir(x, g, lm) -> npt.NDArray[np.float64]:
         B = compute_B(g, lm)
         return np.linalg.solve(B, -g).astype(np.float64)
 
     @staticmethod
-    def compute_dir_reg(x, fx, g, lm, mu) -> npt.NDArray[np.float64]:
+    def compute_dir_reg(x, g, lm, mu) -> npt.NDArray[np.float64]:
         B = compute_B(g, lm)
         return np.linalg.solve(B + mu * np.eye(g.shape[0]), -g).astype(np.float64)
 

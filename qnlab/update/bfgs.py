@@ -37,7 +37,7 @@ def compute_BH(
 
 class BFGSUpdateRule(BaseUpdateRule):
     @staticmethod
-    def compute_dir(x, fx, g, lm) -> npt.NDArray[np.float64]:
+    def compute_dir(x, g, lm) -> npt.NDArray[np.float64]:
         # Recursive formula to compute dir = -(H \cdot g).
         # This is described in page 779 of:
         # Jorge Nocedal.
@@ -57,7 +57,7 @@ class BFGSUpdateRule(BaseUpdateRule):
         return d
 
     @staticmethod
-    def compute_dir_reg(x, fx, g, lm, mu) -> npt.NDArray[np.float64]:
+    def compute_dir_reg(x, g, lm, mu) -> npt.NDArray[np.float64]:
         """Uses new_y = y + mu * s in the update."""
         assert len(lm) > 0
         d = -g.copy()

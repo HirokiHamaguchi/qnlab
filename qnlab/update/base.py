@@ -11,7 +11,6 @@ class BaseUpdateRule(ABC):
     @abstractmethod
     def compute_dir(
         x: npt.NDArray[np.float64],
-        fx: np.float64,  # f(x)
         g: npt.NDArray[np.float64],  # grad f(x)
         lm: QuasiNewtonMemory,
     ) -> npt.NDArray[np.float64]:
@@ -22,7 +21,6 @@ class BaseUpdateRule(ABC):
     @abstractmethod
     def compute_dir_reg(
         x: npt.NDArray[np.float64],
-        fx: np.float64,  # f(x)
         g: npt.NDArray[np.float64],  # grad f(x)
         lm: QuasiNewtonMemory,
         mu: np.float64,  # Regularized parameter

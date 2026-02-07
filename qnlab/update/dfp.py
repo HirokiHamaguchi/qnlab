@@ -38,7 +38,7 @@ def compute_H(
 
 class DFPUpdateRule(BaseUpdateRule):
     @staticmethod
-    def compute_dir(x, fx, g, lm) -> npt.NDArray[np.float64]:
+    def compute_dir(x, g, lm) -> npt.NDArray[np.float64]:
         H = compute_H(g, lm)
         return -H @ g
 

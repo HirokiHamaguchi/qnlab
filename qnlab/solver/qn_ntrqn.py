@@ -191,7 +191,7 @@ def qn_ntrqn(
             mu = gnorm * param.mu_scale
             mu = np.clip(mu, param.mu_min_fraction * offo, offo)
 
-        d = get_direction_reg(method, x, fx, g, lm, mu)
+        d = get_direction_reg(method, x, g, lm, mu)
 
         ref_fx = max(pf2) if len(pf2) > 0 else fx
         ls_res, new_x, new_f, new_g, delta, rejection_counter = (

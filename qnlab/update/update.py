@@ -12,19 +12,18 @@ from qnlab.util.method import Method
 def get_direction(
     method: Method,
     x: npt.NDArray[np.float64],
-    fx: np.float64,
     g: npt.NDArray[np.float64],
     lm: QuasiNewtonMemory,
 ) -> npt.NDArray[np.float64]:
     assert len(lm) > 0, "Memory is empty. Cannot compute direction."
     if method.update == "bfgs":
-        return BFGSUpdateRule.compute_dir(x, fx, g, lm)
+        return BFGSUpdateRule.compute_dir(x, g, lm)
     elif method.update == "dfp":
-        return DFPUpdateRule.compute_dir(x, fx, g, lm)
+        return DFPUpdateRule.compute_dir(x, g, lm)
     elif method.update == "sr1":
-        return SR1UpdateRule.compute_dir(x, fx, g, lm)
+        return SR1UpdateRule.compute_dir(x, g, lm)
     elif method.update == "psb":
-        return PSBUpdateRule.compute_dir(x, fx, g, lm)
+        return PSBUpdateRule.compute_dir(x, g, lm)
     else:
         raise ValueError(f"Unknown update method: {method.update}")
 
@@ -32,7 +31,6 @@ def get_direction(
 def get_direction_reg(
     method: Method,
     x: npt.NDArray[np.float64],
-    fx: np.float64,
     g: npt.NDArray[np.float64],
     lm: QuasiNewtonMemory,
     mu: np.float64,
@@ -40,13 +38,13 @@ def get_direction_reg(
     if len(lm) == 0:
         return lm.zero_memory_direction(g, mu)
     if mu == 0.0:
-        return get_direction(method, x, fx, g, lm)
+        return get_direction(method, x, g, lm)
     if method.update == "bfgs":
-        return BFGSUpdateRule.compute_dir_reg(x, fx, g, lm, mu)
+        return BFGSUpdateRule.compute_dir_reg(x, g, lm, mu)
     elif method.update == "sr1":
-        return SR1UpdateRule.compute_dir_reg(x, fx, g, lm, mu)
+        return SR1UpdateRule.compute_dir_reg(x, g, lm, mu)
     elif method.update == "psb":
-        return PSBUpdateRule.compute_dir_reg(x, fx, g, lm, mu)
+        return PSBUpdateRule.compute_dir_reg(x, g, lm, mu)
     else:
         raise ValueError(f"Unknown reg update method: {method.update}")
 

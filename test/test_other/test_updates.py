@@ -48,7 +48,7 @@ def test_dir_BFGS_and_check():
     method = Method("Line", "raw", "raw", "bfgs")
     for _ in range(10):
         xk, gk, lm = generate_lm(n)
-        d_lbfgs = get_direction(method, xk, np.float64(0.0), gk, lm)
+        d_lbfgs = get_direction(method, xk, gk, lm)
         check_direction(method, n, gk, d_lbfgs, lm)
     print("BFGS passed")
 
@@ -58,7 +58,7 @@ def test_dir_DFP_and_check():
     method = Method("Line", "raw", "raw", "dfp")
     for _ in range(10):
         xk, gk, lm = generate_lm(n)
-        d_dfp = get_direction(method, xk, np.float64(0.0), gk, lm)
+        d_dfp = get_direction(method, xk, gk, lm)
         check_direction(method, n, gk, d_dfp, lm)
     print("DFP passed")
 
@@ -68,9 +68,7 @@ def test_dir_SR1_and_check():
     method = Method("Line", "raw", "raw", "sr1")
     for _ in range(10):
         xk, gk, lm = generate_lm(n)
-        d_sr1 = get_direction_reg(
-            method, xk, np.float64(0.0), gk, lm, mu=np.float64(0.0)
-        )
+        d_sr1 = get_direction_reg(method, xk, gk, lm, mu=np.float64(0.0))
         check_direction(method, n, gk, d_sr1, lm)
     print("SR1 passed")
 
@@ -80,9 +78,7 @@ def test_dir_PSB_and_check():
     method = Method("Line", "raw", "raw", "psb")
     for _ in range(10):
         xk, gk, lm = generate_lm(n)
-        d_psb = get_direction_reg(
-            method, xk, np.float64(0.0), gk, lm, mu=np.float64(0.0)
-        )
+        d_psb = get_direction_reg(method, xk, gk, lm, mu=np.float64(0.0))
         check_direction(method, n, gk, d_psb, lm)
     print("PSB passed")
 

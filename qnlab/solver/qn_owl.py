@@ -79,7 +79,7 @@ def qn_owl(
 
         lm.add_new_data(x, fx, g, xp, fxp, gp, callback, prob.get_machine_eps())
         k += 1
-        d = get_direction(method, x, fx, pg, lm)
+        d = get_direction(method, x, pg, lm)
 
         # For OWL-QN, constrain the search direction.
         isInvalid = (
