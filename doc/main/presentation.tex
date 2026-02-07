@@ -157,9 +157,6 @@
 
 \newcommand{\feps}{\epsilon_\mathrm{f}}
 \newcommand{\gtol}{\epsilon_{\mathrm{gtol}}}
-\newcommand{\AdaGrad}{\textsc{AdaGrad}}
-\newcommand{\Adam}{\textsc{Adam}}
-\newcommand{\AdaGradNorm}{\textsc{AdaGrad-Norm}}
 
 % === TITLE ===
 \title{
@@ -284,10 +281,10 @@
 
 \begin{frame}{キーワード:目的関数値非依存最適化 \citep{grattonOFFOMinimizationAlgorithms2023}}
     機械学習分野での需要などから近年発展してきた手法。\\
-    \AdaGrad や \AdaGradNorm などの最適化手法は、勾配だけで最適化を行う:
+    AdaGrad や AdaGrad-Norm などの最適化手法は、勾配だけで最適化を行う:
     \begin{align*}
-        (\text{\AdaGrad}) \quad x_{k+1}^{(i)} & = x_k^{(i)} - \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k (\nabla f(x_j)^{(i)})^2}} \nabla f(x_k)^{(i)}, \\
-        (\text{\AdaGradNorm}) \quad x_{k+1}   & = x_k - \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k \norm{\nabla f(x_j)}^2}}\,\nabla f(x_k).
+        (\text{AdaGrad}) \quad x_{k+1}^{(i)} & = x_k^{(i)} - \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k (\nabla f(x_j)^{(i)})^2}} \nabla f(x_k)^{(i)}, \\
+        (\text{AdaGrad-Norm}) \quad x_{k+1}  & = x_k - \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k \norm{\nabla f(x_j)}^2}}\,\nabla f(x_k).
     \end{align*}
     ($\theta$ は学習率の逆数, $\varsigma$ は初期化定数, ${}^{(i)}$ は第 $i$ 成分)\\
     \vspace{2em}
@@ -324,7 +321,7 @@
     (直感: $f$ の勾配情報による近似 $B_k$ + 正則化項 $\mu_k I$ を加えた二次形式の最小解方向)
     \begin{itemize}
         \item $\mu_k=0$: 直線探索型とほぼ同じ挙動を意味、速度の観点からは望ましい
-        \item $\mu_k>0$: 保守的なステップになり、安定性向上、 \AdaGradNorm に似た正則化:
+        \item $\mu_k>0$: 保守的なステップになり、安定性向上、 AdaGrad-Norm に似た正則化:
               \begin{equation*}
                   \mu_k = \theta_k \sqrt{\varsigma + \sum_{j \in K^+} \norm{\nabla f(x_j)}^2},\quad \theta_k \in [\theta_{\min}, \theta_{\max}].
               \end{equation*}
@@ -363,7 +360,7 @@
     \end{block}
     \vspace{1em}
 
-    この設定の最適な反復計算量 $\min\{k \mid \norm{\nabla f(x_k)} \le \gtol\}$ は $\Omega(\gtol^{-2})$ である。
+    この設定の標準的な反復計算量 $\min\{k \mid \norm{\nabla f(x_k)} \le \gtol\}$ は $\Omega(\gtol^{-2})$ である。
 \end{frame}
 
 \begin{frame}{収束解析の概要: コアとなる不等式}
@@ -420,8 +417,8 @@
         \]
     \end{exampleblock}
     \begin{itemize}
-        \item \underline{誤差がある設定}でも、非凸問題に対する\underline{最適な反復計算量}とオーダーレベルで一致
-        \item 具体的には、古典的な勾配法型の解析結果と \AdaGradNorm 型の解析結果\\
+        \item \underline{誤差がある設定}でも、非凸問題に対する\underline{標準的な反復計算量}とオーダーレベルで一致
+        \item 具体的には、古典的な勾配法型の解析結果と AdaGrad-Norm 型の解析結果\\
               のハイブリッドになっている
     \end{itemize}
 \end{frame}

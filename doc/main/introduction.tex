@@ -29,7 +29,7 @@ Our approach combines Armijo-type line search with quadratic regularization
 and Objective-Function-Free Optimization (OFFO) inspired strategy
 \citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
 When a sufficient decrease in function value is observed, the method behaves similarly to standard line-search-based quasi-Newton methods, preserving its practical efficiency.
-When numerical noise dominates, we introduce regularization on the approximate Hessian to ensure numerical stability, which yields convergence properties similar to those of OFFO methods, particularly \AdaGradNorm \citep{wardAdaGradStepsizesSharp2020}.
+When numerical noise dominates, we introduce regularization on the approximate Hessian to ensure numerical stability, which yields convergence properties similar to those of OFFO methods, particularly AdaGrad-Norm \citep{wardAdaGradStepsizesSharp2020}.
 The resulting algorithm is particularly well-suited for low-precision or noisy environments.
 
 From a theoretical standpoint, we establish that the proposed method achieves the standard global convergence rate of $\order{1/\varepsilon^2}$ for smooth nonconvex optimization problems, even when objective function values are corrupted by noise.

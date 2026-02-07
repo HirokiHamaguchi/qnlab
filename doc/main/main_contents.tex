@@ -16,8 +16,7 @@ Settings in which objective values are accurate but gradients are noisy, such as
 
 In the following, we formalize the assumptions on function and gradient evaluations.
 We assume that only an error contaminated function $\overline{f}(x)$ is accessible, satisfying the hybrid absolute-relative error model~\citep{highamAccuracyStabilityNumerical2002,10.5555/3168451.3168462}:
-\begin{equation}
-    \label{eq:relative_error_model}
+\begin{equation}\label{eq:error_model}
     \abs{f(x)-\overline{f}(x)} \le \feps \max(1,\abs{f(x)}),
 \end{equation}
 where $0 \le \feps < 1$ is an error rate.
@@ -85,7 +84,7 @@ that avoid explicit evaluations of the objective function and rely solely on gra
 Such methods are particularly attractive when function values are unreliable due to noise.
 Similar adaptive trust-region approaches are also discussed~\citep{grapigliaAdaptiveTrustregionMethod2022}.
 
-Prominent examples of OFFO include adaptive gradient methods such as \AdaGrad~\citep{duchiAdaptiveSubgradientMethods2011} and \AdaGradNorm~\citep{wardAdaGradStepsizesSharp2020}.
+Prominent examples of OFFO include adaptive gradient methods such as AdaGrad~\citep{duchiAdaptiveSubgradientMethods2011} and AdaGrad-Norm~\citep{wardAdaGradStepsizesSharp2020}.
 Their update rules are
 \begin{align*}
     x_{k+1}^{(i)}                                                             & = x_k^{(i)} -
@@ -215,7 +214,7 @@ Since OFFO schemes do not rely on function values, this update is robust to nume
 In this section, we establish the global convergence properties of
 \cref{alg:regularized_qn} under the problem setting in
 \cref{sec:problem_setting}, namely,
-\cref{eq:relative_error_model,eq:exact_gradient_assumption}.
+\cref{eq:error_model,eq:exact_gradient_assumption}.
 
 \subsection{Assumptions}\label{sec:assumptions}
 
@@ -227,14 +226,14 @@ The first assumption guarantees that the objective function is bounded below.
         f(x) \ge f^* \defeq \inf_{x \in \bbR^n} f(x) > -\infty .
     \end{equation*}
 \end{assumption}
-By the triangle inequality and \cref{eq:relative_error_model}, we have
+By the triangle inequality and \cref{eq:error_model}, we have
 $\overline{f}(x) \ge f(x) - \feps \max(1, \abs{f(x)})$.
 Since the function $g(t) = t - \feps \max(1, \abs{t})$ is non-decreasing for $0 \le \feps < 1$, it follows that $\inf_x g(f(x)) = g(f^*)$.
 Consequently, we can also lower bound $\overline{f}$ as
 \begin{equation}\label{eq:ass_bounded_overline_f}
     \overline{f}(x) \ge
     \overline{f}^*
-    \defeq \inf_{x \in \bbR^n} \bigl( f(x) - \feps \max(1, \abs{f(x)}) \bigr)
+    \defeq \inf_{x \in \bbR^n} \qty( f(x) - \feps \max(1, \abs{f(x)}) )
     = f^* - \feps \max(1, \abs{f^*})
     > -\infty .
 \end{equation}
@@ -288,11 +287,11 @@ The following lemma asserts that the error between the actual values difference 
     The proof of \cref{eq:fx_two_cases} is as follows.
     We only consider the case with the plus sign, as the other case can be treated analogously.
     If $f(x)\le 1$, then $\max(1,f(x))=1$ and the inequality is trivial.
-    If $f(x) > 1$, \cref{eq:relative_error_model} implies
-    \begin{equation}\label{eq:relative_error_model_fx_1}
+    If $f(x) > 1$, \cref{eq:error_model} implies
+    \begin{equation}\label{eq:error_model_fx_1}
         \abs{f(x)-\overline{f}(x)} \le \feps \max(1,\abs{f(x)}) = \feps f(x).
     \end{equation}
-    Since $\feps<1$, \cref{eq:relative_error_model_fx_1} implies that $f(x)$ and $\overline f(x)$ have the same sign. Moreover, by the triangle inequality,
+    Since $\feps<1$, \cref{eq:error_model_fx_1} implies that $f(x)$ and $\overline f(x)$ have the same sign. Moreover, by the triangle inequality,
     $\abs{f(x)} - \abs{\overline f(x)} \le \feps \abs{f(x)}$,
     which yields $\max(1,f(x)) = f(x) \le \frac{1}{1-\feps} \overline f(x)$.
     Combining the two cases completes the proof of \cref{eq:fx_two_cases}.
@@ -300,7 +299,7 @@ The following lemma asserts that the error between the actual values difference 
     With these preparations, we now prove the lemma. For all $k \in K$, we have
     \begin{align}
         \abs{\delta_k-\overline{\delta}_k} & = \abs{(f(x_k)-\overline{f}(x_k)) - (f(x_{k+1})-\overline{f}(x_{k+1}))} &  & (\text{rearrangement})                                \notag \\
-                                           & \le \feps\max(1,\abs{f(x_k)}) + \feps\max(1,\abs{f(x_{k+1})})           &  & (\text{definition in \cref{eq:relative_error_model}}) \notag \\
+                                           & \le \feps\max(1,\abs{f(x_k)}) + \feps\max(1,\abs{f(x_{k+1})})           &  & (\text{definition in \cref{eq:error_model}}) \notag          \\
                                            & \le 2\feps \max(1,\abs{f(x_k)},\abs{f(x_{k+1})})                        &  & (\text{max property}) \label{eq:delta_k_error_bound}
     \end{align}
     From the condition of this lemma ($f(x_{k+1}) \le f(x_k)$), this can be further bounded as
@@ -508,7 +507,7 @@ Using this lemma, we can bound the sum of $\norm{g_{k}}^2$ over ${k} \in K^0$ us
 Next, we show that the sum of $\norm{g_{k}}^2$ over ${k} \in K^+$ is bounded.
 Recall that $K^+$ be a set of iteration indices $k$ such that $\mu_k > 0$ as defined in \cref{eq:def_K0_Kplus}, and that $\mu_k$ is defined as $\theta_k \sqrt{\varsigma + \sum_{j \in K^+,\ j < k} \norm{g_{j}}^2}$ with $\theta_k \in [\theta_{\min}, \theta_{\max}]$ in \refLine{line:update_theta} of \cref{alg:regularized_qn}.
 
-Before proceeding to the main proof, we present standard inequalities in the \AdaGradNorm algorithm analysis~\citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020},~\citep[Lemma~3.1]{Gratton08022024}.
+Before proceeding to the main proof, we present standard inequalities in the AdaGrad-Norm algorithm analysis~\citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020},~\citep[Lemma~3.1]{Gratton08022024}.
 Its proof is deferred to \cref{sec:proof_of_sum_norm_g_over_mu_geq_2sqrt_leq_log}.
 \begin{lemma}\label{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}
     In \cref{alg:regularized_qn}, we have
@@ -567,7 +566,7 @@ Now, we define the following constants for later use:
 Finally, we combine the results for $k \in K^0$ (\cref{lem:sum_small_delta_k_bound_K0}) and $k \in K^+$ (\cref{lem:sum_small_delta_k_bound_Kplus}) to derive a bound on the total sum of $\norm{g_k}^2$.
 We define the constant $F$ as follows:
 \begin{equation}
-    F = f(x_0) - f^* + \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}) + C_1 \sqrt{\varsigma} - C_2 \ln(\varsigma).
+    F \defeq f(x_0) - f^* + \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}) + C_1 \sqrt{\varsigma} - C_2 \ln(\varsigma).
     \label{eq:def_F}
 \end{equation}
 Then, we can obtain the following unified bound of the sum of $\norm{g_k}^2$.
@@ -656,7 +655,7 @@ It is well-known that \cref{thm:gc} implies that the iteration complexity to ach
 This is a standard convergence guarantee for first-order optimization algorithms applied to $L$-smooth nonconvex functions for such problems.
 We interpret these results in light of classical optimization results.
 \begin{itemize}
-    \item As for $K^0$ and \cref{lem:sum_norm_g_k_bound_K0}, this is an analogue of the classical gradient descent bound for an error-contaminated function $\overline{f}$.
+    \item As for the term from $K^0$, this is an analogue of the classical gradient descent bound for an error-contaminated function $\overline{f}$.
           Indeed, for gradient descent with fixed step size $\alpha = 1/L$, the sum of squared gradients is bounded as
           \begin{equation*}
               \sum_{j=0}^{k} \norm{g_j}^2
@@ -664,9 +663,8 @@ We interpret these results in light of classical optimization results.
               = \frac{2(f(x_0)-f^*)}{\alpha}.
           \end{equation*}
 
-    \item As for $K^+$ and \cref{lem:sum_norm_g_k_bound_Kplus}, this is analogous to the convergence property of \AdaGradNorm~\citep{wardAdaGradStepsizesSharp2020}, which scales as $(f(x_0)-f^*)^2$.
-          This follows from the fact that $F$ contains the initial optimality gaps
-          $f(x_0)-f^*$ and $\overline{f}(x_0)-\overline{f}^*$ (as the definition in \cref{eq:def_F}), and the term in \cref{lem:sum_norm_g_k_bound_Kplus} is quadratic in $F$.
+    \item As for the term from $K^+$, this is analogous to the convergence property of AdaGrad-Norm, which scales as $(f(x_0)-f^*)^2$~\citep{wardAdaGradStepsizesSharp2020}.
+          This follows from the fact that $F'$ contains the initial optimality gaps $f(x_0)-f^*$ and $\overline{f}(x_0)-\overline{f}^*$, and its term is quadratic in $F'$.
 \end{itemize}
 
 \section{Practical Choices of Algorithmic Variables}\label{sec:proposed_choice}
@@ -745,7 +743,7 @@ When $\mu_k=0$, the direction can be computed efficiently by the standard L-BFGS
 For the case $\mu_k>0$, regularized limited-memory schemes may in principle be employed~\citep{kanzowRegularizationLimitedMemory2023}.
 Alternatively, one may adopt the simple and robust approximation mentioned in the same reference.
 Specifically, we approximate $B_k$ in \cref{eq:proposed_choice_of_Bk} by
-\begin{equation}
+\begin{equation}\label{eq:approx_computation_of_regularized_quasi_Newton}
     B_k\approx\mathrm{BFGS}(\{s_{k_i},\overline{y}_{k_i}+\mu_k s_{k_i}\}_{i=0}^{p-1})-\mu_k I,
 \end{equation}
 so that $B_k+\mu_k I\approx\mathrm{BFGS}(\{s_{k_i},\overline{y}_{k_i}+\mu_k s_{k_i}\}_{i=0}^{p-1})$. Its inverse can then be computed using the standard two-loop recursion.
@@ -803,24 +801,27 @@ We compared the following optimization algorithms:
     \item (\texttt{Ours}): Our proposed regularized quasi-Newton method
           \begin{itemize}
               \item We used \cref{alg:regularized_qn,alg:backtracking_linesearch} with the details in \cref{sec:proposed_choice}.
+              \item (\texttt{Ours-MS}) means the variant incorporating the modified secant condition described in \cref{sec:proposed_choice_Bk}.
           \end{itemize}
 
     \item (\texttt{Line}): Line-search L-BFGS method
           \begin{itemize}
               \item Our Python implementation ported from LBFGSpp~\citep{Okazaki2007libLBFGS}.
               \item The step size was determined using the Mor\'e--Thuente line search, closely resembling SciPy's implementation.
+              \item (\texttt{Line-MS}) means the same variant as \texttt{Ours-MS}.
+          \end{itemize}
+
+    \item (\texttt{Reg}): Regularized L-BFGS method~\citep{kanzowRegularizationLimitedMemory2023}
+          \begin{itemize}
+              \item A quadratic regularization-based quasi-Newton method that does not rely on line search and is conceptually closer to trust-region methods.
+              \item We wrapped the function \texttt{regLBFGS} using \texttt{solveNonmonotone} from \citep{kanzowRegularizationLimitedMemory2023}.
+              \item (\texttt{Reg-Sec}) means the incorporation of the approximated computation as in \cref{eq:approx_computation_of_regularized_quasi_Newton}. This is wrapped function of \texttt{regLBFGSsec} from \citep{kanzowRegularizationLimitedMemory2023}.
           \end{itemize}
 
     \item (\texttt{SciPy}): SciPy's L-BFGS-B method~\citep{2020SciPy-NMeth}
           \begin{itemize}
               \item An established L-BFGS method implemented in C and called from Python.
               \item We used the default parameters, with the exception that \texttt{ftol} was set to $0$ to avoid premature termination.
-          \end{itemize}
-
-    \item (\texttt{Reg}): Regularized L-BFGS method~\citep{kanzowRegularizationLimitedMemory2023}
-          \begin{itemize}
-              \item A quadratic regularization-based quasi-Newton method that does not rely on line search and is conceptually closer to trust-region methods.
-              \item We wrapped the function \texttt{regLBFGS} using \texttt{solveNonmonotone}.
           \end{itemize}
 
     \item (\texttt{NTQN}): Noise-tolerant quasi-Newton method~\citep{xie2020analysis,shiNoiseTolerantQuasiNewtonAlgorithm2022}
@@ -831,7 +832,6 @@ We compared the following optimization algorithms:
 \end{itemize}
 
 In the following, each method is referred to by the name given in parentheses.
-For (\texttt{Ours}) and (\texttt{Line}), we additionally tested variants incorporating the modified secant condition described in \cref{sec:proposed_choice_Bk}, which are denoted by (\texttt{Ours-MS}) and (\texttt{Line-MS}), respectively.
 All these methods are L-BFGS-based, and we set the number of stored curvature pairs to $10$, the default value in SciPy's L-BFGS-B implementation.
 
 All experiments were conducted on a Microsoft Windows 11 Home system (version~10.0, build~26100) equipped with a 13th Gen Intel\textsuperscript{\textregistered} Core\textsuperscript{\texttrademark} i7-1360P CPU, featuring 12 physical cores and 16 logical processors. All computations were performed using the CPU only.
@@ -853,7 +853,7 @@ To simulate different numerical environments, we tested the following four setti
     \item 16-bit floating-point precision (152 problems, $\feps=9.77 \times 10^{-1}$)
 \end{itemize}
 
-Each setting uses a different error rate $\feps$ in the relative error model (\cref{eq:relative_error_model}), as summarized in \cref{tab:machine_epsilon}.
+Each setting uses a different error rate $\feps$ in the error model (\cref{eq:error_model}), as summarized in \cref{tab:machine_epsilon}.
 The table relates the machine epsilon (maximum relative rounding error) for each floating-point precision to the $\feps$ value used in our experiments.
 We set $\feps$ equal to or larger than the machine epsilon to account for additional uncertainties in function and gradient evaluations.
 We also set the maximum number of iterations to $k_{\max} = 15{,}000$ and timed out runs exceeding 10 minutes per problem.
@@ -892,8 +892,9 @@ A curve that lies above others indicates better overall performance.
 \subsubsection{Results with Artificial Noise}\label{sssec:noise_results}
 
 We first present the results in the artificial noise setting described in \cref{sssec:problems}.
-\Cref{fig:results_noise} presents the performance profile with $\feps = 10^{-2}$. In this regime, the proposed method shows superior robustness compared to other quasi-Newton methods.
-Notably, (\texttt{Ours}) and (\texttt{Ours-MS}) outperform (\texttt{NTQN}), which is specifically designed to handle noisy gradients.
+\Cref{fig:results_noise} presents the performance profile.
+In this regime, the proposed method shows superior robustness compared to other quasi-Newton methods.
+This result highlights the validity of our theoretical analysis in \cref{sec:analysis} and demonstrates the effectiveness of our regularization-based approach in handling noisy objective function values.
 
 \begin{figure}[htbp]
     \centering
@@ -912,11 +913,10 @@ Notably, (\texttt{Ours}) and (\texttt{Ours-MS}) outperform (\texttt{NTQN}), whic
 \subsubsection{Results at Different Precision Levels}\label{sssec:exact_results}
 
 We next present performance profiles for each floating-point precision (64-bit, 32-bit, and 16-bit).
-We evaluated each method at three gradient norm tolerance levels ($10^{-3}$, $10^{-4}$, and $10^{-5}$), i.e., $\gtol \in \{10^{-3}, 10^{-4}, 10^{-5}\}$.
+We evaluated each method at three gradient norm tolerance levels, i.e., $\gtol \in \{10^{-1}, 10^{-3}, 10^{-5}\}$.
 These tolerance levels represent different optimization regimes, from moderate accuracy to high precision requirements.
 \Cref{fig:results_all_precisions} shows the comprehensive performance profiles across all three precision levels.
-Our method (\texttt{Ours}) demonstrates competitive or superior performance compared to existing methods in the standard 64-bit setting.
-The modified secant equation variant (\texttt{Ours-MS}) further improves performance.
+Our methods (\texttt{Ours}) and (\texttt{Ours-MS}) demonstrates competitive or superior performance compared to existing methods in the standard 64-bit setting.
 As numerical precision degrades from 64-bit to 32-bit and further to 16-bit, our regularization-based approach demonstrates improved relative performance.
 The proposed method maintains stability even when traditional line-search methods encounter difficulties with reduced precision arithmetic.
 
@@ -925,14 +925,14 @@ The proposed method maintains stability even when traditional line-search method
     % 64-bit precision
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision64_gtol1e-03.pdf}
-        \caption{64-bit, $\gtol=10^{-3}$}
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision64_gtol1e-01.pdf}
+        \caption{64-bit, $\gtol=10^{-1}$}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision64_gtol1e-04.pdf}
-        \caption{64-bit, $\gtol=10^{-4}$}
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision64_gtol1e-03.pdf}
+        \caption{64-bit, $\gtol=10^{-3}$}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
@@ -946,14 +946,14 @@ The proposed method maintains stability even when traditional line-search method
     % 32-bit precision
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision32_gtol1e-03.pdf}
-        \caption{32-bit, $\gtol=10^{-3}$}
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision32_gtol1e-01.pdf}
+        \caption{32-bit, $\gtol=10^{-1}$}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision32_gtol1e-04.pdf}
-        \caption{32-bit, $\gtol=10^{-4}$}
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision32_gtol1e-03.pdf}
+        \caption{32-bit, $\gtol=10^{-3}$}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
@@ -967,14 +967,14 @@ The proposed method maintains stability even when traditional line-search method
     % 16-bit precision
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision16_gtol1e-03.pdf}
-        \caption{16-bit, $\gtol=10^{-3}$}
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision16_gtol1e-01.pdf}
+        \caption{16-bit, $\gtol=10^{-1}$}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision16_gtol1e-04.pdf}
-        \caption{16-bit, $\gtol=10^{-4}$}
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision16_gtol1e-03.pdf}
+        \caption{16-bit, $\gtol=10^{-3}$}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
@@ -994,27 +994,25 @@ The proposed method maintains stability even when traditional line-search method
     \label{fig:results_all_precisions}
 \end{figure}
 
-\subsection{Computational Time}\label{sec:comp_time}
+\subsection{Computational Time per Iteration}\label{sec:comp_time}
 
 In this subsection, we present an experiment to compare the per-iteration computational cost of each method. Since the previous experiments focused on the number of function and gradient evaluations, they did not directly reflect the computational overhead of each algorithm. Here, we measured the total execution time required to perform a fixed number of iterations on a simple problem.
 We conducted experiments on the ill-conditioned quadratic problem
 \begin{equation*}
     \underset{x \in \bbR^n}{\mathrm{minimize}} \quad \frac{1}{2} \sum_{i=1}^n i x_i^2
 \end{equation*}
-with $n=10{,}000$, and measured the total execution time. Timing data were collected after three warm-up runs, followed by $100$ recorded trials.
+with $n=10{,}000$, and measured the total execution time.
 The initial point $x_0$ was chosen as the all-ones vector.
 We used memory size $m=10$ and maximum iterations $k_{\max}=100$, and we did not set any stopping criteria other than reaching $k_{\max}$.
 The simplicity of the optimization problem and the small value of $k_{\max}$ are well suited to the purpose of this experiment, as they ensure that the total runtime is dominated by algorithmic overhead rather than function or gradient computation.
+Timing data were collected after three warm-up runs, followed by $100$ recorded trials.
 
-The results are summarized in \cref{tab:time_results,fig:exec_time}.
-In \cref{tab:time_results}, we report the total number of oracle calls (calls of $\overline{f}$ and $\nabla \overline{f}$) and final objective values $f(x_{k_{\max}})$.
-The comparable values in the table indicate that the comparison of execution times is fair and not affected by differences in convergence behavior.
 In \cref{fig:exec_time}, we report the execution time statistics, and we can observe that our proposed methods (\texttt{Ours}) and (\texttt{Ours-MS}) exhibit competitive performance compared to other methods.
-Although the (\texttt{SciPy}) calls optimized C routines, it incurs associated dispatch overhead, producing a larger mean time.
-The (\texttt{Reg}) method explicitly computes $-(B_k+\mu_k I)^{-1}g_k$, which is numerically attractive but entails extra per-iteration cost.
-In contrast, our proposed methods employ the simplified strategy described in \cref{sec:proposed_choice}, which reduces per-iteration overhead while preserving performance. This design accounts for their competitive mean execution times.
+Combining with the results from \cref{sec:results}, our methods is competitive or superior in total oracle calls and per-iteration computational cost, indicating practical efficiency.
+As a side note, although the (\texttt{SciPy}) calls optimized C routines, it incurs associated dispatch overhead, producing a larger mean time. The main reason of the (\texttt{Reg}) and (\texttt{Reg-Sec}) methods taking longer execution time is mainly due to the implementation aspect of the original code.
 
-\input{check/time_results_table}
+In \cref{tab:time_results}, we report the total number of oracle calls (calls of $\overline{f}$ and $\nabla \overline{f}$) and final objective values $f(x_{k_{\max}})$.
+The purpose of this table is to confirm that all methods achieved similar convergence behavior within the limited number of iterations. The comparable values in the table indicate that the comparison of execution times is fair and not affected by differences in convergence behavior.
 
 \begin{figure}[t]
     \centering
@@ -1024,6 +1022,8 @@ In contrast, our proposed methods employ the simplified strategy described in \c
         Error bars represent one standard deviation over $100$ runs.}
     \label{fig:exec_time}
 \end{figure}
+
+\input{check/time_results_table}
 
 \section{Conclusion}\label{sec:conclusion}
 

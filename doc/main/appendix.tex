@@ -3,7 +3,7 @@
 The proof of \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} is similar to existing results \citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020}, \citep[Lemma~3.1]{Gratton08022024}.
 \begin{proof}
     Recall that \cref{eq:offo_based_update} defines $\mu_k$ as $\theta_k \sqrt{\varsigma + \sum_{j \in K^+, \, j \leq k} \norm{g_j}^2}$, and \refLine{line:update_theta} of \cref{alg:regularized_qn} asserts $\theta_k \in [\theta_{\min}, \theta_{\max}]$.
-    Let $k_i \in K^+$ be the $i$-th element of $K^+$ and define the empty sum as zero.
+    Let $k_i \in K^+$ be the $i$-th element of $K^+$.
     For any $0 < x < y$, $x/y \le -\ln(1-x/y) = \ln y - \ln(y-x)$ holds. Thus, we have
     \begin{align*}
         \frac{\norm{g_{k_i}}^2}{\mu_{k_i}^2}
