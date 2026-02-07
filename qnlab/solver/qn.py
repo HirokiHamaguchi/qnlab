@@ -43,7 +43,7 @@ def qn(
             return qn_owl(prob, OwlParameter(prob.n, options), method, callback)
         else:
             return qn_line(prob, LineParameter(prob.n, options), method, callback)
-    elif method.base == "Kanzow":
+    elif method.base == "Kanzow" or method.base == "KanzowSec":
         return qn_kanzow(prob, KanzowParameter(prob.n, options), method, callback)
     elif method.base == "NTQN":
         return qn_ntqn(prob, NtqnParameter(prob.n, options), method, callback, verbose)

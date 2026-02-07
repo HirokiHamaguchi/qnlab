@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 BaseType = Literal[
     "Line",
     "Kanzow",
+    "KanzowSec",
     "NTRQN",
     "SciPy",
     "NTQN",
@@ -48,7 +49,7 @@ class Method:
         self.scipy_method = scipy_method
         self.label = label if label else self._to_label()
 
-        if self.base in ["SciPy", "Kanzow", "NTQN"]:
+        if self.base in ["SciPy", "Kanzow", "KanzowSec", "NTQN"]:
             if self.base == "SciPy":
                 assert scipy_method in get_args(ScipyMethodType), scipy_method
             assert store == secant == "raw"
@@ -78,6 +79,8 @@ class Method:
             return "NTQN"
         elif self.base == "Kanzow":
             return "Kanzow"
+        elif self.base == "KanzowSec":
+            return "KanzowSec"
         elif self.base == "GradientDescent":
             return "GD"
         elif self.base == "Newton":
@@ -139,6 +142,10 @@ def get_methods(
             {"m": m, "max_iterations": MI},
         ),
         (
+            Method("KanzowSec", "raw", "raw", "bfgs", label="Reg-Sec"),
+            {"m": m, "max_iterations": MI},
+        ),
+        (
             Method("NTQN", "raw", "raw", "bfgs", label="NTQN"),
             {"m": m, "max_iterations": MI},
         ),
@@ -151,8 +158,9 @@ def get_methods(
         "NTRQN-MS": TAB20(1),
         "Line": TAB20(2),
         "Line-MS": TAB20(3),
-        "SciPy": TAB20(6),
         "Reg": TAB20(4),
+        "Reg-Sec": TAB20(5),
+        "SciPy": TAB20(6),
         "NTQN": TAB20(8),
     }
 
@@ -161,8 +169,9 @@ def get_methods(
         "NTRQN-MS": "o--",
         "Line": "^--",
         "Line-MS": "^-.",
-        "SciPy": "v:",
         "Reg": "D--",
+        "Reg-Sec": "D-.",
+        "SciPy": "v:",
         "NTQN": "s-.",
     }
 

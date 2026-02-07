@@ -6,7 +6,7 @@ import numpy.typing as npt
 import qnlab.solver.external_files.kanzow.utility.parameters as kanzow
 from qnlab.parameter import KanzowParameter
 from qnlab.problem.base import BaseProblem
-from qnlab.solver.external_files.kanzow import regLBFGS
+from qnlab.solver.external_files.kanzow import regLBFGS, regLBFGSsec
 from qnlab.util.callback import Callback
 from qnlab.util.method import Method
 from qnlab.util.ret_values import RetCode
@@ -22,7 +22,7 @@ def qn_kanzow(
     Wrapper for the Kanzow regularization method.
     This wrapper adapts the kanzow.solveNonmonotone function to work with the qnlab interface.
     """
-    assert method.base == "Kanzow"
+    assert method.base == "Kanzow" or method.base == "KanzowSec"
     prob.reset()
 
     # Configure kanzow parameters from param
@@ -47,7 +47,10 @@ def qn_kanzow(
         kanzow.tolGrad = float(param.gtol)
         kanzow.memory = param.m
 
-        result = regLBFGS.solveNonmonotone(f_counted, g_with_callback, prob.x0)
+        if method.base == "Kanzow":
+            result = regLBFGS.solveNonmonotone(f_counted, g_with_callback, prob.x0)
+        else:
+            result = regLBFGSsec.solveNonmonotone(f_counted, g_with_callback, prob.x0)
 
         x_opt = result[0]
         iter_info = result[1]  # [successful_iters, total_evals]

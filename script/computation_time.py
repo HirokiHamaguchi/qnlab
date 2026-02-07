@@ -153,11 +153,7 @@ def vis_benchmark(stats: pd.DataFrame):
     plt.ylim(0, max(bar.get_height() + std * 1.2 for bar, std in zip(bars, stds)) * 1.1)
     plt.tight_layout()
 
-    # Create directory if it doesn't exist
-    output_path = Path("../doc/imgs/for_paper")
-    output_path.mkdir(parents=True, exist_ok=True)
-
-    return fig, output_path, methods_list
+    return fig, methods_list
 
 
 def generate_latex_table(methods_list: list[str], table_data: pd.DataFrame):
@@ -200,10 +196,10 @@ def main():
     assert (repo_root / "doc" / "main" / "check").exists()
 
     stats, table_data = run_benchmark()
-    fig, output_path, methods_list = vis_benchmark(stats)
+    fig, methods_list = vis_benchmark(stats)
 
     # Save as PDF
-    pdf_path = output_path / "time.pdf"
+    pdf_path = repo_root / "doc" / "imgs" / "for_paper" / "time.pdf"
     fig.savefig(pdf_path, format="pdf", bbox_inches="tight", dpi=300)
     print(f"Saved figure to {pdf_path}")
     plt.show()
