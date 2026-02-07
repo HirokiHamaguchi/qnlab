@@ -91,7 +91,7 @@ class IterationData:
         # Check if we should store this vector based on the store rule
         if method.store == "cautious":
             THRESHOLD = 1e-8
-            if self.ys < THRESHOLD * min(self.ss, self.yy):
+            if self.ys < max(THRESHOLD * min(self.ss, self.yy), THRESHOLD**2):
                 return False, "skip by cautious update"
 
         return True, ""
