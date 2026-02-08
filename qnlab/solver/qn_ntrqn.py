@@ -225,7 +225,7 @@ def qn_ntrqn(
 
         if verbose:
             print(
-                f"iter:{k:04} mu:{mu:.2e} f:{fx:.6e} ||g||:{np.linalg.norm(g):.2e} ||d||:{np.linalg.norm(d):.2e}"
+                f"iter:{k:04} mu:{mu:.2e} f:{fx:.6e} min_f-delta:{min_fx_minus_delta:.6e} "
             )
         if callback:
             callback.callback(prob, x, fx, g)

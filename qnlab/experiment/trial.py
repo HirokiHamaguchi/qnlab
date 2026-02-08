@@ -18,6 +18,7 @@ def trial(
     use_tex: bool = False,
     only_plot: bool = False,
     only_grad: bool = False,
+    verbose: bool = False,
 ) -> List[Callback]:
     print(f"Trial on problem: {prob.name} (n={prob.n})")
 
@@ -40,7 +41,7 @@ def trial(
         T0 = time.perf_counter()
         callback = Callback(save_xs=save_xs)
 
-        info, fx, x_opt = qn(prob, method, options, callback)
+        info, fx, x_opt = qn(prob, method, options, callback, verbose)
 
         print(f"{str(method)} info:{info} time:{time.perf_counter() - T0:.2f}sec")
         print(f"Final f:{callback.fxs[-1]:.2e}, ||g||:{callback.gnorms[-1]:.2e}")
