@@ -248,7 +248,7 @@ $f \colon \mathbb{R}^n \to \mathbb{R}$ を $C^1$ 級とする。$f$ が $L$-smoo
 
 が任意の $x,y \in \mathbb{R}^n$ について成り立つ。
 
-証明は他の文献に譲る \citep{bauschkeBaillonHaddadTheoremRevisited2009} \citep[Proposition 12.60]{rockafellarVariationalAnalysis1998}。
+証明は他の文献に譲る~\citep{bauschkeBaillonHaddadTheoremRevisited2009}~\citep[Proposition 12.60]{rockafellarVariationalAnalysis1998}。
 
 この定理の帰結として、最適化アルゴリズムが生成する列 $\lbrace x_k \rbrace$ に対し、次を定義すると:
 
@@ -354,7 +354,7 @@ g_k^\top d_k = -g_k^\top \nabla^2 f(x_k)^{-1} g_k < 0.
 
 $f$ が非凸であり、ヘッセ行列 $\nabla^2 f(x_k)$ が負定値または不定値である場合、関数値の減少は保証されず、ニュートン法は収束しないことがある。
 したがって、ニュートン法の適用ではヘッセ行列の正定値性の確認が重要である。
-このような場合への一つの対処法として修正ニュートン法 \citep[Sec. 3.4]{nocedal1999numerical} がある。
+このような場合への一つの対処法として修正ニュートン法~\citep[Sec. 3.4]{nocedal1999numerical} がある。
 
 ### 収束に関する性質
 
@@ -380,7 +380,7 @@ x_{k+1} \gets x_k + \alpha_k d_k,
 ```
 
 ここで $d_k$ は $g_k^\top d_k < 0$ を満たす降下方向であり、$\alpha_k > 0$ は線形探索で決定されるステップサイズである。
-ステップサイズ $\alpha_k$ は Wolfe 条件 \citep[Sec. 3.1]{nocedal1999numerical} により次のように定める。
+ステップサイズ $\alpha_k$ は Wolfe 条件~\citep[Sec. 3.1]{nocedal1999numerical} により次のように定める。
 
 ```math
 \begin{align*}
@@ -648,7 +648,7 @@ f''(x) & = \frac{1}{(1 + x^2)^{3/2}}.
 ##### 強凸関数に対するニュートン法の振動
 
 前の例では目的関数は強凸ではなく、必ずしも良い性質を持っていなかった。
-しかし、強凸性を持つ関数であってもニュートン法が収束しない例が存在する \citep[Example 1.4.3]{Doikov2021SecondOrderTensor}。
+しかし、強凸性を持つ関数であってもニュートン法が収束しない例が存在する~\citep[Example 1.4.3]{Doikov2021SecondOrderTensor}。
 
 この例では $\mu>0$ に対し、次の関数を考える。
 
@@ -824,7 +824,7 @@ B_{k+1} s_k = y_k.
 
 ### 代表的な準ニュートン更新公式
 
-$B_k$, $s_k$, $y_k$ が与えられたとき、セカント条件を満たす $B_{k+1}$ を与える更新公式は多数存在する。ここでは代表的なものをその導出とともに示す \citep{dennisjr.QuasiNewtonMethodsMotivation1977a}。
+$B_k$, $s_k$, $y_k$ が与えられたとき、セカント条件を満たす $B_{k+1}$ を与える更新公式は多数存在する。ここでは代表的なものをその導出とともに示す~\citep{dennisjr.QuasiNewtonMethodsMotivation1977a}。
 本小節に限り、簡潔さのため $B_k$, $B_{k+1}$, $s_k$, $y_k$ をそれぞれ $B$, $\bar{B}$, $s$, $y$ と略記する。
 
 #### Broyden の更新
@@ -841,7 +841,7 @@ $B_k$, $s_k$, $y_k$ が与えられたとき、セカント条件を満たす $B
 
 ##### 導出
 
-単純な構造的仮定からこの公式を導出する \citep[Section 4]{dennisjr.QuasiNewtonMethodsMotivation1977a}。
+単純な構造的仮定からこの公式を導出する~\citep[Section 4]{dennisjr.QuasiNewtonMethodsMotivation1977a}。
 
 **Proposition 5**
 
@@ -941,7 +941,7 @@ Broyden の更新は、セカント条件を満たし、$s$ に直交するベ�
 
 #### SR1 更新
 
-[対称ランク1 (SR1) 更新](https://en.wikipedia.org/wiki/Symmetric_rank-one) \citep{nocedal1999numerical} は更新過程で対称性を維持する基本的な準ニュートン法である。更新公式は次で与えられる。
+[対称ランク1 (SR1) 更新](https://en.wikipedia.org/wiki/Symmetric_rank-one)~\citep{nocedal1999numerical} は更新過程で対称性を維持する基本的な準ニュートン法である。更新公式は次で与えられる。
 
 ```math
 \begin{align*}
@@ -1011,7 +1011,7 @@ SR1 更新は $(y - Bs)^\top s \neq 0$ であることを前提とする。$(y -
 
 #### Powell 対称 Broyden (PSB) 更新
 
-Powell 対称 Broyden (PSB) 更新 \cite{haeltermanAnalyticalStudyLeast2009} は最も重要な準ニュートン更新公式の一つである。更新公式は次で与えられる。
+Powell 対称 Broyden (PSB) 更新~\cite{haeltermanAnalyticalStudyLeast2009} は最も重要な準ニュートン更新公式の一つである。更新公式は次で与えられる。
 
 ```math
 \begin{align*}
@@ -1211,7 +1211,7 @@ $c = s$ の選択は更新結果の正定値性を確保する動機に基づく
 
 #### DFP 更新
 
-[Davidon--Fletcher--Powell (DFP) 更新](https://en.wikipedia.org/wiki/Davidon%E2%80%93Fletcher%E2%80%93Powell_formula) \cite{nocedal1999numerical} は古典的な準ニュートン更新公式である。更新公式は次で与えられる。
+[Davidon--Fletcher--Powell (DFP) 更新](https://en.wikipedia.org/wiki/Davidon%E2%80%93Fletcher%E2%80%93Powell_formula)~\cite{nocedal1999numerical} は古典的な準ニュートン更新公式である。更新公式は次で与えられる。
 
 ```math
 \begin{align*}
@@ -1399,7 +1399,7 @@ B'^{-1} & = I + 2\frac{s'^\top y'+y'^\top y'}{2(s'^\top y')^2}(s' s'^\top)
 
 </details>
 
-これらの定式化の証明は文献を参照されたい \citep{kanamoriBregmanExtensionQuasiNewton2010,kanamoriBregmanExtensionQuasiNewton2010a}。
+これらの定式化の証明は文献を参照されたい~\citep{kanamoriBregmanExtensionQuasiNewton2010,kanamoriBregmanExtensionQuasiNewton2010a}。
 [こちらのスライド](http://matsuzoe.web.nitech.ac.jp/infogeo/OCAMI2010/kanamori.pdf)も参照されたい。
 
 ### BFGS 法
@@ -1629,7 +1629,7 @@ C^{-1} + V^\top B_k^{-1} U
 
 ### BFGS と DFP の比較
 
-BFGS と DFP は構造的にはかなり対称的であるにもかかわらず、実際の最適化問題に適用すると実用上の効率は大きく異なる。Powell の解析 \citep{powellHowBadAre1986} は、単純な2次元二次関数に対する両手法の挙動を調べてこの非対称性を検討した。漸近収束理論では両者は同程度に振る舞うと示唆されることが多いが、Powell は実用上の効率が大きく異なること、とくに近似ヘッセ行列が真のヘッセ行列から遠い場合に差が顕著であることを示した。
+BFGS と DFP は構造的にはかなり対称的であるにもかかわらず、実際の最適化問題に適用すると実用上の効率は大きく異なる。Powell の解析~\citep{powellHowBadAre1986} は、単純な2次元二次関数に対する両手法の挙動を調べてこの非対称性を検討した。漸近収束理論では両者は同程度に振る舞うと示唆されることが多いが、Powell は実用上の効率が大きく異なること、とくに近似ヘッセ行列が真のヘッセ行列から遠い場合に差が顕著であることを示した。
 
 #### 問題設定
 
@@ -1653,7 +1653,7 @@ f(x, y) = \frac{1}{2}(x^2 + y^2),
 ```
 
 これは Powell の元の解析に一致する。
-この選択の詳細は \citep{powellHowBadAre1986} を参照されたい。
+この選択の詳細は~\citep{powellHowBadAre1986} を参照されたい。
 
 反復は現在点のノルムが初期ノルムに対する許容値を下回るまで続ける。各 $\lambda_1$ に対して収束に要する反復回数を記録する。
 
@@ -1661,16 +1661,16 @@ f(x, y) = \frac{1}{2}(x^2 + y^2),
 
 数値結果を Table 1 に示す。これは Powell の原表の内容を一部再現したものである。収束挙動は初期固有値 $\lambda_1$ に強く依存する。
 
-| $\lambda_1$ | BFGS | DFP |
-| :--: | :--: | :--: |
-| 0.001 | 4 | 3 |
-| 0.01 | 5 | 3 |
-| 0.1 | 6 | 4 |
-| 1 | 1 | 1 |
-| 10 | 8 | 16 |
-| 100 | 10 | 107 |
-| 1000 | 12 | 1006 |
-| 10000 | 15 | 9987 |
+| $\lambda_1$ | BFGS  |  DFP  |
+| :---------: | :---: | :---: |
+|    0.001    |   4   |   3   |
+|    0.01     |   5   |   3   |
+|     0.1     |   6   |   4   |
+|      1      |   1   |   1   |
+|     10      |   8   |  16   |
+|     100     |  10   |  107  |
+|    1000     |  12   | 1006  |
+|    10000    |  15   | 9987  |
 
 (Table 1 \ifEn Convergence comparison between BFGS and DFP methods for different initial eigenvalues $\lambda_1$ \else 初期固有値 $\lambda_1$ に対する BFGS と DFP の収束比較)
 
@@ -1718,7 +1718,7 @@ Powell の単純な二次問題の解析は、計算量の大半が費やされ�
 限定記憶準ニュートン法は、古典的な準ニュートン法を大規模最適化問題へ拡張する手法である。
 標準的な準ニュートン法では近似ヘッセ行列またはその逆行列を密行列として保存し更新するため、$n$ 変数に対して $\mathcal{O}(n^2)$ のメモリを要する。
 
-BFGS 更新に基づく L-BFGS 法 \citep{liuLimitedMemoryBFGS1989a} は、行列全体を明示的に保存しない。
+BFGS 更新に基づく L-BFGS 法~\citep{liuLimitedMemoryBFGS1989a} は、行列全体を明示的に保存しない。
 代わりに最新の $m$ 組のベクトル対 $\lbrace(s_i,y_i)\rbrace$ のみを保持する。
 これにより記憶量は $\mathcal{O}(nm)$ に減少し、$m$ が小さな定数(通常 $m\le 10$) のとき大幅な改善となる。
 
@@ -1774,7 +1774,7 @@ V_{m-1}^\top \cdots V_0^\top H_0 V_0 \cdots V_{m-1}
 
 上のコンパクト表現は、$H_m$ を明示的に形成せずに任意のベクトル $q$ に適用できる。
 $r = H_m q$ とおく。
-行列積の結合性を利用すると、この計算は長さ $m$ の短いループを二回回すだけで実行でき、よく知られた L-BFGS の二重ループ再帰につながる \citep[Algorithm 7.4]{nocedal1999numerical}。
+行列積の結合性を利用すると、この計算は長さ $m$ の短いループを二回回すだけで実行でき、よく知られた L-BFGS の二重ループ再帰につながる~\citep[Algorithm 7.4]{nocedal1999numerical}。
 このアルゴリズムは $\mathcal{O}(md)$ の演算量と $\mathcal{O}(md)$ の記憶量を要する。ここで $d$ は問題次元である。
 
 ![999_two_loop_recursion](999_two_loop_recursion.png)
@@ -1887,7 +1887,7 @@ H_0 = \gamma I,
 \end{equation*}
 ```
 
-この選択は近似逆ヘッセ行列と目的関数の局所曲率の関係に基づく \citep{liuLimitedMemoryBFGS1989a,shannoMatrixConditioningNonlinear1978}。
+この選択は近似逆ヘッセ行列と目的関数の局所曲率の関係に基づく~\citep{liuLimitedMemoryBFGS1989a,shannoMatrixConditioningNonlinear1978}。
 このスケーリングを正当化するため、目的関数 $f$ が二回連続微分可能であると仮定し、最新のステップに沿った平均ヘッセ行列を考える。
 
 ```math
@@ -1923,7 +1923,7 @@ y_{m-1}
 これは Rayleigh 商である。
 もし $\bar{G}^{1/2} s_{m-1}$ が $\bar{G}$ の固有ベクトルであれば、この量の逆数は対応する固有値に等しい。
 
-さらに $\gamma$ の選択は Barzilai--Borwein 法の短ステップサイズ \citep{barzilaiTwoPointStepSize1988} と一致し、L-BFGS の初期化と古典的なステップ長選択戦略の密接な関係を示している。
+さらに $\gamma$ の選択は Barzilai--Borwein 法の短ステップサイズ~\citep{barzilaiTwoPointStepSize1988} と一致し、L-BFGS の初期化と古典的なステップ長選択戦略の密接な関係を示している。
 この観察は、実用におけるスケール単位行列初期化の有効性をさらに支持する。
 
 
@@ -2015,7 +2015,7 @@ Fig. 10 では、正確なヘッセ行列から構築された理想的な二次
 
 #### 関数値ベースの修正セカント条件
 
-最初の修正は、前の点での関数値を二次モデルに組み込みます \citep{yuanModifiedBFGSAlgorithm1991,weiNewQuasiNewtonMethods2006, babaie-kafakiModifiedBFGSAlgorithm2011}。
+最初の修正は、前の点での関数値を二次モデルに組み込みます~\citep{yuanModifiedBFGSAlgorithm1991,weiNewQuasiNewtonMethods2006, babaie-kafakiModifiedBFGSAlgorithm2011}。
 異なる近似ヘッセ行列 $B^{\mathrm{F}}_{k+1}$ を持つ別のモデルを考えましょう:
 
 ```math
@@ -2098,7 +2098,7 @@ B^{\mathrm{F}'}_{k+1} s_k = y_k + \frac{\max(0, 2(f(x_k) - f(x_{k+1})) + (\nabla
 
 #### 3次項付き修正セカント条件
 
-2 番目の修正はモデルに 3 次項を導入し、前の点での関数値と勾配の両方の一致を同時に満たすことを可能にします \citep{zhangNewQuasiNewtonEquation1999, zhangPropertiesNumericalPerformance2001,yabeLocalSuperlinearConvergence2007}。
+2 番目の修正はモデルに 3 次項を導入し、前の点での関数値と勾配の両方の一致を同時に満たすことを可能にします~\citep{zhangNewQuasiNewtonEquation1999, zhangPropertiesNumericalPerformance2001,yabeLocalSuperlinearConvergence2007}。
 
 $T_{k+1} \in \mathbb{R}^{n \times n \times n}$ を $x_{k+1}$ での $f$ の3階微分テンソルとし、以下を満たすものとします
 
@@ -2187,9 +2187,9 @@ B^{\mathrm{C}}_{k+1} s_k = y_k + \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nab
 ### その他の曲率保存方法
 
 曲率情報を保存するために、いくつかのトピックがあります。
-Agg-BFGS \citep{berahasLimitedmemoryBFGSDisplacement2022} は、最も古い情報を破棄して最新のものを追加するのではなく、データを集約することにより曲率情報を管理する別のアプローチです。
+Agg-BFGS~\citep{berahasLimitedmemoryBFGSDisplacement2022} は、最も古い情報を破棄して最新のものを追加するのではなく、データを集約することにより曲率情報を管理する別のアプローチです。
 
-Multi-Secant \citep{leeAdvancingMultiSecantQuasiNewton2025} は、複数のステップと勾配差ベクトルのペアを維持することにより、セカント条件フレームワークを拡張します。標準的な定式化では、以下を定義します
+Multi-Secant~\citep{leeAdvancingMultiSecantQuasiNewton2025} は、複数のステップと勾配差ベクトルのペアを維持することにより、セカント条件フレームワークを拡張します。標準的な定式化では、以下を定義します
 
 ```math
 \begin{equation*}

@@ -1,6 +1,6 @@
 \section{Proof of \texorpdfstring{\cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}}{Lemma \ref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}}}\label{sec:proof_of_sum_norm_g_over_mu_geq_2sqrt_leq_log}
 
-The proof of \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} is similar to existing results \citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020}, \citep[Lemma~3.1]{Gratton08022024}.
+The proof of \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} is similar to existing results~\citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020},~\citep[Lemma~3.1]{Gratton08022024}.
 \begin{proof}
     Recall that \cref{eq:offo_based_update} defines $\mu_k$ as $\theta_k \sqrt{\varsigma + \sum_{j \in K^+, \, j \leq k} \norm{g_j}^2}$, and \refLine{line:update_theta} of \cref{alg:regularized_qn} asserts $\theta_k \in [\theta_{\min}, \theta_{\max}]$.
     Let $k_i \in K^+$ be the $i$-th element of $K^+$.
@@ -22,7 +22,7 @@ The proof of \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} is similar to exist
 
 \section{Proof of \texorpdfstring{\cref{prop:bounded_BFGS}}{Proposition \ref{prop:bounded_BFGS}}}\label{sec:proof_of_bounded_BFGS}
 
-The proof of \cref{prop:bounded_BFGS} is similar to existing results \citep[Theorem 5.5]{gaoQuasiNewtonMethodsSuperlinear2018} \citep[Lemma 1]{gowerStochasticBlockBFGS2016}.
+The proof of \cref{prop:bounded_BFGS} is similar to existing results~\citep[Theorem 5.5]{gaoQuasiNewtonMethodsSuperlinear2018}~\citep[Lemma 1]{gowerStochasticBlockBFGS2016}.
 \begin{proof}
     We consider standard BFGS updates with a single curvature pair $(s,y)$.
     From \cref{eq:curvature_conditions1,eq:curvature_conditions2}, we have
@@ -57,8 +57,8 @@ The proof of \cref{prop:bounded_BFGS} is similar to existing results \citep[Theo
     \myQED
 \end{proof}
 
-The conditions \cref{eq:curvature_conditions1,eq:curvature_conditions2} are standard in the analysis of quasi-Newton methods \citep[Theorem 2.1]{byrdToolAnalysisQuasiNewton1989}.
-If $f$ is $L$-smooth (\cref{ass:LSmooth}) and convex, then by the Baillon--Haddad theorem \citep{baillonQuelquesProprietesOperateurs1977,bauschkeBaillonHaddadTheoremRevisited2009} its gradient is $1/L$-cocoercive:
+The conditions \cref{eq:curvature_conditions1,eq:curvature_conditions2} are standard in the analysis of quasi-Newton methods~\citep[Theorem 2.1]{byrdToolAnalysisQuasiNewton1989}.
+If $f$ is $L$-smooth (\cref{ass:LSmooth}) and convex, then by the Baillon--Haddad theorem~\citep{baillonQuelquesProprietesOperateurs1977,bauschkeBaillonHaddadTheoremRevisited2009} its gradient is $1/L$-cocoercive:
 \begin{equation}
     (\nabla f(x)-\nabla f(y))^\top (x-y) \ge \frac{1}{L} \norm{\nabla f(x)-\nabla f(y)}^2
 \end{equation}

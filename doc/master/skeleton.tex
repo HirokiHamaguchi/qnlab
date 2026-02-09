@@ -1,0 +1,218 @@
+\documentclass[uplatex,english,suri,master]{suribt}
+%\documentclass[oneside]{suribt}% 本文が * ページ以下のときに (掲示に注意)
+
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{mathptmx}
+
+\usepackage{ascmac}
+\usepackage{appendix}
+\usepackage[linesnumbered, ruled]{algorithm2e}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{bm,bbm}
+\usepackage{booktabs}
+\usepackage{cancel}
+\usepackage{enumitem}
+\usepackage{fancybox}
+\usepackage{floatrow}
+\usepackage[breaklinks]{hyperref}
+\usepackage{ifthen}
+\usepackage{lipsum}
+\usepackage{makecell}
+\usepackage{mathrsfs}
+\usepackage[showonlyrefs]{mathtools}
+\usepackage{multirow}
+\usepackage{optidef}
+\usepackage{orcidlink}
+\usepackage{physics}
+\usepackage{pifont}
+\usepackage{subcaption}
+\usepackage{subfiles}
+\usepackage{thm-restate}
+\usepackage{tikz}
+\usepackage{xparse}
+
+\usepackage{cleveref}
+\usepackage[numbers,sort&compress]{natbib}
+
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
+
+\definecolor{cA}{HTML}{0072BD}
+\definecolor{cB}{HTML}{EDB120}
+\definecolor{cC}{HTML}{77AC30}
+\definecolor{cD}{HTML}{D95319}
+
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+\newcommand{\cyan}[1]{\textcolor{cyan}{#1}}
+\newcommand{\gray}[1]{\textcolor{gray}{#1}}
+\newcommand{\green}[1]{\textcolor{green}{#1}}
+\newcommand{\brown}[1]{\textcolor{brown}{#1}}
+\newcommand{\black}[1]{\textcolor{black}{#1}}
+\newcommand{\orange}[1]{\textcolor{orange}{#1}}
+\newcommand{\st}{\text{ s.t. }}
+\newcommand{\Img}[1]{\mathrm{Im}\qty(#1)}
+\newcommand{\Ker}[1]{\mathrm{Ker}\qty(#1)}
+\newcommand{\Supp}[1]{\mathrm{supp}\qty(#1)}
+\newcommand{\Rank}[1]{\mathrm{rank}\qty(#1)}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+% C++ (https://tex.stackexchange.com/questions/4302/prettiest-way-to-typeset-c-cplusplus)
+\newcommand{\Cpp}{C\nolinebreak[4]\hspace{-.05em}\raisebox{.4ex}{\relsize{-3}{\textbf{++}}}}
+% https://tex.stackexchange.com/questions/28836/typesetting-the-define-equals-symbol
+\newcommand{\defeq}{\coloneqq}
+\newcommand{\eqdef}{\eqqcolon}
+% https://tex.stackexchange.com/questions/5502/how-to-get-a-mid-binary-relation-that-grows
+\newcommand{\relmiddle}[1]{\mathrel{}\middle#1\mathrel{}}
+
+% https://tex.stackexchange.com/questions/564216/newcommand-for-each-letter
+\ExplSyntaxOn
+\NewDocumentCommand{\definealphabet}{mmmm}{
+    \int_step_inline:nnn{`#3}{`#4}{
+        \cs_new_protected:cpx{#1 \char_generate:nn{##1}{11}}{
+            \exp_not:N #2{\char_generate:nn{##1}{11}}}}}
+\ExplSyntaxOff
+
+% cleveref fails to accurately capture pseudo-code line numbers. We define a custom reference command for lines in algorithms.
+\newcommand{\refLine}[1]{Line~\ref{#1}}
+\newcommand{\refLines}[2]{Lines~\ref{#1}--\ref{#2}}
+
+\definealphabet{bb}{\mathbb}{A}{Z}
+\definealphabet{rm}{\mathrm}{A}{Z}
+\definealphabet{cal}{\mathcal}{A}{Z}
+\definealphabet{frak}{\mathfrak}{a}{z}
+% \definealphabet{scr}{\mathscr}{A}{Z}
+% \definealphabet{frak}{\mathfrak}{A}{Z}
+
+% \spn@wtheorem{assumption}{Assumption}{\bfseries}{\itshape}
+
+% Theorem 環境の定義
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+\newtheorem{corollary}{Corollary}
+\newtheorem{remark}{Remark}
+\newtheorem{example}{Example}
+\newtheorem{assumption}{Assumption}
+
+% cleverefの設定
+\crefname{theorem}{Theorem}{Theorems}
+\crefname{proposition}{Proposition}{Propositions}
+\crefname{lemma}{Lemma}{Lemmas}
+\crefname{assumption}{Assumption}{Assumptions}
+\crefname{definition}{Definition}{Definitions}
+\crefname{corollary}{Corollary}{Corollaries}
+\crefname{remark}{Remark}{Remarks}
+\crefname{example}{Example}{Examples}
+\crefname{figure}{Figure}{Figures}
+\crefname{table}{Table}{Tables}
+\crefname{algorithm}{Algorithm}{Algorithms}
+
+% https://qiita.com/rityo_masu/items/efd44bc8f9229e014237
+\allowdisplaybreaks[4]
+
+\NewDocumentCommand{\ared}{O{k}}{\mathrm{ared}_{#1}}
+\NewDocumentCommand{\ered}{O{k}}{\overline{\mathrm{ared}}_{#1}}
+\NewDocumentCommand{\pred}{O{k}}{\mathrm{pred}_{#1}}
+\NewDocumentCommand{\ep}{O{k}}{\frac{\ered[#1]}{\pred[#1]}}
+\NewDocumentCommand{\inep}{O{k}}{\ered[#1]/\pred[#1]}
+\NewDocumentCommand{\ap}{O{k}}{\frac{\ared[#1]}{\pred[#1]}}
+\NewDocumentCommand{\inap}{O{k}}{\ared[#1]/\pred[#1]}
+\newcommand{\feps}{\varepsilon_\mathrm{f}}
+\newcommand{\gtol}{\epsilon_{\mathrm{gtol}}}
+
+% Language switch
+\newif\ifEn
+\Entrue
+
+\title{Practical Regularized Quasi-Newton Methods with Inexact Function Values\\
+(不正確な関数値下における\\実用的な正則化準ニュートン法)}
+%\titlewidth{}% タイトル幅 (指定するときは単位つきで)
+\author{Hiroki Hamaguchi}
+\eauthor{Hiroki Hamaguchi}% Copyright 表示で使われる
+\studentid{48-246226}
+\supervisor{Professor Takeda Akiko}% 1 つ引数をとる (役職まで含めて書く)
+%\supervisor{指導教員名 役職 \and 指導教員名 役職}% 複数教員の場合，\and でつなげる
+\handin{2026}{2}% 提出月. 2 つ (年, 月) 引数をとる
+\keywords{Regularized Quasi-Newton Method,
+        Numerical Stability,
+        Numerical Error,
+        AdaGrad-Norm,
+        Objective-Function-Free Optimization} % 概要の下に表示される
+
+\begin{document}
+\maketitle%%%%%%%%%%%%%%%%%%% タイトル %%%%
+
+\frontmatter% ここから前文
+\begin{abstract}%%%%%%%%%%%%% 概要 %%%%%%%%
+    \input{../main/abstract.tex}
+\end{abstract}
+
+\tableofcontents%%%%%%%%%%%%% 目次 %%%%%%%%
+
+\mainmatter% ここから本文 %%% 本文 %%%%%%%%
+
+\chapter{Introduction}
+
+\section{Introduction}\label{sec:introduction}
+
+\subfile{../main/introduction.tex}
+
+\section{Organization of This Thesis}
+
+The remainder of this thesis is organized as follows.
+
+\Cref{chap:background} reviews the foundations of quasi-Newton methods.
+In \cref{sec:background_quasi_newton}, we briefly explain what quasi-Newton methods are.
+In \cref{sec:background_modified_secant}, we explain the modified secant condition, which is used in our numerical experiments.
+Since both topics are standard and well documented in the literature, we present them as a separate chapter.
+
+\Cref{chap:main} presents the proposed regularized quasi-Newton method along with its theoretical analysis.
+In \cref{sec:preliminaries}, we introduce the problem setting and review relevant background.
+In \cref{sec:algorithm}, we present the proposed algorithm.
+In \cref{sec:analysis}, we establish a global convergence property of the proposed algorithm.
+In \cref{sec:proposed_choice}, we discuss practical choices of algorithmic variables and parameters.
+In \cref{sec:experiments}, we report numerical results on the CUTEst benchmark problems.
+Finally, in \cref{sec:conclusion}, we conclude the thesis with a summary and future research directions.
+
+Our implementation is publicly available on GitHub%
+\footnote{\label{fn:ourGitHub}\url{https://github.com/HirokiHamaguchi/qnlab}}.
+
+\chapter{Foundations of Quasi-Newton Methods}
+\label{chap:background}
+
+In this chapter, we review the foundations of quasi-Newton methods.
+
+\newcommand{\myQED}{}
+
+\subfile{../study/3_quasi_newton.tex}
+
+\subfile{../study/4_modified_secant.tex}
+
+\chapter{Noise-Tolerant Regularized Quasi-Newton Method}
+\label{chap:main}
+
+In this chapter, we present the proposed regularized quasi-Newton method that is robust against inexact function values.
+This chapter is of our main contribution.
+
+\subfile{../main/main_contents.tex}
+
+\backmatter% ここから後付
+\chapter{Acknowledgments}%%%%%%%%%%%%%%% 謝辞 %%%%%%%
+
+I would like to express my sincere gratitude to my supervisor, Professor Akiko Takeda, and Project Research Associate Naoki Marumo for their extensive guidance on the direction and content of the research.
+
+\bibliographystyle{spbasic}
+\bibliography{../L-BFGS.bib}
+
+\appendix% ここから付録 %%%%% 付録 %%%%%%%
+
+\chapter{Appendix}
+
+\input{../main/appendix.tex}
+
+\end{document}

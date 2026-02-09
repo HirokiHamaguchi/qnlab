@@ -82,11 +82,11 @@
 \ifEn
     If $f$ is nonconvex and the Hessian $\nabla^2 f(x_k)$ is negative definite or indefinite, function values are not guaranteed to decrease, and Newton's method may fail to converge.
     Therefore, checking the positive definiteness of the Hessian is important when applying Newton's method.
-    The modified Newton method \citep[Sec. 3.4]{nocedal1999numerical} is one remedy for handling such cases.
+    The modified Newton method~\citep[Sec. 3.4]{nocedal1999numerical} is one remedy for handling such cases.
 \else
     $f$ が非凸であり、ヘッセ行列 $\nabla^2 f(x_k)$ が負定値または不定値である場合、関数値の減少は保証されず、ニュートン法は収束しないことがある。
     したがって、ニュートン法の適用ではヘッセ行列の正定値性の確認が重要である。
-    このような場合への一つの対処法として修正ニュートン法 \citep[Sec. 3.4]{nocedal1999numerical} がある。
+    このような場合への一つの対処法として修正ニュートン法~\citep[Sec. 3.4]{nocedal1999numerical} がある。
 \fi
 
 \ifEn
@@ -127,10 +127,10 @@
 \end{equation*}
 \ifEn
     where $d_k$ is a descent direction satisfying $g_k^\top d_k < 0$ and $\alpha_k > 0$ is the step size determined by line search.
-    We employ the Wolfe conditions \citep[Sec. 3.1]{nocedal1999numerical} to determine the step size $\alpha_k$ as follows:
+    We employ the Wolfe conditions~\citep[Sec. 3.1]{nocedal1999numerical} to determine the step size $\alpha_k$ as follows:
 \else
     ここで $d_k$ は $g_k^\top d_k < 0$ を満たす降下方向であり、$\alpha_k > 0$ は線形探索で決定されるステップサイズである。
-    ステップサイズ $\alpha_k$ は Wolfe 条件 \citep[Sec. 3.1]{nocedal1999numerical} により次のように定める。
+    ステップサイズ $\alpha_k$ は Wolfe 条件~\citep[Sec. 3.1]{nocedal1999numerical} により次のように定める。
 \fi
 \begin{align*}
     f(x_k + \alpha_k d_k) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k, \\
@@ -499,12 +499,12 @@
 
 \ifEn
     In the previous example, the objective function was not strongly convex and did not necessarily possess favorable properties.
-    However, even for functions with the strong convexity property, there exist examples where Newton's method fails to converge \citep[Example 1.4.3]{Doikov2021SecondOrderTensor}.
+    However, even for functions with the strong convexity property, there exist examples where Newton's method fails to converge~\citep[Example 1.4.3]{Doikov2021SecondOrderTensor}.
 
     In this example, for $\mu>0$, consider the function
 \else
     前の例では目的関数は強凸ではなく、必ずしも良い性質を持っていなかった。
-    しかし、強凸性を持つ関数であってもニュートン法が収束しない例が存在する \citep[Example 1.4.3]{Doikov2021SecondOrderTensor}。
+    しかし、強凸性を持つ関数であってもニュートン法が収束しない例が存在する~\citep[Example 1.4.3]{Doikov2021SecondOrderTensor}。
 
     この例では $\mu>0$ に対し、次の関数を考える。
 \fi
