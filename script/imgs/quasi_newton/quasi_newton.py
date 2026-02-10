@@ -104,25 +104,25 @@ def beautify_ax(ax, transparent_panes=False):
         ax.zaxis.line.set_alpha(1.0)
 
 
-def draw_common_elements(ax, draw_type:int):
+def draw_common_elements(ax, draw_type: int):
     """共通の描画要素（点、テキスト、線）を描画する関数"""
     if draw_type == 1:
         x_now = x_k
-        x_next=None
+        x_next = None
     elif draw_type == 2:
         x_now = x_k
         x_next = x_kp1
     elif draw_type == 3:
         x_now = x_kp1
-        x_next= x_kp2
+        x_next = x_kp2
+    else:
+        raise ValueError("draw_type must be 1, 2, or 3.")
 
     # x_k の点とテキスト
-    ax.scatter(
-        [x_now[0]], [x_now[1]], [f(x_now)], s=100, color="red"
-    )
+    ax.scatter([x_now[0]], [x_now[1]], [f(x_now)], s=100, color="red")
     ax.text(
-        x_now[0],
-        x_now[1] + 0.2,
+        x_now[0] - (0.0 if draw_type <= 2 else 0.4),
+        x_now[1] + (0.2 if draw_type <= 2 else 0.4),
         f(x_now),
         r"$x_{k" + ("}$" if draw_type <= 2 else r"+1}$"),
         fontsize=45,
@@ -140,25 +140,24 @@ def draw_common_elements(ax, draw_type:int):
         )
         mid = x_now + 0.5 * (x_next - x_now)
         ax.text(
-            mid[0] - 0.2,
+            mid[0] - (0.2 if draw_type == 2 else 0.5),
             mid[1] - 0.3,
             f(mid),
             r"$s_k$" if draw_type == 2 else r"$s_{k+1}$",
-            fontsize=30
+            fontsize=30,
         )
 
         # x_k の点とテキスト
-        ax.scatter(
-            [x_next[0]], [x_next[1]], [f(x_next)], s=100, color="yellow"
-        )
+        ax.scatter([x_next[0]], [x_next[1]], [f(x_next)], s=100, color="yellow")
         ax.text(
             x_next[0],
-            x_next[1] + (0.2 if draw_type == 2 else -0.2),
+            x_next[1] + (0.2 if draw_type == 2 else 0.2),
             f(x_next),
             r"$x_{k+1}$" if draw_type == 2 else r"$x_{k+2}$",
             fontsize=45,
             color="yellow",
         )
+
 
 def draw_surface_z(ax, alpha):
     """Z（元の関数）のサーフェスを描画"""
@@ -188,7 +187,6 @@ def draw_surface_quadratic(ax, Q, color, alpha):
             fontsize=40,
             color="tab:green",
         )
-
 
 
 def create_enhanced_figure(draw_func, filename):
@@ -293,6 +291,7 @@ assert np.all(np.linalg.eigvals(B_kp1) > 0)
 Q_Bkp1 = quadratic_surface(B_kp1, x_k, g_k, X, Y)
 
 x_kp2 = x_kp1 - np.linalg.solve(B_kp1, g_kp1)
+
 
 def draw_panel3(ax, transparent_surfaces=True):
     if transparent_surfaces:

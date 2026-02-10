@@ -1,3 +1,5 @@
+%!LW recipe=uplatex
+
 \documentclass[0_main]{subfiles}
 
 \begin{document}
@@ -65,14 +67,14 @@
     \caption{
         \ifEn
             Conceptual illustration of quasi-Newton methods.
-            (1) The objective function $f$ (blue surface) and the current point $x_k$ (red dot).
-            (2) The quadratic model induced by the current Hessian approximation (orange surface) and its minimizer $x_{k+1}$ (yellow cross).
-            (3) The updated quadratic model based on the new point $x_{k+1}$ (green surface).
+            (1) Given the objective function $f$ (blue surface) and the current point $x_k$ (red point).
+            (2) Move to the minimizer $x_{k+1}$ (yellow cross) of the quadratic model $m_k(x)$ (orange surface) obtained by the current approximate Hessian.
+            (3) Update the quadratic model (green surface) and repeat this operation.
         \else
             準ニュートン法の概念図。
-            (1) 目的関数 $f$ (青い曲面) と現在点 $x_k$ (赤点)。
-            (2) 現在のヘッセ近似によって得られる二次モデル (橙色の曲面) とその最小点 $x_{k+1}$ (黄色のバツ印)。
-            (3) 新しい点 $x_{k+1}$ に基づく更新後の二次モデル (緑色の曲面)。
+            (1) 目的関数 $f$ (青い曲面) と現在点 $x_k$ (赤点)が与えられる。
+            (2) 現在の近似ヘッセ行列によって得られる二次モデル $m_k(x)$ (橙色の曲面) にて、その最小点 $x_{k+1}$ (黄色のバツ印) に移動する。
+            (3) 二次モデルを更新し (緑色の曲面)、この操作を繰り返す。
         \fi
     }
     \label{fig:quasi_newton_overview}
@@ -94,8 +96,8 @@
 \ifEn
     Let $f\colon \mathbb{R}^n \to \mathbb{R}$ be of class $C^2$.
     Suppose that a symmetric matrix $B_k$ is given as an approximation of the Hessian matrix $\nabla^2 f(x_k)$.
-    We determine an approximation Hessian $B_{k+1}$ at the next point $x_{k+1}$.
-    Although there are infinitely many possible candidates for such a matrix, it is natural to impose symmetry on $B_{k+1}$ as well, given that the true Hessian matrix is symmetric.
+    We determine an approximate Hessian $B_{k+1}$ at the next point $x_{k+1}$.
+    Although there are infinitely many possible candidates for such a matrix, it is natural to impose symmetry on $B_{k+1}$, given that the true Hessian matrix is symmetric.
     For the current point $x_k$ and the next point $x_{k+1}$,
     we define the step and gradient difference as
 \else
@@ -111,10 +113,10 @@
 \ifEn
     We assume that $y_k^\top s_k \neq 0$ and $s_k \neq 0$.
     Here, the $s$ in $s_k$ stands for step.
-    We can approximate $\nabla f(x_k)$ using the Hessian $\nabla^2 f(x_{k+1})$ and $B_{k+1}$ as follows:
+    Since the new approximation is constructed around $x_{k+1}$, we consider approximating $\nabla f(x_k)$ using the Hessian matrix $\nabla^2 f(x_{k+1})$ and $B_{k+1}$ as follows:
 \else
-    ここで $y_k^\top s_k \neq 0$ かつ $s_k \neq 0$ を仮定する。なお $s_k$ の $s$ は step を意味する。
-    ヘッセ行列 $\nabla^2 f(x_{k+1})$ および $B_{k+1}$ を用いて $\nabla f(x_k)$ を次のように近似できる:
+    $y_k^\top s_k \neq 0$ かつ $s_k \neq 0$ を仮定する。なお、$s_k$ の $s$ は step を意味する。
+    ここで、新しい近似は $x_{k+1}$ を中心に構築されるため、$\nabla f(x_k)$ をヘッセ行列 $\nabla^2 f(x_{k+1})$ および $B_{k+1}$ を用いて近似することを考える。
 \fi
 \begin{align*}
     \nabla f(x_k) & \approx \nabla f(x_{k+1}) + \nabla^2 f(x_{k+1})(x_k - x_{k+1}) \\
@@ -140,6 +142,41 @@
     This relation is called the secant condition, or the quasi-Newton equation.
 \else
     この関係はセカント条件、または準ニュートン方程式と呼ばれる。
+\fi
+
+\ifEn
+    More precisely, the secant condition can also be justified as follows. Consider a quadratic approximation model around $x_{k+1}$:
+\else
+    より厳密には、セカント条件は次のように正当化することも出来る。$x_{k+1}$ の周りの二次近似モデルを考える。
+\fi
+\begin{equation*}
+    m_{k+1}(x) = f(x_{k+1}) + \nabla f(x_{k+1})^\top (x - x_{k+1}) + \frac{1}{2} (x - x_{k+1})^\top B_{k+1} (x - x_{k+1}).
+\end{equation*}
+\ifEn
+    By construction, regardless of $B_{k+1}$, this model satisfies
+\else
+    このモデルは構成上、$B_{k+1}$と関係なしに、次を満たす:
+\fi
+\begin{equation*}
+    \begin{cases}
+        m_{k+1}(x_{k+1}) = f(x_{k+1}), \\
+        \nabla m_{k+1}(x_{k+1}) = \nabla f(x_{k+1}).
+    \end{cases}
+\end{equation*}
+\ifEn
+    Additionally, the secant condition ensures that the model satisfies
+\else
+    さらに、セカント条件はモデルが次を満たすことを保証する:
+\fi
+\begin{align*}
+    \nabla m_{k+1}(x_k) & = \nabla f(x_{k+1}) - B_{k+1} (x_{k+1} - x_k)             &  & (\text{definition of model}) \\
+                        & = \nabla f(x_{k+1}) - (\nabla f(x_{k+1}) - \nabla f(x_k)) &  & \text{(secant condition)}    \\
+                        & = \nabla f(x_k).
+\end{align*}
+\ifEn
+    This implies that the secant condition ensures that the quadratic model $m_{k+1}(x)$ accurately reflects the known information at both $x_{k+1}$ and $x_k$, except for the previous function value $f(x_k)$.
+\else
+    これはセカント条件が、二次モデル $m_{k+1}(x)$ が既知の情報を $x_{k+1}$ と $x_k$ の両方を、前の関数値 $f(x_k)$ を除いて、正確に反映していることを意味する。
 \fi
 
 \end{document}

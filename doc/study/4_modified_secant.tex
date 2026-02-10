@@ -18,60 +18,18 @@
 \fi
 
 \ifEn
-    \subsection{Standard Secant Condition}
-\else
-    \subsection{標準的なセカント条件}
-\fi
-\label{subsec:standard_secant}
-
-\ifEn
-    First, recall that the standard secant condition used in quasi-Newton methods is given by
-\else
-    まず、準ニュートン法で使用される標準的なセカント条件は以下の通りでした:
-\fi
-\begin{equation*}
-    B_{k+1} s_k = y_k.
-\end{equation*}
-To justify this condition, consider a quadratic approximation model around $x_{k+1}$:
-\begin{equation*}
-    m_{k+1}(x) = f(x_{k+1}) + \nabla f(x_{k+1})^\top (x - x_{k+1}) + \frac{1}{2} (x - x_{k+1})^\top B_{k+1} (x - x_{k+1}).
-\end{equation*}
-By construction, this model satisfies
-\begin{equation*}
-    \begin{cases}
-        m_{k+1}(x_{k+1}) = f(x_{k+1}) \\
-        \nabla m_{k+1}(x_{k+1}) = \nabla f(x_{k+1})
-    \end{cases}
-\end{equation*}
-regardless of the choice of $B_{k+1}$.
-Additionally, the secant condition ensures that the model satisfies
-\begin{align*}
-    \nabla m_{k+1}(x_k) & = \nabla f(x_{k+1}) - B_{k+1} (x_{k+1} - x_k)             &  & (\text{definition of model}) \\
-                        & = \nabla f(x_{k+1}) - (\nabla f(x_{k+1}) - \nabla f(x_k)) &  & \text{(secant condition)}    \\
-                        & = \nabla f(x_k)
-\end{align*}
-\ifEn
-    which matches the gradient information from the previous iteration.
-    Thus, by using the secant condition, we ensure that the quadratic model $m_{k+1}(x)$ accurately reflects the gradient information at both $x_{k+1}$ and $x_k$, except for the previous function value $f(x_k)$.
-\else
-    これは前の反復からの勾配情報と一致します。
-    したがって、セカント条件を使用することにより、二次モデル $m_{k+1}(x)$ が前の関数値 $f(x_k)$ を除いて、$x_{k+1}$ と $x_k$ の両方での勾配情報を正確に反映します。
-\fi
-
-\ifEn
     \subsection{Modified Secant Condition}
 \else
     \subsection{修正セカント条件}
 \fi
 
 \ifEn
-    Although the secant condition is widely used, it can fail to capture the curvature of the objective function accurately because it only matches gradient information.
+    Although the secant condition is widely used in many quasi-Newton methods, it can fail to capture the curvature of the objective function accurately because it only utilizes gradient information.
     We illustrate this limitation in \cref{fig:msec_overview}.
 \else
-    セカント条件は広く使用されていますが、勾配情報のみを照合するため、目的関数の曲率を正確に捕捉できない場合があります。
-    この制限を \cref{fig:msec_overview} で説明します。
+    セカント条件は多くの準ニュートン法で広く用いられていますが、勾配情報のみを活用するため、目的関数の曲率を正確に捉えられないことがあります。
+    このことを\cref{fig:msec_overview}で説明します。
 \fi
-
 \ifEn
     In \cref{fig:msec_explain}, we have two points $x_k$ and $x_{k+1}$ with their corresponding function values and gradients.
     In \cref{fig:ideal_model}, we see that the ideal quadratic model constructed from the exact Hessian fits well around the new point $x_{k+1}$, leading to a better convergence behavior.
@@ -86,26 +44,51 @@ Additionally, the secant condition ensures that the model satisfies
     \centering
     \begin{subfigure}[t]{0.33\textwidth}
         \includegraphics[width=\linewidth]{../imgs/modified_secant/trial_EXPLAIN.pdf}
-        \subcaption{Available function and gradient data at $x_k$ and $x_{k+1}$.}
+        % \subcaption{Points $x_k$ and $x_{k+1}$.}
+        \subcaption{
+            \ifEn
+                Points $x_k$ and $x_{k+1}$.
+            \else
+                点 $x_k$ と $x_{k+1}$。
+            \fi
+        }
         \label{fig:msec_explain}
     \end{subfigure}%
     \hfill
     \begin{subfigure}[t]{0.33\textwidth}
         \includegraphics[width=\linewidth]{../imgs/modified_secant/trial_HESS.pdf}
-        \subcaption{Ideal quadratic from the exact Hessian.}
+        \subcaption{
+            \ifEn
+                Model with the exact Hessian.
+            \else
+                正確なヘッセ行列を用いたモデル。
+            \fi
+        }
         \label{fig:ideal_model}
     \end{subfigure}%
     \hfill
     \begin{subfigure}[t]{0.33\textwidth}
         \includegraphics[width=\linewidth]{../imgs/modified_secant/trial_BFGS.pdf}
-        \subcaption{Standard secant matches gradient but not $f(x_k)$.}
+        \subcaption{
+            \ifEn
+                Model with the secant condition.
+            \else
+                セカント条件を用いたモデル。
+            \fi
+        }
         \label{fig:standard_secant}
     \end{subfigure}
     \caption{
         \ifEn
-            Motivation for modified secant equations. The standard secant update omits $f(x_k)$ and can misestimate curvature, while the modified secant condition combines function values with gradients, aiming to approximate the ideal quadratic model.
+            Limitations of the standard secant condition.
+            (a) Function values and gradients at $x_k$ and $x_{k+1}$ are already known.
+            (b) The ideal quadratic model constructed from the exact Hessian fits well around the new point $x_{k+1}$.
+            (c) The standard secant update may fail to capture curvature adequately.
         \else
-            修正セカント方程式の動機。 標準的なセカント更新は $f(x_k)$ を使用せず、曲率を誤推定する可能性がある。関数値と勾配を組み合わせた修正セカント条件は理想的な二次モデルを近似することを目的としています。
+            標準的なセカント条件の欠点。
+            (a) $x_k$ と $x_{k+1}$ での関数値と勾配が既に分かっている。
+            (b) 正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットする。
+            (c) 標準的なセカント更新では、必ずしも十分に曲率を捉えられない。
         \fi
     }
     \label{fig:msec_overview}
@@ -123,7 +106,7 @@ Additionally, the secant condition ensures that the model satisfies
     この観察は、関数値情報を取り込んでヘッセ行列の近似を改善する修正セカント条件の動機となります。
 \fi
 
-\begin{figure}[htbp]
+\begin{figure}[t]
     \centering
     \includegraphics[width=\textwidth]{../imgs/modified_secant/cubic_interpolation.pdf}
     \caption{
@@ -143,17 +126,17 @@ Additionally, the secant condition ensures that the model satisfies
 \fi
 
 \ifEn
-    \subsubsection{Function-Value-Based Modified Secant Condition}
+    \subsubsection{Function-Value-Matching Modified Secant Condition}
 \else
-    \subsubsection{関数値ベースの修正セカント条件}
+    \subsubsection{関数値一致の修正セカント条件}
 \fi
 \label{subsubsec:yuan}
 
 \ifEn
-    The first modification incorporates the function value at the previous point into the quadratic model~\citep{yuanModifiedBFGSAlgorithm1991,weiNewQuasiNewtonMethods2006, babaie-kafakiModifiedBFGSAlgorithm2011}.
+    The first modification enforces the quadratic model to match the function value at the previous point~\citep{yuanModifiedBFGSAlgorithm1991,weiNewQuasiNewtonMethods2006, babaie-kafakiModifiedBFGSAlgorithm2011}.
     Let us consider an alternate model with a different approximate Hessian $B^{\mathrm{F}}_{k+1}$:
 \else
-    最初の修正は、前の点での関数値を二次モデルに組み込みます~\citep{yuanModifiedBFGSAlgorithm1991,weiNewQuasiNewtonMethods2006, babaie-kafakiModifiedBFGSAlgorithm2011}。
+    最初の修正は、二次モデルが前の点での関数値と一致することを強制します~\citep{yuanModifiedBFGSAlgorithm1991,weiNewQuasiNewtonMethods2006, babaie-kafakiModifiedBFGSAlgorithm2011}。
     異なる近似ヘッセ行列 $B^{\mathrm{F}}_{k+1}$ を持つ別のモデルを考えましょう:
 \fi
 \begin{equation*}
@@ -169,10 +152,8 @@ Additionally, the secant condition ensures that the model satisfies
 \end{equation*}
 \ifEn
     which enforces that the function value at the previous point is correctly modeled.
-    This is the key idea behind function-value-based modified secant conditions.
 \else
     これは前の点での関数値が正しくモデル化されることを保証します。
-    これが関数値ベースの修正セカント条件の背後にある主要な考え方です。
 \fi
 
 \ifEn
@@ -180,7 +161,7 @@ Additionally, the secant condition ensures that the model satisfies
     Substituting the definition of $m^{\mathrm{F}}_{k+1}$ and using $s_k = x_{k+1} - x_k$, the condition becomes
 \else
     対応する修正セカント条件を $B^{\mathrm{F}}_{k+1}$ に対して導出しましょう。
-    $m^{\mathrm{F}}_{k+1}$ の定義を代入し、$s_k = x_{k+1} - x_k$ を使用することで、条件は以下になります
+    $m^{\mathrm{F}}_{k+1}$ の定義を代入し、$s_k = x_{k+1} - x_k$ を使用することで、条件は以下になります:
 \fi
 \begin{align*}
     f(x_k) & = f(x_{k+1}) + \nabla f(x_{k+1})^\top (x_k - x_{k+1}) + \frac{1}{2} (x_k - x_{k+1})^\top B^{\mathrm{F}}_{k+1} (x_k - x_{k+1}) \\
@@ -189,13 +170,13 @@ Additionally, the secant condition ensures that the model satisfies
 \ifEn
     Now, assume that the updated matrix has the form
 \else
-    次に、更新された行列が以下の形を持つと仮定します
+    次に、更新された行列が以下の形を持つと仮定します:
 \fi
 \begin{equation*}
-    B^{\mathrm{F}}_{k+1} s_k = y_k - \sigma^\mathrm{F}_k s_k,
+    B^{\mathrm{F}}_{k+1} s_k = y_k - \sigma^\mathrm{F}_k s_k.
 \end{equation*}
 \ifEn
-    where $\sigma^\mathrm{F}_k \in \mathbb{R}$ is a scalar to be determined.
+    Here, $\sigma^\mathrm{F}_k \in \mathbb{R}$ is a scalar to be determined.
 \else
     ここで、$\sigma^\mathrm{F}_k \in \mathbb{R}$ は決定する必要があるスカラーです。
 \fi
@@ -230,7 +211,7 @@ Substituting this equation and using $s_k^\top B^{\mathrm{F}}_{k+1} s_k = s_k^\t
 \end{equation*}
 
 \ifEn
-    This is the function-value-based modified secant condition.
+    This is the function-value-matching modified secant condition.
     Unlike the standard secant condition, this formulation ensures that the quadratic model matches not only the function value at the previous point but also the gradients at both points.
     Refer to \cref{fig:yuan_msec} for an illustration.
 \else
@@ -244,7 +225,7 @@ Substituting this equation and using $s_k^\top B^{\mathrm{F}}_{k+1} s_k = s_k^\t
     \includegraphics[width=0.7\textwidth]{../imgs/modified_secant/trial_2.pdf}
     \caption{
         \ifEn
-            Function-value-based modified secant equation. The modified secant equation $B^\mathrm{F}_k s_k = y_k + \sigma^\mathrm{F}_k s_k$ constructs a quadratic model that satisfies the function value condition $m^{\mathrm{F}}_k(x_{k-1}) = f(x_{k-1})$ at the previous point. This differs from the standard secant equation, which only matches gradients but not function values.
+            Function-value-matching modified secant equation. The modified secant equation $B^\mathrm{F}_k s_k = y_k + \sigma^\mathrm{F}_k s_k$ constructs a quadratic model that satisfies the function value condition $m^{\mathrm{F}}_k(x_{k-1}) = f(x_{k-1})$ at the previous point. This differs from the standard secant equation, which only matches gradients but not function values.
         \else
             関数値ベースの修正セカント方程式。修正セカント方程式 $B^\mathrm{F}_k s_k = y_k + \sigma^\mathrm{F}_k s_k$ は、前の点での関数値条件 $m^{\mathrm{F}}_k(x_{k-1}) = f(x_{k-1})$ を満たす二次モデルを構築します。これは勾配のみを照合し、関数値を照合しない標準的なセカント方程式とは異なります。
         \fi
@@ -350,7 +331,7 @@ Substituting this equation and using $s_k^\top B^{\mathrm{F}}_{k+1} s_k = s_k^\t
 \end{equation*}
 
 \ifEn
-    This is a cubic-augmented modified secant condition. Unlike the function-value-based quadratic modification, this formulation allows simultaneous satisfaction of both the function value and gradient conditions at the previous point through the introduction of the tensor term.
+    This is a cubic-augmented modified secant condition. Unlike the function-value-matching quadratic modification, this formulation allows simultaneous satisfaction of both the function value and gradient conditions at the previous point through the introduction of the tensor term.
     Refer to \cref{fig:zhang_models} for an illustration.
 \else
     これが3次拡張修正セカント条件です。関数値ベースの二次修正とは異なり、この定式化はテンソル項の導入を通じて前の点での関数値条件と勾配条件の両方を同時に満たすことを可能にします。
@@ -361,13 +342,26 @@ Substituting this equation and using $s_k^\top B^{\mathrm{F}}_{k+1} s_k = s_k^\t
     \centering
     \begin{subfigure}[t]{0.49\textwidth}
         \includegraphics[width=\linewidth]{../imgs/modified_secant/trial_1_cubic.pdf}
-        \subcaption{Cubic-augmented modified secant.}
+        % \subcaption{Cubic-augmented modified secant.}
+        \subcaption{
+            \ifEn
+                Cubic-augmented modified secant.
+            \else
+                3次拡張修正セカント。
+            \fi
+        }
         \label{fig:zhang_cubic}
     \end{subfigure}%
     \hfill
     \begin{subfigure}[t]{0.49\textwidth}
         \includegraphics[width=\linewidth]{../imgs/modified_secant/trial_1_quadratic.pdf}
-        \subcaption{Quadratic expansion of the cubic-augmented model.}
+        \subcaption{
+            \ifEn
+                Quadratic expansion of the cubic-augmented model.
+            \else
+                3次拡張モデルの二次展開。
+            \fi
+        }
         \label{fig:zhang_quadratic}
     \end{subfigure}
     \caption{
