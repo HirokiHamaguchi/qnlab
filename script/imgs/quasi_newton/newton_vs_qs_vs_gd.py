@@ -20,7 +20,7 @@ def run_methods(prob: RosenbrockProblem):
             {"max_iter": 1000, "tol": 1e-6},
         ),
         (
-            Method(base="Newton", label="Newton Method"),
+            Method(base="Newton", label="Newton's Method"),
             callback_newton,
             {"max_iter": 1000, "tol": 1e-6},
         ),
@@ -57,7 +57,7 @@ def main():
         prob,
         callbacks,
         labels,
-        "Rosenbrock",
+        "Comparison of Optimization Methods on Rosenbrock Function",
         pdf_path=str(OUTPUT_DIR / "newton_vs_qs_vs_gd"),
         max_length=100,
         use_tex=True,

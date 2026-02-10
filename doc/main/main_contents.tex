@@ -63,8 +63,7 @@ In contrast, regularized quasi-Newton methods compute the step as
 with a regularization parameter $\mu_k \ge 0$.
 Combining regularization with line search is also possible and has been explored~\citep{uedaConvergencePropertiesRegularized2010}.
 
-A fundamental strategy for choosing $\mu_k$ in nonconvex optimization
-was proposed in earlier work on regularized Newton methods~\citep{uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,shengNewAdaptiveTrust2018}. Their formulation sets
+A fundamental strategy for choosing $\mu_k$ in nonconvex optimization was proposed in earlier work on regularized Newton methods~\citep{uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,shengNewAdaptiveTrust2018}. Their formulation sets
 \begin{equation}
     \mu_k = c_1 \max(0, -\lambda_{\min}(B_k)) + c_2 \norm{\nabla f(x_k)}^\delta,
     \label{eq:ueda_mu}
@@ -828,7 +827,7 @@ All experiments were conducted on a Microsoft Windows 11 Home system (version~10
 
 \subsubsection{Test Problems and Settings}\label{sssec:problems}
 
-We evaluated all algorithms on unconstrained problems from the CUTEst collection~\citep{gouldCUTEstConstrainedUnconstrained2015}, implemented in Python using the PyCUTEst interface~\citep{PyCUTEst2022}.
+We evaluated all algorithms on unconstrained problems from the CUTEst benchmark collection~\citep{gouldCUTEstConstrainedUnconstrained2015}, implemented in Python using the PyCUTEst interface~\citep{PyCUTEst2022}.
 All problems were initialized with the default starting points provided by the library.
 Following the previous work~\citep{kanzowRegularizationLimitedMemory2023}, we excluded 17 problems where either the initial point is already stationary or all algorithms are known to fail.
 This left 220 test problems.

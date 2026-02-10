@@ -82,7 +82,7 @@
 \ifEn
     If $f$ is nonconvex and the Hessian $\nabla^2 f(x_k)$ is negative definite or indefinite, function values are not guaranteed to decrease, and Newton's method may fail to converge.
     Therefore, checking the positive definiteness of the Hessian is important when applying Newton's method.
-    The modified Newton method~\citep[Sec. 3.4]{nocedal1999numerical} is one remedy for handling such cases.
+    The modified Newton's method~\citep[Sec. 3.4]{nocedal1999numerical} is one remedy for handling such cases.
 \else
     $f$ が非凸であり、ヘッセ行列 $\nabla^2 f(x_k)$ が負定値または不定値である場合、関数値の減少は保証されず、ニュートン法は収束しないことがある。
     したがって、ニュートン法の適用ではヘッセ行列の正定値性の確認が重要である。
@@ -564,7 +564,7 @@
 
 \ifEn
     To avoid the issues described above, it is common practice to select the step size $\alpha_k$ appropriately using a line search.
-    Newton's method equipped with line search is often referred to as the modified Newton method and is known to possess global convergence properties.
+    Newton's method equipped with line search is often referred to as the modified Newton's method and is known to possess global convergence properties.
 \else
     上記の問題を避けるため、線形探索を用いてステップサイズ $\alpha_k$ を適切に選ぶことが一般的である。
     線形探索を備えたニュートン法は修正ニュートン法と呼ばれることが多く、大域収束性を持つことが知られている。

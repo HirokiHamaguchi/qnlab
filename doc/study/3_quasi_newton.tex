@@ -79,9 +79,10 @@
 \end{figure}
 
 \ifEn
-    The core of quasi-Newton methods lies in how to update $B_k$ (or its inverse $H_k$) at each iteration so that it approaches the Hessian matrix $\nabla^2 f(x_k)$. \Cref{fig:quasi_newton_overview} illustrates this concept. First, around the current point $x_k$, a quadratic approximation model of the objective function $f$ is constructed using $B_k$. Next, this quadratic model is minimized to obtain the next point $x_{k+1}$. After obtaining $x_{k+1}$, the approximation matrix $B_k$ is updated to $B_{k+1}$ using the gradient information at $x_k$ and $x_{k+1}$. This procedure is repeated until convergence, which constitutes the quasi-Newton method.
+    The core of quasi-Newton methods lies in how to update $B_k$ at each iteration so that it approaches the true Hessian matrix.
+    \Cref{fig:quasi_newton_overview} illustrates this concept. First, around the current point $x_k$, a quadratic approximation model of the objective function $f$ is constructed using $B_k$. Next, this quadratic model is minimized to obtain the next point $x_{k+1}$. After obtaining $x_{k+1}$, the approximation matrix $B_k$ is updated to $B_{k+1}$ using the gradient information at $x_k$ and $x_{k+1}$. This procedure is repeated until convergence, which constitutes the quasi-Newton method.
 \else
-    準ニュートン法の核心は、各反復で $B_k$ (またはその逆行列 $H_k$) をどのように更新してヘッセ行列 $\nabla^2 f(x_k)$ に近づけるかにある。\Cref{fig:quasi_newton_overview} はこの概念を示す。まず現在点 $x_k$ の周りで、$B_k$ を用いて目的関数 $f$ の二次近似モデルを構成する。次にこの二次モデルを最小化して次の点 $x_{k+1}$ を得る。$x_{k+1}$ を得た後、$x_k$ と $x_{k+1}$ における勾配情報を用いて近似行列 $B_k$ を $B_{k+1}$ に更新する。この手続きを収束まで繰り返すことが準ニュートン法である。
+    準ニュートン法の核心は、各反復で $B_k$ をどのように更新して真のヘッセ行列に近づけるかにある。\Cref{fig:quasi_newton_overview} はこの概念を示す。まず現在点 $x_k$ の周りで、$B_k$ を用いて目的関数 $f$ の二次近似モデルを構成する。次にこの二次モデルを最小化して次の点 $x_{k+1}$ を得る。$x_{k+1}$ を得た後、$x_k$ と $x_{k+1}$ における勾配情報を用いて近似行列 $B_k$ を $B_{k+1}$ に更新する。この手続きを収束まで繰り返すことが準ニュートン法である。
 \fi
 
 \ifEn
@@ -105,7 +106,7 @@
     現在点 $x_k$ と次点 $x_{k+1}$ に対して、ステップと勾配差を次で定義する。
 \fi
 \begin{equation*}
-    s_k = x_{k+1} - x_k, \qquad   y_k = \nabla f(x_{k+1}) - \nabla f(x_k).
+    s_k \coloneq x_{k+1} - x_k, \qquad   y_k \coloneq \nabla f(x_{k+1}) - \nabla f(x_k).
 \end{equation*}
 \ifEn
     We assume that $y_k^\top s_k \neq 0$ and $s_k \neq 0$.

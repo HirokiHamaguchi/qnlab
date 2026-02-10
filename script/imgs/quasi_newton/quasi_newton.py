@@ -104,32 +104,61 @@ def beautify_ax(ax, transparent_panes=False):
         ax.zaxis.line.set_alpha(1.0)
 
 
-def draw_common_elements(ax, is_kp1=False):
+def draw_common_elements(ax, draw_type:int):
     """共通の描画要素（点、テキスト、線）を描画する関数"""
+    if draw_type == 1:
+        x_now = x_k
+        x_next=None
+    elif draw_type == 2:
+        x_now = x_k
+        x_next = x_kp1
+    elif draw_type == 3:
+        x_now = x_kp1
+        x_next= x_kp2
+
     # x_k の点とテキスト
-    if not is_kp1:
-        ax.scatter([x_k[0]], [x_k[1]], [f(x_k)], s=100, color="red")
-        ax.text(
-            x_k[0],
-            x_k[1] + 0.2,
-            f(x_k),
-            r"$x_k$",
-            fontsize=45,
-            color="red",
+    ax.scatter(
+        [x_now[0]], [x_now[1]], [f(x_now)], s=100, color="red"
+    )
+    ax.text(
+        x_now[0],
+        x_now[1] + 0.2,
+        f(x_now),
+        r"$x_{k" + ("}$" if draw_type <= 2 else r"+1}$"),
+        fontsize=45,
+        color="red",
+    )
+
+    # ステップ s_k の線とテキスト
+    if x_next is not None:
+        ax.plot(
+            [x_now[0], x_next[0]],
+            [x_now[1], x_next[1]],
+            [f(x_now), f(x_next)],
+            linewidth=2,
+            color="k",
         )
-    else:
+        mid = x_now + 0.5 * (x_next - x_now)
+        ax.text(
+            mid[0] - 0.2,
+            mid[1] - 0.3,
+            f(mid),
+            r"$s_k$" if draw_type == 2 else r"$s_{k+1}$",
+            fontsize=30
+        )
+
+        # x_k の点とテキスト
         ax.scatter(
-            [x_kp1[0]], [x_kp1[1]], [f(x_kp1)], s=100, color="yellow", marker="x"
+            [x_next[0]], [x_next[1]], [f(x_next)], s=100, color="yellow"
         )
         ax.text(
-            x_kp1[0],
-            x_kp1[1] + 0.2,
-            f(x_kp1),
-            r"$x_{k+1}$",
+            x_next[0],
+            x_next[1] + (0.2 if draw_type == 2 else -0.2),
+            f(x_next),
+            r"$x_{k+1}$" if draw_type == 2 else r"$x_{k+2}$",
             fontsize=45,
             color="yellow",
         )
-
 
 def draw_surface_z(ax, alpha):
     """Z（元の関数）のサーフェスを描画"""
@@ -160,25 +189,6 @@ def draw_surface_quadratic(ax, Q, color, alpha):
             color="tab:green",
         )
 
-
-def draw_step_elements(ax):
-    """ステップ関連の要素（x_{k+1}, s_k）を描画"""
-    # x_{k+1} の点とテキスト
-    ax.scatter([x_kp1[0]], [x_kp1[1]], [f(x_kp1)], s=100, marker="x", color="yellow")
-    ax.text(
-        x_kp1[0], x_kp1[1] + 0.2, f(x_kp1), r"$x_{k+1}$", fontsize=45, color="yellow"
-    )
-
-    # ステップ s_k の線とテキスト
-    ax.plot(
-        [x_k[0], x_kp1[0]],
-        [x_k[1], x_kp1[1]],
-        [f(x_k), f(x_kp1)],
-        linewidth=2,
-        color="k",
-    )
-    mid = x_k + 0.5 * s_k
-    ax.text(mid[0] - 0.2, mid[1] - 0.3, f(mid), r"$s_k$", fontsize=30)
 
 
 def create_enhanced_figure(draw_func, filename):
@@ -239,7 +249,7 @@ def create_enhanced_figure(draw_func, filename):
 def draw_panel1(ax, transparent_surfaces=True):
     if transparent_surfaces:
         draw_surface_z(ax, alpha=0.0)
-        draw_common_elements(ax)
+        draw_common_elements(ax, 1)
         ax.text2D(
             0.65,
             0.7,
@@ -265,8 +275,7 @@ def draw_panel2(ax, transparent_surfaces=True):
     if transparent_surfaces:
         draw_surface_z(ax, alpha=0.0)
         draw_surface_quadratic(ax, Q_Bk, "tab:orange", alpha=0.0)
-        draw_common_elements(ax)
-        draw_step_elements(ax)
+        draw_common_elements(ax, 2)
     else:
         draw_surface_z(ax, alpha=1.0)
         draw_surface_quadratic(ax, Q_Bk, "tab:orange", alpha=0.7)
@@ -283,12 +292,13 @@ assert np.all(np.linalg.eigvals(B_kp1) > 0)
 
 Q_Bkp1 = quadratic_surface(B_kp1, x_k, g_k, X, Y)
 
+x_kp2 = x_kp1 - np.linalg.solve(B_kp1, g_kp1)
 
 def draw_panel3(ax, transparent_surfaces=True):
     if transparent_surfaces:
         draw_surface_z(ax, alpha=0.0)
         draw_surface_quadratic(ax, Q_Bkp1, "tab:green", alpha=0.0)
-        draw_common_elements(ax, is_kp1=True)
+        draw_common_elements(ax, 3)
     else:
         draw_surface_z(ax, alpha=1.0)
         draw_surface_quadratic(ax, Q_Bkp1, "tab:green", alpha=0.7)
