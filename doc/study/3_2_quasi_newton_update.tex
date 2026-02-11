@@ -164,7 +164,7 @@
 \ifEn
     Note that this update rule does not preserve symmetry. In the following, we introduce representative quasi-Newton update rules that improve upon this aspect.
 \else
-    この更新則は、対称性を保たないという点に注意して下さい。以下では、その点を改善した代表的な準ニュートン更新則を紹介します。
+    この更新則は、対称性を保たないという点に注意してください。以下では、その点を改善した代表的な準ニュートン更新則を紹介します。
 \fi
 
 \ifEn
@@ -725,7 +725,7 @@
 \else
     更なる詳細については
     \citep{kanamoriBregmanExtensionQuasiNewton2010,kanamoriBregmanExtensionQuasiNewton2010a}
-    をご参照下さい。
+    をご参照ください。
     \href{http://matsuzoe.web.nitech.ac.jp/infogeo/OCAMI2010/kanamori.pdf}{こちらのスライド}
     も参考になります。
 \fi
@@ -768,7 +768,7 @@
     Note that this BFGS update formula for $H_{k+1}$ has the same form as the DFP update formula for $B_{k+1}$. These are dual to each other.
     We now prove that this equation indeed gives the inverse of the BFGS update.
 \else
-    なお、このBFGS更新における $H_{k+1}$ の公式は、DFP更新則における $B_{k+1}$ の形式と同じであることに注意して下さい。これらは双対の関係にあります。
+    なお、このBFGS更新における $H_{k+1}$ の公式は、DFP更新則における $B_{k+1}$ の形式と同じであることに注意してください。これらは双対の関係にあります。
     以下では、この式が確かにBFGS更新の逆行列を与えることを示します。
 \fi
 
@@ -1083,7 +1083,7 @@
     See~\citep{powellHowBadAre1986} for details on this choice.
 \else
     これはPowellの元の解析に沿ったものです。
-    この選択の詳細は~\citep{powellHowBadAre1986}を参照して下さい。
+    この選択の詳細は~\citep{powellHowBadAre1986}を参照してください。
 \fi
 \ifEn
     The iteration continues until the norm of the current point falls below a tolerance relative to its initial norm.
@@ -1235,7 +1235,7 @@
     以下では、準ニュートン法を大規模最適化問題へ拡張する際に重要となる、記憶制限準ニュートン法について説明します。
     通常の準ニュートン法では、近似ヘッセ行列 $B_k$ またはその逆行列 $H_k$ を密行列として陽に保存・更新するため、$n$ 変数に対して $\mathcal{O}(n^2)$ のメモリを要します。
     一方で、記憶制限準ニュートン法では、最新の $m$ 組のベクトルペア $\{(s_i,y_i)\}$ という限られた情報のみを保持して、その情報だけから近似ヘッセ行列に関する計算を行います。
-    この工夫により空間計算量は $\mathcal{O}(nm)$ に減少し、$m$ が小さな定数(通常 $m\le 10$) のとき大幅な改善となります。
+    この工夫により空間計算量は $\mathcal{O}(nm)$ に減少し、$m$ が小さな定数(通常は $m\le 10$) のとき大幅な改善となります。
     特に、BFGS更新の記憶制限版であるL-BFGS法~\citep{liuLimitedMemoryBFGS1989a}は、特にその代表的な手法です。
     このBFGS更新の場合に注目し、限られた情報だけを用いて準ニュートン方向 $d_k = -H_k g_k$ を空間計算量・時間計算量の両面で効率的に計算する方法を示します。
 \fi
