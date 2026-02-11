@@ -451,9 +451,9 @@ To this purpose, we introduce the following constant:
     It also holds that $\overline{f}(x_0) \ge \overline{f}(x_{k_{\ell}})$ from \cref{eq:mu_0_condition} with $j=0$ and $k=k_{\ell}$. We also have $\overline{f}(x_{k_{\ell}}) \ge \overline{f}^*$ from \cref{ass:bounded} and \cref{eq:ass_bounded_overline_f}.
     Thus, \cref{eq:telescoping_sum_Delta_K0} can be further bounded as
     \begin{align*}
-        \sum_{k \in K^0} \Delta_{k} & \leq \overline{f}(x_0) - \overline{f}(x_{k_{\ell}}) + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k_{\ell}}), -\overline{f}(x_{k_{\ell}+1})) &  & \text{(\cref{eq:relaxed_Armijo_condition})} \\
-                                    & \leq \overline{f}(x_0) - \overline{f}^* + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{0}), -\overline{f}^*)                                  &  & \text{(\cref{eq:ass_bounded_overline_f})}   \\
-                                    & = \overline{f}(x_0) - \overline{f}^* + \Delta_{\max}.                                                                                           &  & \text{(\cref{eq:def_Delta_max})}
+        \sum_{k \in K^0} \Delta_{k} & \leq \overline{f}(x_0) - \overline{f}(x_{k_{\ell}}) + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k_{\ell}}), -\overline{f}(x_{k_{\ell}+1})) &  & (\text{\cref{eq:relaxed_Armijo_condition}}) \\
+                                    & \leq \overline{f}(x_0) - \overline{f}^* + \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{0}), -\overline{f}^*)                                  &  & (\text{\cref{eq:ass_bounded_overline_f}})   \\
+                                    & = \overline{f}(x_0) - \overline{f}^* + \Delta_{\max}.                                                                                           &  & (\text{\cref{eq:def_Delta_max}})
     \end{align*}
     This completes the proof.
     \myQED

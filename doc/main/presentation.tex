@@ -273,8 +273,8 @@
     停止条件は $\norm{\nabla \overline{f}(x)} \leq \gtol$ なので、過程では常に $\norm{\nabla \overline{f}(x)} > \gtol$ が成立する。
     \begin{exampleblock}{勾配に対する誤差モデル: 誤差が $\gtol$ より十分小さい}
         \begin{equation*}
-            \text{(数値実験)} \norm{\nabla f(x)-\nabla\overline{f}(x)}\ll\gtol, \qquad
-            \text{(理論解析)} \norm{\nabla f(x)-\nabla\overline{f}(x)}=0.
+            (\text{数値実験}) \norm{\nabla f(x)-\nabla\overline{f}(x)}\ll\gtol, \qquad
+            (\text{理論解析}) \norm{\nabla f(x)-\nabla\overline{f}(x)}=0.
         \end{equation*}
     \end{exampleblock}
 \end{frame}
@@ -353,7 +353,7 @@
             f(x) \ge f^* \defeq \inf_{x \in \bbR^n} f(x) > -\infty.
         \end{equation*}
     \end{block}
-    \begin{block}{仮定2: 目的関数 $f$ の $L$-smooth性}
+    \begin{block}{仮定2: 目的関数 $f$ の $L$-平滑性}
         \begin{equation*}
             \exists\, 0< L < \infty \quad\text{s.t.}\quad f(y) \le f(x) + \nabla f(x)^\top (y - x) + \frac{L}{2} \norm{y - x}^2.
         \end{equation*}
@@ -366,7 +366,7 @@
 \begin{frame}{収束解析の概要: コアとなる不等式}
     \vspace{-0.7em}
     \begin{equation*}
-        K^0 = \{k \in K \mid \mu_k = 0\}, \; K^+ = \{k \in K \mid \mu_k > 0\}, \; \text{(Armijo定数) }c, \; \text{(smooth性) }L.
+        K^0 = \{k \in K \mid \mu_k = 0\}, \; K^+ = \{k \in K \mid \mu_k > 0\}, \; (\text{Armijo定数}) c, \; (\text{平滑性}) L.
     \end{equation*}
     \vspace{-0.7em}
     \begin{block}{勾配ノルム和に対する複合的な上界評価}
@@ -560,8 +560,8 @@
         \end{itemize}
     \end{columns}
     \begin{align*}
-        \text{(近似ヘッセ行列)} &  & B_k & \approx\mathrm{BFGS}(\{s_{k_i},\overline{y}_{k_i}+\mu_k s_{k_i}\}_{i=0}^{p-1})-\mu_k I, \\
-        \text{(探索方向)}    &  & d_k & =-(B_k+\mu_k I)^{-1}\nabla f(x_k) = -\mathrm{BFGS}(\dots)^{-1}\nabla f(x_k).
+        (\text{近似ヘッセ行列}) &  & B_k & \approx\mathrm{BFGS}(\{s_{k_i},\overline{y}_{k_i}+\mu_k s_{k_i}\}_{i=0}^{p-1})-\mu_k I, \\
+        (\text{探索方向})    &  & d_k & =-(B_k+\mu_k I)^{-1}\nabla f(x_k) = -\mathrm{BFGS}(\dots)^{-1}\nabla f(x_k).
     \end{align*}
 \end{frame}
 

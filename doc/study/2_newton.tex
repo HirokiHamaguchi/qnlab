@@ -70,7 +70,7 @@
     Thus, we introduce a step size $\alpha_k > 0$ determined by line search to ensure a sufficient decrease in function values, leading to the update rule presented initially.
     This is the basic procedure of Newton's method.
 \else
-    次の反復点として、直接$x^*$を選ぶことは自然に思えますが、後で見るように一般にこのままでは大域収束性を保証できません。
+    次の反復点として、直接 $x^*$ を選ぶことは自然に思えますが、後で見るように一般にこのままでは大域収束性を保証できません。
     そこで、関数値の十分な減少を確保するため、直線探索で定めるステップサイズ $\alpha_k > 0$ を導入すると、最初に示した更新式が得られます。
     これがニュートン法の基本的な手続きとなります。
 \fi
@@ -219,9 +219,9 @@
         よって、
     \fi
     \begin{align*}
-        f(x_{k+1}) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k                                          &  & \text{(Armijo condition)}         \\
-                   & \leq f(x_k) - c_1 \frac{1 - c_2}{L} \frac{(g_k^\top d_k)^2}{\lVert d_k \rVert^2} &  & \text{(previous inequality)}      \\
-                   & = f(x_k) - c_1 \frac{1 - c_2}{L} \cos^2 \theta_k \lVert g_k \rVert^2.            &  & \text{(definition of $\theta_k$)}
+        f(x_{k+1}) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k                                          &  & (\text{Armijo condition})         \\
+                   & \leq f(x_k) - c_1 \frac{1 - c_2}{L} \frac{(g_k^\top d_k)^2}{\lVert d_k \rVert^2} &  & (\text{previous inequality})      \\
+                   & = f(x_k) - c_1 \frac{1 - c_2}{L} \cos^2 \theta_k \lVert g_k \rVert^2.            &  & (\text{definition of $\theta_k$})
     \end{align*}
     \ifEn
         By repeatedly applying this inequality, we obtain
@@ -262,6 +262,7 @@
     \else
         よって、Wolfe条件による直線探索付きの一般的な反復法に対する大域収束性が示されました。
     \fi
+    \myQED
 \end{proof}
 
 \ifEn
