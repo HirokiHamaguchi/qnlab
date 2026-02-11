@@ -1,7 +1,7 @@
 import numpy as np
 import numpy.typing as npt
 
-from qnlab.update.update import check_direction, get_direction, get_direction_reg
+from qnlab.update.update import check_direction, get_direction
 from qnlab.util.memory_interface import QuasiNewtonMemory
 from qnlab.util.method import Method
 
@@ -13,7 +13,7 @@ def generate_lm(
     npt.NDArray[np.float64],
     QuasiNewtonMemory,
 ]:
-    lm = QuasiNewtonMemory(np.zeros(n), maxlen=3, method=Method())
+    lm = QuasiNewtonMemory(np.zeros(n), maxlen=maxlen, method=Method())
 
     A = np.random.randn(n, n)
     A = A @ A.T  # SPD
@@ -68,7 +68,7 @@ def test_dir_SR1_and_check():
     method = Method("Line", "raw", "raw", "sr1")
     for _ in range(10):
         xk, gk, lm = generate_lm(n)
-        d_sr1 = get_direction_reg(method, xk, gk, lm, mu=np.float64(0.0))
+        d_sr1 = get_direction(method, xk, gk, lm)
         check_direction(method, n, gk, d_sr1, lm)
     print("SR1 passed")
 
@@ -78,7 +78,7 @@ def test_dir_PSB_and_check():
     method = Method("Line", "raw", "raw", "psb")
     for _ in range(10):
         xk, gk, lm = generate_lm(n)
-        d_psb = get_direction_reg(method, xk, gk, lm, mu=np.float64(0.0))
+        d_psb = get_direction(method, xk, gk, lm)
         check_direction(method, n, gk, d_psb, lm)
     print("PSB passed")
 
