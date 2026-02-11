@@ -281,7 +281,7 @@
 
 \begin{frame}{キーワード:目的関数値非依存最適化 \citep{grattonOFFOMinimizationAlgorithms2023}}
     機械学習分野での需要などから近年発展してきた手法。\\
-    AdaGrad や AdaGrad-Norm などの最適化手法は、勾配だけで最適化を行う:
+    AdaGrad や AdaGrad-Norm などの最適化手法は、勾配だけで最適化を行う。
     \begin{align*}
         (\text{AdaGrad}) \quad x_{k+1}^{(i)} & = x_k^{(i)} - \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k (\nabla f(x_j)^{(i)})^2}} \nabla f(x_k)^{(i)}, \\
         (\text{AdaGrad-Norm}) \quad x_{k+1}  & = x_k - \frac{1}{\theta\sqrt{\varsigma + \sum_{j=0}^k \norm{\nabla f(x_j)}^2}}\,\nabla f(x_k).
@@ -347,7 +347,7 @@
 \begin{frame}{理論解析における仮定}
     以下では、提案手法が適切な仮定の下で収束することを示す。\\[1em]
 
-    最適化問題は、次の非常に標準的な2つの仮定を満たすとする:
+    最適化問題は、次の非常に標準的な2つの仮定を満たすとする。
     \begin{block}{仮定1: 目的関数 $f$ の下側に関する有界性}
         \begin{equation*}
             f(x) \ge f^* \defeq \inf_{x \in \bbR^n} f(x) > -\infty.
@@ -403,7 +403,7 @@
 
 \begin{frame}{大域収束率の結論}
     \begin{block}{主結果}
-        仮定1,2の下で、任意の反復回数 $k_{\max}>0$ に対し、提案手法は以下を満たす:
+        仮定1,2の下で、任意の反復回数 $k_{\max}>0$ に対し、提案手法は以下を満たす。
         \begin{equation*}
             \sum_{j=0}^{k_{\max}-1} \norm{\nabla f(x_j)}^2 \le \text{const.}
             \implies

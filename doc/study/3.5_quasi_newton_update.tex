@@ -98,7 +98,7 @@
         Hence $\bar{B}_{\mathrm{Broyden}}$ indeed satisfies the conditions imposed on $\bar{B}$.
         Therefore, by uniqueness, we have $\bar{B} = \bar{B}_{\mathrm{Broyden}}$.
     \else
-        したがって $\bar{B}_{\mathrm{Broyden}}$ は $\bar{B}$ に課された条件を満たす。
+        従って $\bar{B}_{\mathrm{Broyden}}$ は $\bar{B}$ に課された条件を満たす。
         ゆえに一意性より $\bar{B} = \bar{B}_{\mathrm{Broyden}}$ を得る。
     \fi
     \myQED
@@ -161,7 +161,7 @@
         Thus, $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$.
     \else
         最後の不等式ではフロベニウスノルムの劣乗法性と $\lVert ss^\top/(s^\top s) \rVert_F=1$ を用いた。
-        したがって $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$ である。
+        従って $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$ である。
     \fi
     \myQED
 \end{proof}
@@ -237,7 +237,7 @@
 \ifEn
     Thus, we obtain
 \else
-    したがって
+    従って
 \fi
 \begin{equation*}
     \bar{B}_{\mathrm{SR1}}
@@ -339,7 +339,7 @@
     \ifEn
         The sequence $\{ C_{t} \}_{t=0}^{\infty}$ converges, and the limit is given by
     \else
-        行列の列 $\{ C_{t} \}_{t=0}^{\infty}$ は収束し、その極限は次で与えられる:
+        行列の列 $\{ C_{t} \}_{t=0}^{\infty}$ は収束し、その極限は次で与えられる。
     \fi
     \begin{equation*}
         \lim_{t \to \infty} C_{t}
@@ -419,7 +419,7 @@
         行列 $cs^\top/c^\top s$ はランク1で固有値は $1,0,\dots,0$ である。
         よって $P$ は固有値 $0$ を一つ持ち、残りはすべて $1/2$ である。
         とくにスペクトル半径は $1/2<1$ となる。
-        したがってノイマン級数が収束し、次が成り立つ。
+        従ってノイマン級数が収束し、次が成り立つ。
     \fi
     \begin{align*}
         \sum_{t=0}^{\infty}w_t & =        \sum_{t=0}^{\infty}P^t(y-Bs)                         &  & (w_0=y-Bs)                \\
@@ -473,7 +473,7 @@
         Therefore both subsequences $\{ C_{2t} \}$ and $\{ C_{2t+1} \}$ converge to $C_{\infty}$,
         completing the proof.
     \else
-        したがって部分列 $\{ C_{2t} \}$ と $\{ C_{2t+1} \}$ はどちらも $C_{\infty}$ に収束し、証明を完了する。
+        従って部分列 $\{ C_{2t} \}$ と $\{ C_{2t+1} \}$ はどちらも $C_{\infty}$ に収束し、証明を完了する。
     \fi
     \myQED
 \end{proof}
@@ -572,7 +572,7 @@
     \paragraph{KL ダイバージェンス最小化による導出}
 \fi
 
-KLダイバージェンスとは、行列間の近さを測る一種の非対称な尺度であり、正定値行列 $P,Q \in \mathbb{R}^{n \times n}$ に対して次で定義される:
+KLダイバージェンスとは、行列間の近さを測る一種の非対称な尺度であり、正定値行列 $P,Q \in \mathbb{R}^{n \times n}$ に対して次で定義される。
 \begin{equation*}
     \mathrm{KL}(P,Q) \coloneqq \mathrm{tr}(P Q^{-1}) - \log\det(P Q^{-1}) - n.
 \end{equation*}
@@ -605,7 +605,7 @@ BFGS 更新はKLダイバージェンスを用いた次の最適化問題の解�
     \begin{equation*}
         s' \coloneqq B^{\frac{1}{2}} s, \quad y' \coloneqq B^{-\frac{1}{2}} y, \quad B' \coloneqq B^{-\frac{1}{2}} \bar{B} B^{-\frac{1}{2}}
     \end{equation*}
-    と置くと、最適化問題は次のように書き直せる:
+    と置くと、最適化問題は次のように書き直せる。
     \begin{align*}
         \underset{B' \succ 0}{\text{minimize}} & \quad \mathrm{KL}(B', I) \\
         \text{subject to}                      & \quad B' s' = y'.
@@ -619,14 +619,14 @@ BFGS 更新はKLダイバージェンスを用いた次の最適化問題の解�
         \mathcal{L}(B',\lambda,\Lambda) = \mathrm{tr}(B') -\log\det(B') -n +2\lambda^\top(B's'-y') +\mathrm{tr}\left(\Lambda(B'-B'^\top)\right)
     \end{equation*}
     と定義する。
-    KKT条件のうち停留性に関する条件は、行列微分の公式 ($X \succ 0$ に対して、$\log\det(X)$ の微分が $X^{-\top}$ かつ、 $\mathrm{tr}(AX)$ の微分が $A^\top$) を用いて $B'$ で微分し、$B'=B'^\top$ を用いることで次のように書ける:
+    KKT条件のうち停留性に関する条件は、行列微分の公式 ($X \succ 0$ に対して、$\log\det(X)$ の微分が $X^{-\top}$ かつ、 $\mathrm{tr}(AX)$ の微分が $A^\top$) を用いて $B'$ で微分し、$B'=B'^\top$ を用いることで次のように書ける。
     \begin{equation*}
         I-B'^{-1}
         +2\lambda s'^\top
         +\Lambda^\top-\Lambda
         =0.
     \end{equation*}
-    この式とその転置を加えて2で割り、再び $B' = B'^\top$ を用いると次を得る:
+    この式とその転置を加えて2で割り、再び $B' = B'^\top$ を用いると次を得る。
     \begin{equation*}
         B'^{-1} = I+\lambda s'^\top+s'\lambda^\top.
     \end{equation*}
@@ -830,7 +830,7 @@ BFGS 更新はKLダイバージェンスを用いた次の最適化問題の解�
     This is closely related to assumptions on the Hessian eigenvalues of the objective function, such as $\mu$-strong convexity and $L$-smoothness.
 \else
     更新行列の固有値挙動の解析に有用な、BFGS 更新のトレースと行列式の公式も示す。
-    エルミート行列ではこれらはそれぞれ固有値の総和と積に対応する。したがってトレースと行列式が適切に有界なら、固有値自体も有界に保たれると期待できる(例えばすべての固有値が正である場合)。
+    エルミート行列ではこれらはそれぞれ固有値の総和と積に対応する。従ってトレースと行列式が適切に有界なら、固有値自体も有界に保たれると期待できる(例えばすべての固有値が正である場合)。
     これは $\mu$-強凸性や $L$-平滑性など、目的関数のヘッセ行列固有値に関する仮定と密接に関係する。
 \fi
 
@@ -984,7 +984,7 @@ BFGS 更新はKLダイバージェンスを用いた次の最適化問題の解�
 \ifEn
     Although BFGS and DFP are quite symmetric in structure, they exhibit remarkably different practical efficiency when applied to real optimization problems. Powell's analysis~\citep{powellHowBadAre1986} investigates this asymmetry by studying the behavior of both methods on a simple two-dimensional quadratic function. While asymptotic convergence theory often suggests that both methods should perform similarly, Powell reveals that their practical efficiency can differ dramatically, especially when the approximate Hessian is far from the true Hessian.
 \else
-    BFGS と DFP は構造的にはかなり対称的であるにもかかわらず、実際の最適化問題に適用すると実用上の効率は大きく異なる。Powell の解析~\citep{powellHowBadAre1986} は、単純な2次元二次関数に対する両手法の挙動を調べてこの非対称性を検討した。漸近収束理論では両者は同程度に振る舞うと示唆されることが多いが、Powell は実用上の効率が大きく異なること、とくに近似ヘッセ行列が真のヘッセ行列から遠い場合に差が顕著であることを示した。
+    BFGS と DFP は構造的にはかなり対称的であるにもかかわらず、実際の最適化問題に適用すると実用上の効率は大きく異なる。Powell の解析~\citep{powellHowBadAre1986} は、単純な二次元二次関数に対する両手法の挙動を調べてこの非対称性を検討した。漸近収束理論では両者は同程度に振る舞うと示唆されることが多いが、Powell は実用上の効率が大きく異なること、とくに近似ヘッセ行列が真のヘッセ行列から遠い場合に差が顕著であることを示した。
 \fi
 
 \ifEn
@@ -1004,7 +1004,7 @@ BFGS 更新はKLダイバージェンスを用いた次の最適化問題の解�
 \ifEn
     with both BFGS and DFP methods using a fixed step size of $\alpha_k = 1$ at every iteration. This choice of unit step size is practical for quadratic functions, where it often satisfies standard line search criteria.
 \else
-    そして BFGS と DFP のどちらも各反復で固定ステップサイズ $\alpha_k = 1$ を用いる。二次関数ではこの単位ステップが標準的な線形探索条件を満たすことが多く、実用的な選択である。
+    そして BFGS と DFP のどちらも各反復で固定ステップサイズ $\alpha_k = 1$ を用いる。二次関数ではこの単位ステップが標準的な直線探索条件を満たすことが多く、実用的な選択である。
 \fi
 
 \ifEn
@@ -1373,7 +1373,7 @@ BFGS 更新はKLダイバージェンスを用いた次の最適化問題の解�
 \ifEn
     Thus, the two-loop recursion exactly evaluates the action of $H_m$ on a vector while avoiding explicit matrix construction, achieving both mathematical rigor and computational efficiency.
 \else
-    したがって二重ループ再帰は、行列を明示的に構成せずに $H_m$ の作用を正確に評価し、数学的厳密さと計算効率の両方を実現する。
+    従って二重ループ再帰は、行列を明示的に構成せずに $H_m$ の作用を正確に評価し、数学的厳密さと計算効率の両方を実現する。
 \fi
 
 \ifEn

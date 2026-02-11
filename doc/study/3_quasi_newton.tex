@@ -16,9 +16,9 @@
     \includegraphics[width=\textwidth]{../imgs/quasi_newton/newton_vs_qs_vs_gd.pdf}
     \caption{
         \ifEn
-            Comparison of Newton's method, quasi-Newton methods, and gradient descent
+            Comparison of Newton's method, quasi-Newton methods, and gradient descent.
         \else
-            ニュートン法、準ニュートン法、勾配降下法の比較
+            ニュートン法、準ニュートン法、勾配降下法の比較。
         \fi
     }
     \label{fig:newton_vs_qs_vs_gd}
@@ -27,7 +27,8 @@
 \ifEn
     In this section, we discuss quasi-Newton methods. Quasi-Newton methods are based on Newton's method, but aim to reduce its primary drawback, namely, the high computational cost of evaluating the Hessian matrix. Specifically, instead of using the true Hessian matrix $\nabla^2 f(x_k)$, an approximation matrix $B_k$ is employed, thereby achieving fast convergence while keeping the computational cost low.
 \else
-    本節では準ニュートン法について述べる。準ニュートン法はニュートン法に基づくが、その主要な欠点であるヘッセ行列の計算コストの大きさを低減することを目的とする。具体的には真のヘッセ行列 $\nabla^2 f(x_k)$ の代わりに近似行列 $B_k$ を用い、高速な収束性を保ちつつ計算コストを抑える。
+    本節では準ニュートン法について述べる。
+    準ニュートン法はニュートン法に基づくが、その主要な欠点であるヘッセ行列の計算コストの大きさを低減することを目的とする。具体的には真のヘッセ行列 $\nabla^2 f(x_k)$ の代わりに近似行列 $B_k$ を用い、高速な収束性を保ちつつ計算コストを抑える。
 \fi
 
 \ifEn
@@ -39,7 +40,7 @@
 \ifEn
     Line-search-based quasi-Newton methods generate a sequence $\{ x_k \}_{k=0}^{\infty}$ converging to the optimal solution $x^*$ as follows:
 \else
-    線形探索に基づく準ニュートン法は、最適解 $x^*$ に収束する列 $\{ x_k \}_{k=0}^{\infty}$ を次のように生成する:
+    直線探索に基づく準ニュートン法は、最適解 $x^*$ に収束する列 $\{ x_k \}_{k=0}^{\infty}$ を次のように生成する。
 \fi
 \begin{equation*}
     x_{k+1} = x_k - \alpha_k B_k^{-1} \nabla f(x_k)
@@ -48,7 +49,7 @@
 \ifEn
     Here, $\alpha_k > 0$ is the step size determined by line search, $B_k$ is an approximation of the Hessian matrix $\nabla^2 f(x_k)$ at the point $x_k$, and $H_k \coloneqq B_k^{-1}$ denotes its inverse.
 \else
-    ここで $\alpha_k > 0$ は線形探索で定めるステップサイズであり、$B_k$ は点 $x_k$ におけるヘッセ行列 $\nabla^2 f(x_k)$ の近似である。$H_k \coloneqq B_k^{-1}$ はその逆行列を表す。
+    ここで $\alpha_k > 0$ は直線探索で定めるステップサイズであり、$B_k$ は点 $x_k$ におけるヘッセ行列 $\nabla^2 f(x_k)$ の近似である。$H_k \coloneqq B_k^{-1}$ はその逆行列を表す。
 \fi
 
 \begin{figure}[t]
@@ -155,7 +156,7 @@
 \ifEn
     By construction, regardless of $B_{k+1}$, this model satisfies
 \else
-    このモデルは構成上、$B_{k+1}$と関係なしに、次を満たす:
+    このモデルは構成上、$B_{k+1}$と関係なしに、次を満たす。
 \fi
 \begin{equation*}
     \begin{cases}
@@ -166,7 +167,7 @@
 \ifEn
     Additionally, the secant condition ensures that the model satisfies
 \else
-    さらに、セカント条件はモデルが次を満たすことを保証する:
+    さらに、セカント条件はモデルが次を満たすことを保証する。
 \fi
 \begin{align*}
     \nabla m_{k+1}(x_k) & = \nabla f(x_{k+1}) - B_{k+1} (x_{k+1} - x_k)             &  & (\text{definition of model}) \\
