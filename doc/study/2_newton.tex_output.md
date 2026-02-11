@@ -349,7 +349,7 @@ f''(x) & = \frac{1}{(1 + x^2)^{3/2}}.
 
 これは、最適解 $x^*=0$ から離れた点では、2階微分の値、つまりヘッセ行列の固有値が非常に小さくなり、ニュートンステップが過大になる為です。反復を重ねるごとに、より遠くへ飛んでいき、最適解から離れてしまいます。
 
-![../imgs/quasi_newton/newton_failure_sqrt_function_1.1.png](../imgs/quasi_newton/newton_failure_sqrt_function_1.1.png)
+![../imgs/quasi_newton/newton_failure_sqrt_function_1.1.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_failure_sqrt_function_1.1.png)
 
 (Fig. 3 初期点 $x_0=1.1$ でニュートン法が発散する例)
 
@@ -378,7 +378,7 @@ f''''(x) & = \frac{e^x(1 - 4e^x + e^{2x})}{(1+e^x)^4}.
 
 それにもかかわらず、初期点 $x_0$ が $\mu$ に対して十分大きい場合、Fig. 4 に示すようにニュートン法は振動します。
 
-<img width="50%" src="../imgs/quasi_newton/newton_failure_strongly_convex_function_0.1_-4.png" /><img width="50%" src="../imgs/quasi_newton/newton_failure_strongly_convex_function_0.01_-4.png" />
+<img width="50%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_failure_strongly_convex_function_0.1_-4.png" /><img width="50%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_failure_strongly_convex_function_0.01_-4.png" />
 
 (Fig. 4 (左) $x_0=-4, \ \mu=0.1$ ではニュートン法が収束する。(右) $x_0=-4, \ \mu=0.01$ ではニュートン法が振動する。)
 
@@ -393,7 +393,7 @@ f''''(x) & = \frac{e^x(1 - 4e^x + e^{2x})}{(1+e^x)^4}.
 概念的な補足として、「根探索としてのニュートン法」 と 「最適化におけるニュートン法」 の関係を簡潔に整理します。
 両者は密接に関係した手法ですが、考え方や適用対象は異なります。
 
-![../imgs/quasi_newton/newton_raphson.png](../imgs/quasi_newton/newton_raphson.png)
+![../imgs/quasi_newton/newton_raphson.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_raphson.png)
 
 (Fig. 5 勾配 $\nabla f(x)=3 x^2 - 4 x + 1$ に対する根探索と関数 $f(x)=x^3 - 2 x^2 + x$ に対する最適化。)
 

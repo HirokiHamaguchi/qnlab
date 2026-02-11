@@ -1,7 +1,7 @@
 
 ## 準ニュートン法
 
-![../imgs/quasi_newton/newton_vs_qs_vs_gd.png](../imgs/quasi_newton/newton_vs_qs_vs_gd.png)
+![../imgs/quasi_newton/newton_vs_qs_vs_gd.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_vs_qs_vs_gd.png)
 
 (Fig. 6 ニュートン法、準ニュートン法、勾配降下法の比較。)
 
@@ -22,7 +22,7 @@ x_{k+1} = x_k - \alpha_k B_k^{-1} \nabla f(x_k)
 ここで $\alpha_k > 0$ は直線探索で定めるステップサイズであり、$B_k$ は点 $x_k$ におけるヘッセ行列 $\nabla^2 f(x_k)$ の近似です。$H_k \mathrel{\vcenter{:}}= B_k^{-1}$ はその逆行列を表します。
 この更新則はニュートン法の更新則と酷似しており、その故にこの手法は準ニュートン法と呼ばれています。
 
-<img width="33%" src="../imgs/quasi_newton/quasi_newton_1.png" /><img width="33%" src="../imgs/quasi_newton/quasi_newton_2.png" /><img width="33%" src="../imgs/quasi_newton/quasi_newton_3.png" />
+<img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/quasi_newton_1.png" /><img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/quasi_newton_2.png" /><img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/quasi_newton_3.png" />
 
 (Fig. 7 準ニュートン法の概念図。 (1) 目的関数 $f$ (青い曲面) と現在点 $x_k$ (赤点) が与えられます。 (2) 現在の近似ヘッセ行列によって得られる二次モデル $m_k(x)$ (橙色の曲面) を最小化し、その最小点 $x_{k+1}$ (黄色のバツ印) に移動します。 (3) 二次モデルを更新し (緑色の曲面)、この操作を繰り返します。)
 

@@ -13,7 +13,7 @@ Fig. 10 では、対応する関数値と勾配を持つ2つの点 $x_k$ と $x_
 Fig. 10 では、正確なヘッセ行列から構築された理想的な二次モデルが新しい点 $x_{k+1}$ の周りでよくフィットし、より良い収束性能をもたらすことが見られます。
 しかし、Fig. 10 では、標準的なセカント更新はこれらの点での勾配のみを照合し、$x_k$ での関数値を無視します。曲率を大きく誤推定する可能性があり、真の目的関数の近似が悪くなります。
 
-<img src="../imgs/modified_secant/trial_EXPLAIN.png" /><img src="../imgs/modified_secant/trial_HESS.png" /><img src="../imgs/modified_secant/trial_BFGS.png" />
+<img src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_EXPLAIN.png" /><img src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_HESS.png" /><img src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_BFGS.png" />
 
 (Fig. 10 標準的なセカント条件の欠点。 (a) $x_k$ と $x_{k+1}$ での関数値と勾配が既に分かっている。 (b) 正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットする。 (c) 標準的なセカント更新では、必ずしも十分に曲率を捉えられない。)
 
@@ -22,7 +22,7 @@ Fig. 10 では、正確なヘッセ行列から構築された理想的な二次
 2 点 $x_k$ と $x_{k+1}$ で勾配が同じであっても、関数値の自然な内挿は関数値 $f(x_k)$ と $f(x_{k+1})$ に応じて異なります。
 この観察は、関数値情報を取り込んでヘッセ行列の近似を改善する修正セカント条件の動機となります。
 
-![../imgs/modified_secant/cubic_interpolation.png](../imgs/modified_secant/cubic_interpolation.png)
+![../imgs/modified_secant/cubic_interpolation.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/cubic_interpolation.png)
 
 (Fig. 11 $x_k$ と $x_{k+1}$ で同一の勾配を持つが異なる関数値による内挿。これは異なる内挿関数を生じさせ、ヘッセ行列の近似に関数値情報を組み込むことの重要性を強調しています。)
 
@@ -105,7 +105,7 @@ B^{\mathrm{F}'}_{k+1} s_k = y_k + \frac{\max(0, 2(f(x_k) - f(x_{k+1})) + (\nabla
 これが関数値一致の修正セカント条件です。
 具体例としてFig. 12 も参照してください。
 
-![../imgs/modified_secant/trial_2.png](../imgs/modified_secant/trial_2.png)
+![../imgs/modified_secant/trial_2.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_2.png)
 
 (Fig. 12 関数値一致の修正セカント方程式。 前の点 $x_{k-1}$ での関数値 $f(x_{k-1})$ と $m^{\mathrm{F}}_k(x_{k-1})$ が一致している。)
 
@@ -201,7 +201,7 @@ B^{\mathrm{C}}_{k+1} s_k = y_k + \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nab
 これが三次項による修正セカント条件です。
 具体例としてFig. 13も参照してください。
 
-<img src="../imgs/modified_secant/trial_1_cubic.png" /><img src="../imgs/modified_secant/trial_1_quadratic.png" />
+<img src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_1_cubic.png" /><img src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_1_quadratic.png" />
 
 (Fig. 13 三次項による修正セカント方程式。Fig. 13 では、三次項をモデルに組み込むことで、前の点で関数値と勾配の両方が一致します。Fig. 13 では、その二次までの展開によるモデルを示しています。)
 

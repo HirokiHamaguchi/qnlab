@@ -13,7 +13,7 @@
 \end{equation*}
 ```
 
-本節では、この最適化問題に関する基本的な定義と性質をまとめる。
+本節では、この最適化問題に関する基本的な定義と性質をまとめます。
 
 ### 凸性と強凸性
 
@@ -33,7 +33,7 @@ f((1-\lambda) x + \lambda y)                                        & \le (1-\la
 凸関数と強凸関数の例を Fig. 1 に示しました。
 このような定義は、文献によって多少の揺れがありますが、例えば\citep{nesterovIntroductoryLecturesConvex2014,kanamori2016continuous}などを参照してください。
 
-<img src="../imgs/quasi_newton/convexity_comparison_convex.png" /><img src="../imgs/quasi_newton/convexity_comparison_strongly_convex.png" />
+<img src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/convexity_comparison_convex.png" /><img src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/convexity_comparison_strongly_convex.png" />
 
 (Fig. 1 凸関数と強凸関数の例。 破線は $x=0$ における二次近似を示しています。 上2つの関数は凸ですが強凸ではなく、 下2つの関数は強凸性の定義を満たす $\mu>0$ が存在し、強凸となります。)
 
@@ -206,7 +206,7 @@ $v \in \mathbb{R}^n$ は任意なので、$\nabla^2 f(x)\succeq \mu I$ という
 ヘッセ行列が正定値・不定値・負定値である二次関数を Fig. 2 に示しました。
 定値性と凸性の対応関係を視覚的に確認できます。
 
-![../imgs/quasi_newton/pd.png](../imgs/quasi_newton/pd.png)
+![../imgs/quasi_newton/pd.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/pd.png)
 
 (Fig. 2 二次モデル $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ を二次元空間で示したもの。 ヘッセ行列 $H$ が (左)正定値、(中央)不定値、(右)負定値の場合を示す。)
 

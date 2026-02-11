@@ -11,7 +11,7 @@ from typing import Dict, List, Tuple
 import fitz
 
 # Constants
-USE_GITHUB_URL = False
+USE_GITHUB_URL = True
 GITHUB_RAW_URL_BASE = "https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/"
 
 # Environment types
@@ -292,7 +292,7 @@ def convert_subfile_to_md(content: str) -> str:
         # Build image path
         image_path = filename + ".png"
         if USE_GITHUB_URL:
-            url = f"{GITHUB_RAW_URL_BASE}doc/study/{image_path}"
+            url = f"{GITHUB_RAW_URL_BASE}doc/{image_path}"
         else:
             url = image_path
         return f"![{filename}]({url})"
@@ -367,7 +367,7 @@ def convert_figure_to_md(block: str, counter: int) -> str:
         image_path = image_entries[0]["path"].replace(".pdf", ".png")
         if USE_GITHUB_URL:
             assert image_path.startswith("../")
-            url = f"{GITHUB_RAW_URL_BASE}{image_path.replace('../', '')}"
+            url = f"{GITHUB_RAW_URL_BASE}doc/{image_path.replace('../', '')}"
         else:
             url = image_path
         result = f"![{image_path}]({url})\n"
@@ -377,7 +377,7 @@ def convert_figure_to_md(block: str, counter: int) -> str:
             image_path = entry["path"].replace(".pdf", ".png")
             if USE_GITHUB_URL:
                 assert image_path.startswith("../")
-                url = f"{GITHUB_RAW_URL_BASE}{image_path.replace('../', '')}"
+                url = f"{GITHUB_RAW_URL_BASE}doc/{image_path.replace('../', '')}"
             else:
                 url = image_path
             width = entry.get("width_percent")

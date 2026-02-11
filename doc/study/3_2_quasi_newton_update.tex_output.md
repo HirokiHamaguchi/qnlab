@@ -859,11 +859,11 @@ BFGSとDFPのどちらも各反復で固定ステップサイズ $\alpha_k = 1$ 
 \Cref{fig:bfgs_dfp_100} と Fig. 9 は特定の $\lambda_1$ に対する反復軌跡を示しています。
 これらの図は、同一の初期点から最小点(原点)へ向かう二つの手法の進み方を可視化し、収束速度と経路の違いを明確に示しています。
 
-![../imgs/quasi_newton/bfgs_vs_dfp_100.png](../imgs/quasi_newton/bfgs_vs_dfp_100.png)
+![../imgs/quasi_newton/bfgs_vs_dfp_100.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/bfgs_vs_dfp_100.png)
 
 (Fig. 8 $\lambda_1 = 100$ におけるBFGSとDFPの反復軌跡。BFGSは10回で収束する一方、DFPは107回を要し、固有値誤差が大きい場合にBFGSが優位であることを示しています。)
 
-![../imgs/quasi_newton/bfgs_vs_dfp_0.1.png](../imgs/quasi_newton/bfgs_vs_dfp_0.1.png)
+![../imgs/quasi_newton/bfgs_vs_dfp_0.1.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/bfgs_vs_dfp_0.1.png)
 
 (Fig. 9 $\lambda_1 = 0.1$ におけるBFGSとDFPの反復軌跡。どちらも素早く収束し、DFPがBFGSよりわずかに速くなっています。)
 
@@ -949,7 +949,7 @@ V_{m-1}^\top \cdots V_0^\top H_0 V_0 \cdots V_{m-1}
 この計算は長さ $m$ の短いループを二回回すだけで実行でき、L-BFGS のtwo-loop recursionと呼ばれるアルゴリズムとして知られています~\citep[Algorithm 7.4]{nocedal1999numerical}。
 このアルゴリズムは $\mathcal{O}(nm)$ の時間・空間計算量を要します。
 
-![999_two_loop_recursion](999_two_loop_recursion.png)
+![999_two_loop_recursion](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/999_two_loop_recursion.png)
 
 この二重ループ再帰の出力が確かに $r = H_m q$ を計算していることを、以下では確認します。
 
