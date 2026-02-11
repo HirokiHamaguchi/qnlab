@@ -1246,7 +1246,7 @@ DFP更新を導出する他の方法もいくつか存在し、それらの一�
 ##### 双対による導出
 
 この更新はDFP更新の双対を考えることで導出できる。
-$B$ に対する BFGS 更新は $H$ に対する DFP 更新と同じであることに注意する。
+$B$ に対する BFGS更新は $H$ に対する DFP 更新と同じであることに注意する。
 
 ##### KL ダイバージェンス最小化による導出
 
@@ -1270,7 +1270,7 @@ KLダイバージェンスとは、行列間の近さを測る一種の非対称
 \end{align*}
 ```
 
-BFGS 更新はKLダイバージェンスを用いた次の最適化問題の解としても得られる。
+BFGS更新はKLダイバージェンスを用いた次の最適化問題の解としても得られる。
 
 ```math
 \begin{align*}
@@ -1284,7 +1284,7 @@ BFGS 更新はKLダイバージェンスを用いた次の最適化問題の解�
 **Proposition 8** ({\citep[Section 7.2.4]{kanamori2016continuous}})
 
 $B \succ 0$ を正定値対称行列とする。
-上記の最適化問題の解は BFGS 更新公式で与えられる。
+上記の最適化問題の解は BFGS更新公式で与えられる。
 
 <details>
 <summary>Proof</summary>
@@ -1404,9 +1404,9 @@ B'^{-1} & = I + 2\frac{s'^\top y'+y'^\top y'}{2(s'^\top y')^2}(s' s'^\top)
 
 ### BFGS 法
 
-本小節では BFGS 更新に注目し、その公式の詳細な導出を示す。
-BFGS 更新は実用上もっとも成功した準ニュートン更新公式の一つとして知られている。
-BFGS 更新公式は次で与えられる。
+本小節では BFGS更新に注目し、その公式の詳細な導出を示す。
+BFGS更新は実用上もっとも成功した準ニュートン更新公式の一つとして知られている。
+BFGS更新公式は次で与えられる。
 
 ```math
 \begin{equation*}
@@ -1416,7 +1416,7 @@ B_{k+1}   = B_k - \frac{B_k s_k s_k^\top B_k}{s_k^\top B_k s_k} + \frac{y_k y_k^
 
 #### 逆更新の公式
 
-BFGS 更新の逆行列 $H_k \mathrel{\vcenter{:}}= B_k^{-1}$ は次式で与えられる。
+BFGS更新の逆行列 $H_k \mathrel{\vcenter{:}}= B_k^{-1}$ は次式で与えられる。
 
 ```math
 \begin{equation*}
@@ -1424,7 +1424,7 @@ H_{k+1} = \left(I - \frac{s_k y_k^\top}{y_k^\top s_k}\right) H_k \left(I - \frac
 \end{equation*}
 ```
 
-この式が確かに BFGS 更新の逆行列を与えることを示す。
+この式が確かに BFGS更新の逆行列を与えることを示す。
 
 **Proposition 9**
 
@@ -1433,7 +1433,7 @@ H_{k+1} = \left(I - \frac{s_k y_k^\top}{y_k^\top s_k}\right) H_k \left(I - \frac
 <details>
 <summary>Proof</summary>
 
-BFGS 更新は次の簡潔なランク2の形に書き直せる。
+BFGS更新は次の簡潔なランク2の形に書き直せる。
 
 ```math
 \begin{equation*}
@@ -1480,9 +1480,9 @@ H_{k+1} & = (B_k + U C V^\top)^{-1}                                             
 
 </details>
 
-#### BFGS 更新の正定値性
+#### BFGS更新の正定値性
 
-BFGS 更新の重要な性質として、現在の近似 $B_k$ が正定値で曲率条件 $y_k^\top s_k > 0$ が成り立つなら、更新後の近似 $B_{k+1}$ も正定値であることが保証される。
+BFGS更新の重要な性質として、現在の近似 $B_k$ が正定値で曲率条件 $y_k^\top s_k > 0$ が成り立つなら、更新後の近似 $B_{k+1}$ も正定値であることが保証される。
 
 **Proposition 10**
 
@@ -1508,19 +1508,19 @@ v^\top H_{k+1} v
 
 </details>
 
-#### BFGS 更新のトレースと行列式の公式
+#### BFGS更新のトレースと行列式の公式
 
-更新行列の固有値挙動の解析に有用な、BFGS 更新のトレースと行列式の公式も示す。
+更新行列の固有値挙動の解析に有用な、BFGS更新のトレースと行列式の公式も示す。
 エルミート行列ではこれらはそれぞれ固有値の総和と積に対応する。したがってトレースと行列式が適切に有界なら、固有値自体も有界に保たれると期待できる(例えばすべての固有値が正である場合)。
 これは $\mu$-強凸性や $L$-平滑性など、目的関数のヘッセ行列固有値に関する仮定と密接に関係する。
 
 ##### トレースの公式
 
-BFGS 更新後の行列のトレースには明示式がある。
+BFGS更新後の行列のトレースには明示式がある。
 
 **Proposition 11** ({\citep[(6.44)]{nocedal1999numerical}})
 
-$B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ を BFGS 更新とする。このとき
+$B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ を BFGS更新とする。このとき
 
 ```math
 \begin{equation*}
@@ -1533,7 +1533,7 @@ $B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ を BFGS �
 <details>
 <summary>Proof</summary>
 
-BFGS 更新公式にトレースを適用すると
+BFGS更新公式にトレースを適用すると
 
 ```math
 \begin{equation*}
@@ -1564,11 +1564,11 @@ BFGS 更新公式にトレースを適用すると
 
 ##### 行列式の公式
 
-BFGS 更新後の行列式も閉形式で与えられる。
+BFGS更新後の行列式も閉形式で与えられる。
 
 **Proposition 12** ({\citep[(6.45)]{nocedal1999numerical}})
 
-$B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ を BFGS 更新とし、$B$ が正則であるとする。このとき
+$B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ を BFGS更新とし、$B$ が正則であるとする。このとき
 
 ```math
 \begin{equation*}
@@ -1581,7 +1581,7 @@ $B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ を BFGS �
 <details>
 <summary>Proof</summary>
 
-BFGS 更新のランク2表現を思い出す。
+BFGS更新のランク2表現を思い出す。
 [行列式補題](https://en.wikipedia.org/wiki/Matrix_determinant_lemma)より、$U, C, V$ は次を満たす。
 
 ```math
@@ -1697,7 +1697,7 @@ $\lambda_1 > 1$ のとき、すなわち初期ヘッセ近似が真の曲率を�
 核心的な洞察は、過大な固有値の補正が過小な固有値の補正より重要であるという点である。
 
 ヘッセ固有値が過大評価されると、アルゴリズムは過度に保守的なステップを取り、最小点への進みが遅くなる。この誤差を補正するには、更新公式が大きな固有値を 1 へ縮小する必要がある。
-BFGS 更新はこの作業に非常に効果的である。
+BFGS更新はこの作業に非常に効果的である。
 
 一方、ヘッセ固有値が過小評価される場合、アルゴリズムはやや攻撃的なステップを取るが、誤差は自己修正的である。
 その後の勾配計算が近似の改善に役立つ情報を提供する。
@@ -1718,7 +1718,7 @@ Powell の単純な二次問題の解析は、計算量の大半が費やされ�
 限定記憶準ニュートン法は、古典的な準ニュートン法を大規模最適化問題へ拡張する手法である。
 標準的な準ニュートン法では近似ヘッセ行列またはその逆行列を密行列として保存し更新するため、$n$ 変数に対して $\mathcal{O}(n^2)$ のメモリを要する。
 
-BFGS 更新に基づく L-BFGS 法~\citep{liuLimitedMemoryBFGS1989a} は、行列全体を明示的に保存しない。
+BFGS更新に基づく L-BFGS 法~\citep{liuLimitedMemoryBFGS1989a} は、行列全体を明示的に保存しない。
 代わりに最新の $m$ 組のベクトル対 $\lbrace(s_i,y_i)\rbrace$ のみを保持する。
 これにより記憶量は $\mathcal{O}(nm)$ に減少し、$m$ が小さな定数(通常 $m\le 10$) のとき大幅な改善となる。
 
@@ -1730,10 +1730,10 @@ H_0, H_1, \dots, H_m,
 \end{equation*}
 ```
 
-ここで $H_\ell$ は初期行列 $H_0$ に対して $\ell$ 回の BFGS 更新を適用して得られる逆ヘッセ近似を表す。
-これは最適化アルゴリズムの反復点とは異なる点に注意する。本小節では BFGS 更新の構造のみに注目する。
+ここで $H_\ell$ は初期行列 $H_0$ に対して $\ell$ 回の BFGS更新を適用して得られる逆ヘッセ近似を表す。
+これは最適化アルゴリズムの反復点とは異なる点に注意する。本小節では BFGS更新の構造のみに注目する。
 
-#### 逆 BFGS 更新のコンパクト表現
+#### 逆 BFGS更新のコンパクト表現
 
 保存された補正対 $\lbrace(s_i,y_i)\rbrace_{i=0}^{m-1}$ を用い、次を定義する。
 
@@ -1744,7 +1744,7 @@ V_i = I - \rho_i y_i s_i^\top.
 \end{equation*}
 ```
 
-逆 BFGS 更新は次のように表される。
+逆 BFGS更新は次のように表される。
 
 ```math
 \begin{equation*}

@@ -17,7 +17,8 @@ plt.rcParams["font.serif"] = "Times New Roman"
 plt.rcParams.update(
     {
         "font.size": 20,  # labels
-        "axes.titlesize": 20,  # title
+        "figure.titlesize": 30,  # figure title
+        "axes.titlesize": 30,  # title
         "axes.labelsize": 20,  # x and y labels
         "xtick.labelsize": 10,  # x tick labels
         "ytick.labelsize": 10,  # y tick labels
