@@ -56,8 +56,11 @@ def convert_citep(content: str) -> str:
     used_keys = set()
 
     def citep_replace(match: re.Match[str]) -> str:
-        # Extract the content inside \citep{}
-        cite_keys = match.group(1)
+        # Extract optional arguments and citation keys
+        opt1 = match.group(1)  # First optional argument
+        opt2 = match.group(2)  # Second optional argument
+        cite_keys = match.group(3)  # Citation keys
+
         # Split by comma and strip whitespace
         keys = [key.strip() for key in cite_keys.split(",")]
 
@@ -67,10 +70,26 @@ def convert_citep(content: str) -> str:
             used_keys.add(key)
             footnote_refs.append(f"[^{key}]")
 
-        return "".join(footnote_refs)
+        result = "".join(footnote_refs)
 
-    # Replace all \citep commands
-    content_converted = re.sub(r"\\citep\{([^}]+)\}", citep_replace, content)
+        # Add optional arguments if present
+        optional_parts = []
+        if opt1:
+            optional_parts.append(opt1)
+        if opt2:
+            optional_parts.append(opt2)
+
+        if optional_parts:
+            result += f" ({', '.join(optional_parts)})"
+
+        return result
+
+    # Replace all \citep commands (with optional arguments)
+    content_converted = re.sub(
+        r"\\citep(?:\[([^\]]*)\])?(?:\[([^\]]*)\])?\{([^}]+)\}",
+        citep_replace,
+        content
+    )
 
     # Append footnote definitions at the end
     if used_keys:

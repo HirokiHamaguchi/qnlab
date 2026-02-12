@@ -21,7 +21,7 @@ def main() -> None:
     global_state = get_global_state()
     global_state.reset()
 
-    current_dir = Path(__file__).parent
+    current_dir = Path(__file__).parent.parent.resolve()
 
     # Convert PDFs to PNGs
     convert_pdf_to_png(current_dir)
@@ -44,7 +44,7 @@ def main() -> None:
         )
         each_markdown_lines.append((tex_file.name, markdown_lines))
 
-    output_file = current_dir / "combined_output.md"
+    output_file = current_dir / "qiita" / "combined_output.md"
     output_content = "\n".join(all_markdown_lines)
     output_content = re.sub(r"\\label\{[^}]+\}", "", output_content)
     output_content = for_qiita_post_process(output_content)
