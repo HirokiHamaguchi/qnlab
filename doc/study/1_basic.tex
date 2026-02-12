@@ -46,7 +46,7 @@
     The function $f$ is convex or $\mu$-strongly convex if and only if the following hold for any $x,y \in \mathbb{R}^n$ and $\lambda \in [0,1]$:
 \else
     凸性(convexity)と強凸性(strong convexity)は最適化理論における基本概念です。
-    簡単のため、$f$ は $\mathbb{R}^n$ 全域で実数値を取る関数である、つまり、$f \colon \mathbb{R}^n \to \mathbb{R}$ とします。また、$\mu>0$ を定数とします。
+    簡単のため、$f$ は $\mathbb{R}^n$ 全域で実数値を取る関数、つまり、$f \colon \mathbb{R}^n \to \mathbb{R}$ とします。また、$\mu>0$ を定数とします。
     この時、関数 $f$ が凸、または $\mu$-強凸であることは、任意の $x,y \in \mathbb{R}^n$ と $\lambda \in [0,1]$ について次が成り立つこととそれぞれ同値です。
 \fi
 \begin{align*}
@@ -55,15 +55,29 @@
     \textrm{($\mu$-strongly convex)} \quad f((1-\lambda) x + \lambda y) & \le (1-\lambda) f(x) + \lambda f(y) - \frac{\mu}{2} \lambda (1-\lambda) \lVert x-y \rVert^2.
 \end{align*}
 \ifEn
+    There are more intuitive equivalent definitions of convexity and strong convexity using the gradient of $f$.
+    Assume that $f$ is at least of class $C^1$ and it takes real values over the domain $\mathbb{R}^n$.
+    The function $f$ is convex or $\mu$-strongly convex if and only if the following hold for any $x,y \in \mathbb{R}^n$:
+\else
+    より直感的な定義として、関数 $f$ の勾配を用いた凸性および強凸性の同値な定義も存在します。
+    $f$ が少なくとも $C^1$ 級で、その定義域 $\mathbb{R}^n$ 全体で実数値を取ると仮定します。
+    関数 $f$ が凸、または $\mu$-強凸であることは、任意の $x,y \in \mathbb{R}^n$ について次が成り立つこととそれぞれ同値です。
+\fi
+\begin{align*}
+    \textrm{(convex)} \quad
+    f(y) & \ge f(x)+\nabla f(x)^\top (y-x),                                  \\
+    \textrm{($\mu$-strongly convex)} \quad
+    f(y) & \ge f(x)+\nabla f(x)^\top (y-x)+\frac{\mu}{2}\lVert y-x \rVert^2.
+\end{align*}
+\ifEn
     Strong convexity indicates that, in addition to convexity, the objective function has uniformly positive curvature.
     Examples of convex and strongly convex functions are shown in \cref{fig:convexity_comparison}.
-    Such definitions may vary slightly in the literature; for example, see~\citep{nesterovIntroductoryLecturesConvex2014,kanamori2016continuous}.
+    Such definitions may vary slightly in the literature. For example, see~\citep{nesterovIntroductoryLecturesConvex2014,kanamori2016continuous}.
 \else
     強凸性は、凸性に加えて目的関数が一様に正の曲率を持つことを意味します。
     凸関数と強凸関数の例を \cref{fig:convexity_comparison} に示しました。
-    このような定義は、文献によって多少の揺れがありますが、例えば\citep{nesterovIntroductoryLecturesConvex2014,kanamori2016continuous}などを参照してください。
+    このような定義は、文献によって多少の揺れがありますが、例えば~\citep{nesterovIntroductoryLecturesConvex2014,kanamori2016continuous}などを参照してください。
 \fi
-
 \begin{figure}[t]
     \centering
     \includegraphics[width=\textwidth]{../imgs/quasi_newton/convexity_comparison_convex.pdf}
@@ -83,23 +97,11 @@
     }
     \label{fig:convexity_comparison}
 \end{figure}
-
 \ifEn
-    There are alternative definitions of convexity or strong convexity using the gradient of $f$.
-    Assume that $f$ is at least of class $C^1$ and it takes real values over the domain $\mathbb{R}^n$.
-    The function $f$ is convex or $\mu$-strongly convex if and only if the following hold for any $x,y \in \mathbb{R}^n$:
+    We show the equivalence of these two definitions below.
 \else
-    関数 $f$ の勾配を用いた凸性および強凸性の同値な定義も存在します。
-    $f$ が少なくとも $C^1$ 級で、その定義域 $\mathbb{R}^n$ 全体で実数値を取ると仮定します。
-    関数 $f$ が凸、または $\mu$-強凸であることは、任意の $x,y \in \mathbb{R}^n$ について次が成り立つこととそれぞれ同値です。
+    これら二つの定義の同値性を以下で示します。
 \fi
-\begin{align*}
-    \textrm{(convex)} \quad
-    f(y) & \ge f(x)+\nabla f(x)^\top (y-x),                                  \\
-    \textrm{($\mu$-strongly convex)} \quad
-    f(y) & \ge f(x)+\nabla f(x)^\top (y-x)+\frac{\mu}{2}\lVert y-x \rVert^2.
-\end{align*}
-
 \begin{proposition}
     \ifEn
         Let $f \colon \mathbb{R}^n \to \mathbb{R}$ be of class $C^1$. Then the two definitions of convexity and $\mu$-strong convexity are equivalent, respectively.
@@ -305,10 +307,10 @@
 \end{proof}
 
 \ifEn
-    Quadratic functions whose Hessians are positive definite, indefinite, and negative definite are illustrated in \cref{fig:pd}. One can visually confirm the correspondence between positive definiteness and convexity.
+    Quadratic functions whose Hessians are positive definite, indefinite, and negative definite are illustrated in \cref{fig:pd}. We can confirm the correspondence between positive definiteness and convexity.
 \else
     ヘッセ行列が正定値・不定値・負定値である二次関数を \cref{fig:pd} に示しました。
-    定値性と凸性の対応関係を視覚的に確認できます。
+    定値性と凸性の対応関係を確認できます。
 \fi
 
 \begin{figure}[t]
@@ -317,11 +319,9 @@
     \caption{
         \ifEn
             Quadratic model
-            $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ in 2-dimensional space with Hessians $H$ which is (left) positive definite, (center) indefinite, (right) negative definite.
+            $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ in 2-dimensional space with Hessians $H$ which is (left) positive definite, (center) indefinite, (right) negative definite. $f(x)$ is (left) convex, (center) non-convex, and (right) concave, respectively.
         \else
-            二次モデル
-            $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ を二次元空間で示したもの。
-            ヘッセ行列 $H$ が (左)正定値、(中央)不定値、(右)負定値の場合を示す。
+            二次モデル $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ を二次元空間で示したもの。 ヘッセ行列 $H$ が (左)正定値、(中央)不定値、(右)負定値の場合を示す。 $f(x)$ はそれぞれ (左)凸、(中央)非凸、(右)凹である。
         \fi
     }
     \label{fig:pd}

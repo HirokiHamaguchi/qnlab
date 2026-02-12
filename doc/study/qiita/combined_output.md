@@ -21,7 +21,7 @@
 ### 凸性と強凸性
 
 凸性(convexity)と強凸性(strong convexity)は最適化理論における基本概念です。
-簡単のため、$f$ は $\mathbb{R}^n$ 全域で実数値を取る関数である、つまり、$f \colon \mathbb{R}^n \to \mathbb{R}$ とします。また、$\mu>0$ を定数とします。
+簡単のため、$f$ は $\mathbb{R}^n$ 全域で実数値を取る関数、つまり、$f \colon \mathbb{R}^n \to \mathbb{R}$ とします。また、$\mu>0$ を定数とします。
 この時、関数 $f$ が凸、または $\mu$-強凸であることは、任意の $x,y \in \mathbb{R}^n$ と $\lambda \in [0,1]$ について次が成り立つこととそれぞれ同値です。
 
 ```math
@@ -32,15 +32,7 @@ f((1-\lambda) x + \lambda y)                                        & \le (1-\la
 \end{align*}
 ```
 
-強凸性は、凸性に加えて目的関数が一様に正の曲率を持つことを意味します。
-凸関数と強凸関数の例を Fig. 1 に示しました。
-このような定義は、文献によって多少の揺れがありますが、例えば\citep{nesterovIntroductoryLecturesConvex2014,kanamori2016continuous}などを参照してください。
-
-<img src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/convexity_comparison_convex.png" /><img src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/convexity_comparison_strongly_convex.png" />
-
-(Fig. 1 凸関数と強凸関数の例。 破線は $x=0$ における二次近似を示しています。 上2つの関数は凸ですが強凸ではなく、 下2つの関数は強凸性の定義を満たす $\mu>0$ が存在し、強凸となります。)
-
-関数 $f$ の勾配を用いた凸性および強凸性の同値な定義も存在します。
+より直感的な定義として、関数 $f$ の勾配を用いた凸性および強凸性の同値な定義も存在します。
 $f$ が少なくとも $C^1$ 級で、その定義域 $\mathbb{R}^n$ 全体で実数値を取ると仮定します。
 関数 $f$ が凸、または $\mu$-強凸であることは、任意の $x,y \in \mathbb{R}^n$ について次が成り立つこととそれぞれ同値です。
 
@@ -52,6 +44,16 @@ f(y) & \ge f(x)+\nabla f(x)^\top (y-x),                                  \\
 f(y) & \ge f(x)+\nabla f(x)^\top (y-x)+\frac{\mu}{2}\lVert y-x \rVert^2.
 \end{align*}
 ```
+
+強凸性は、凸性に加えて目的関数が一様に正の曲率を持つことを意味します。
+凸関数と強凸関数の例を Fig. 1 に示しました。
+このような定義は、文献によって多少の揺れがありますが、例えば~[^nesterovIntroductoryLecturesConvex2014][^kanamori2016continuous]などを参照してください。
+
+<img src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/convexity_comparison_convex.png" /><img src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/convexity_comparison_strongly_convex.png" />
+
+(Fig. 1 凸関数と強凸関数の例。 破線は $x=0$ における二次近似を示しています。 上2つの関数は凸ですが強凸ではなく、 下2つの関数は強凸性の定義を満たす $\mu>0$ が存在し、強凸となります。)
+
+これら二つの定義の同値性を以下で示します。
 
 **Proposition 1**
 
@@ -207,11 +209,11 @@ $v \in \mathbb{R}^n$ は任意なので、$\nabla^2 f(x)\succeq \mu I$ という
 </details>
 
 ヘッセ行列が正定値・不定値・負定値である二次関数を Fig. 2 に示しました。
-定値性と凸性の対応関係を視覚的に確認できます。
+定値性と凸性の対応関係を確認できます。
 
 ![../imgs/quasi_newton/pd.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/pd.png)
 
-(Fig. 2 二次モデル $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ を二次元空間で示したもの。 ヘッセ行列 $H$ が (左)正定値、(中央)不定値、(右)負定値の場合を示す。)
+(Fig. 2 二次モデル $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ を二次元空間で示したもの。 ヘッセ行列 $H$ が (左)正定値、(中央)不定値、(右)負定値の場合を示す。 $f(x)$ はそれぞれ (左)凸、(中央)非凸、(右)凹である。)
 
 ### $L$-平滑性 ($L$-smoothness)
 
@@ -341,7 +343,7 @@ $f$ が $L$-平滑かつ $\mu$-強凸であれば、任意の $x \in \mathbb{R}^
 
 が任意の $x,y \in \mathbb{R}^n$ について成り立つ。
 
-証明は他の文献を参照してください~\citep{bauschkeBaillonHaddadTheoremRevisited2009}~\citep[Proposition 12.60]{rockafellarVariationalAnalysis1998}。
+証明は他の文献を参照してください~[^bauschkeBaillonHaddadTheoremRevisited2009]~\citep[Proposition 12.60]{rockafellarVariationalAnalysis1998}。
 
 最適化アルゴリズムが生成する列 $\lbrace x_k \rbrace$ に対し、
 
@@ -459,7 +461,7 @@ f(x_k + \alpha_k d_k) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k, \\
 \end{equation*}
 ```
 
-ここで $0 < c_1 < c_2 < 1$ は定数です。
+$0 < c_1 < c_2 < 1$ は定数です。
 一つ目の条件は、Armijo 条件とも呼ばれ、次の点での関数値 $f(x_k + \alpha_k d_k)$ が、現在の点での関数値 $f(x_k)$ よりも、勾配から導かれる予測値 $\alpha_k g_k^\top d_k$ の少なくとも $c_1$ 倍した値は減少していることを要求します。
 二つ目の条件は、曲率条件とも呼ばれ、探索方向に射影した次の点での減少率 $-g_{k+1}^\top d_k$ が、現在の点での射影された減少率 $-g_k^\top d_k$ よりも、少なくとも $c_2$ 倍した値は小さくなっている、つまり探索方向 $d_k$ 上においては、十分に最適化されていることを要求しています。
 
@@ -927,7 +929,7 @@ m_{k+1}(x_{k+1}) = f(x_{k+1}), \\
 
 ### 代表的な準ニュートン更新則
 
-$B_k$, $s_k$, $y_k$ が与えられたとき、セカント条件を満たす $B_{k+1}$ を与える更新則は多数存在します。ここでは代表的なものをその導出とともに示します~\citep{dennisjr.QuasiNewtonMethodsMotivation1977a}。
+$B_k$, $s_k$, $y_k$ が与えられたとき、セカント条件を満たす $B_{k+1}$ を与える更新則は多数存在します。ここでは代表的なものをその導出とともに示します~[^dennisjr.QuasiNewtonMethodsMotivation1977a]。
 本小節に限り、簡潔さのため $B_k$, $B_{k+1}$, $s_k$, $y_k$ をそれぞれ $B$, $\bar{B}$, $s$, $y$ と略記します。
 
 #### Broyden更新
@@ -995,7 +997,7 @@ $z^\top s = 0$ を満たす任意のベクトル $z$ を取ります。このと
 
 Broyden更新は、フロベニウスノルムにおける最小変化更新としても特徴づけられます。
 
-**Proposition 7** (\citep{dennisjr.QuasiNewtonMethodsMotivation1977a}, Theorem~4.1)
+**Proposition 7** ([^dennisjr.QuasiNewtonMethodsMotivation1977a], Theorem~4.1)
 
 $B\in\mathbb{R}^{n\times n}$, $y\in\mathbb{R}^n$, $s\in\mathbb{R}^n\setminus\lbrace 0 \rbrace$ が与えられているとき、行列 $\bar{B}_{\mathrm{Broyden}}$ は以下の最適化問題の一意解である。
 
@@ -1041,7 +1043,7 @@ $\bar{B}_{\mathrm{Broyden}}$ が実際に最小解であることを示します
 
 #### Symmetric Rank-One (SR1) 更新
 
-[対称ランク1 (SR1) 更新](https://en.wikipedia.org/wiki/Symmetric_rank-one)~\citep{nocedal1999numerical} は更新過程で対称性を維持する基本的な準ニュートン法です。更新則は次で与えられます。
+[対称ランク1 (SR1) 更新](https://en.wikipedia.org/wiki/Symmetric_rank-one)~[^nocedal1999numerical] は更新過程で対称性を維持する基本的な準ニュートン法です。更新則は次で与えられます。
 
 ```math
 \begin{equation*}
@@ -1160,7 +1162,7 @@ C_{2t+2} = \frac{C_{2t+1} + C_{2t+1}^\top}{2}            & (\text{symmetrization
 
 重要な結果として、列 $\lbrace C_{2t} \rbrace_{t=0}^{\infty}$ はセカント条件を満たす対称行列に収束します。次の命題ではそれを示します。
 
-**Proposition 8** (\citep{dennisjr.QuasiNewtonMethodsMotivation1977a}, Lemma~7.2)
+**Proposition 8** ([^dennisjr.QuasiNewtonMethodsMotivation1977a], Lemma~7.2)
 
 行列の列 $\lbrace C_{t} \rbrace_{t=0}^{\infty}$ は収束し、その極限は次で与えられる。
 
@@ -1496,7 +1498,7 @@ B'^{-1} & = I + 2\frac{s'^\top y'+y'^\top y'}{2(s'^\top y')^2}(s' s'^\top)
 </details>
 
 更なる詳細については
-\citep{kanamoriBregmanExtensionQuasiNewton2010,kanamoriBregmanExtensionQuasiNewton2010a}
+[^kanamoriBregmanExtensionQuasiNewton2010][^kanamoriBregmanExtensionQuasiNewton2010a]
 をご参照ください。
 [こちらのスライド](http://matsuzoe.web.nitech.ac.jp/infogeo/OCAMI2010/kanamori.pdf)
 も参考になります。
@@ -1733,7 +1735,7 @@ C^{-1} + V^\top B_k^{-1} U
 
 これまで何度か言及したように、BFGSとDFPは双対関係にあります。
 しかし、実際の最適化問題に適用すると実用上の効率は大きく異なることが知られています。
-Powellによる解析~\citep{powellHowBadAre1986}では、単純な二次元二次関数に対する両手法の挙動を調べて、この非対称性を検討しました。
+Powellによる解析~[^powellHowBadAre1986]では、単純な二次元二次関数に対する両手法の挙動を調べて、この非対称性を検討しました。
 漸近的には同程度に振る舞うと示唆されることが多い両手法について、Powellはその実用上の効率が大きく異なること、特に近似ヘッセ行列が真のヘッセ行列から遠い場合に差が顕著であることを明らかにしました。ここでは、その数値実験を再現します。
 
 #### 問題設定
@@ -1758,7 +1760,7 @@ BFGSとDFPのどちらも各反復で固定ステップサイズ $\alpha_k = 1$ 
 ```
 
 これはPowellの元の解析に沿ったものです。
-この選択の詳細は~\citep{powellHowBadAre1986}を参照してください。
+この選択の詳細は~[^powellHowBadAre1986]を参照してください。
 
 反復は現在点のノルムが初期ノルムに対する許容値を下回るまで続けました。
 そして、各 $\lambda_1$ に対して収束に要する反復回数を記録しました。
@@ -1820,7 +1822,7 @@ BFGS更新はこのようなタスクには強い効果を発揮しますが、D
 通常の準ニュートン法では、近似ヘッセ行列 $B_k$ またはその逆行列 $H_k$ を密行列として陽に保存・更新するため、$n$ 変数に対して $\mathcal{O}(n^2)$ のメモリを要します。
 一方で、記憶制限準ニュートン法では、最新の $m$ 組のベクトルペア $\lbrace(s_i,y_i)\rbrace$ という限られた情報のみを保持して、その情報だけから近似ヘッセ行列に関する計算を行います。
 この工夫により空間計算量は $\mathcal{O}(nm)$ に減少し、$m$ が小さな定数(通常は $m\le 10$) のとき大幅な改善となります。
-特に、BFGS更新の記憶制限版であるL-BFGS法~\citep{liuLimitedMemoryBFGS1989a}は、特にその代表的な手法です。
+特に、BFGS更新の記憶制限版であるL-BFGS法~[^liuLimitedMemoryBFGS1989a]は、特にその代表的な手法です。
 このBFGS更新の場合に注目し、限られた情報だけを用いて準ニュートン方向 $d_k = -H_k g_k$ を空間計算量・時間計算量の両面で効率的に計算する方法を示します。
 
 本小節では次の有限長の行列の列を扱います。
@@ -1985,7 +1987,7 @@ H_0 = \gamma I.
 \end{equation*}
 ```
 
-この選択は次の議論によって正当化できます~\citep{liuLimitedMemoryBFGS1989a,shannoMatrixConditioningNonlinear1978}。
+この選択は次の議論によって正当化できます~[^liuLimitedMemoryBFGS1989a][^shannoMatrixConditioningNonlinear1978]。
 目的関数 $f$ が二回連続微分可能であると仮定し、最新のステップに沿った平均ヘッセ行列を考えます。
 
 ```math
@@ -2020,7 +2022,7 @@ y_{m-1}
 これは、ベクトル $\bar{G}^{1/2} s_{m-1}$ に関する行列 $\bar{G}$ のRayleigh商の逆数です。
 従って、このスケーリングはこれらの方向に沿った平均逆曲率を大まかに近似しています。
 
-さらにこの $\gamma$ の選択は Barzilai--Borwein 法の短ステップサイズ~\citep{barzilaiTwoPointStepSize1988} と一致しており、L-BFGS の初期化と古典的なステップ長選択戦略の密接な関係を示しています。
+さらにこの $\gamma$ の選択は Barzilai--Borwein 法の短ステップサイズ~[^barzilaiTwoPointStepSize1988] と一致しており、L-BFGS の初期化と古典的なステップ長選択戦略の密接な関係を示しています。
 
 
 <!-- From 4_modified_secant.tex -->
@@ -2056,7 +2058,7 @@ Fig. 10 では、正確なヘッセ行列から構築された理想的な二次
 
 #### 関数値一致の修正セカント条件
 
-最初の修正は、二次モデルが前の点での関数値と一致することを強制します~\citep{yuanModifiedBFGSAlgorithm1991,weiNewQuasiNewtonMethods2006, babaie-kafakiModifiedBFGSAlgorithm2011}。
+最初の修正は、二次モデルが前の点での関数値と一致することを強制します~[^yuanModifiedBFGSAlgorithm1991][^weiNewQuasiNewtonMethods2006][^babaie-kafakiModifiedBFGSAlgorithm2011]。
 異なる近似ヘッセ行列 $B^{\mathrm{F}}_{k+1}$ を持つ別のモデルを考えます。
 
 ```math
@@ -2137,7 +2139,7 @@ B^{\mathrm{F}'}_{k+1} s_k = y_k + \frac{\max(0, 2(f(x_k) - f(x_{k+1})) + (\nabla
 
 #### 三次項による修正セカント条件
 
-2つ目の修正セカント条件では、モデルに三次項を導入し、前の点での関数値と勾配の両方の一致を同時に満たすことを可能にします~\citep{zhangNewQuasiNewtonEquation1999, zhangPropertiesNumericalPerformance2001,yabeLocalSuperlinearConvergence2007}。
+2つ目の修正セカント条件では、モデルに三次項を導入し、前の点での関数値と勾配の両方の一致を同時に満たすことを可能にします~[^zhangNewQuasiNewtonEquation1999][^zhangPropertiesNumericalPerformance2001][^yabeLocalSuperlinearConvergence2007]。
 
 $T_{k+1} \in \mathbb{R}^{n \times n \times n}$ を、以下を満たす $x_{k+1}$ での $f$ の3階微分テンソルとします。
 
@@ -2234,9 +2236,9 @@ B^{\mathrm{C}}_{k+1} s_k = y_k + \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nab
 ### その他の曲率関連手法
 
 曲率情報を表すベクトルペア $s_k, y_k$ を求めることについては、他にもいくつかのトピックがあります。
-Agg-BFGS~\citep{berahasLimitedmemoryBFGSDisplacement2022} は、最も古い情報を破棄して最新のものを追加するのではなく、データを集約することにより曲率情報を管理する別のアプローチです。
+Agg-BFGS~[^berahasLimitedmemoryBFGSDisplacement2022] は、最も古い情報を破棄して最新のものを追加するのではなく、データを集約することにより曲率情報を管理する別のアプローチです。
 
-Multi-Secant~\citep{leeAdvancingMultiSecantQuasiNewton2025} とは、複数のステップと勾配差ベクトルのペアを維持することにより、セカント条件を拡張します。ここまでで見てきた標準的な形式では、次のように定義していました。
+Multi-Secant~[^leeAdvancingMultiSecantQuasiNewton2025] とは、複数のステップと勾配差ベクトルのペアを維持することにより、セカント条件を拡張します。ここまでで見てきた標準的な形式では、次のように定義していました。
 
 ```math
 \begin{equation*}
@@ -2254,3 +2256,23 @@ s_i = x_{k+1} - x_i, \quad y_i = \nabla f(x_{k+1}) - \nabla f(x_i). \quad (i = k
 
 このアプローチによって、場合によってはより良い近似が得られることもあります。
 
+
+[^babaie-kafakiModifiedBFGSAlgorithm2011]: TODO
+[^barzilaiTwoPointStepSize1988]: TODO
+[^bauschkeBaillonHaddadTheoremRevisited2009]: TODO
+[^berahasLimitedmemoryBFGSDisplacement2022]: TODO
+[^dennisjr.QuasiNewtonMethodsMotivation1977a]: TODO
+[^kanamori2016continuous]: TODO
+[^kanamoriBregmanExtensionQuasiNewton2010]: TODO
+[^kanamoriBregmanExtensionQuasiNewton2010a]: TODO
+[^leeAdvancingMultiSecantQuasiNewton2025]: TODO
+[^liuLimitedMemoryBFGS1989a]: TODO
+[^nesterovIntroductoryLecturesConvex2014]: TODO
+[^nocedal1999numerical]: TODO
+[^powellHowBadAre1986]: TODO
+[^shannoMatrixConditioningNonlinear1978]: TODO
+[^weiNewQuasiNewtonMethods2006]: TODO
+[^yabeLocalSuperlinearConvergence2007]: TODO
+[^yuanModifiedBFGSAlgorithm1991]: TODO
+[^zhangNewQuasiNewtonEquation1999]: TODO
+[^zhangPropertiesNumericalPerformance2001]: TODO

@@ -145,13 +145,13 @@
     \end{dcases}
 \end{equation*}
 \ifEn
-    Here, $0 < c_1 < c_2 < 1$ are constants.
+    $0 < c_1 < c_2 < 1$ are constants.
     The first condition is known as the Armijo condition, which requires that the function value at the next point $f(x_k + \alpha_k d_k)$ decreases by at least a fraction $c_1$ of the predicted decrease $\alpha_k g_k^\top d_k$.
     The second condition is known as the curvature condition, which requires that the rate of decrease projected onto the search direction at the next point $-g_{k+1}^\top d_k$ is at most a fraction $c_2$ of the current projected decrease $-g_k^\top d_k$, indicating sufficient optimization along the search direction $d_k$.
 
     We also define $\theta_k \in [0, \pi]$ as the angle between the direction $d_k$ and the negative gradient $-g_k$, satisfying
 \else
-    ここで $0 < c_1 < c_2 < 1$ は定数です。
+    $0 < c_1 < c_2 < 1$ は定数です。
     一つ目の条件は、Armijo 条件とも呼ばれ、次の点での関数値 $f(x_k + \alpha_k d_k)$ が、現在の点での関数値 $f(x_k)$ よりも、勾配から導かれる予測値 $\alpha_k g_k^\top d_k$ の少なくとも $c_1$ 倍した値は減少していることを要求します。
     二つ目の条件は、曲率条件とも呼ばれ、探索方向に射影した次の点での減少率 $-g_{k+1}^\top d_k$ が、現在の点での射影された減少率 $-g_k^\top d_k$ よりも、少なくとも $c_2$ 倍した値は小さくなっている、つまり探索方向 $d_k$ 上においては、十分に最適化されていることを要求しています。
 
