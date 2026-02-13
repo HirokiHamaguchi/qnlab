@@ -86,7 +86,7 @@ def convert_citep(content: str) -> str:
 
     # Replace all \citep commands (with optional arguments)
     content_converted = re.sub(
-        r"\\citep(?:\[([^\]]*)\])?(?:\[([^\]]*)\])?\{([^}]+)\}",
+        r"~\\citep(?:\[([^\]]*)\])?(?:\[([^\]]*)\])?\{([^}]+)\}",
         citep_replace,
         content
     )
