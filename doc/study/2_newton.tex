@@ -117,7 +117,7 @@
     まず、ニュートン法に限らない直線探索付きの手法に対する、一般的な大域収束性の結果
 \fi
 \begin{equation*}
-    \lim_{k \to \infty} \lVert g_k \rVert = 0
+    \lim_{k \to \infty} \left\lVert g_k \right\rVert = 0
 \end{equation*}
 \ifEn
     for methods with line search, and then explain its application to Newton's method.
@@ -158,7 +158,7 @@
     また、方向 $d_k$ と負の勾配 $-g_k$ のなす角を $\theta_k \in [0, \pi]$ とし、次式を満たすように定めます。
 \fi
 \begin{equation*}
-    \cos \theta_k = \frac{-g_k^\top d_k}{\lVert g_k \rVert\lVert d_k \rVert}.
+    \cos \theta_k = \frac{-g_k^\top d_k}{\left\lVert g_k \right\rVert\left\lVert d_k \right\rVert}.
 \end{equation*}
 \ifEn
     Under these settings, we present a simplified version of the following classical well-known result.
@@ -188,7 +188,7 @@
         この反復法は次を満たす点列 $\{ x_k \}_k$ を生成する。
     \fi
     \begin{equation*}
-        \lim_{k \to \infty} \lVert g_k \rVert = 0.
+        \lim_{k \to \infty} \left\lVert g_k \right\rVert = 0.
     \end{equation*}
 \end{theorem}
 \begin{proof}
@@ -202,7 +202,7 @@
             (g_{k+1} - g_k)^\top d_k = g_{k+1}^\top d_k - g_k^\top d_k
             \geq (c_2 - 1) g_k^\top d_k, \\
             (g_{k+1} - g_k)^\top d_k \leq
-            \lVert g_{k+1} - g_k \rVert \lVert d_k \rVert \leq L \lVert x_{k+1} - x_k \rVert \lVert d_k \rVert  = \alpha_k L \lVert d_k \rVert^2.
+            \left\lVert g_{k+1} - g_k \right\rVert \left\lVert d_k \right\rVert \leq L \left\lVert x_{k+1} - x_k \right\rVert \left\lVert d_k \right\rVert  = \alpha_k L \left\lVert d_k \right\rVert^2.
         \end{dcases}
     \end{equation*}
     \ifEn
@@ -211,7 +211,7 @@
         これらを組み合わせると次の不等式が得られます。
     \fi
     \begin{equation*}
-        \alpha_k \geq \frac{c_2 - 1}{L} \frac{g_k^\top d_k}{\lVert d_k \rVert^2}.
+        \alpha_k \geq \frac{c_2 - 1}{L} \frac{g_k^\top d_k}{\left\lVert d_k \right\rVert^2}.
     \end{equation*}
     \ifEn
         Thus, we have
@@ -219,9 +219,9 @@
         よって、
     \fi
     \begin{align*}
-        f(x_{k+1}) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k                                          &  & (\text{Armijo condition})         \\
-                   & \leq f(x_k) - c_1 \frac{1 - c_2}{L} \frac{(g_k^\top d_k)^2}{\lVert d_k \rVert^2} &  & (\text{previous inequality})      \\
-                   & = f(x_k) - c_1 \frac{1 - c_2}{L} \cos^2 \theta_k \lVert g_k \rVert^2.            &  & (\text{definition of $\theta_k$})
+        f(x_{k+1}) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k                                                     &  & (\text{Armijo condition})         \\
+                   & \leq f(x_k) - c_1 \frac{1 - c_2}{L} \frac{(g_k^\top d_k)^2}{\left\lVert d_k \right\rVert^2} &  & (\text{previous inequality})      \\
+                   & = f(x_k) - c_1 \frac{1 - c_2}{L} \cos^2 \theta_k \left\lVert g_k \right\rVert^2.            &  & (\text{definition of $\theta_k$})
     \end{align*}
     \ifEn
         By repeatedly applying this inequality, we obtain
@@ -229,7 +229,7 @@
         この不等式を繰り返し適用することで次が得られます。
     \fi
     \begin{equation*}
-        f(x_{k+1}) \leq f(x_0) - c_1 \frac{1 - c_2}{L} \sum_{j=0}^k \cos^2 \theta_j \lVert g_j \rVert^2.
+        f(x_{k+1}) \leq f(x_0) - c_1 \frac{1 - c_2}{L} \sum_{j=0}^k \cos^2 \theta_j \left\lVert g_j \right\rVert^2.
     \end{equation*}
     \ifEn
         Since we assumed that $f$ is bounded below, there exists a constant $f^*$ such that $f(x_{k+1}) \geq f^*$ for all $k$.
@@ -239,7 +239,7 @@
         従って、Zoutendijk 条件と呼ばれる次式が得られます。
     \fi
     \begin{equation*}
-        \sum_{k=0}^\infty \cos^2 \theta_k \lVert g_k \rVert^2 \leq \frac{L}{c_1 (1 - c_2)} (f(x_0) - f^*) < \infty.
+        \sum_{k=0}^\infty \cos^2 \theta_k \left\lVert g_k \right\rVert^2 \leq \frac{L}{c_1 (1 - c_2)} (f(x_0) - f^*) < \infty.
     \end{equation*}
     \ifEn
         This condition implies that
@@ -247,7 +247,7 @@
         この条件より、次が従います。
     \fi
     \begin{equation*}
-        \cos^2 \theta_k \lVert g_k \rVert^2 \to 0.
+        \cos^2 \theta_k \left\lVert g_k \right\rVert^2 \to 0.
     \end{equation*}
     \ifEn
         Combined with the assumption that $\cos \theta_k \geq \delta > 0$ for all $k$, it follows immediately that
@@ -255,7 +255,7 @@
         $\cos \theta_k \geq \delta > 0$ がすべての $k$ で成り立つという仮定と合わせると、直ちに次が従います。
     \fi
     \begin{equation*}
-        \lim_{k \to \infty} \lVert g_k \rVert = 0.
+        \lim_{k \to \infty} \left\lVert g_k \right\rVert = 0.
     \end{equation*}
     \ifEn
         This completes the proof.
@@ -274,8 +274,8 @@
 \fi
 \begin{equation*}
     \cos \theta_k
-    = \frac{g_k^\top \nabla^2 f(x_k)^{-1} g_k}{\lVert g_k \rVert\lVert \nabla^2 f(x_k)^{-1} g_k \rVert}
-    \geq \frac{\lVert g_k \rVert^2 \lambda_{\min}(\nabla^2 f(x_k)^{-1})}{\lVert g_k \rVert^2 \lambda_{\max}(\nabla^2 f(x_k)^{-1})}
+    = \frac{g_k^\top \nabla^2 f(x_k)^{-1} g_k}{\left\lVert g_k \right\rVert\left\lVert \nabla^2 f(x_k)^{-1} g_k \right\rVert}
+    \geq \frac{\left\lVert g_k \right\rVert^2 \lambda_{\min}(\nabla^2 f(x_k)^{-1})}{\left\lVert g_k \right\rVert^2 \lambda_{\max}(\nabla^2 f(x_k)^{-1})}
     \geq \frac{\mu}{L},
 \end{equation*}
 \ifEn
@@ -304,10 +304,10 @@
     \label{thm:newton-quadratic}
     \ifEn
         Suppose that the Hessian matrix $\nabla^2 f(x)$ is Lipschitz continuous in a neighborhood of the solution $x^*$, and that sufficient second-order optimality conditions hold (i.e., $\nabla f(x^*)=0$ and $\nabla^2 f(x^*)$ is positive definite).
-        In Newton's method described in the previous section, if $\alpha_k=1$ holds for all $k$ and the initial point $x_0$ is sufficiently close to $x^*$, then the sequence of gradient norms $\{\lVert \nabla f(x_k) \rVert\}$ converges quadratically.
+        In Newton's method described in the previous section, if $\alpha_k=1$ holds for all $k$ and the initial point $x_0$ is sufficiently close to $x^*$, then the sequence of gradient norms $\{\left\lVert \nabla f(x_k) \right\rVert\}$ converges quadratically.
     \else
         ヘッセ行列 $\nabla^2 f(x)$ が解 $x^*$ の近傍で Lipschitz連続であり、最適性の二次の十分条件が成り立つとする。すなわち $\nabla f(x^*)=0$ かつ $\nabla^2 f(x^*)$ は正定値である。
-        前節までのニュートン法において、すべての $k$ で $\alpha_k=1$ が満たされるとし、初期点 $x_0$ が $x^*$ に十分近いとき、勾配ノルム列 $\{\lVert \nabla f(x_k) \rVert\}$ は二次収束する。
+        前節までのニュートン法において、すべての $k$ で $\alpha_k=1$ が満たされるとし、初期点 $x_0$ が $x^*$ に十分近いとき、勾配ノルム列 $\{\left\lVert \nabla f(x_k) \right\rVert\}$ は二次収束する。
     \fi
 \end{theorem}
 \begin{proof}
@@ -329,23 +329,23 @@
         テイラーの定理と三角不等式より次が成り立つ。
     \fi
     \begin{align*}
-                & \lVert \nabla^2 f(x_k)(x_k-x^*)-\left(\nabla f(x_k)-\nabla f(x^*)\right) \rVert                              \\
-        =   {}  & \left\lVert \nabla^2 f(x_k)(x_k-x^*)-\int_0^1 \nabla^2 f(x_k+t(x^*-x_k)) (x_k - x^*)\mathrm{d}t \right\rVert \\
-        \leq {} & \int_0^1 \lVert \nabla^2 f(x_k)-\nabla^2 f(x_k+t(x^*-x_k)) \rVert\lVert x_k-x^* \rVert\mathrm{d}t.
+                & \left\lVert \nabla^2 f(x_k)(x_k-x^*)-\left(\nabla f(x_k)-\nabla f(x^*)\right) \right\rVert                               \\
+        =   {}  & \left\lVert \nabla^2 f(x_k)(x_k-x^*)-\int_0^1 \nabla^2 f(x_k+t(x^*-x_k)) (x_k - x^*)\mathrm{d}t \right\rVert             \\
+        \leq {} & \int_0^1 \left\lVert \nabla^2 f(x_k)-\nabla^2 f(x_k+t(x^*-x_k)) \right\rVert\left\lVert x_k-x^* \right\rVert\mathrm{d}t.
     \end{align*}
     \ifEn
-        If $\nabla^2 f$ is Lipschitz continuous with constant $L^{\mathrm{H}}$, then the integrand is bounded by $L^{\mathrm{H}}t\lVert x_k-x^* \rVert$, and integrating yields
+        If $\nabla^2 f$ is Lipschitz continuous with constant $L^{\mathrm{H}}$, then the integrand is bounded by $L^{\mathrm{H}}t\left\lVert x_k-x^* \right\rVert$, and integrating yields
     \else
-        $\nabla^2 f$ が定数 $L^{\mathrm{H}}$ を持つ Lipschitz 連続であれば、被積分関数は $L^{\mathrm{H}}t\lVert x_k-x^* \rVert$ で上から抑えられ、積分により次を得る。
+        $\nabla^2 f$ が定数 $L^{\mathrm{H}}$ を持つ Lipschitz 連続であれば、被積分関数は $L^{\mathrm{H}}t\left\lVert x_k-x^* \right\rVert$ で上から抑えられ、積分により次を得る。
     \fi
     \begin{equation*}
-        \lVert \nabla^2 f(x_k)(x_k-x^*)-\left(\nabla f(x_k)-\nabla f(x^*)\right) \rVert
-        \le \frac{1}{2}L^{\mathrm{H}}\lVert x_k-x^* \rVert^2.
+        \left\lVert \nabla^2 f(x_k)(x_k-x^*)-\left(\nabla f(x_k)-\nabla f(x^*)\right) \right\rVert
+        \le \frac{1}{2}L^{\mathrm{H}}\left\lVert x_k-x^* \right\rVert^2.
     \end{equation*}
     \ifEn
-        Since $\nabla^2 f(x^*)$ is positive definite, there exists a radius $r>0$ such that for all $x$ satisfying $\lVert x-x^* \rVert\le r$,
+        Since $\nabla^2 f(x^*)$ is positive definite, there exists a radius $r>0$ such that for all $x$ satisfying $\left\lVert x-x^* \right\rVert\le r$,
     \else
-        $\nabla^2 f(x^*)$ は正定値なので、ある半径 $r>0$ が存在して $\lVert x-x^* \rVert\le r$ を満たすすべての $x$ について
+        $\nabla^2 f(x^*)$ は正定値なので、ある半径 $r>0$ が存在して $\left\lVert x-x^* \right\rVert\le r$ を満たすすべての $x$ について
     \fi
     \begin{equation*}
         \left\lVert \left(\nabla^2 f(x)\right)^{-1} \right\rVert\le 2 \left\lVert \left(\nabla^2 f(x^*)\right)^{-1} \right\rVert
@@ -358,37 +358,37 @@
         これらを合わせると次を得る。
     \fi
     \begin{align*}
-        \lVert x_{k+1} - x^* \rVert
+        \left\lVert x_{k+1} - x^* \right\rVert
          & \leq \left\lVert \left(\nabla^2 f(x_k)\right)^{-1} \right\rVert \left\lVert \nabla^2 f(x_k)(x_k-x^*)-\left(\nabla f(x_k)-\nabla f(x^*)\right) \right\rVert \\
-         & \le L^{\mathrm{H}} \left\lVert \left(\nabla^2 f(x^*)\right)^{-1} \right\rVert \lVert x_k-x^* \rVert^2.
+         & \le L^{\mathrm{H}} \left\lVert \left(\nabla^2 f(x^*)\right)^{-1} \right\rVert \left\lVert x_k-x^* \right\rVert^2.
     \end{align*}
     \ifEn
         Let $\widetilde L \coloneqq L^{\mathrm{H}}\left\lVert \left(\nabla^2 f(x^*)\right)^{-1} \right\rVert$.
-        If the initial point is chosen such that $\lVert x_0-x^* \rVert\le \min\{ r, 1/(2\widetilde L) \}$, then by induction $\{ x_k \}$ remains within the neighborhood and converges to $x^*$.
+        If the initial point is chosen such that $\left\lVert x_0-x^* \right\rVert\le \min\{ r, 1/(2\widetilde L) \}$, then by induction $\{ x_k \}$ remains within the neighborhood and converges to $x^*$.
         The above error bound implies quadratic convergence of $\{ x_k \}$.
 
         To show quadratic convergence of the gradient norm, we use $x_{k+1}-x_k=-\left(\nabla^2 f(x_k)\right)^{-1}\nabla f(x_k)$ and
         $\nabla f(x_k)+\nabla^2 f(x_k)(x_{k+1}-x_k)=0$, yielding
     \else
         $\widetilde L \coloneqq L^{\mathrm{H}}\left\lVert \left(\nabla^2 f(x^*)\right)^{-1} \right\rVert$ とおく。
-        初期点が $\lVert x_0-x^* \rVert\le \min\{ r, 1/(2\widetilde L) \}$ を満たすように選ばれていれば、帰納法により $\{ x_k \}$ は近傍内に留まり $x^*$ に収束する。
+        初期点が $\left\lVert x_0-x^* \right\rVert\le \min\{ r, 1/(2\widetilde L) \}$ を満たすように選ばれていれば、帰納法により $\{ x_k \}$ は近傍内に留まり $x^*$ に収束する。
         上の誤差評価は $\{ x_k \}$ の二次収束を示す。
 
         勾配ノルムの二次収束を示すために、$x_{k+1}-x_k=-\left(\nabla^2 f(x_k)\right)^{-1}\nabla f(x_k)$ と
         $\nabla f(x_k)+\nabla^2 f(x_k)(x_{k+1}-x_k)=0$ を用いると次を得る。
     \fi
     \begin{align*}
-        \lVert \nabla f(x_{k+1}) \rVert
-         & = \lVert \nabla f(x_{k+1})-\nabla f(x_k)-\nabla^2 f(x_k)(x_{k+1}-x_k) \rVert                                   \\
-         & \le \int_0^1 \lVert \nabla^2 f(x_k+t (x_{k+1}-x_k))-\nabla^2 f(x_k) \rVert\lVert x_{k+1}-x_k \rVert\mathrm{d}t \\
-         & \le \frac{1}{2}L^{\mathrm{H}}\lVert x_{k+1}-x_k \rVert^2                                                       \\
-         & \le \frac{1}{2}L^{\mathrm{H}}\lVert \left(\nabla^2 f(x_k)\right)^{-1} \rVert^2\lVert \nabla f(x_k) \rVert^2    \\
-         & \le 2 L^{\mathrm{H}} \lVert \left(\nabla^2 f(x^*)\right)^{-1} \rVert^2\lVert \nabla f(x_k) \rVert^2.
+        \left\lVert \nabla f(x_{k+1}) \right\rVert
+         & = \left\lVert \nabla f(x_{k+1})-\nabla f(x_k)-\nabla^2 f(x_k)(x_{k+1}-x_k) \right\rVert                                              \\
+         & \le \int_0^1 \left\lVert \nabla^2 f(x_k+t (x_{k+1}-x_k))-\nabla^2 f(x_k) \right\rVert\left\lVert x_{k+1}-x_k \right\rVert\mathrm{d}t \\
+         & \le \frac{1}{2}L^{\mathrm{H}}\left\lVert x_{k+1}-x_k \right\rVert^2                                                                  \\
+         & \le \frac{1}{2}L^{\mathrm{H}}\left\lVert \left(\nabla^2 f(x_k)\right)^{-1} \right\rVert^2\left\lVert \nabla f(x_k) \right\rVert^2    \\
+         & \le 2 L^{\mathrm{H}} \left\lVert \left(\nabla^2 f(x^*)\right)^{-1} \right\rVert^2\left\lVert \nabla f(x_k) \right\rVert^2.
     \end{align*}
     \ifEn
-        Therefore, $\lVert \nabla f(x_k) \rVert$ converges quadratically to 0.
+        Therefore, $\left\lVert \nabla f(x_k) \right\rVert$ converges quadratically to 0.
     \else
-        よって $\lVert \nabla f(x_k) \rVert$ は0へと局所二次収束する。
+        よって $\left\lVert \nabla f(x_k) \right\rVert$ は0へと局所二次収束する。
     \fi
     \myQED
 \end{proof}

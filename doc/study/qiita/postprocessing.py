@@ -15,7 +15,7 @@ from converters import (
 )
 
 
-def post_process_content(content: str, label_map=None) -> str:
+def post_process_content(content: str) -> str:
     """Apply post-processing conversions to content.
 
     This is applied after main environment processing to handle conversions
@@ -26,7 +26,6 @@ def post_process_content(content: str, label_map=None) -> str:
 
     Args:
         content: The content to post-process
-        label_map: Optional label mapping for cref conversion
 
     Returns:
         Post-processed content
@@ -37,6 +36,10 @@ def post_process_content(content: str, label_map=None) -> str:
     content = convert_href_to_md(content)
     # Then convert nested itemize/enumerate
     content = convert_nested_itemize_enumerate(content)
+    # Remove labels and \myQED
+    content = re.sub(r"\\label\{[^}]+\}", "", content)
+    content = content.replace("\\myQED", "")
+    content = content.replace("^*", "^\\ast")
     # Note: citep conversion is applied in for_qiita_post_process
     return content
 
@@ -67,11 +70,7 @@ def for_qiita_post_process(content: str) -> str:
         else:
             resList.append(line)
     res = "\n".join(resList) + "\n"
-    res = (
-        res.replace("\n\n\n", "\n\n")
-        .replace("\n\n\n", "\n\n")
-        .replace("\n\n\n", "\n\n")
-    )
+    res = re.sub(r"\n{3,}", "\n\n", res)
     res = res.replace("\\coloneqq", "\\mathrel{\\vcenter{:}}=").replace(
         "{dcases}", "{cases}"
     )

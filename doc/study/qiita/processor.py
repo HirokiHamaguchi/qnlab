@@ -22,7 +22,6 @@ from converters import (
     convert_subfile_to_md,
     convert_table_to_md,
 )
-from postprocessing import post_process_content
 from utils import preprocess_latex
 
 
@@ -87,6 +86,8 @@ class LatexToMarkdownConverter:
         all_envs = self._get_all_envs_pattern()
         environment_match = re.match(r"\\begin\{(" + all_envs + r")\}", line)
         if not environment_match:
+            self.markdown_lines.append(self.process_normal_line(line))
+            self.i += 1
             return False
 
         env_name = environment_match.group(1)
@@ -100,7 +101,7 @@ class LatexToMarkdownConverter:
         )
 
         if converted:
-            self.markdown_lines.append(converted)
+            self.markdown_lines.append(self.process_normal_line(converted))
 
         return True
 
@@ -154,7 +155,7 @@ class LatexToMarkdownConverter:
         elif env_name in MATH_ENVS:
             return self._convert_numbered_env(env_name, block, labels, env_start_line)
         elif env_name in EQUATION_ENVS:
-            return convert_equation_environments(block)
+            return block # done in postprocessing
         elif env_name == "proof":
             return convert_proof_to_md(block)
         return ""
@@ -179,9 +180,9 @@ class LatexToMarkdownConverter:
         )
 
         if env_name == "figure":
-            return convert_figure_to_md(block, counter, post_process_content)
+            return convert_figure_to_md(block, counter)
         elif env_name == "table":
-            return convert_table_to_md(block, counter, post_process_content)
+            return convert_table_to_md(block, counter)
         else:
             return convert_math_env_to_md(block, env_name, counter)
 
@@ -291,8 +292,7 @@ class LatexToMarkdownConverter:
         line = convert_cref(line, self.global_state.label_map)
         # Convert section commands
         line = convert_section_commands(line)
-        self.markdown_lines.append(line)
-        self.i += 1
+        return line
 
     def process_file(self) -> List[str]:
         """Process the LaTeX file and return list of Markdown lines.
@@ -329,10 +329,8 @@ class LatexToMarkdownConverter:
                 self.i += 1
                 continue
 
-            if self.process_environment_block(line):
-                continue
+            self.process_environment_block(line)
 
-            self.process_normal_line(line)
 
         return self.markdown_lines
 

@@ -24,19 +24,23 @@ def convert_cref(line: str, label_map: Dict[str, tuple]) -> str:
     """
 
     def cref_replace(match: re.Match[str]) -> str:
-        label = match.group(1)
-
-        if label not in label_map:
+        labels = [label.strip() for label in match.group(1).split(",") if label.strip()]
+        if not labels:
             return match.group(0)
 
-        label_type, label_num = label_map[label]
-        display_name = ENV_DISPLAY_NAMES.get(label_type)
+        converted: List[str] = []
+        for label in labels:
+            if label not in label_map:
+                return match.group(0)
+            label_type, label_num = label_map[label]
+            display_name = ENV_DISPLAY_NAMES.get(label_type)
+            if not display_name:
+                return match.group(0)
+            converted.append(f"{display_name} {label_num}")
 
-        if display_name:
-            return f"{display_name} {label_num}"
-        return match.group(0)
+        return ", ".join(converted)
 
-    return re.sub(r"\\cref\{([^}]+)\}", cref_replace, line)
+    return re.sub(r"\\[Cc]ref\{([^}]+)\}", cref_replace, line)
 
 
 def convert_section_commands(line: str) -> str:
@@ -133,7 +137,7 @@ def convert_subfile_to_md(content: str) -> str:
         # Build image path
         image_path = filename + ".png"
         if USE_GITHUB_URL:
-            url = f"{GITHUB_RAW_URL_BASE}doc/{image_path}"
+            url = f"{GITHUB_RAW_URL_BASE}doc/study/{image_path}"
         else:
             url = image_path
         return f"![{filename}]({url})"
@@ -232,9 +236,9 @@ def convert_proof_to_md(block: str) -> str:
     for line in lines:
         stripped = line.strip()
         if stripped == "\\begin{proof}":
-            converted.append("*Proof*:")
+            converted.append("<details><summary>証明</summary>\n")
         elif stripped == "\\end{proof}":
-            converted.append("")
+            converted.append("(証明終わり)\n\n</details>")
         else:
             converted.append(line)
     return "\n".join(converted).strip()
@@ -261,7 +265,7 @@ def convert_math_env_to_md(block: str, env_name: str, counter: int) -> str:
     return "\n".join(result_lines)
 
 
-def convert_figure_to_md(block: str, counter: int, postprocess_fn) -> str:
+def convert_figure_to_md(block: str, counter: int) -> str:
     r"""Convert LaTeX figure block to Markdown.
 
     Converts \includegraphics paths to GitHub raw content URLs and PDF to PNG.
@@ -298,10 +302,9 @@ def convert_figure_to_md(block: str, counter: int, postprocess_fn) -> str:
     caption_text = extract_braced_content(block, "caption").replace("\n", " ").strip()
     if caption_text:
         print(f"Figure {counter} caption: {caption_text}")
-        caption_text = postprocess_fn(caption_text)
         result += f"\n({ENV_DISPLAY_NAMES['figure']} {counter} {caption_text})\n"
 
-    return postprocess_fn(result)
+    return result
 
 
 def extract_figure_images(block: str) -> List[Dict[str, str]]:
@@ -341,7 +344,7 @@ def extract_figure_images(block: str) -> List[Dict[str, str]]:
     return images
 
 
-def convert_table_to_md(block: str, counter: int, postprocess_fn) -> str:
+def convert_table_to_md(block: str, counter: int) -> str:
     """Convert LaTeX table to Markdown.
 
     Extracts tabular content and formats as Markdown table.
@@ -362,7 +365,10 @@ def convert_table_to_md(block: str, counter: int, postprocess_fn) -> str:
     rows = []
     current_row = []
     for line in lines:
-        cells = [cell.strip() for cell in line.split("&")]
+        cells = [cell.strip().replace("\\\\", "").replace(" ", "") for cell in line.split("&")]
+        cells=[c for c in cells if c!="\\hline"]
+        if len(cells)==0:
+            continue
         current_row.extend(cells)
         if "\\\\" in line:
             rows.append(current_row)
@@ -394,7 +400,6 @@ def convert_table_to_md(block: str, counter: int, postprocess_fn) -> str:
     caption_text = extract_braced_content(block, "caption").replace("\n", " ").strip()
     if caption_text:
         print(f"Table {counter} caption: {caption_text}")
-        caption_text = postprocess_fn(caption_text)
         result += f"\n({ENV_DISPLAY_NAMES['table']} {counter}: {caption_text})\n"
 
-    return postprocess_fn(result)
+    return result

@@ -27,8 +27,8 @@
 ```math
 \begin{align*}
 \textrm{(convex)} \quad
-f((1-\lambda) x + \lambda y)                                        & \le (1-\lambda) f(x) + \lambda f(y),                                                         \\
-\textrm{($\mu$-strongly convex)} \quad f((1-\lambda) x + \lambda y) & \le (1-\lambda) f(x) + \lambda f(y) - \frac{\mu}{2} \lambda (1-\lambda) \lVert x-y \rVert^2.
+f((1-\lambda) x + \lambda y)                                        & \le (1-\lambda) f(x) + \lambda f(y),                                                                    \\
+\textrm{($\mu$-strongly convex)} \quad f((1-\lambda) x + \lambda y) & \le (1-\lambda) f(x) + \lambda f(y) - \frac{\mu}{2} \lambda (1-\lambda) \left\lVert x-y \right\rVert^2.
 \end{align*}
 ```
 
@@ -39,15 +39,15 @@ $f$ が少なくとも $C^1$ 級で、その定義域 $\mathbb{R}^n$ 全体で�
 ```math
 \begin{align*}
 \textrm{(convex)} \quad
-f(y) & \ge f(x)+\nabla f(x)^\top (y-x),                                  \\
+f(y) & \ge f(x)+\nabla f(x)^\top (y-x),                                             \\
 \textrm{($\mu$-strongly convex)} \quad
-f(y) & \ge f(x)+\nabla f(x)^\top (y-x)+\frac{\mu}{2}\lVert y-x \rVert^2.
+f(y) & \ge f(x)+\nabla f(x)^\top (y-x)+\frac{\mu}{2}\left\lVert y-x \right\rVert^2.
 \end{align*}
 ```
 
 強凸性は、凸性に加えて目的関数が一様に正の曲率を持つことを意味します。
 凸関数と強凸関数の例を Fig. 1 に示しました。
-このような定義は、文献によって多少の揺れがありますが、例えば~[^nesterovIntroductoryLecturesConvex2014][^kanamori2016continuous]などを参照してください。
+このような定義は、文献によって多少の揺れがありますが、例えば[^nesterovIntroductoryLecturesConvex2014][^kanamori2016continuous]などを参照してください。
 
 ![../imgs/quasi_newton/convexity_comparison_convex.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/convexity_comparison_convex.png)
 
@@ -60,44 +60,52 @@ f(y) & \ge f(x)+\nabla f(x)^\top (y-x)+\frac{\mu}{2}\lVert y-x \rVert^2.
 関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^1$ 級であるとする。
 このとき、凸と $\mu$-強凸に関する二つの定義はそれぞれ同値である。
 
-*Proof*:
+<details><summary>証明</summary>
 
 $\mu$-強凸の場合について示します。
 まず、前者の定義が成立することを仮定すると、勾配の定義と、$f$ が $C^1$ 級であることから、以下が成り立ちます。
 
+```math
 \begin{align*}
 \nabla f(x)^\top (y-x)
-& =\lim_{\lambda \to 0} \frac{f(x+ \lambda (y-x)) - f(x)}{\lambda}                                                                                         \\
-& \le \lim_{\lambda \to 0} \frac{1}{\lambda} \left( (1-\lambda) f(x) + \lambda f(y) - \frac{\mu}{2} \lambda (1-\lambda) \lVert x-y \rVert^2 - f(x) \right) \\
-& = f(y) - f(x) - \frac{\mu}{2} \lVert x-y \rVert^2.
+& =\lim_{\lambda \to 0} \frac{f(x+ \lambda (y-x)) - f(x)}{\lambda}                                                                                                    \\
+& \le \lim_{\lambda \to 0} \frac{1}{\lambda} \left( (1-\lambda) f(x) + \lambda f(y) - \frac{\mu}{2} \lambda (1-\lambda) \left\lVert x-y \right\rVert^2 - f(x) \right) \\
+& = f(y) - f(x) - \frac{\mu}{2} \left\lVert x-y \right\rVert^2.
 \end{align*}
+```
 
 従って、後者の定義が成立します。
 
 続いて、後者の定義が成立することを仮定します。
 $z \mathrel{\vcenter{:}}= (1-\lambda)x + \lambda y$ とおくと、次が成り立ちます。
 
+```math
 \begin{align*}
-f(x) \geq f(z) + \nabla f(z)^\top (x-z) + \frac{\mu}{2} \lVert x-z \rVert^2, \\
-f(y) \geq f(z) + \nabla f(z)^\top (y-z) + \frac{\mu}{2} \lVert y-z \rVert^2.
+f(x) \geq f(z) + \nabla f(z)^\top (x-z) + \frac{\mu}{2} \left\lVert x-z \right\rVert^2, \\
+f(y) \geq f(z) + \nabla f(z)^\top (y-z) + \frac{\mu}{2} \left\lVert y-z \right\rVert^2.
 \end{align*}
+```
 
 これらを、それぞれ $1-\lambda$ 倍、$\lambda$ 倍して足し合わせると、次が成り立ちます。
 
+```math
 \begin{align*}
 (1-\lambda) f(x) + \lambda f(y)
 & \geq f(z) + \nabla f(z)^\top \left( (1-\lambda)(x-z) + \lambda (y-z) \right)
-+ \frac{\mu}{2} \left( (1-\lambda) \lVert x-z \rVert^2 + \lambda \lVert y-z \rVert^2 \right)                                   \\
-& = f(z) + \frac{\mu}{2} \left( (1-\lambda) \lambda^2 \lVert x-y \rVert^2 + \lambda (1-\lambda)^2 \lVert y-x \rVert^2 \right) \\
-& = f(z) + \frac{\mu}{2} \lambda (1-\lambda) \lVert x-y \rVert^2.
++ \frac{\mu}{2} \left( (1-\lambda) \left\lVert x-z \right\rVert^2 + \lambda \left\lVert y-z \right\rVert^2 \right)                                   \\
+& = f(z) + \frac{\mu}{2} \left( (1-\lambda) \lambda^2 \left\lVert x-y \right\rVert^2 + \lambda (1-\lambda)^2 \left\lVert y-x \right\rVert^2 \right) \\
+& = f(z) + \frac{\mu}{2} \lambda (1-\lambda) \left\lVert x-y \right\rVert^2.
 \end{align*}
+```
 
 従って、前者の定義が成立します。
 つまり、これらの定義は同値であることが示されました。
 
 $\mu=0$ の場合も、同様の議論により凸性について示すことができます。
 
-\myQED
+(証明終わり)
+
+</details>
 
 ### Positive Definiteness of the Hessian
 
@@ -120,8 +128,8 @@ $A$ を $\mathbb{R}^{n \times n}$ の対称行列とします。
 行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表します。
 特に $B$ が零行列のときは $A \succeq 0$ と書きます。
 同様に、$\preceq$ は半負定値に対して定義されます。
-$\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \lVert v \rVert^2$ と同値です。
-これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味し、さらに作用素ノルムについても $\lVert A \rVert \geq \mu$ であることを導きます。
+$\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ と同値です。
+これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味し、さらに作用素ノルムについても $\left\lVert A \right\rVert \geq \mu$ であることを導きます。
 
 ここで、凸性および強凸性とヘッセ行列の正定値性との関係は次の通りです。
 
@@ -129,68 +137,80 @@ $\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ 
 
 関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^2$ 級であるとする。
 このとき、
-\begin{itemize}
-\item $f$ が凸であることと、任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\succeq0$ が成り立つことは同値である。
-\item $f$ が $\mu$-強凸であることと、任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\succeq\mu I$ が成り立つことは同値である。
-\end{itemize}
+- $f$ が凸であることと、任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\succeq0$ が成り立つことは同値である。
+- $f$ が $\mu$-強凸であることと、任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\succeq\mu I$ が成り立つことは同値である。
 
-*Proof*:
+<details><summary>証明</summary>
 
 まず $\mu>0$ とし、任意の $x \in \mathbb{R}^n$ に対して $\nabla^2 f(x)\succeq \mu I$ が成り立つと仮定します。
 微分積分学の基本定理より、任意の $x,y \in \mathbb{R}^n$ について次が成り立ちます。
 
+```math
 \begin{equation*}
 f(y)
 = f(x)+\nabla f(x)^\top (y-x)
 +\frac{1}{2} \int_0^1 (y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t.
 \end{equation*}
+```
 
 また、仮定 $\nabla^2 f(x)\succeq \mu I$ から次が得られます。
 
+```math
 \begin{equation*}
 \int_0^1 (y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t
-\ge \int_0^1 \mu\lVert y-x \rVert^2 \mathrm{d}t
-= \mu\lVert y-x \rVert^2.
+\ge \int_0^1 \mu\left\lVert y-x \right\rVert^2 \mathrm{d}t
+= \mu\left\lVert y-x \right\rVert^2.
 \end{equation*}
+```
 
 以上の結果を合わせると、$\mu$-強凸性の定義が導かれます。
 
 逆に、$f$ が $\mu$-強凸であると仮定します。
 任意の $x \in \mathbb{R}^n, \ v \in \mathbb{R}^n$ および $t>0$ に対し、$y=x \pm tv$ とおくと次が成り立ちます。
 
+```math
 \begin{equation*}
 \begin{cases}
-f(x + tv)\ge f(x) + t\nabla f(x)^\top v+\frac{\mu}{2}t^2\lVert v \rVert^2, \\
-f(x - tv)\ge f(x) - t\nabla f(x)^\top v+\frac{\mu}{2}t^2\lVert v \rVert^2.
+f(x + tv)\ge f(x) + t\nabla f(x)^\top v+\frac{\mu}{2}t^2\left\lVert v \right\rVert^2, \\
+f(x - tv)\ge f(x) - t\nabla f(x)^\top v+\frac{\mu}{2}t^2\left\lVert v \right\rVert^2.
 \end{cases}
 \end{equation*}
+```
 
 テイラーの定理より、ある $s_\pm \in (0,1)$ が存在して次が成り立ちます。
 
+```math
 \begin{equation*}
 \begin{cases}
 f(x + tv) = f(x) + t\nabla f(x)^\top v + \frac{1}{2} t^2 v^\top \nabla^2 f(x + s_+ t v) v, \\
 f(x - tv) = f(x) - t\nabla f(x)^\top v + \frac{1}{2} t^2 v^\top \nabla^2 f(x - s_- t v) v.
 \end{cases}
 \end{equation*}
+```
 
 これらの結果を合わせると次が成り立ちます。
 
+```math
 \begin{equation*}
-v^\top \frac{\nabla^2 f(x+ s_+ t v) + \nabla^2 f(x - s_- t v)}{2} v \ge \mu \lVert v \rVert^2.
+v^\top \frac{\nabla^2 f(x+ s_+ t v) + \nabla^2 f(x - s_- t v)}{2} v \ge \mu \left\lVert v \right\rVert^2.
 \end{equation*}
+```
 
 $t \to 0$ とし、$f$ が $C^2$ 級という仮定による $\nabla^2 f$ の連続性を用いると次を得ます。
 
+```math
 \begin{equation*}
-v^\top \nabla^2 f(x) v \ge \mu \lVert v \rVert^2.
+v^\top \nabla^2 f(x) v \ge \mu \left\lVert v \right\rVert^2.
 \end{equation*}
+```
 
 $v \in \mathbb{R}^n$ は任意なので、$\nabla^2 f(x)\succeq \mu I$ という結果が得られました。
 
 上記の議論で $\mu=0$ とすれば、同様に凸の場合も示されます。
 
-\myQED
+(証明終わり)
+
+</details>
 
 ヘッセ行列が正定値・不定値・負定値である二次関数を Fig. 2 に示しました。
 定値性と凸性の対応関係を確認できます。
@@ -206,7 +226,7 @@ $v \in \mathbb{R}^n$ は任意なので、$\nabla^2 f(x)\succeq \mu I$ という
 
 ```math
 \begin{equation*}
-\lVert \nabla f(x)-\nabla f(y) \rVert \le L\lVert x-y \rVert
+\left\lVert \nabla f(x)-\nabla f(y) \right\rVert \le L\left\lVert x-y \right\rVert
 \end{equation*}
 ```
 
@@ -219,58 +239,72 @@ $v \in \mathbb{R}^n$ は任意なので、$\nabla^2 f(x)\succeq \mu I$ という
 関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^2$ 級であるとする。
 このとき、$f$ が $L$-平滑であることと、任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\preceq L I$ が成り立つことは同値である。
 
-*Proof*:
+<details><summary>証明</summary>
 
 $f$ は $C^2$ 級なので、微分積分学の基本定理より任意の $x,y \in \mathbb{R}^n$ について次が成り立つ。
 
+```math
 \begin{equation*}
 \nabla f(y) - \nabla f(x)
 = \int_0^1 \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t.
 \end{equation*}
+```
 
 任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\preceq L I$ と仮定します。
-このとき $\lVert \nabla^2 f(x) \rVert \le L$ が成り立つので、
+このとき $\left\lVert \nabla^2 f(x) \right\rVert \le L$ が成り立つので、
 
+```math
 \begin{align*}
-\lVert \nabla f(y) - \nabla f(x) \rVert
-& = \lVert \int_0^1 \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t \rVert   &  & (\text{previous equation})   \\
-& \le \int_0^1 \lVert \nabla^2 f(x+t(y-x))(y-x) \rVert \mathrm{d}t &  & (\text{triangle inequality}) \\
-& \le \int_0^1 L\lVert y-x \rVert \mathrm{d}t                      &  & (\text{by assumption})       \\
-& = L\lVert y-x \rVert,
+\left\lVert \nabla f(y) - \nabla f(x) \right\rVert
+& = \left\lVert \int_0^1 \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t \right\rVert   &  & (\text{previous equation})   \\
+& \le \int_0^1 \left\lVert \nabla^2 f(x+t(y-x))(y-x) \right\rVert \mathrm{d}t &  & (\text{triangle inequality}) \\
+& \le \int_0^1 L\left\lVert y-x \right\rVert \mathrm{d}t                      &  & (\text{by assumption})       \\
+& = L\left\lVert y-x \right\rVert,
 \end{align*}
+```
 
 つまり、 $f$ の $L$-平滑性が示されました。
 
 逆に、$f$ が $L$-平滑であるとすると、任意の $x \in \mathbb{R}^n$ と $v \in \mathbb{R}^n$ に対して次が成り立ちます。
 
+```math
 \begin{equation*}
-\lVert \nabla f(x+tv)-\nabla f(x) \rVert \le L\lVert tv \rVert = Lt\lVert v \rVert.
+\left\lVert \nabla f(x+tv)-\nabla f(x) \right\rVert \le L\left\lVert tv \right\rVert = Lt\left\lVert v \right\rVert.
 \end{equation*}
+```
 
-さらにテイラーの定理より、$t \to 0$ のとき $\lVert r(t) \rVert/t \to 0$ を満たす剰余項 $r(t)$ を用いて次が成り立ちます。
+さらにテイラーの定理より、$t \to 0$ のとき $\left\lVert r(t) \right\rVert/t \to 0$ を満たす剰余項 $r(t)$ を用いて次が成り立ちます。
 
+```math
 \begin{equation*}
 \nabla f(x+tv)-\nabla f(x) = t \nabla^2 f(x) v + r(t).
 \end{equation*}
+```
 
 そして、これは次のように書き換えられます。
 
+```math
 \begin{equation*}
 \nabla^2 f(x) v = \lim_{t \to 0} \frac{\nabla f(x+tv)-\nabla f(x) -r(t)}{t} = \lim_{t \to 0} \frac{\nabla f(x+tv)-\nabla f(x)}{t}.
 \end{equation*}
+```
 
 $v$ との内積を取ると次が得られます。
 
+```math
 \begin{align*}
-v^\top \nabla^2 f(x) v & = \lim_{t \to 0} \left(\frac{\nabla f(x+tv)-\nabla f(x)}{t}\right)^\top v                                                         \\
-& \leq \lim_{t \to 0} \frac{\lVert \nabla f(x+tv)-\nabla f(x) \rVert}{t} \lVert v \rVert &  & (\text{Cauchy--Schwarz inequality})   \\
-& \leq \lim_{t \to 0} \frac{L\lVert tv \rVert}{t} \lVert v \rVert                        &  & (\text{by $L$-smoothness definition}) \\
-& = L \lVert v \rVert^2.
+v^\top \nabla^2 f(x) v & = \lim_{t \to 0} \left(\frac{\nabla f(x+tv)-\nabla f(x)}{t}\right)^\top v                                                                               \\
+& \leq \lim_{t \to 0} \frac{\left\lVert \nabla f(x+tv)-\nabla f(x) \right\rVert}{t} \left\lVert v \right\rVert &  & (\text{Cauchy--Schwarz inequality})   \\
+& \leq \lim_{t \to 0} \frac{L\left\lVert tv \right\rVert}{t} \left\lVert v \right\rVert                        &  & (\text{by $L$-smoothness definition}) \\
+& = L \left\lVert v \right\rVert^2.
 \end{align*}
+```
 
 $v \in \mathbb{R}^n$ は任意なので、$\nabla^2 f(x)\preceq L I$ という結果が得られました。
 
-\myQED
+(証明終わり)
+
+</details>
 
 #### ヘッセ行列の固有値のバウンド
 
@@ -281,17 +315,21 @@ $L$-平滑性と $\mu$-強凸性を組み合わせると、ヘッセ行列の固
 $f \colon \mathbb{R}^n \to \mathbb{R}$ を $C^2$ 級とする。
 $f$ が $L$-平滑かつ $\mu$-強凸であれば、任意の $x \in \mathbb{R}^n$ に対してヘッセ行列 $\nabla^2 f(x)$ の固有値は区間 $[\mu, L]$ に含まれる。
 
-*Proof*:
+<details><summary>証明</summary>
 
-\cref{prop:convexity-hessian,prop:smoothness-hessian} より、全ての $x \in \mathbb{R}^n$ に対して、次が成り立ちます。
+Proposition 2, Proposition 3 より、全ての $x \in \mathbb{R}^n$ に対して、次が成り立ちます。
 
+```math
 \begin{equation*}
 \mu I \preceq \nabla^2 f(x) \preceq L I.
 \end{equation*}
+```
 
 これより $\nabla^2 f(x)$ の固有値が区間 $[\mu, L]$ に含まれることが直ちに従います。
 
-\myQED
+(証明終わり)
+
+</details>
 
 #### Baillon--Haddadの定理
 
@@ -301,12 +339,16 @@ $f$ が $L$-平滑かつ $\mu$-強凸であれば、任意の $x \in \mathbb{R}^
 **Proposition 5**
 
 関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^1$ 級であるとする。$f$ が $L$-平滑かつ凸であれば、任意の $x,y \in \mathbb{R}^n$ に対して $\nabla f$ は $1/L$-cocoercive である、すなわち
+
+```math
 \begin{equation*}
-(\nabla f(x)-\nabla f(y))^\top (x-y) \ge \frac{1}{L} \lVert \nabla f(x)-\nabla f(y) \rVert^2
+(\nabla f(x)-\nabla f(y))^\top (x-y) \ge \frac{1}{L} \left\lVert \nabla f(x)-\nabla f(y) \right\rVert^2
 \end{equation*}
+```
+
 が任意の $x,y \in \mathbb{R}^n$ について成り立つ。
 
-証明は他の文献を参照してください~[^bauschkeBaillonHaddadTheoremRevisited2009]~[^rockafellarVariationalAnalysis1998] (Proposition 12.60)。
+証明は他の文献を参照してください[^bauschkeBaillonHaddadTheoremRevisited2009][^rockafellarVariationalAnalysis1998] (Proposition 12.60)。
 
 最適化アルゴリズムが生成する列 $\lbrace x_k \rbrace$ に対し、
 
@@ -320,12 +362,11 @@ s_k \mathrel{\vcenter{:}}= x_{k+1}-x_k, \quad y_k \mathrel{\vcenter{:}}= \nabla 
 
 ```math
 \begin{equation*}
-s_k^\top y_k \ge \frac{1}{L} \lVert y_k \rVert^2.
+s_k^\top y_k \ge \frac{1}{L} \left\lVert y_k \right\rVert^2.
 \end{equation*}
 ```
 
 この不等式は準ニュートン法の一種であるBFGS法やL-BFGS法などの更新則の解析で用いられています。
-
 
 <!-- From 2_newton.tex -->
 
@@ -353,7 +394,7 @@ $x_k$ での $f$ の二次のテイラー近似は次式で与えられます。
 
 ```math
 \begin{equation*}
-m^*_{k}(x) \mathrel{\vcenter{:}}= f(x_k) + g_k^\top (x - x_k) + \frac{1}{2} (x - x_k)^\top \nabla^2 f(x_k) (x - x_k).
+m^\ast_{k}(x) \mathrel{\vcenter{:}}= f(x_k) + g_k^\top (x - x_k) + \frac{1}{2} (x - x_k)^\top \nabla^2 f(x_k) (x - x_k).
 \end{equation*}
 ```
 
@@ -361,19 +402,19 @@ m^*_{k}(x) \mathrel{\vcenter{:}}= f(x_k) + g_k^\top (x - x_k) + \frac{1}{2} (x -
 
 ```math
 \begin{equation*}
-\nabla m^*_k(x) = g_k + \nabla^2 f(x_k)(x - x_k).
+\nabla m^\ast_k(x) = g_k + \nabla^2 f(x_k)(x - x_k).
 \end{equation*}
 ```
 
-仮定よりこの二次モデルは強凸であるため、点 $x^* \in \mathbb{R}^n$ が $m^*_k$ の最小点であることと $\nabla m^*_k(x) = 0$ が成り立つことは同値です。従って、解は以下の通りです。
+仮定よりこの二次モデルは強凸であるため、点 $x^\ast \in \mathbb{R}^n$ が $m^\ast_k$ の最小点であることと $\nabla m^\ast_k(x) = 0$ が成り立つことは同値です。従って、解は以下の通りです。
 
 ```math
 \begin{equation*}
-\underset{x \in \mathbb{R}^n}{\mathrm{arg \ min}} \ m^*_{k}(x) = x_k -\left(\nabla^2 f(x_k)\right)^{-1} g_k.
+\underset{x \in \mathbb{R}^n}{\mathrm{arg \ min}} \ m^\ast_{k}(x) = x_k -\left(\nabla^2 f(x_k)\right)^{-1} g_k.
 \end{equation*}
 ```
 
-次の反復点として、直接 $x^*$ を選ぶことは自然に思えますが、後で見るように一般にこのままでは大域収束性を保証できません。
+次の反復点として、直接 $x^\ast$ を選ぶことは自然に思えますが、後で見るように一般にこのままでは大域収束性を保証できません。
 そこで、関数値の十分な減少を確保するため、直線探索で定めるステップサイズ $\alpha_k > 0$ を導入すると、最初に示した更新式が得られます。
 これがニュートン法の基本的な手続きとなります。
 
@@ -386,7 +427,7 @@ g_k^\top d_k = -g_k^\top \nabla^2 f(x_k)^{-1} g_k < 0.
 ```
 
 $f$ が非凸である、つまりヘッセ行列 $\nabla^2 f(x_k)$ が負定値または不定値である場合、降下方向であるとは限らないので、ニュートン法は収束しない可能性があります。
-このような場合への一つの対処法として修正ニュートン法~[^nocedal1999numerical] (Sec. 3.4) が知られていますが、ここでは説明を省略します。
+このような場合への一つの対処法として修正ニュートン法[^nocedal1999numerical] (Sec. 3.4) が知られていますが、ここでは説明を省略します。
 
 ### ニュートン法の収束性
 
@@ -398,7 +439,7 @@ $f$ が非凸である、つまりヘッセ行列 $\nabla^2 f(x_k)$ が負定値
 
 ```math
 \begin{equation*}
-\lim_{k \to \infty} \lVert g_k \rVert = 0
+\lim_{k \to \infty} \left\lVert g_k \right\rVert = 0
 \end{equation*}
 ```
 
@@ -413,7 +454,7 @@ x_{k+1} \gets x_k + \alpha_k d_k.
 ```
 
 ここで $d_k$ は $g_k^\top d_k < 0$ を満たす降下方向であり、$\alpha_k > 0$ は直線探索で決定されるステップサイズです。
-ステップサイズ $\alpha_k$ は (弱)Wolfe 条件~[^nocedal1999numerical] (Sec. 3.1) により次のように定められるとします。
+ステップサイズ $\alpha_k$ は (弱)Wolfe 条件[^nocedal1999numerical] (Sec. 3.1) により次のように定められるとします。
 
 ```math
 \begin{equation*}
@@ -432,7 +473,7 @@ $0 < c_1 < c_2 < 1$ は定数です。
 
 ```math
 \begin{equation*}
-\cos \theta_k = \frac{-g_k^\top d_k}{\lVert g_k \rVert\lVert d_k \rVert}.
+\cos \theta_k = \frac{-g_k^\top d_k}{\left\lVert g_k \right\rVert\left\lVert d_k \right\rVert}.
 \end{equation*}
 ```
 
@@ -443,72 +484,93 @@ $0 < c_1 < c_2 < 1$ は定数です。
 関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^1$ 級であり $\mathbb{R}^n$ 上で下に有界で、かつ $L$-平滑だとする。
 次の反復法を考える。
 
+```math
 \begin{equation*}
 x_{k+1} \gets x_k + \alpha_k d_k.
 \end{equation*}
+```
 
 初期点 $x_0 \in \mathbb{R}^n$ から開始され、ステップサイズ $\alpha_k$ は Wolfe 条件を満たすとする。
 角 $\lbrace \theta_k \rbrace_k$ に対して、ある正の定数 $\delta$ が存在して $\cos \theta_k \geq \delta > 0$ が全ての $k$ で成り立つならば、
 この反復法は次を満たす点列 $\lbrace x_k \rbrace_k$ を生成する。
 
+```math
 \begin{equation*}
-\lim_{k \to \infty} \lVert g_k \rVert = 0.
+\lim_{k \to \infty} \left\lVert g_k \right\rVert = 0.
 \end{equation*}
-*Proof*:
+```
+
+<details><summary>証明</summary>
 
 Wolfe 条件、Cauchy--Schwarz の不等式、$f$ の $L$-平滑性より、次の二つの関係式が成り立ちます。
 
+```math
 \begin{equation*}
 \begin{cases}
 (g_{k+1} - g_k)^\top d_k = g_{k+1}^\top d_k - g_k^\top d_k
 \geq (c_2 - 1) g_k^\top d_k, \\
 (g_{k+1} - g_k)^\top d_k \leq
-\lVert g_{k+1} - g_k \rVert \lVert d_k \rVert \leq L \lVert x_{k+1} - x_k \rVert \lVert d_k \rVert  = \alpha_k L \lVert d_k \rVert^2.
+\left\lVert g_{k+1} - g_k \right\rVert \left\lVert d_k \right\rVert \leq L \left\lVert x_{k+1} - x_k \right\rVert \left\lVert d_k \right\rVert  = \alpha_k L \left\lVert d_k \right\rVert^2.
 \end{cases}
 \end{equation*}
+```
 
 これらを組み合わせると次の不等式が得られます。
 
+```math
 \begin{equation*}
-\alpha_k \geq \frac{c_2 - 1}{L} \frac{g_k^\top d_k}{\lVert d_k \rVert^2}.
+\alpha_k \geq \frac{c_2 - 1}{L} \frac{g_k^\top d_k}{\left\lVert d_k \right\rVert^2}.
 \end{equation*}
+```
 
 よって、
 
+```math
 \begin{align*}
-f(x_{k+1}) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k                                          &  & (\text{Armijo condition})         \\
-& \leq f(x_k) - c_1 \frac{1 - c_2}{L} \frac{(g_k^\top d_k)^2}{\lVert d_k \rVert^2} &  & (\text{previous inequality})      \\
-& = f(x_k) - c_1 \frac{1 - c_2}{L} \cos^2 \theta_k \lVert g_k \rVert^2.            &  & (\text{definition of $\theta_k$})
+f(x_{k+1}) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k                                                     &  & (\text{Armijo condition})         \\
+& \leq f(x_k) - c_1 \frac{1 - c_2}{L} \frac{(g_k^\top d_k)^2}{\left\lVert d_k \right\rVert^2} &  & (\text{previous inequality})      \\
+& = f(x_k) - c_1 \frac{1 - c_2}{L} \cos^2 \theta_k \left\lVert g_k \right\rVert^2.            &  & (\text{definition of $\theta_k$})
 \end{align*}
+```
 
 この不等式を繰り返し適用することで次が得られます。
 
+```math
 \begin{equation*}
-f(x_{k+1}) \leq f(x_0) - c_1 \frac{1 - c_2}{L} \sum_{j=0}^k \cos^2 \theta_j \lVert g_j \rVert^2.
+f(x_{k+1}) \leq f(x_0) - c_1 \frac{1 - c_2}{L} \sum_{j=0}^k \cos^2 \theta_j \left\lVert g_j \right\rVert^2.
 \end{equation*}
+```
 
-仮定より $f$ は下に有界なので、ある定数 $f^*$ が存在して、全ての $k$ について $f(x_{k+1}) \geq f^*$ となります。
+仮定より $f$ は下に有界なので、ある定数 $f^\ast$ が存在して、全ての $k$ について $f(x_{k+1}) \geq f^\ast$ となります。
 従って、Zoutendijk 条件と呼ばれる次式が得られます。
 
+```math
 \begin{equation*}
-\sum_{k=0}^\infty \cos^2 \theta_k \lVert g_k \rVert^2 \leq \frac{L}{c_1 (1 - c_2)} (f(x_0) - f^*) < \infty.
+\sum_{k=0}^\infty \cos^2 \theta_k \left\lVert g_k \right\rVert^2 \leq \frac{L}{c_1 (1 - c_2)} (f(x_0) - f^\ast) < \infty.
 \end{equation*}
+```
 
 この条件より、次が従います。
 
+```math
 \begin{equation*}
-\cos^2 \theta_k \lVert g_k \rVert^2 \to 0.
+\cos^2 \theta_k \left\lVert g_k \right\rVert^2 \to 0.
 \end{equation*}
+```
 
 $\cos \theta_k \geq \delta > 0$ がすべての $k$ で成り立つという仮定と合わせると、直ちに次が従います。
 
+```math
 \begin{equation*}
-\lim_{k \to \infty} \lVert g_k \rVert = 0.
+\lim_{k \to \infty} \left\lVert g_k \right\rVert = 0.
 \end{equation*}
+```
 
 よって、Wolfe条件による直線探索付きの一般的な反復法に対する大域収束性が示されました。
 
-\myQED
+(証明終わり)
+
+</details>
 
 ニュートン法は $d_k = -\nabla^2 f(x_k)^{-1} g_k$ とした Theorem 1 の特別な場合なので、適切な $f$ に関する条件の下でこの結果を適用できます。
 特に $f$ が $L$-平滑かつ $\mu$-強凸であれば、任意の $k$ について次が成り立ちます。
@@ -516,8 +578,8 @@ $\cos \theta_k \geq \delta > 0$ がすべての $k$ で成り立つという仮�
 ```math
 \begin{equation*}
 \cos \theta_k
-= \frac{g_k^\top \nabla^2 f(x_k)^{-1} g_k}{\lVert g_k \rVert\lVert \nabla^2 f(x_k)^{-1} g_k \rVert}
-\geq \frac{\lVert g_k \rVert^2 \lambda_{\min}(\nabla^2 f(x_k)^{-1})}{\lVert g_k \rVert^2 \lambda_{\max}(\nabla^2 f(x_k)^{-1})}
+= \frac{g_k^\top \nabla^2 f(x_k)^{-1} g_k}{\left\lVert g_k \right\rVert\left\lVert \nabla^2 f(x_k)^{-1} g_k \right\rVert}
+\geq \frac{\left\lVert g_k \right\rVert^2 \lambda_{\min}(\nabla^2 f(x_k)^{-1})}{\left\lVert g_k \right\rVert^2 \lambda_{\max}(\nabla^2 f(x_k)^{-1})}
 \geq \frac{\mu}{L},
 \end{equation*}
 ```
@@ -532,71 +594,85 @@ $\cos \theta_k \geq \delta > 0$ がすべての $k$ で成り立つという仮�
 
 **Theorem 2**
 
-ヘッセ行列 $\nabla^2 f(x)$ が解 $x^*$ の近傍で Lipschitz連続であり、最適性の二次の十分条件が成り立つとする。すなわち $\nabla f(x^*)=0$ かつ $\nabla^2 f(x^*)$ は正定値である。
-前節までのニュートン法において、すべての $k$ で $\alpha_k=1$ が満たされるとし、初期点 $x_0$ が $x^*$ に十分近いとき、勾配ノルム列 $\lbrace\lVert \nabla f(x_k) \rVert\rbrace$ は二次収束する。
+ヘッセ行列 $\nabla^2 f(x)$ が解 $x^\ast$ の近傍で Lipschitz連続であり、最適性の二次の十分条件が成り立つとする。すなわち $\nabla f(x^\ast)=0$ かつ $\nabla^2 f(x^\ast)$ は正定値である。
+前節までのニュートン法において、すべての $k$ で $\alpha_k=1$ が満たされるとし、初期点 $x_0$ が $x^\ast$ に十分近いとき、勾配ノルム列 $\lbrace\left\lVert \nabla f(x_k) \right\rVert\rbrace$ は二次収束する。
 
-*Proof*:
+<details><summary>証明</summary>
 
 $k=0$ とし、$x_k$ から $x_{k+1}$ への更新を考える。
-ヘッセ行列 $\nabla^2 f(x_k)$ は $x^*$ の十分小さい近傍で可逆であるため、最適性条件 $\nabla f(x^*)=0$ と $\alpha_k=1$ より次が成り立つ。
+ヘッセ行列 $\nabla^2 f(x_k)$ は $x^\ast$ の十分小さい近傍で可逆であるため、最適性条件 $\nabla f(x^\ast)=0$ と $\alpha_k=1$ より次が成り立つ。
 
+```math
 \begin{align*}
-x_{k+1} - x^*
-& = x_k - x^* - \left(\nabla^2 f(x_k)\right)^{-1}\nabla f(x_k)                                                        \\
-& = \left(\nabla^2 f(x_k)\right)^{-1} \left(\nabla^2 f(x_k)(x_k-x^*)-\left(\nabla f(x_k)-\nabla f(x^*)\right)\right).
+x_{k+1} - x^\ast
+& = x_k - x^\ast - \left(\nabla^2 f(x_k)\right)^{-1}\nabla f(x_k)                                                        \\
+& = \left(\nabla^2 f(x_k)\right)^{-1} \left(\nabla^2 f(x_k)(x_k-x^\ast)-\left(\nabla f(x_k)-\nabla f(x^\ast)\right)\right).
 \end{align*}
+```
 
 テイラーの定理と三角不等式より次が成り立つ。
 
+```math
 \begin{align*}
-& \lVert \nabla^2 f(x_k)(x_k-x^*)-\left(\nabla f(x_k)-\nabla f(x^*)\right) \rVert                              \\
-=   {}  & \left\lVert \nabla^2 f(x_k)(x_k-x^*)-\int_0^1 \nabla^2 f(x_k+t(x^*-x_k)) (x_k - x^*)\mathrm{d}t \right\rVert \\
-\leq {} & \int_0^1 \lVert \nabla^2 f(x_k)-\nabla^2 f(x_k+t(x^*-x_k)) \rVert\lVert x_k-x^* \rVert\mathrm{d}t.
+& \left\lVert \nabla^2 f(x_k)(x_k-x^\ast)-\left(\nabla f(x_k)-\nabla f(x^\ast)\right) \right\rVert                               \\
+=   {}  & \left\lVert \nabla^2 f(x_k)(x_k-x^\ast)-\int_0^1 \nabla^2 f(x_k+t(x^\ast-x_k)) (x_k - x^\ast)\mathrm{d}t \right\rVert             \\
+\leq {} & \int_0^1 \left\lVert \nabla^2 f(x_k)-\nabla^2 f(x_k+t(x^\ast-x_k)) \right\rVert\left\lVert x_k-x^\ast \right\rVert\mathrm{d}t.
 \end{align*}
+```
 
-$\nabla^2 f$ が定数 $L^{\mathrm{H}}$ を持つ Lipschitz 連続であれば、被積分関数は $L^{\mathrm{H}}t\lVert x_k-x^* \rVert$ で上から抑えられ、積分により次を得る。
+$\nabla^2 f$ が定数 $L^{\mathrm{H}}$ を持つ Lipschitz 連続であれば、被積分関数は $L^{\mathrm{H}}t\left\lVert x_k-x^\ast \right\rVert$ で上から抑えられ、積分により次を得る。
 
+```math
 \begin{equation*}
-\lVert \nabla^2 f(x_k)(x_k-x^*)-\left(\nabla f(x_k)-\nabla f(x^*)\right) \rVert
-\le \frac{1}{2}L^{\mathrm{H}}\lVert x_k-x^* \rVert^2.
+\left\lVert \nabla^2 f(x_k)(x_k-x^\ast)-\left(\nabla f(x_k)-\nabla f(x^\ast)\right) \right\rVert
+\le \frac{1}{2}L^{\mathrm{H}}\left\lVert x_k-x^\ast \right\rVert^2.
 \end{equation*}
+```
 
-$\nabla^2 f(x^*)$ は正定値なので、ある半径 $r>0$ が存在して $\lVert x-x^* \rVert\le r$ を満たすすべての $x$ について
+$\nabla^2 f(x^\ast)$ は正定値なので、ある半径 $r>0$ が存在して $\left\lVert x-x^\ast \right\rVert\le r$ を満たすすべての $x$ について
 
+```math
 \begin{equation*}
-\left\lVert \left(\nabla^2 f(x)\right)^{-1} \right\rVert\le 2 \left\lVert \left(\nabla^2 f(x^*)\right)^{-1} \right\rVert
+\left\lVert \left(\nabla^2 f(x)\right)^{-1} \right\rVert\le 2 \left\lVert \left(\nabla^2 f(x^\ast)\right)^{-1} \right\rVert
 \end{equation*}
+```
 
 が成り立つ。
 これらを合わせると次を得る。
 
+```math
 \begin{align*}
-\lVert x_{k+1} - x^* \rVert
-& \leq \left\lVert \left(\nabla^2 f(x_k)\right)^{-1} \right\rVert \left\lVert \nabla^2 f(x_k)(x_k-x^*)-\left(\nabla f(x_k)-\nabla f(x^*)\right) \right\rVert \\
-& \le L^{\mathrm{H}} \left\lVert \left(\nabla^2 f(x^*)\right)^{-1} \right\rVert \lVert x_k-x^* \rVert^2.
+\left\lVert x_{k+1} - x^\ast \right\rVert
+& \leq \left\lVert \left(\nabla^2 f(x_k)\right)^{-1} \right\rVert \left\lVert \nabla^2 f(x_k)(x_k-x^\ast)-\left(\nabla f(x_k)-\nabla f(x^\ast)\right) \right\rVert \\
+& \le L^{\mathrm{H}} \left\lVert \left(\nabla^2 f(x^\ast)\right)^{-1} \right\rVert \left\lVert x_k-x^\ast \right\rVert^2.
 \end{align*}
+```
 
-$\widetilde L \mathrel{\vcenter{:}}= L^{\mathrm{H}}\left\lVert \left(\nabla^2 f(x^*)\right)^{-1} \right\rVert$ とおく。
-初期点が $\lVert x_0-x^* \rVert\le \min\lbrace r, 1/(2\widetilde L) \rbrace$ を満たすように選ばれていれば、帰納法により $\lbrace x_k \rbrace$ は近傍内に留まり $x^*$ に収束する。
+$\widetilde L \mathrel{\vcenter{:}}= L^{\mathrm{H}}\left\lVert \left(\nabla^2 f(x^\ast)\right)^{-1} \right\rVert$ とおく。
+初期点が $\left\lVert x_0-x^\ast \right\rVert\le \min\lbrace r, 1/(2\widetilde L) \rbrace$ を満たすように選ばれていれば、帰納法により $\lbrace x_k \rbrace$ は近傍内に留まり $x^\ast$ に収束する。
 上の誤差評価は $\lbrace x_k \rbrace$ の二次収束を示す。
 
 勾配ノルムの二次収束を示すために、$x_{k+1}-x_k=-\left(\nabla^2 f(x_k)\right)^{-1}\nabla f(x_k)$ と
 $\nabla f(x_k)+\nabla^2 f(x_k)(x_{k+1}-x_k)=0$ を用いると次を得る。
 
+```math
 \begin{align*}
-\lVert \nabla f(x_{k+1}) \rVert
-& = \lVert \nabla f(x_{k+1})-\nabla f(x_k)-\nabla^2 f(x_k)(x_{k+1}-x_k) \rVert                                   \\
-& \le \int_0^1 \lVert \nabla^2 f(x_k+t (x_{k+1}-x_k))-\nabla^2 f(x_k) \rVert\lVert x_{k+1}-x_k \rVert\mathrm{d}t \\
-& \le \frac{1}{2}L^{\mathrm{H}}\lVert x_{k+1}-x_k \rVert^2                                                       \\
-& \le \frac{1}{2}L^{\mathrm{H}}\lVert \left(\nabla^2 f(x_k)\right)^{-1} \rVert^2\lVert \nabla f(x_k) \rVert^2    \\
-& \le 2 L^{\mathrm{H}} \lVert \left(\nabla^2 f(x^*)\right)^{-1} \rVert^2\lVert \nabla f(x_k) \rVert^2.
+\left\lVert \nabla f(x_{k+1}) \right\rVert
+& = \left\lVert \nabla f(x_{k+1})-\nabla f(x_k)-\nabla^2 f(x_k)(x_{k+1}-x_k) \right\rVert                                              \\
+& \le \int_0^1 \left\lVert \nabla^2 f(x_k+t (x_{k+1}-x_k))-\nabla^2 f(x_k) \right\rVert\left\lVert x_{k+1}-x_k \right\rVert\mathrm{d}t \\
+& \le \frac{1}{2}L^{\mathrm{H}}\left\lVert x_{k+1}-x_k \right\rVert^2                                                                  \\
+& \le \frac{1}{2}L^{\mathrm{H}}\left\lVert \left(\nabla^2 f(x_k)\right)^{-1} \right\rVert^2\left\lVert \nabla f(x_k) \right\rVert^2    \\
+& \le 2 L^{\mathrm{H}} \left\lVert \left(\nabla^2 f(x^\ast)\right)^{-1} \right\rVert^2\left\lVert \nabla f(x_k) \right\rVert^2.
 \end{align*}
+```
 
-よって $\lVert \nabla f(x_k) \rVert$ は0へと局所二次収束する。
+よって $\left\lVert \nabla f(x_k) \right\rVert$ は0へと局所二次収束する。
 
-\myQED
+(証明終わり)
 
-これらの\cref{thm:line-search-global-convergence,thm:newton-quadratic}は、直線探索を伴うニュートン法が適切な条件の下で大域収束性と局所二次収束性の両方を持つことを示しています。
+</details>
+
+これらのTheorem 1, Theorem 2は、直線探索を伴うニュートン法が適切な条件の下で大域収束性と局所二次収束性の両方を持つことを示しています。
 この高速な収束性は、通常は線形収束にとどまる勾配降下法などの一階法と比べたときの大きな利点となります。
 一方で、ヘッセ行列 $\nabla^2 f(x_k) \in \mathbb{R}^{n \times n}$ の計算や線形方程式 $\nabla^2 f(x_k) d_k = -\nabla f(x_k)$ の求解には、特に大規模問題において、膨大な計算コストを要します。
 そのため、準ニュートン法などの他の最適化手法が一般的には用いられることも多く、これについて後の節では述べていきます。
@@ -643,7 +719,7 @@ f''(x) & = \frac{1}{(1 + x^2)^{3/2}}.
 
 初期点の絶対値が 1 を超えると、Fig. 3 に示すようにこの関数に対するニュートン法は発散します。
 
-これは、最適解 $x^*=0$ から離れた点では、2階微分の値、つまりヘッセ行列の固有値が非常に小さくなり、ニュートンステップが過大になる為です。反復を重ねるごとに、より遠くへ飛んでいき、最適解から離れてしまいます。
+これは、最適解 $x^\ast=0$ から離れた点では、2階微分の値、つまりヘッセ行列の固有値が非常に小さくなり、ニュートンステップが過大になる為です。反復を重ねるごとに、より遠くへ飛んでいき、最適解から離れてしまいます。
 
 ![../imgs/quasi_newton/newton_failure_sqrt_function_1.1.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_failure_sqrt_function_1.1.png)
 
@@ -652,7 +728,7 @@ f''(x) & = \frac{1}{(1 + x^2)^{3/2}}.
 ##### 強凸関数に対するニュートン法の振動
 
 前の例では目的関数は強凸ではなく、必ずしも良い性質を持っている訳ではありませんでした。
-しかし、強凸性を持つ関数であってもニュートン法が収束しない例が知られています~[^Doikov2021SecondOrderTensor] (Example 1.4.3)。
+しかし、強凸性を持つ関数であってもニュートン法が収束しない例が知られています[^Doikov2021SecondOrderTensor] (Example 1.4.3)。
 
 この例では $\mu>0$ に対し、次の関数を考えます。
 
@@ -725,14 +801,14 @@ x_{k+1} = x_k - \nabla^2 f(x_k)^{-1} \nabla f(x_k).
 #### 二つの定式化の関係
 
 具体例を通じて両者の等価性を確認してみます。
-\Cref{fig:newton_raphson}は単純な三次関数 $f(x)$ を用いて両者の関係を示したものです。
+Fig. 5は単純な三次関数 $f(x)$ を用いて両者の関係を示したものです。
 左図は $g(x) = \nabla f(x)$ に対する根探索であり、右図は $f(x)$ に対する最適化となっています。
 
 根探索の定式化では、$\nabla f(x) = 3x^2 - 4x + 1$ を接線で近似します。すなわち、
 
 ```math
 \begin{equation*}
-\nabla m^*_k(x) = \nabla f(x_k) + \nabla^2 f(x_k)(x - x_k)
+\nabla m^\ast_k(x) = \nabla f(x_k) + \nabla^2 f(x_k)(x - x_k)
 \end{equation*}
 ```
 
@@ -742,14 +818,13 @@ x_{k+1} = x_k - \nabla^2 f(x_k)^{-1} \nabla f(x_k).
 
 ```math
 \begin{equation*}
-m^*_k(x) = f(x_k) + \nabla f(x_k)(x - x_k) + \frac{1}{2}\nabla^2 f(x_k)(x - x_k)^2
+m^\ast_k(x) = f(x_k) + \nabla f(x_k)(x - x_k) + \frac{1}{2}\nabla^2 f(x_k)(x - x_k)^2
 \end{equation*}
 ```
 
 として、この二次モデルの最小点を $x_{k+1}$ として取ります。
 
 従って、正定値性の仮定の下では両者が本質的に等価な操作を行うことが分かり、その対応関係が見てとれます。
-
 
 <!-- From 3_1_quasi_newton.tex -->
 
@@ -762,9 +837,9 @@ m^*_k(x) = f(x_k) + \nabla f(x_k)(x - x_k) + \frac{1}{2}\nabla^2 f(x_k)(x - x_k)
 本節では準ニュートン法について説明します。
 準ニュートン法はニュートン法に基づいていますが、その主要な欠点であるヘッセ行列やその逆行列の計算コストを低減することを目的としています。具体的には、真のヘッセ行列 $\nabla^2 f(x_k)$ の代わりに近似行列 $B_k$ とその逆行列 $H_k$ を用いることで、高速な収束性を保ちつつ計算コストを抑えます。
 
-\Cref{fig:newton_vs_qs_vs_gd} はニュートン法、準ニュートン法、勾配降下法の比較を示しています。勾配降下法は勾配の反対方向に単純に更新する方法です。1反復あたりの計算コストは最小ですが、収束は遅くなります。ニュートン法は反復回数が最も少ない一方で、1ステップあたりの計算コストが最も高いです。準ニュートン法はその中間に位置し、両者のバランスを取っています。特に、反復回数ではなく実際の計算時間で比較すると、準ニュートン法が最良の性能を示すことが多いです。
+Fig. 6 はニュートン法、準ニュートン法、勾配降下法の比較を示しています。勾配降下法は勾配の反対方向に単純に更新する方法です。1反復あたりの計算コストは最小ですが、収束は遅くなります。ニュートン法は反復回数が最も少ない一方で、1ステップあたりの計算コストが最も高いです。準ニュートン法はその中間に位置し、両者のバランスを取っています。特に、反復回数ではなく実際の計算時間で比較すると、準ニュートン法が最良の性能を示すことが多いです。
 
-直線探索に基づく準ニュートン法では、最適解 $x^*$ に収束する列 ${ x_k }*{k=0}^{\infty}$ を次のように生成します。
+直線探索に基づく準ニュートン法では、最適解 $x^\ast$ に収束する列 ${ x_k }*{k=0}^{\infty}$ を次のように生成します。
 
 ```math
 \begin{equation*}
@@ -780,7 +855,7 @@ x_{k+1} = x_k - \alpha_k B_k^{-1} \nabla f(x_k)
 
 (Fig. 7 準ニュートン法の概念図。 (1) 目的関数 $f$ (青い曲面) と現在点 $x_k$ (赤点) が与えられます。 (2) 現在の近似ヘッセ行列によって得られる二次モデル $m_k(x)$ (橙色の曲面) を最小化し、その最小点 $x_{k+1}$ (黄色のバツ印) に移動します。 (3) 二次モデルを更新し (緑色の曲面)、この操作を繰り返します。)
 
-準ニュートン法の核心は、各反復で $B_k$ をどのように更新して真のヘッセ行列に近づけるかにあります。\Cref{fig:quasi_newton_overview} は準ニュートン法の概念図です。まず現在の点 $x_k$ の周りで、$B_k$ を用いて目的関数 $f$ の二次近似モデルを構成します。次にこの二次モデルを最小化して次の点 $x_{k+1}$ を得ます。$x_{k+1}$ を得た後、$x_k$ と $x_{k+1}$ における勾配情報を用いて近似行列 $B_k$ を $B_{k+1}$ に更新します。この手続きを収束するまで繰り返すことが準ニュートン法です。
+準ニュートン法の核心は、各反復で $B_k$ をどのように更新して真のヘッセ行列に近づけるかにあります。Fig. 7 は準ニュートン法の概念図です。まず現在の点 $x_k$ の周りで、$B_k$ を用いて目的関数 $f$ の二次近似モデルを構成します。次にこの二次モデルを最小化して次の点 $x_{k+1}$ を得ます。$x_{k+1}$ を得た後、$x_k$ と $x_{k+1}$ における勾配情報を用いて近似行列 $B_k$ を $B_{k+1}$ に更新します。この手続きを収束するまで繰り返すことが準ニュートン法です。
 
 ### セカント条件
 
@@ -858,7 +933,7 @@ m_{k+1}(x_{k+1}) = f(x_{k+1}), \\
 
 ### 代表的な準ニュートン更新則
 
-$B_k$, $s_k$, $y_k$ が与えられたとき、セカント条件を満たす $B_{k+1}$ を与える更新則は多数存在します。ここでは代表的なものをその導出とともに示します~[^dennisjr.QuasiNewtonMethodsMotivation1977a]。
+$B_k$, $s_k$, $y_k$ が与えられたとき、セカント条件を満たす $B_{k+1}$ を与える更新則は多数存在します。ここでは代表的なものをその導出とともに示します[^dennisjr.QuasiNewtonMethodsMotivation1977a]。
 本小節に限り、簡潔さのため $B_k$, $B_{k+1}$, $s_k$, $y_k$ をそれぞれ $B$, $\bar{B}$, $s$, $y$ と略記します。
 
 #### Broyden更新
@@ -874,22 +949,30 @@ $B_k$, $s_k$, $y_k$ が与えられたとき、セカント条件を満たす $B
 
 ##### 導出
 
-単純な構造的仮定からこの公式を導出します~[^dennisjr.QuasiNewtonMethodsMotivation1977a] (Section 4)。
+単純な構造的仮定からこの公式を導出します[^dennisjr.QuasiNewtonMethodsMotivation1977a] (Section 4)。
 
 **Proposition 6**
 
 $\bar{B}$ がセカント条件
+
+```math
 \begin{equation*}
 \bar{B}s = y,
 \end{equation*}
-と作用制約
+```
+
+と制約
+
+```math
 \begin{equation*}
 \bar{B}z = Bz
 \quad\text{for all } z\in\mathbb{R}^n \text{ such that } z^\top s = 0.
 \end{equation*}
+```
+
 を満たすと仮定します。このとき $\bar{B}$ は一意に定まり、$\bar{B}_{\mathrm{Broyden}}$ に一致します。
 
-*Proof*:
+<details><summary>証明</summary>
 
 ベクトル $s$ と $s$ の直交補空間の基底は $\mathbb{R}^n$ の基底を成します。
 $\bar{B}$ の条件はこの基底に対する $\bar{B}$ の作用を完全に決定するため、$\bar{B}$ は一意に定まります。
@@ -897,6 +980,7 @@ $\bar{B}$ の条件はこの基底に対する $\bar{B}$ の作用を完全に�
 ここで $\bar{B}_{\mathrm{Broyden}}$ が課された条件を満たすことを示します。
 $z^\top s = 0$ を満たす任意のベクトル $z$ を取ります。このとき、次を得ます。
 
+```math
 \begin{align*}
 \bar{B}_{\mathrm{Broyden}} s
 & = \left(B + \frac{(y - Bs)s^\top}{s^\top s}\right) s
@@ -907,11 +991,14 @@ $z^\top s = 0$ を満たす任意のベクトル $z$ を取ります。このと
 = Bz + (z^\top s) \frac{y - Bs}{s^\top s}
 = Bz.
 \end{align*}
+```
 
 したがって、$\bar{B}_{\mathrm{Broyden}}$ は課された条件を満たします。
 よって、一意性より $\bar{B} = \bar{B}_{\mathrm{Broyden}}$ となります。
 
-\myQED
+(証明終わり)
+
+</details>
 
 Broyden更新は、フロベニウスノルムにおける最小変化更新としても特徴づけられます。
 
@@ -919,39 +1006,50 @@ Broyden更新は、フロベニウスノルムにおける最小変化更新と�
 
 $B\in\mathbb{R}^{n\times n}$, $y\in\mathbb{R}^n$, $s\in\mathbb{R}^n\setminus\lbrace 0 \rbrace$ が与えられているとき、行列 $\bar{B}_{\mathrm{Broyden}}$ は以下の最適化問題の一意解である。
 
+```math
 \begin{align*}
-\underset{\tilde{B} \in \mathbb{R}^{n \times n}}{\mathrm{minimize}} & \quad \lVert \tilde{B} - B \rVert_F \\
+\underset{\tilde{B} \in \mathbb{R}^{n \times n}}{\mathrm{minimize}} & \quad \left\lVert \tilde{B} - B \right\rVert_F \\
 \mathrm{subject to}                                                 & \quad \tilde{B} s = y.
 \end{align*}
-*Proof*:
+```
 
-関数 $\tilde{B}\mapsto\lVert \tilde{B}-B \rVert^2_F$ を最適化すると考えてよく、これは $\mathbb{R}^{n\times n}$ 上で凸です。
+<details><summary>証明</summary>
+
+関数 $\tilde{B}\mapsto\left\lVert \tilde{B}-B \right\rVert^2_F$ を最適化すると考えてよく、これは $\mathbb{R}^{n\times n}$ 上で凸です。
 制約集合
+
+```math
 \begin{equation*}
 \lbrace\tilde{B}\in\mathbb{R}^{n\times n}:\tilde{B}s=y\rbrace
 \end{equation*}
+```
+
 はアフィン集合であり凸です。
 よって、この最適化問題は高々一つの最小解しか持ちません。
 
 $\bar{B}_{\mathrm{Broyden}}$ が実際に最小解であることを示します。
 制約 $\tilde{B}s=y$ を満たす任意の $\tilde{B}$ に対して
 
+```math
 \begin{equation*}
-\lVert \bar{B}_{\mathrm{Broyden}} - B \rVert_F^2
+\left\lVert \bar{B}_{\mathrm{Broyden}} - B \right\rVert_F^2
 = \left\lVert (\tilde{B}-B) \frac{s s^\top}{s^\top s} \right\rVert_F^2
-\leq \lVert \tilde{B}-B \rVert_F^2.
+\leq \left\lVert \tilde{B}-B \right\rVert_F^2.
 \end{equation*}
+```
 
-ここでフロベニウスノルムの劣乗法性と $\lVert ss^\top/(s^\top s) \rVert_F=1$ を用いました。
+ここでフロベニウスノルムの劣乗法性と $\left\lVert ss^\top/(s^\top s) \right\rVert_F=1$ を用いました。
 よって $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$ です。
 
-\myQED
+(証明終わり)
+
+</details>
 
 この更新則は、対称性を保たないという点に注意してください。以下では、その点を改善した代表的な準ニュートン更新則を紹介します。
 
 #### Symmetric Rank-One (SR1) 更新
 
-[対称ランク1 (SR1) 更新](https://en.wikipedia.org/wiki/Symmetric_rank-one)~[^nocedal1999numerical] は更新過程で対称性を維持する基本的な準ニュートン法です。更新則は次で与えられます。
+[対称ランク1 (SR1) 更新](https://en.wikipedia.org/wiki/Symmetric_rank-one)[^nocedal1999numerical] は更新過程で対称性を維持する基本的な準ニュートン法です。更新則は次で与えられます。
 
 ```math
 \begin{equation*}
@@ -1020,7 +1118,7 @@ SR1 更新は $(y - Bs)^\top s \neq 0$ であることを前提としていま�
 
 #### Powell Symmetric Broyden (PSB) 更新
 
-Powell Symmetric Broyden (PSB) 更新~\cite{m.j.d.powellNewAlgorithmUnconstrained1970,doi:10.1137/1.9781611971200,haeltermanAnalyticalStudyLeast2009} も準ニュートン更新則の一つで、更新則は次で与えられます。
+Powell Symmetric Broyden (PSB) 更新[^m.j.d.powellNewAlgorithmUnconstrained1970][^doi:10.1137/1.9781611971200][^haeltermanAnalyticalStudyLeast2009] も準ニュートン更新則の一つで、更新則は次で与えられます。
 
 ```math
 \begin{equation*}
@@ -1074,6 +1172,7 @@ C_{2t+2} = \frac{C_{2t+1} + C_{2t+1}^\top}{2}            & (\text{symmetrization
 
 行列の列 $\lbrace C_{t} \rbrace_{t=0}^{\infty}$ は収束し、その極限は次で与えられる。
 
+```math
 \begin{equation*}
 \lim_{t \to \infty} C_{t}
 =
@@ -1081,35 +1180,46 @@ C_{\infty}
 \mathrel{\vcenter{:}}=
 B + \frac{(y - Bs)c^\top + c(y - Bs)^\top}{c^\top s} - \frac{(y - Bs)^\top s}{(c^\top s)^2} c c^\top.
 \end{equation*}
-*Proof*:
+```
+
+<details><summary>証明</summary>
 
 まず偶数番目の部分列を解析します。 $t=0,1,2,\dots$ に対し、次のように定義します。
 
+```math
 \begin{equation*}
 G_t \mathrel{\vcenter{:}}= C_{2t}.
 \end{equation*}
+```
 
 構成方法より各 $G_t$ は対称です。
 定義から次を得ます。
 
+```math
 \begin{equation*}
 G_{t+1} = G_t +\frac{1}{2c^\top s}\left((y-G_t s)c^\top+c(y-G_t s)^\top\right).
 \end{equation*}
+```
 
 また、セカント条件に対する誤差ベクトルを次で導入します。
 
+```math
 \begin{equation*}
 w_t \mathrel{\vcenter{:}}= y-G_t s.
 \end{equation*}
+```
 
 このとき、
 
+```math
 \begin{equation*}
 G_{t+1} = G_t+\frac{1}{2c^\top s}(w_t c^\top+cw_t^\top).
 \end{equation*}
+```
 
 上式を $w_t$ の定義に代入すると
 
+```math
 \begin{align*}
 w_{t+1} & = y-\left(G_t+\frac{1}{2c^\top s}(w_t c^\top+cw_t^\top)\right)s \\
 & =
@@ -1117,33 +1227,41 @@ w_t-\frac12w_t-\frac{w_t^\top s}{2c^\top s}c                              \\
 & =
 \frac{1}{2}\left(w_t-\frac{w_t^\top s}{c^\top s}c\right).
 \end{align*}
+```
 
 よって
 
+```math
 \begin{equation*}
 w_{t+1}=Pw_t,
 \qquad
 P \mathrel{\vcenter{:}}= \frac{1}{2}\left(I-\frac{cs^\top}{c^\top s}\right).
 \end{equation*}
+```
 
 行列 $cs^\top/c^\top s$ はランク1で固有値は $1,0,\dots,0$ です。
 よって $P$ は固有値 $0$ を一つ持ち、残りはすべて $1/2$ となります。
 特にスペクトル半径は $1/2<1$ であるので、次のように級数が収束します。
 
+```math
 \begin{align*}
 \sum_{t=0}^{\infty}w_t & =        \sum_{t=0}^{\infty}P^t(y-Bs)                         &  & (w_0=y-Bs)                \\
 & =  (I-P)^{-1}(y-Bs)                                                                          \\
 & = 2\left(I-\frac{1}{2}\frac{cs^\top}{c^\top s}\right) (y-Bs). &  & (\text{definition of } P)
 \end{align*}
+```
 
 最後の式は次から導かれることに注意してください。
 
+```math
 \begin{equation*}
 2(I-P) \left(I-\frac{1}{2}\frac{cs^\top}{c^\top s}\right) = \left(I + \frac{cs^\top}{c^\top s}\right) \left(I-\frac{1}{2}\frac{cs^\top}{c^\top s}\right) = I.
 \end{equation*}
+```
 
 よって
 
+```math
 \begin{align*}
 \lim_{t\to\infty}G_t
 & =
@@ -1154,26 +1272,33 @@ B+\frac{1}{2c^\top s}
 & = B + \frac{(y - Bs)c^\top + c(y - Bs)^\top}{c^\top s} - \frac{(y - Bs)^\top s}{(c^\top s)^2} c c^\top                                                                         \\
 & = C_{\infty}.
 \end{align*}
+```
 
 これで偶数番目の部分列 $\lbrace C_{2t} \rbrace$ が $C_{\infty}$ に収束することが示されました。
 
 次に奇数番目の部分列について、次の式が成立しています。
 
+```math
 \begin{equation*}
 C_{2t+1}
 =
 G_t+\frac{w_t c^\top}{c^\top s}.
 \end{equation*}
+```
 
-$G_t\to C_{\infty}$ であり、また $\lVert w_t \rVert\to0$ が $P$ のスペクトル半径が1未満であることから従うため、
+$G_t\to C_{\infty}$ であり、また $\left\lVert w_t \right\rVert\to0$ が $P$ のスペクトル半径が1未満であることから従うため、
 
+```math
 \begin{equation*}
 C_{2t+1} \to C_{\infty}.
 \end{equation*}
+```
 
 従って、部分列 $\lbrace C_{2t} \rbrace$ と $\lbrace C_{2t+1} \rbrace$ はどちらも $C_{\infty}$ に収束し、証明が完了します。
 
-\myQED
+(証明終わり)
+
+</details>
 
 $c = s$ のとき、$C_{\infty}$ の一般式は標準的な PSB 更新則を導きます。
 
@@ -1185,7 +1310,7 @@ $c = s$ のとき、$C_{\infty}$ の一般式は標準的な PSB 更新則を導
 
 #### Davidon--Fletcher--Powell (DFP) 更新
 
-[Davidon--Fletcher--Powell (DFP) 更新](https://en.wikipedia.org/wiki/Davidon%E2%80%93Fletcher%E2%80%93Powell_formula)~\cite{nocedal1999numerical} も古典的な準ニュートン更新則です。
+[Davidon--Fletcher--Powell (DFP) 更新](https://en.wikipedia.org/wiki/Davidon%E2%80%93Fletcher%E2%80%93Powell_formula)[^nocedal1999numerical] も古典的な準ニュートン更新則です。
 更新則は次で与えられます。
 
 ```math
@@ -1262,71 +1387,88 @@ $\mathrm{tr}$ は2つの行列の積に対して可換性を持つため、KLダ
 $B \succ 0$ を正定値対称行列とする。
 このとき、上記の最適化問題の解はBFGS更新則で与えられる。
 
-*Proof*:
+<details><summary>証明</summary>
 
 $B$ が正定値対称行列であることに注意して、
 まず、次のように定義します。
 
+```math
 \begin{equation*}
 s' \mathrel{\vcenter{:}}= B^{\frac{1}{2}} s, \quad y' \mathrel{\vcenter{:}}= B^{-\frac{1}{2}} y, \quad B' \mathrel{\vcenter{:}}= B^{-\frac{1}{2}} \bar{B} B^{-\frac{1}{2}}.
 \end{equation*}
+```
 
 すると、最適化問題は次のように書き直せます。
 
+```math
 \begin{align*}
 \underset{B' \succ 0}{\text{minimize}} & \quad \mathrm{KL}(B', I) \\
 \text{subject to}                      & \quad B' s' = y'.
 \end{align*}
+```
 
 ただし、KLダイバージェンスの不変性より、次が成り立つことを用いました。
 
+```math
 \begin{equation*}
 \mathrm{KL}(\bar{B}, B) = \mathrm{KL}(B^{-\frac{1}{2}} \bar{B} B^{-\frac{1}{2}}, B^{-\frac{1}{2}} B B^{-\frac{1}{2}}) = \mathrm{KL}(B', I)
 \end{equation*}
+```
 
 なお、本最適化問題において $B' \succ 0$ という制約は自動的に対称性を含むため、$B' = B'^\top$ を制約として陽に課しても解は変わりません。
 
 この問題の解を、ラグランジュの未定乗数法を用いて求めます。
 ラグランジュ乗数 $\lambda\in\mathbb{R}^n$ および $\Lambda\in\mathbb{R}^{n\times n}$ を用いて、ラグランジアンを次のように定義します。
 
+```math
 \begin{equation*}
 \mathcal{L}(B',\lambda,\Lambda) = \mathrm{tr}(B') -\log\det(B') -n +2\lambda^\top(B's'-y') +\mathrm{tr}\left(\Lambda(B'-B'^\top)\right).
 \end{equation*}
+```
 
 一般に、行列微分の公式として、$X \succ 0$ に対して、$\log\det(X)$ の微分が $X^{-\top}$ かつ、 $\mathrm{tr}(AX)$ の微分が $A^\top$ となります。
 KKT条件のうち停留性に関する条件は、$B'$ で微分し、$B'=B'^\top$ を用いることで次のように書けます。
 
+```math
 \begin{equation*}
 I-B'^{-\top}
 +2\lambda s'^\top
 +\Lambda^\top-\Lambda
 =0.
 \end{equation*}
+```
 
 この式とその転置を加えて2で割り、再び $B' = B'^\top$ を用いると次を得る。
 
+```math
 \begin{equation*}
 B'^{-1} = I+\lambda s'^\top+s'\lambda^\top.
 \end{equation*}
+```
 
 制約条件 $B's'=y'$ より $B'^{-1}y'=s'$ であるから、
 上式に右から $y'$ を掛けた式と、さらに左から $y'^\top$ を掛けた式はそれぞれ、次のようになる。
 
+```math
 \begin{align*}
 s'         & = y' +(s'^\top y')\lambda +(\lambda^\top y')s'                                \\
 y'^\top s' & = y'^\top y' + (s'^\top y')(y'^\top \lambda) + (\lambda^\top y')(y'^\top s').
 \end{align*}
+```
 
 第2式より
 
+```math
 \begin{equation*}
 \lambda^\top y'
 =
 \frac{y'^\top s'-y'^\top y'}{2(s'^\top y')}.
 \end{equation*}
+```
 
 これを第1式に代入すると、
 
+```math
 \begin{equation*}
 \lambda
 = \frac{s'-y'}{s'^\top y'} - \frac{\lambda^\top y'}{s'^\top y'}s'
@@ -1334,30 +1476,37 @@ y'^\top s' & = y'^\top y' + (s'^\top y')(y'^\top \lambda) + (\lambda^\top y')(y'
 \frac{s'^\top y'+y'^\top y'}{2(s'^\top y')^2}s'
 -\frac{1}{s'^\top y'}y'.
 \end{equation*}
+```
 
 この $\lambda$ を $B'^{-1}$ の表式に代入して整理すると、
 
+```math
 \begin{align*}
 B'^{-1} & = I + 2\frac{s'^\top y'+y'^\top y'}{2(s'^\top y')^2}(s' s'^\top)
 -\frac{1}{s'^\top y'}(y' s'^\top + s' y'^\top)                                                                                         \\
 & = \left( I-\frac{s'y'^\top}{s'^\top y'} \right) \left( I-\frac{y's'^\top}{s'^\top y'} \right) +\frac{s's'^\top}{s'^\top y'}.
 \end{align*}
+```
 
 最後に $B' = B^{-\frac{1}{2}} \bar{B} B^{-\frac{1}{2}}$ より、$\bar{B} = B^{\frac{1}{2}} B' B^{\frac{1}{2}}$ であるため、$\bar{B}^{-1}$ を計算すると、
 
+```math
 \begin{align*}
 \bar{B}^{-1} & = B^{-\frac{1}{2}} B'^{-1} B^{-\frac{1}{2}}                                                                                                                                                                          \\
 & = B^{-\frac{1}{2}} \left( I-\frac{s'y'^\top}{s'^\top y'} \right) \left( I-\frac{y's'^\top}{s'^\top y'} \right) B^{-\frac{1}{2}} + \frac{(B^{-\frac{1}{2}}s')(B^{-\frac{1}{2}}s')^\top}{s'^\top y'}                   \\
 & = B^{-\frac{1}{2}} \left( I-\frac{B^{\frac{1}{2}}s y^\top B^{-\frac{1}{2}}}{s^\top y} \right) \left( I-\frac{B^{-\frac{1}{2}}y s^\top B^{\frac{1}{2}}}{s^\top y} \right) B^{-\frac{1}{2}} + \frac{ss^\top}{s^\top y} \\
 & = \left( I - \frac{s y^\top}{y^\top s} \right) B^{-1} \left( I - \frac{y s^\top}{y^\top s} \right) + \frac{s s^\top}{y^\top s}.
 \end{align*}
+```
 
 後述の通り、これは確かにBFGS更新の逆行列の公式であるため、証明が完了します。
 
-\myQED
+(証明終わり)
+
+</details>
 
 更なる詳細については
-[^kanamoriBregmanExtensionQuasiNewton2010][^kanamoriBregmanExtensionQuasiNewton2010a]
+\citep{kanamoriBregmanExtensionQuasiNewton2010,kanamoriBregmanExtensionQuasiNewton2010a}
 をご参照ください。
 [こちらのスライド](http://matsuzoe.web.nitech.ac.jp/infogeo/OCAMI2010/kanamori.pdf)
 も参考になります。
@@ -1391,31 +1540,38 @@ H_{k+1} = \left(I - \frac{s_k y_k^\top}{y_k^\top s_k}\right) H_k \left(I - \frac
 
 行列 $H_{k+1}$ は $B_{k+1}$ の逆行列である。
 
-*Proof*:
+<details><summary>証明</summary>
 
 BFGS更新は次の簡潔なランク2の形に書き直せます。
 
+```math
 \begin{equation*}
 B_{k+1} = B_k + UCV^\top.
 \end{equation*}
+```
 
 ここで
 
+```math
 \begin{equation*}
 U = \begin{bmatrix}B_k s_k & y_k\end{bmatrix},\qquad
 C = \begin{pmatrix}-\frac{1}{s_k^\top B_k s_k} & 0 \\ 0 & \frac{1}{y_k^\top s_k}\end{pmatrix},\qquad
 V = \begin{bmatrix}B_k s_k & y_k\end{bmatrix}
 \end{equation*}
+```
 
 です。実際、次の式が成り立ちます。
 
+```math
 \begin{equation*}
 U C V^\top   = \begin{bmatrix} -\frac{B_k s_k}{s_k^\top B_k s_k}&    \frac{y_k}{y_k^\top s_k} \end{bmatrix} \begin{bmatrix} s_k^\top B_k  \\  y_k^\top \end{bmatrix}
 = -\frac{B_k s_k s_k^\top B_k}{s_k^\top B_k s_k} + \frac{y_k y_k^\top}{y_k^\top s_k}.
 \end{equation*}
+```
 
 Sherman--Morrison--Woodbury の恒等式より、$H_{k+1}$ を次のように計算できます。
 
+```math
 \begin{align*}
 H_{k+1} & = (B_k + U C V^\top)^{-1}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      \\
 & = B_k^{-1}- B_k^{-1}U\left(C^{-1}+V^\top B_k^{-1}U\right)^{-1}V^\top B_k^{-1}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \\
@@ -1426,10 +1582,13 @@ H_{k+1} & = (B_k + U C V^\top)^{-1}                                             
 & = H_k+\frac{1}{(y_k^\top s_k)^2} \left((y_k^\top H_k y_k + y_k^\top s_k) s_k s_k^\top - (y_k^\top s_k)(s_k y_k^\top H_k + H_k y_k s_k^\top) \right)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            \\
 & = \left(I - \frac{s_k y_k^\top}{y_k^\top s_k}\right) H_k \left(I - \frac{y_k s_k^\top}{y_k^\top s_k}\right) + \frac{s_k s_k^\top}{y_k^\top s_k}.
 \end{align*}
+```
 
 を得ます。
 
-\myQED
+(証明終わり)
+
+</details>
 
 #### BFGS更新の正定値性
 
@@ -1439,21 +1598,25 @@ BFGS更新の重要な性質として、現在の近似 $B_k$ が正定値で曲
 
 $B_k$ が正定値で $y_k^\top s_k > 0$ が成り立つなら、$B_{k+1}$ も正定値である。
 
-*Proof*:
+<details><summary>証明</summary>
 
 仮定より $B_k$ とその逆行列 $H_k$ は正定値です。
 任意の非零ベクトル $v \in \mathbb{R}^n$ に対して
 
+```math
 \begin{equation*}
 v^\top H_{k+1} v
 = v^\top \left(I - \frac{s_k y_k^\top}{y_k^\top s_k}\right) H_k \left(I - \frac{y_k s_k^\top}{y_k^\top s_k}\right) v + v^\top \frac{s_k s_k^\top}{y_k^\top s_k} v
 \geq 0 + \frac{(s_k^\top v)^2}{y_k^\top s_k} > 0.
 \end{equation*}
+```
 
 ここで第1項は $H_k$ が正定値であるため非負であり、第2項は曲率条件 $y_k^\top s_k > 0$ により正です。
 よって $H_{k+1}$ は正定値であり、その逆行列 $B_{k+1} = H_{k+1}^{-1}$ も正定値であることが分かります。
 
-\myQED
+(証明終わり)
+
+</details>
 
 #### BFGS更新のトレースと行列式の公式
 
@@ -1469,34 +1632,46 @@ BFGS更新後の行列のトレースは、次のような明示的な公式で�
 **Proposition 12**
 
 $B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ をBFGS更新とする。このとき
+
+```math
 \begin{equation*}
-\mathrm{tr}(B_{+}) = \mathrm{tr}(B) - \frac{\lVert B s \rVert^2}{s^\top Bs} + \frac{\lVert y \rVert^2}{y^\top s}
+\mathrm{tr}(B_{+}) = \mathrm{tr}(B) - \frac{\left\lVert B s \right\rVert^2}{s^\top Bs} + \frac{\left\lVert y \right\rVert^2}{y^\top s}
 \end{equation*}
+```
+
 が成り立つ。
 
-*Proof*:
+<details><summary>証明</summary>
 
 BFGS更新則にトレースを適用すると
 
+```math
 \begin{equation*}
 \mathrm{tr}(B_{+}) = \mathrm{tr}(B) - \mathrm{tr}\left(\frac{Bss^\top B}{s^\top Bs}\right) + \mathrm{tr}\left(\frac{yy^\top}{y^\top s}\right).
 \end{equation*}
+```
 
 第2項について
 
+```math
 \begin{equation*}
-\mathrm{tr}\left(\frac{Bss^\top B}{s^\top Bs}\right) = \frac{1}{s^\top Bs}\mathrm{tr}((Bs)(Bs)^\top) = \frac{\lVert B s \rVert^2}{s^\top Bs}.
+\mathrm{tr}\left(\frac{Bss^\top B}{s^\top Bs}\right) = \frac{1}{s^\top Bs}\mathrm{tr}((Bs)(Bs)^\top) = \frac{\left\lVert B s \right\rVert^2}{s^\top Bs}.
 \end{equation*}
+```
 
 第3項について
 
+```math
 \begin{equation*}
-\mathrm{tr}\left(\frac{yy^\top}{y^\top s}\right) = \frac{1}{y^\top s}\mathrm{tr}(yy^\top) = \frac{\lVert y \rVert^2}{y^\top s}.
+\mathrm{tr}\left(\frac{yy^\top}{y^\top s}\right) = \frac{1}{y^\top s}\mathrm{tr}(yy^\top) = \frac{\left\lVert y \right\rVert^2}{y^\top s}.
 \end{equation*}
+```
 
 以上より所望の式が得られます。
 
-\myQED
+(証明終わり)
+
+</details>
 
 ##### 行列式の公式
 
@@ -1505,31 +1680,40 @@ BFGS更新後の行列式も閉形式で与えられます。
 **Proposition 13**
 
 $B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ をBFGS更新とし、$B$ が正則であるとする。このとき
+
+```math
 \begin{equation*}
 \det(B_{+}) = \det(B) \frac{y^\top s}{s^\top Bs}
 \end{equation*}
+```
+
 が成り立つ。
 
-*Proof*:
+<details><summary>証明</summary>
 
-\href{https://en.wikipedia.org/wiki/Matrix_determinant_lemma}{行列式補題}より、
+[行列式補題](https://en.wikipedia.org/wiki/Matrix_determinant_lemma)より、
 BFGS更新のランク2表現を思い出すと、
 $U, C, V$ は次を満たします。
 
+```math
 \begin{equation*}
 \det(B_{k+1}) =\det(B_k + U C V^\top)=\det(B_k)\det(C) \det \left(C^{-1} + V^\top B_k^{-1} U\right).
 \end{equation*}
+```
 
 ここで $I_2$ は $2\times 2$ の単位行列です。
 
 $U=V=\begin{bmatrix}B_k s_k & y_k\end{bmatrix}$ なので
 
+```math
 \begin{equation*}
 V^\top B_k^{-1} U = \begin{bmatrix} s_k^\top B_k s_k & s_k^\top y_k \\ y_k^\top s_k     & y_k^\top B_k^{-1} y_k \end{bmatrix},
 \end{equation*}
+```
 
 よって
 
+```math
 \begin{equation*}
 C^{-1} + V^\top B_k^{-1} U
 =
@@ -1538,24 +1722,29 @@ C^{-1} + V^\top B_k^{-1} U
 =
 \begin{bmatrix}0 & s_k^\top y_k \\ y_k^\top s_k & y_k^\top B_k^{-1} y_k \end{bmatrix}.
 \end{equation*}
+```
 
 以上を合わせると
 
+```math
 \begin{equation*}
 \det(B_{k+1})
 = \det(B_k) \left(-\frac{1}{s_k^\top B_k s_k} \cdot \frac{1}{y_k^\top s_k}\right) \left(- (s_k^\top y_k)(y_k^\top s_k)\right)
 = \det(B_k) \frac{y_k^\top s_k}{s_k^\top B_k s_k},
 \end{equation*}
+```
 
 を得ます。以上で、証明が完了します。
 
-\myQED
+(証明終わり)
+
+</details>
 
 ### BFGSとDFPの比較
 
 これまで何度か言及したように、BFGSとDFPは双対関係にあります。
 しかし、実際の最適化問題に適用すると実用上の効率は大きく異なることが知られています。
-Powellによる解析~[^powellHowBadAre1986]では、単純な二次元二次関数に対する両手法の挙動を調べて、この非対称性を検討しました。
+Powellによる解析[^powellHowBadAre1986]では、単純な二次元二次関数に対する両手法の挙動を調べて、この非対称性を検討しました。
 漸近的には同程度に振る舞うと示唆されることが多い両手法について、Powellはその実用上の効率が大きく異なること、特に近似ヘッセ行列が真のヘッセ行列から遠い場合に差が顕著であることを明らかにしました。ここでは、その数値実験を再現します。
 
 #### 問題設定
@@ -1580,7 +1769,7 @@ BFGSとDFPのどちらも各反復で固定ステップサイズ $\alpha_k = 1$ 
 ```
 
 これはPowellの元の解析に沿ったものです。
-この選択の詳細は~[^powellHowBadAre1986]を参照してください。
+この選択の詳細は[^powellHowBadAre1986]を参照してください。
 
 反復は現在点のノルムが初期ノルムに対する許容値を下回るまで続けました。
 そして、各 $\lambda_1$ に対して収束に要する反復回数を記録しました。
@@ -1591,21 +1780,20 @@ BFGSとDFPのどちらも各反復で固定ステップサイズ $\alpha_k = 1$ 
 これはPowellの元論文の表と部分的に一致しています。
 収束挙動は初期固有値 $\lambda_1$ に強く依存することが分かります。
 
-| \hline | $\lambda_1$ | BFGS | DFP  \\ |
-| --- | --- | --- | --- |
-| \hline | 0.001 | 4 | 3    \\ |
-| 0.01 | 5 | 3    \\ |
-| 0.1 | 6 | 4    \\ |
-| 1 | 1 | 1    \\ |
-| 10 | 8 | 16   \\ |
-| 100 | 10 | 107  \\ |
-| 1000 | 12 | 1006 \\ |
-| 10000 | 15 | 9987 \\ |
-| \hline |
+| $\lambda_1$ | BFGS | DFP |
+| --- | --- | --- |
+| 0.001 | 4 | 3 |
+| 0.01 | 5 | 3 |
+| 0.1 | 6 | 4 |
+| 1 | 1 | 1 |
+| 10 | 8 | 16 |
+| 100 | 10 | 107 |
+| 1000 | 12 | 1006 |
+| 10000 | 15 | 9987 |
 
 (Table 1: \ifEn Convergence comparison between BFGS and DFP methods for different initial eigenvalues $\lambda_1$. \else 初期固有値 $\lambda_1$ に対するBFGSとDFPの収束比較。)
 
-\Cref{fig:bfgs_dfp_100} と Fig. 9 は特定の $\lambda_1$ に対する反復軌跡を示しています。
+Fig. 8 と Fig. 9 は特定の $\lambda_1$ に対する反復軌跡を示しています。
 これらの図は、同一の初期点から最小点(原点)へ向かう二つの手法の進み方を可視化し、収束速度と経路の違いを明確に示しています。
 
 ![../imgs/quasi_newton/bfgs_vs_dfp_100.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/bfgs_vs_dfp_100.png)
@@ -1643,7 +1831,7 @@ BFGS更新はこのようなタスクには強い効果を発揮しますが、D
 通常の準ニュートン法では、近似ヘッセ行列 $B_k$ またはその逆行列 $H_k$ を密行列として陽に保存・更新するため、$n$ 変数に対して $\mathcal{O}(n^2)$ のメモリを要します。
 一方で、記憶制限準ニュートン法では、最新の $m$ 組のベクトルペア $\lbrace(s_i,y_i)\rbrace$ という限られた情報のみを保持して、その情報だけから近似ヘッセ行列に関する計算を行います。
 この工夫により空間計算量は $\mathcal{O}(nm)$ に減少し、$m$ が小さな定数(通常は $m\le 10$) のとき大幅な改善となります。
-特に、BFGS更新の記憶制限版であるL-BFGS法~[^liuLimitedMemoryBFGS1989a]は、特にその代表的な手法です。
+特に、BFGS更新の記憶制限版であるL-BFGS法[^liuLimitedMemoryBFGS1989a]は、特にその代表的な手法です。
 このBFGS更新の場合に注目し、限られた情報だけを用いて準ニュートン方向 $d_k = -H_k g_k$ を空間計算量・時間計算量の両面で効率的に計算する方法を示します。
 
 本小節では次の有限長の行列の列を扱います。
@@ -1695,10 +1883,10 @@ V_{m-1}^\top \cdots V_0^\top H_0 V_0 \cdots V_{m-1}
 #### 二重ループ再帰
 
 準ニュートン法では、逆行列 $H_m$ と与えられたベクトル $q \in \mathbb{R}^n$ に対して $r = H_m q$ が効率的に計算できることが、アルゴリズムにおいて重要です。
-この計算は長さ $m$ の短いループを二回回すだけで実行でき、L-BFGS のtwo-loop recursionと呼ばれるアルゴリズムとして知られています~[^nocedal1999numerical] (Algorithm 7.4)。
+この計算は長さ $m$ の短いループを二回回すだけで実行でき、L-BFGS のtwo-loop recursionと呼ばれるアルゴリズムとして知られています[^nocedal1999numerical] (Algorithm 7.4)。
 このアルゴリズムは $\mathcal{O}(nm)$ の時間・空間計算量を要します。
 
-![999_two_loop_recursion](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/999_two_loop_recursion.png)
+![999_two_loop_recursion](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/study/999_two_loop_recursion.png)
 
 この二重ループ再帰の出力が確かに $r = H_m q$ を計算していることを、以下では確認します。
 
@@ -1706,42 +1894,53 @@ V_{m-1}^\top \cdots V_0^\top H_0 V_0 \cdots V_{m-1}
 
 二重ループ再帰アルゴリズムの出力は $r = H_m q$ を満たす。
 
-*Proof*:
+<details><summary>証明</summary>
 
 アルゴリズムの1つ目のループ ($i = m-1, m-2, \dots, 0$) では、入力ベクトル $q^{(m)} \mathrel{\vcenter{:}}= q$ から次を計算する。
 
+```math
 \begin{equation*}
 \alpha_i \mathrel{\vcenter{:}}= \rho_i s_i^\top q^{(i+1)}, \qquad
 q^{(i)} \mathrel{\vcenter{:}}= q^{(i+1)} - \alpha_i y_i.
 \end{equation*}
+```
 
 $\alpha_i$ の定義を代入し、コンパクト表現における $V_i$ の定義を用いると
 
+```math
 \begin{equation*}
 q^{(i)} = q^{(i+1)} - \rho_i \left(s_i^\top q^{(i+1)}\right) y_i = \left(I - \rho_i y_i s_i^\top\right) q^{(i+1)} = V_i q^{(i+1)}.
 \end{equation*}
+```
 
 よってすべての $i = 0, 1, \dots, m-1$ に対して、次が得られます。
 
+```math
 \begin{equation*}
 q^{(i)} = V_i V_{i+1} \cdots V_{m-1} q.
 \end{equation*}
+```
 
 次にアルゴリズムは $H_0$ を適用します。
 
+```math
 \begin{equation*}
 r^{(0)} = H_0 q^{(0)} = H_0 V_0 V_1 \cdots V_{m-1} q.
 \end{equation*}
+```
 
 続いて、$i = 0, 1, \dots, m-1$ に対して、二つ目のループは次を計算します。
 
+```math
 \begin{equation*}
 \beta_i     = \rho_i y_i^\top r^{(i)}, \qquad
 r^{(i+1)}   = r^{(i)} + s_i \left(\alpha_i - \beta_i\right).
 \end{equation*}
+```
 
 $\alpha_i$, $\beta_i$, $q^{(i+1)}$ の定義を代入すると
 
+```math
 \begin{align*}
 r^{(i+1)}
 & =
@@ -1753,9 +1952,11 @@ V_i^\top r^{(i)}
 \rho_i s_i s_i^\top
 \left(V_{i+1} V_{i+2} \cdots V_{m-1}\right) q.
 \end{align*}
+```
 
 初期値 $r^{(0)} = H_0 q^{(0)}$ からこの関係を再帰的に展開すると
 
+```math
 \begin{equation*}
 r^{(m)}
 =
@@ -1766,10 +1967,13 @@ V_{m-1}^\top \cdots V_0^\top H_0 V_0 \cdots V_{m-1} q
 \rho_j s_j s_j^\top
 (V_{j+1} \cdots V_{m-1}) q.
 \end{equation*}
+```
 
 これは、$H_m$ のコンパクト表現を $q$ に適用した式と一致します。よって、アルゴリズムの出力が $r = H_m q$ を満たすことが示され、証明が完了します。
 
-\myQED
+(証明終わり)
+
+</details>
 
 従って、このtwo-loop recursionによって、行列 $H_m$ を陽に構成せずに、ベクトルに対する作用を正確に評価できることがわかります。
 
@@ -1792,7 +1996,7 @@ H_0 = \gamma I.
 \end{equation*}
 ```
 
-この選択は次の議論によって正当化できます~[^liuLimitedMemoryBFGS1989a][^shannoMatrixConditioningNonlinear1978]。
+この選択は次の議論によって正当化できます[^liuLimitedMemoryBFGS1989a][^shannoMatrixConditioningNonlinear1978]。
 目的関数 $f$ が二回連続微分可能であると仮定し、最新のステップに沿った平均ヘッセ行列を考えます。
 
 ```math
@@ -1827,8 +2031,7 @@ y_{m-1}
 これは、ベクトル $\bar{G}^{1/2} s_{m-1}$ に関する行列 $\bar{G}$ のRayleigh商の逆数です。
 従って、このスケーリングはこれらの方向に沿った平均逆曲率を大まかに近似しています。
 
-さらにこの $\gamma$ の選択は Barzilai--Borwein 法の短ステップサイズ~[^barzilaiTwoPointStepSize1988] と一致しており、L-BFGS の初期化と古典的なステップ長選択戦略の密接な関係を示しています。
-
+さらにこの $\gamma$ の選択は Barzilai--Borwein 法の短ステップサイズ[^barzilaiTwoPointStepSize1988] と一致しており、L-BFGS の初期化と古典的なステップ長選択戦略の密接な関係を示しています。
 
 <!-- From 4_modified_secant.tex -->
 
@@ -1863,7 +2066,7 @@ Fig. 10 では、正確なヘッセ行列から構築された理想的な二次
 
 #### 関数値一致の修正セカント条件
 
-最初の修正は、二次モデルが前の点での関数値と一致することを強制します~[^yuanModifiedBFGSAlgorithm1991][^weiNewQuasiNewtonMethods2006][^babaie-kafakiModifiedBFGSAlgorithm2011]。
+最初の修正は、二次モデルが前の点での関数値と一致することを強制します[^yuanModifiedBFGSAlgorithm1991][^weiNewQuasiNewtonMethods2006][^babaie-kafakiModifiedBFGSAlgorithm2011]。
 異なる近似ヘッセ行列 $B^{\mathrm{F}}_{k+1}$ を持つ別のモデルを考えます。
 
 ```math
@@ -1905,7 +2108,7 @@ f(x_k) & = f(x_{k+1}) + \nabla f(x_{k+1})^\top (x_k - x_{k+1}) + \frac{1}{2} (x_
 
 ```math
 \begin{equation*}
-f(x_k) = f(x_{k+1}) - \nabla f(x_{k+1})^\top s_k + \frac{1}{2} s_k^\top y_k - \frac{\sigma^\mathrm{F}_k}{2} \lVert s_k \rVert^2.
+f(x_k) = f(x_{k+1}) - \nabla f(x_{k+1})^\top s_k + \frac{1}{2} s_k^\top y_k - \frac{\sigma^\mathrm{F}_k}{2} \left\lVert s_k \right\rVert^2.
 \end{equation*}
 ```
 
@@ -1913,8 +2116,8 @@ $\sigma^\mathrm{F}_k$ について解き、$y_k = \nabla f(x_{k+1}) - \nabla f(x
 
 ```math
 \begin{align*}
-\sigma^\mathrm{F}_k & = \frac{2(f(x_{k+1}) - f(x_k)) - (2\nabla f(x_{k+1}) - y_k)^\top s_k}{\lVert s_k \rVert^2}           \\
-& = \frac{2(f(x_{k+1}) - f(x_k)) - (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k}{\lVert s_k \rVert^2}.
+\sigma^\mathrm{F}_k & = \frac{2(f(x_{k+1}) - f(x_k)) - (2\nabla f(x_{k+1}) - y_k)^\top s_k}{\left\lVert s_k \right\rVert^2}           \\
+& = \frac{2(f(x_{k+1}) - f(x_k)) - (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k}{\left\lVert s_k \right\rVert^2}.
 \end{align*}
 ```
 
@@ -1922,7 +2125,7 @@ $\sigma^\mathrm{F}_k$ について解き、$y_k = \nabla f(x_{k+1}) - \nabla f(x
 
 ```math
 \begin{equation*}
-B^{\mathrm{F}}_{k+1} s_k = \hat{y}^{\mathrm{F}}_k \mathrel{\vcenter{:}}= y_k + \frac{2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k}{\lVert s_k \rVert^2} s_k.
+B^{\mathrm{F}}_{k+1} s_k = \hat{y}^{\mathrm{F}}_k \mathrel{\vcenter{:}}= y_k + \frac{2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k}{\left\lVert s_k \right\rVert^2} s_k.
 \end{equation*}
 ```
 
@@ -1931,7 +2134,7 @@ B^{\mathrm{F}}_{k+1} s_k = \hat{y}^{\mathrm{F}}_k \mathrel{\vcenter{:}}= y_k + \
 
 ```math
 \begin{equation*}
-B^{\mathrm{F}'}_{k+1} s_k = y_k + \frac{\max(0, 2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k)}{\lVert s_k \rVert^2} s_k.
+B^{\mathrm{F}'}_{k+1} s_k = y_k + \frac{\max(0, 2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k)}{\left\lVert s_k \right\rVert^2} s_k.
 \end{equation*}
 ```
 
@@ -1944,7 +2147,7 @@ B^{\mathrm{F}'}_{k+1} s_k = y_k + \frac{\max(0, 2(f(x_k) - f(x_{k+1})) + (\nabla
 
 #### 三次項による修正セカント条件
 
-2つ目の修正セカント条件では、モデルに三次項を導入し、前の点での関数値と勾配の両方の一致を同時に満たすことを可能にします~[^zhangNewQuasiNewtonEquation1999][^zhangPropertiesNumericalPerformance2001][^yabeLocalSuperlinearConvergence2007]。
+2つ目の修正セカント条件では、モデルに三次項を導入し、前の点での関数値と勾配の両方の一致を同時に満たすことを可能にします[^zhangNewQuasiNewtonEquation1999][^zhangPropertiesNumericalPerformance2001][^yabeLocalSuperlinearConvergence2007]。
 
 $T_{k+1} \in \mathbb{R}^{n \times n \times n}$ を、以下を満たす $x_{k+1}$ での $f$ の3階微分テンソルとします。
 
@@ -2011,7 +2214,7 @@ f(x_k)        & = f(x_{k+1}) - s_k^\top \nabla f(x_{k+1}) + \frac{1}{2} s_k^\top
 
 ```math
 \begin{equation*}
-3(f(x_k) - f(x_{k+1})) + \frac{3}{2} s_k^\top (\nabla f(x_{k+1}) + \nabla f(x_k)) = - \frac{\sigma^\mathrm{C}_k}{2} \lVert s_k \rVert^2,
+3(f(x_k) - f(x_{k+1})) + \frac{3}{2} s_k^\top (\nabla f(x_{k+1}) + \nabla f(x_k)) = - \frac{\sigma^\mathrm{C}_k}{2} \left\lVert s_k \right\rVert^2,
 \end{equation*}
 ```
 
@@ -2019,7 +2222,7 @@ f(x_k)        & = f(x_{k+1}) - s_k^\top \nabla f(x_{k+1}) + \frac{1}{2} s_k^\top
 
 ```math
 \begin{equation*}
-\sigma^\mathrm{C}_k = -\frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nabla f(x_k) + \nabla f(x_{k+1}))}{\lVert s_k \rVert^2}.
+\sigma^\mathrm{C}_k = -\frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nabla f(x_k) + \nabla f(x_{k+1}))}{\left\lVert s_k \right\rVert^2}.
 \end{equation*}
 ```
 
@@ -2027,7 +2230,7 @@ f(x_k)        & = f(x_{k+1}) - s_k^\top \nabla f(x_{k+1}) + \frac{1}{2} s_k^\top
 
 ```math
 \begin{equation*}
-B^{\mathrm{C}}_{k+1} s_k = y_k + \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nabla f(x_k) + \nabla f(x_{k+1}))}{\lVert s_k \rVert^2} s_k.
+B^{\mathrm{C}}_{k+1} s_k = y_k + \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nabla f(x_k) + \nabla f(x_{k+1}))}{\left\lVert s_k \right\rVert^2} s_k.
 \end{equation*}
 ```
 
@@ -2036,14 +2239,14 @@ B^{\mathrm{C}}_{k+1} s_k = y_k + \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nab
 
 ![../imgs/modified_secant/trial_1_cubic.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_1_cubic.png)
 
-(Fig. 13 三次項による修正セカント方程式。\cref{fig:zhang_cubic} では、三次項をモデルに組み込むことで、前の点で関数値と勾配の両方が一致します。\cref{fig:zhang_quadratic} では、その二次までの展開によるモデルを示しています。)
+(Fig. 13 三次項による修正セカント方程式。Fig. 13 では、三次項をモデルに組み込むことで、前の点で関数値と勾配の両方が一致します。Fig. 13 では、その二次までの展開によるモデルを示しています。)
 
 ### その他の曲率関連手法
 
 曲率情報を表すベクトルペア $s_k, y_k$ を求めることについては、他にもいくつかのトピックがあります。
-Agg-BFGS~[^berahasLimitedmemoryBFGSDisplacement2022] は、最も古い情報を破棄して最新のものを追加するのではなく、データを集約することにより曲率情報を管理する別のアプローチです。
+Agg-BFGS[^berahasLimitedmemoryBFGSDisplacement2022] は、最も古い情報を破棄して最新のものを追加するのではなく、データを集約することにより曲率情報を管理する別のアプローチです。
 
-Multi-Secant~[^leeAdvancingMultiSecantQuasiNewton2025] とは、複数のステップと勾配差ベクトルのペアを維持することにより、セカント条件を拡張します。ここまでで見てきた標準的な形式では、次のように定義していました。
+Multi-Secant[^leeAdvancingMultiSecantQuasiNewton2025] とは、複数のステップと勾配差ベクトルのペアを維持することにより、セカント条件を拡張します。ここまでで見てきた標準的な形式では、次のように定義していました。
 
 ```math
 \begin{equation*}
@@ -2068,11 +2271,12 @@ s_i = x_{k+1} - x_i, \quad y_i = \nabla f(x_{k+1}) - \nabla f(x_i). \quad (i = k
 [^bauschkeBaillonHaddadTheoremRevisited2009]: TODO
 [^berahasLimitedmemoryBFGSDisplacement2022]: TODO
 [^dennisjr.QuasiNewtonMethodsMotivation1977a]: TODO
+[^doi:10.1137/1.9781611971200]: TODO
+[^haeltermanAnalyticalStudyLeast2009]: TODO
 [^kanamori2016continuous]: TODO
-[^kanamoriBregmanExtensionQuasiNewton2010]: TODO
-[^kanamoriBregmanExtensionQuasiNewton2010a]: TODO
 [^leeAdvancingMultiSecantQuasiNewton2025]: TODO
 [^liuLimitedMemoryBFGS1989a]: TODO
+[^m.j.d.powellNewAlgorithmUnconstrained1970]: TODO
 [^nesterovIntroductoryLecturesConvex2014]: TODO
 [^nocedal1999numerical]: TODO
 [^powellHowBadAre1986]: TODO

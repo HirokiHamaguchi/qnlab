@@ -183,7 +183,7 @@
     この方程式を代入すると、以下が得られます。
 \fi
 \begin{equation*}
-    f(x_k) = f(x_{k+1}) - \nabla f(x_{k+1})^\top s_k + \frac{1}{2} s_k^\top y_k - \frac{\sigma^\mathrm{F}_k}{2} \lVert s_k \rVert^2.
+    f(x_k) = f(x_{k+1}) - \nabla f(x_{k+1})^\top s_k + \frac{1}{2} s_k^\top y_k - \frac{\sigma^\mathrm{F}_k}{2} \left\lVert s_k \right\rVert^2.
 \end{equation*}
 \ifEn
     Solving for $\sigma^\mathrm{F}_k$ and using $y_k = \nabla f(x_{k+1}) - \nabla f(x_k)$, we obtain
@@ -191,8 +191,8 @@
     $\sigma^\mathrm{F}_k$ について解き、$y_k = \nabla f(x_{k+1}) - \nabla f(x_k)$ を使用することで、以下を得ます。
 \fi
 \begin{align*}
-    \sigma^\mathrm{F}_k & = \frac{2(f(x_{k+1}) - f(x_k)) - (2\nabla f(x_{k+1}) - y_k)^\top s_k}{\lVert s_k \rVert^2}           \\
-                        & = \frac{2(f(x_{k+1}) - f(x_k)) - (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k}{\lVert s_k \rVert^2}.
+    \sigma^\mathrm{F}_k & = \frac{2(f(x_{k+1}) - f(x_k)) - (2\nabla f(x_{k+1}) - y_k)^\top s_k}{\left\lVert s_k \right\rVert^2}           \\
+                        & = \frac{2(f(x_{k+1}) - f(x_k)) - (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k}{\left\lVert s_k \right\rVert^2}.
 \end{align*}
 \ifEn
     Therefore, the modified secant condition becomes
@@ -200,7 +200,7 @@
     従って、修正セカント条件は以下になります。
 \fi
 \begin{equation*}
-    B^{\mathrm{F}}_{k+1} s_k = \hat{y}^{\mathrm{F}}_k \coloneqq y_k + \frac{2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k}{\lVert s_k \rVert^2} s_k.
+    B^{\mathrm{F}}_{k+1} s_k = \hat{y}^{\mathrm{F}}_k \coloneqq y_k + \frac{2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k}{\left\lVert s_k \right\rVert^2} s_k.
 \end{equation*}
 \ifEn
     By using this modified $\hat{y}^\mathrm{F}_k$ instead of $y_k$ in various quasi-Newton updates, we can incorporate function value information while keeping almost the same algorithm.
@@ -210,7 +210,7 @@
     また、特にBFGS更新で $s_k^\top y_k > 0$ という条件は正定値性を保つために使われるなど重要な性質である為、$s_k$ との内積が正であることを保証した、次の修正も考えられます。
 \fi
 \begin{equation*}
-    B^{\mathrm{F}'}_{k+1} s_k = y_k + \frac{\max(0, 2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k)}{\lVert s_k \rVert^2} s_k.
+    B^{\mathrm{F}'}_{k+1} s_k = y_k + \frac{\max(0, 2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k)}{\left\lVert s_k \right\rVert^2} s_k.
 \end{equation*}
 \ifEn
     This is the function-value-matching modified secant condition.
@@ -320,7 +320,7 @@
     そうすると、先の方程式は
 \fi
 \begin{equation*}
-    3(f(x_k) - f(x_{k+1})) + \frac{3}{2} s_k^\top (\nabla f(x_{k+1}) + \nabla f(x_k)) = - \frac{\sigma^\mathrm{C}_k}{2} \lVert s_k \rVert^2,
+    3(f(x_k) - f(x_{k+1})) + \frac{3}{2} s_k^\top (\nabla f(x_{k+1}) + \nabla f(x_k)) = - \frac{\sigma^\mathrm{C}_k}{2} \left\lVert s_k \right\rVert^2,
 \end{equation*}
 \ifEn
     which means
@@ -328,7 +328,7 @@
     つまり、
 \fi
 \begin{equation*}
-    \sigma^\mathrm{C}_k = -\frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nabla f(x_k) + \nabla f(x_{k+1}))}{\lVert s_k \rVert^2}.
+    \sigma^\mathrm{C}_k = -\frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nabla f(x_k) + \nabla f(x_{k+1}))}{\left\lVert s_k \right\rVert^2}.
 \end{equation*}
 \ifEn
     Thus, the modified secant condition becomes
@@ -336,7 +336,7 @@
     従って、以下の修正セカント条件が得られます。
 \fi
 \begin{equation*}
-    B^{\mathrm{C}}_{k+1} s_k = y_k + \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nabla f(x_k) + \nabla f(x_{k+1}))}{\lVert s_k \rVert^2} s_k.
+    B^{\mathrm{C}}_{k+1} s_k = y_k + \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nabla f(x_k) + \nabla f(x_{k+1}))}{\left\lVert s_k \right\rVert^2} s_k.
 \end{equation*}
 \ifEn
     This is a cubic-augmented modified secant condition.

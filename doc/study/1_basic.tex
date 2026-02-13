@@ -51,8 +51,8 @@
 \fi
 \begin{align*}
     \textrm{(convex)} \quad
-    f((1-\lambda) x + \lambda y)                                        & \le (1-\lambda) f(x) + \lambda f(y),                                                         \\
-    \textrm{($\mu$-strongly convex)} \quad f((1-\lambda) x + \lambda y) & \le (1-\lambda) f(x) + \lambda f(y) - \frac{\mu}{2} \lambda (1-\lambda) \lVert x-y \rVert^2.
+    f((1-\lambda) x + \lambda y)                                        & \le (1-\lambda) f(x) + \lambda f(y),                                                                    \\
+    \textrm{($\mu$-strongly convex)} \quad f((1-\lambda) x + \lambda y) & \le (1-\lambda) f(x) + \lambda f(y) - \frac{\mu}{2} \lambda (1-\lambda) \left\lVert x-y \right\rVert^2.
 \end{align*}
 \ifEn
     There are more intuitive equivalent definitions of convexity and strong convexity using the gradient of $f$.
@@ -65,9 +65,9 @@
 \fi
 \begin{align*}
     \textrm{(convex)} \quad
-    f(y) & \ge f(x)+\nabla f(x)^\top (y-x),                                  \\
+    f(y) & \ge f(x)+\nabla f(x)^\top (y-x),                                             \\
     \textrm{($\mu$-strongly convex)} \quad
-    f(y) & \ge f(x)+\nabla f(x)^\top (y-x)+\frac{\mu}{2}\lVert y-x \rVert^2.
+    f(y) & \ge f(x)+\nabla f(x)^\top (y-x)+\frac{\mu}{2}\left\lVert y-x \right\rVert^2.
 \end{align*}
 \ifEn
     Strong convexity indicates that, in addition to convexity, the objective function has uniformly positive curvature.
@@ -121,9 +121,9 @@
     \fi
     \begin{align*}
         \nabla f(x)^\top (y-x)
-         & =\lim_{\lambda \to 0} \frac{f(x+ \lambda (y-x)) - f(x)}{\lambda}                                                                                         \\
-         & \le \lim_{\lambda \to 0} \frac{1}{\lambda} \left( (1-\lambda) f(x) + \lambda f(y) - \frac{\mu}{2} \lambda (1-\lambda) \lVert x-y \rVert^2 - f(x) \right) \\
-         & = f(y) - f(x) - \frac{\mu}{2} \lVert x-y \rVert^2.
+         & =\lim_{\lambda \to 0} \frac{f(x+ \lambda (y-x)) - f(x)}{\lambda}                                                                                                    \\
+         & \le \lim_{\lambda \to 0} \frac{1}{\lambda} \left( (1-\lambda) f(x) + \lambda f(y) - \frac{\mu}{2} \lambda (1-\lambda) \left\lVert x-y \right\rVert^2 - f(x) \right) \\
+         & = f(y) - f(x) - \frac{\mu}{2} \left\lVert x-y \right\rVert^2.
     \end{align*}
     \ifEn
         Thus, the latter definition holds.
@@ -137,8 +137,8 @@
         $z \coloneqq (1-\lambda)x + \lambda y$ とおくと、次が成り立ちます。
     \fi
     \begin{align*}
-        f(x) \geq f(z) + \nabla f(z)^\top (x-z) + \frac{\mu}{2} \lVert x-z \rVert^2, \\
-        f(y) \geq f(z) + \nabla f(z)^\top (y-z) + \frac{\mu}{2} \lVert y-z \rVert^2.
+        f(x) \geq f(z) + \nabla f(z)^\top (x-z) + \frac{\mu}{2} \left\lVert x-z \right\rVert^2, \\
+        f(y) \geq f(z) + \nabla f(z)^\top (y-z) + \frac{\mu}{2} \left\lVert y-z \right\rVert^2.
     \end{align*}
     \ifEn
         Multiplying the first inequality by $1-\lambda$ and the second by $\lambda$, and adding them together, we obtain
@@ -148,9 +148,9 @@
     \begin{align*}
         (1-\lambda) f(x) + \lambda f(y)
          & \geq f(z) + \nabla f(z)^\top \left( (1-\lambda)(x-z) + \lambda (y-z) \right)
-        + \frac{\mu}{2} \left( (1-\lambda) \lVert x-z \rVert^2 + \lambda \lVert y-z \rVert^2 \right)                                   \\
-         & = f(z) + \frac{\mu}{2} \left( (1-\lambda) \lambda^2 \lVert x-y \rVert^2 + \lambda (1-\lambda)^2 \lVert y-x \rVert^2 \right) \\
-         & = f(z) + \frac{\mu}{2} \lambda (1-\lambda) \lVert x-y \rVert^2.
+        + \frac{\mu}{2} \left( (1-\lambda) \left\lVert x-z \right\rVert^2 + \lambda \left\lVert y-z \right\rVert^2 \right)                                   \\
+         & = f(z) + \frac{\mu}{2} \left( (1-\lambda) \lambda^2 \left\lVert x-y \right\rVert^2 + \lambda (1-\lambda)^2 \left\lVert y-x \right\rVert^2 \right) \\
+         & = f(z) + \frac{\mu}{2} \lambda (1-\lambda) \left\lVert x-y \right\rVert^2.
     \end{align*}
     \ifEn
         Thus, the former definition holds.
@@ -191,15 +191,15 @@
     For matrices $A,B \in \mathbb{R}^{n \times n}$, the notation $A \succeq B$ indicates that $A-B$ is positive semi-definite.
     In particular, if $B$ is a zero matrix, we simply write $A \succeq 0$.
     We similarly define $\preceq$ for negative semi-definiteness.
-    For $\mu \geq 0$, the condition $A \succeq \mu I$ is equivalent to $v^\top A v \ge \mu \lVert v \rVert^2$ for all $v \in \mathbb{R}^n$.
-    It directly implies that all eigenvalues of $A$ are at least $\mu$, which in turn implies that the operator norm $\lVert A \rVert$ is at least $\mu$, i.e., $\lVert A \rVert \geq \mu$.
+    For $\mu \geq 0$, the condition $A \succeq \mu I$ is equivalent to $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ for all $v \in \mathbb{R}^n$.
+    It directly implies that all eigenvalues of $A$ are at least $\mu$, which in turn implies that the operator norm $\left\lVert A \right\rVert$ is at least $\mu$, i.e., $\left\lVert A \right\rVert \geq \mu$.
 \else
     正定値でも負定値でもない行列は不定値(indefinite)と呼ばれます。
     行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表します。
     特に $B$ が零行列のときは $A \succeq 0$ と書きます。
     同様に、$\preceq$ は半負定値に対して定義されます。
-    $\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \lVert v \rVert^2$ と同値です。
-    これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味し、さらに作用素ノルムについても $\lVert A \rVert \geq \mu$ であることを導きます。
+    $\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ と同値です。
+    これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味し、さらに作用素ノルムについても $\left\lVert A \right\rVert \geq \mu$ であることを導きます。
 \fi
 
 \ifEn
@@ -243,8 +243,8 @@
     \fi
     \begin{equation*}
         \int_0^1 (y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t
-        \ge \int_0^1 \mu\lVert y-x \rVert^2 \mathrm{d}t
-        = \mu\lVert y-x \rVert^2.
+        \ge \int_0^1 \mu\left\lVert y-x \right\rVert^2 \mathrm{d}t
+        = \mu\left\lVert y-x \right\rVert^2.
     \end{equation*}
     \ifEn
         Thus, combining these results gives the definition of $\mu$-strong convexity.
@@ -261,8 +261,8 @@
     \fi
     \begin{equation*}
         \begin{dcases}
-            f(x + tv)\ge f(x) + t\nabla f(x)^\top v+\frac{\mu}{2}t^2\lVert v \rVert^2, \\
-            f(x - tv)\ge f(x) - t\nabla f(x)^\top v+\frac{\mu}{2}t^2\lVert v \rVert^2.
+            f(x + tv)\ge f(x) + t\nabla f(x)^\top v+\frac{\mu}{2}t^2\left\lVert v \right\rVert^2, \\
+            f(x - tv)\ge f(x) - t\nabla f(x)^\top v+\frac{\mu}{2}t^2\left\lVert v \right\rVert^2.
         \end{dcases}
     \end{equation*}
     \ifEn
@@ -282,7 +282,7 @@
         これらの結果を合わせると次が成り立ちます。
     \fi
     \begin{equation*}
-        v^\top \frac{\nabla^2 f(x+ s_+ t v) + \nabla^2 f(x - s_- t v)}{2} v \ge \mu \lVert v \rVert^2.
+        v^\top \frac{\nabla^2 f(x+ s_+ t v) + \nabla^2 f(x - s_- t v)}{2} v \ge \mu \left\lVert v \right\rVert^2.
     \end{equation*}
     \ifEn
         Letting $t \to 0$ and using the continuity of $\nabla^2 f$ from the $C^2$ assumption gives
@@ -290,7 +290,7 @@
         $t \to 0$ とし、$f$ が $C^2$ 級という仮定による $\nabla^2 f$ の連続性を用いると次を得ます。
     \fi
     \begin{equation*}
-        v^\top \nabla^2 f(x) v \ge \mu \lVert v \rVert^2.
+        v^\top \nabla^2 f(x) v \ge \mu \left\lVert v \right\rVert^2.
     \end{equation*}
     \ifEn
         Because $v \in \mathbb{R}^n$ is arbitrary, we obtain $\nabla^2 f(x)\succeq \mu I$.
@@ -341,7 +341,7 @@
     関数 $f$ が $L$-平滑であるとは、ある定数 $L>0$ が存在して
 \fi
 \begin{equation*}
-    \lVert \nabla f(x)-\nabla f(y) \rVert \le L\lVert x-y \rVert
+    \left\lVert \nabla f(x)-\nabla f(y) \right\rVert \le L\left\lVert x-y \right\rVert
 \end{equation*}
 \ifEn
     holds for all $x,y$.
@@ -374,17 +374,17 @@
     \end{equation*}
     \ifEn
         Assume $\nabla^2 f(x)\preceq L I$ for all $x \in \mathbb{R}^n$.
-        It implies that the operator norm of $\nabla^2 f(x)$ satisfies $\lVert \nabla^2 f(x) \rVert \le L$, and thus
+        It implies that the operator norm of $\nabla^2 f(x)$ satisfies $\left\lVert \nabla^2 f(x) \right\rVert \le L$, and thus
     \else
         任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\preceq L I$ と仮定します。
-        このとき $\lVert \nabla^2 f(x) \rVert \le L$ が成り立つので、
+        このとき $\left\lVert \nabla^2 f(x) \right\rVert \le L$ が成り立つので、
     \fi
     \begin{align*}
-        \lVert \nabla f(y) - \nabla f(x) \rVert
-         & = \lVert \int_0^1 \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t \rVert   &  & (\text{previous equation})   \\
-         & \le \int_0^1 \lVert \nabla^2 f(x+t(y-x))(y-x) \rVert \mathrm{d}t &  & (\text{triangle inequality}) \\
-         & \le \int_0^1 L\lVert y-x \rVert \mathrm{d}t                      &  & (\text{by assumption})       \\
-         & = L\lVert y-x \rVert,
+        \left\lVert \nabla f(y) - \nabla f(x) \right\rVert
+         & = \left\lVert \int_0^1 \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t \right\rVert   &  & (\text{previous equation})   \\
+         & \le \int_0^1 \left\lVert \nabla^2 f(x+t(y-x))(y-x) \right\rVert \mathrm{d}t &  & (\text{triangle inequality}) \\
+         & \le \int_0^1 L\left\lVert y-x \right\rVert \mathrm{d}t                      &  & (\text{by assumption})       \\
+         & = L\left\lVert y-x \right\rVert,
     \end{align*}
     \ifEn
         which proves the $L$-smoothness of $f$.
@@ -396,12 +396,12 @@
         逆に、$f$ が $L$-平滑であるとすると、任意の $x \in \mathbb{R}^n$ と $v \in \mathbb{R}^n$ に対して次が成り立ちます。
     \fi
     \begin{equation*}
-        \lVert \nabla f(x+tv)-\nabla f(x) \rVert \le L\lVert tv \rVert = Lt\lVert v \rVert.
+        \left\lVert \nabla f(x+tv)-\nabla f(x) \right\rVert \le L\left\lVert tv \right\rVert = Lt\left\lVert v \right\rVert.
     \end{equation*}
     \ifEn
-        By Taylor's theorem, with remainder $r(t)$ satisfies $\lVert r(t) \rVert/t \to 0$ as $t \to 0$, we also have
+        By Taylor's theorem, with remainder $r(t)$ satisfies $\left\lVert r(t) \right\rVert/t \to 0$ as $t \to 0$, we also have
     \else
-        さらにテイラーの定理より、$t \to 0$ のとき $\lVert r(t) \rVert/t \to 0$ を満たす剰余項 $r(t)$ を用いて次が成り立ちます。
+        さらにテイラーの定理より、$t \to 0$ のとき $\left\lVert r(t) \right\rVert/t \to 0$ を満たす剰余項 $r(t)$ を用いて次が成り立ちます。
     \fi
     \begin{equation*}
         \nabla f(x+tv)-\nabla f(x) = t \nabla^2 f(x) v + r(t).
@@ -420,10 +420,10 @@
         $v$ との内積を取ると次が得られます。
     \fi
     \begin{align*}
-        v^\top \nabla^2 f(x) v & = \lim_{t \to 0} \left(\frac{\nabla f(x+tv)-\nabla f(x)}{t}\right)^\top v                                                         \\
-                               & \leq \lim_{t \to 0} \frac{\lVert \nabla f(x+tv)-\nabla f(x) \rVert}{t} \lVert v \rVert &  & (\text{Cauchy--Schwarz inequality})   \\
-                               & \leq \lim_{t \to 0} \frac{L\lVert tv \rVert}{t} \lVert v \rVert                        &  & (\text{by $L$-smoothness definition}) \\
-                               & = L \lVert v \rVert^2.
+        v^\top \nabla^2 f(x) v & = \lim_{t \to 0} \left(\frac{\nabla f(x+tv)-\nabla f(x)}{t}\right)^\top v                                                                               \\
+                               & \leq \lim_{t \to 0} \frac{\left\lVert \nabla f(x+tv)-\nabla f(x) \right\rVert}{t} \left\lVert v \right\rVert &  & (\text{Cauchy--Schwarz inequality})   \\
+                               & \leq \lim_{t \to 0} \frac{L\left\lVert tv \right\rVert}{t} \left\lVert v \right\rVert                        &  & (\text{by $L$-smoothness definition}) \\
+                               & = L \left\lVert v \right\rVert^2.
     \end{align*}
     \ifEn
         Because $v \in \mathbb{R}^n$ is arbitrary, we obtain $\nabla^2 f(x)\preceq L I$.
@@ -487,13 +487,13 @@
     \ifEn
         Let $f \colon \mathbb{R}^n \to \mathbb{R}$ be of class $C^1$. If $f$ is $L$-smooth and convex, then for all $x,y \in \mathbb{R}^n$, $\nabla f$ is $1/L$-cocoercive, i.e.,
         \begin{equation*}
-            (\nabla f(x)-\nabla f(y))^\top (x-y) \ge \frac{1}{L} \lVert \nabla f(x)-\nabla f(y) \rVert^2
+            (\nabla f(x)-\nabla f(y))^\top (x-y) \ge \frac{1}{L} \left\lVert \nabla f(x)-\nabla f(y) \right\rVert^2
         \end{equation*}
         for all $x,y \in \mathbb{R}^n$.
     \else
         関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^1$ 級であるとする。$f$ が $L$-平滑かつ凸であれば、任意の $x,y \in \mathbb{R}^n$ に対して $\nabla f$ は $1/L$-cocoercive である、すなわち
         \begin{equation*}
-            (\nabla f(x)-\nabla f(y))^\top (x-y) \ge \frac{1}{L} \lVert \nabla f(x)-\nabla f(y) \rVert^2
+            (\nabla f(x)-\nabla f(y))^\top (x-y) \ge \frac{1}{L} \left\lVert \nabla f(x)-\nabla f(y) \right\rVert^2
         \end{equation*}
         が任意の $x,y \in \mathbb{R}^n$ について成り立つ。
     \fi
@@ -517,7 +517,7 @@
     と定義した上で、Baillon--Haddad 定理を $x=x_{k+1}$、$y=x_k$ に適用すると、次の結果が得られます。
 \fi
 \begin{equation*}
-    s_k^\top y_k \ge \frac{1}{L} \lVert y_k \rVert^2.
+    s_k^\top y_k \ge \frac{1}{L} \left\lVert y_k \right\rVert^2.
 \end{equation*}
 \ifEn
     This inequality is sometimes used in the analysis of update formulas in methods such as BFGS and L-BFGS.

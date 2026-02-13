@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from pdf_handler import convert_pdf_to_png
-from postprocessing import for_qiita_post_process
+from postprocessing import for_qiita_post_process, post_process_content
 from processor import get_global_state, process_latex_file
 
 
@@ -46,7 +46,7 @@ def main() -> None:
 
     output_file = current_dir / "qiita" / "combined_output.md"
     output_content = "\n".join(all_markdown_lines)
-    output_content = re.sub(r"\\label\{[^}]+\}", "", output_content)
+    output_content = post_process_content(output_content)
     output_content = for_qiita_post_process(output_content)
     output_file.write_text(output_content, encoding="utf-8")
     print(f"\nConversion complete! Output written to {output_file}")
