@@ -2370,6 +2370,9 @@ s_i = x_{k+1} - x_i, \quad y_i = \nabla f(x_{k+1}) - \nabla f(x_i). \quad (i = k
 
 このアプローチによって、場合によってはより良い近似が得られることもあります。
 
+## 最後に
+
+以上です。お読みいただきありがとうございました。
 
 [^Doikov2021SecondOrderTensor]: Nikita Doikov. New Second-Order and Tensor Methods in Convex Optimization. PhD thesis, Universit\'e catholique de Louvain, 2021.
 [^FanZhongXiuMingLianSokZuiShiHuaarugorizumu2023]: 飯塚 秀明. 連続最適化アルゴリズム. オーム社, 2023.

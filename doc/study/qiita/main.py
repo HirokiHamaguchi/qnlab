@@ -52,6 +52,15 @@ def main() -> None:
             [f"\n<!-- From {tex_file.name} -->\n", *markdown_lines, "\n"]
         )
 
+    all_markdown_lines.extend(
+        [
+            "",
+            "## 最後に",
+            "",
+            "以上です。お読みいただきありがとうございました。",
+        ]
+    )
+
     output_file = current_dir / "qiita" / "combined_output.md"
     output_content = "\n".join(all_markdown_lines)
     output_content = post_process_content(output_content)
