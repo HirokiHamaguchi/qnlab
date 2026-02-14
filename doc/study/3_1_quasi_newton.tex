@@ -25,11 +25,9 @@
 \end{figure}
 
 \ifEn
-    In this section, we discuss quasi-Newton methods. Quasi-Newton methods are based on Newton's method but aim to reduce its primary drawback, namely the high computational cost of evaluating the Hessian matrix.
-    Instead of using the true Hessian matrix $\nabla^2 f(x_k)$, an approximation matrix $B_k$ is employed, thereby achieving fast convergence while keeping the computational cost low.
+    In this section, we discuss quasi-Newton methods. Quasi-Newton methods are based on Newton's method but aim to reduce its primary drawback, namely the high computational cost of evaluating the Hessian matrix. Instead of using the true Hessian matrix $\nabla^2 f(x_k)$, an approximation matrix $B_k$ is employed, thereby achieving fast convergence while keeping the computational cost low.
 \else
-    本節では準ニュートン法について説明します。
-    準ニュートン法はニュートン法に基づいていますが、その主要な欠点であるヘッセ行列やその逆行列の計算コストを低減することを目的としています。具体的には、真のヘッセ行列 $\nabla^2 f(x_k)$ の代わりに近似行列 $B_k$ とその逆行列 $H_k$ を用いることで、高速な収束性を保ちつつ計算コストを抑えます。
+    本節では準ニュートン法について説明します。準ニュートン法はニュートン法に基づいていますが、その主要な欠点であるヘッセ行列やその逆行列の計算コストを低減することを目的としています。具体的には、真のヘッセ行列 $\nabla^2 f(x_k)$ の代わりに近似行列 $B_k$ とその逆行列 $H_k$ を用いることで、高速な収束性を保ちつつ計算コストを抑えます。
 \fi
 
 \ifEn
@@ -39,20 +37,18 @@
 \fi
 
 \ifEn
-    Line-search-based quasi-Newton methods generate a sequence ${ x_k }*{k=0}^{\infty}$ that converges to the optimal solution $x^*$ as follows:
+    Line-search-based quasi-Newton methods generate a sequence $\{ x_k \}_{k=0}^{\infty}$ that converges to the optimal solution $x^*$ as follows:
 \else
-    直線探索に基づく準ニュートン法では、最適解 $x^*$ に収束する列 ${ x_k }*{k=0}^{\infty}$ を次のように生成します。
+    直線探索に基づく準ニュートン法では、最適解 $x^*$ に収束する列 $\{ x_k \}_{k=0}^{\infty}$ を次のように生成します。
 \fi
 \begin{equation*}
     x_{k+1} = x_k - \alpha_k B_k^{-1} \nabla f(x_k)
     = x_k - \alpha_k H_k \nabla f(x_k).
 \end{equation*}
 \ifEn
-    Here, $\alpha_k > 0$ is the step size determined by line search, $B_k$ is an approximation of the Hessian matrix $\nabla^2 f(x_k)$ at the point $x_k$, and $H_k \coloneqq B_k^{-1}$ denotes its inverse.
-    This update rule closely resembles that of Newton's method, which is why it is called a quasi-Newton method.
+    Here, $\alpha_k > 0$ is the step size determined by line search, $B_k$ is an approximation of the Hessian matrix $\nabla^2 f(x_k)$ at the point $x_k$, and $H_k \coloneqq B_k^{-1}$ denotes its inverse. This update rule closely resembles that of Newton's method, which is why it is called a quasi-Newton method.
 \else
-    ここで $\alpha_k > 0$ は直線探索で定めるステップサイズであり、$B_k$ は点 $x_k$ におけるヘッセ行列 $\nabla^2 f(x_k)$ の近似です。$H_k \coloneqq B_k^{-1}$ はその逆行列を表します。
-    この更新則はニュートン法の更新則と酷似しており、その故にこの手法は準ニュートン法と呼ばれています。
+    ここで $\alpha_k > 0$ は直線探索で定めるステップサイズであり、$B_k$ は点 $x_k$ におけるヘッセ行列 $\nabla^2 f(x_k)$ の近似です。$H_k \coloneqq B_k^{-1}$ はその逆行列を表します。この更新則はニュートン法の更新則と酷似しており、その故にこの手法は準ニュートン法と呼ばれています。
 \fi
 
 \begin{figure}[t]
@@ -100,16 +96,9 @@
 \fi
 
 \ifEn
-    Let $f\colon \mathbb{R}^n \to \mathbb{R}$ be of class $C^2$.
-    Suppose that a symmetric matrix $B_k$ is given as an approximation of the Hessian matrix $\nabla^2 f(x_k)$.
-    We consider updating the approximate Hessian to $B_{k+1}$ for the next point $x_{k+1}$.
-    Although there are infinitely many possible candidates for such a matrix, it is natural to impose symmetry on $B_{k+1}$, since the true Hessian matrix is symmetric.
-    For the current point $x_k$ and the next point $x_{k+1}$, we define the step and the gradient difference as follows:
+    Let $f\colon \mathbb{R}^n \to \mathbb{R}$ be of class $C^2$. Suppose that a symmetric matrix $B_k$ is given as an approximation of the Hessian matrix $\nabla^2 f(x_k)$. We consider updating the approximate Hessian to $B_{k+1}$ for the next point $x_{k+1}$. Although there are infinitely many possible candidates for such a matrix, it is natural to impose symmetry on $B_{k+1}$, since the true Hessian matrix is symmetric. For the current point $x_k$ and the next point $x_{k+1}$, we define the step and the gradient difference as follows:
 \else
-    関数 $f\colon \mathbb{R}^n \to \mathbb{R}$ を $C^2$ 級とします。
-    対称行列 $B_k$ が点 $x_k$ におけるヘッセ行列 $\nabla^2 f(x_k)$ の近似として与えられたとき、次の点 $x_{k+1}$ における近似ヘッセ行列 $B_{k+1}$ への更新を考えます。
-    このような行列の候補は無数に存在しますが、真のヘッセ行列が対称であることから、$B_{k+1}$ にも対称性を課すのが自然です。
-    現在の点 $x_k$ と次の点 $x_{k+1}$ に対して、ステップと勾配差を次のように定義します。
+    関数 $f\colon \mathbb{R}^n \to \mathbb{R}$ を $C^2$ 級とします。対称行列 $B_k$ が点 $x_k$ におけるヘッセ行列 $\nabla^2 f(x_k)$ の近似として与えられたとき、次の点 $x_{k+1}$ における近似ヘッセ行列 $B_{k+1}$ への更新を考えます。このような行列の候補は無数に存在しますが、真のヘッセ行列が対称であることから、$B_{k+1}$ にも対称性を課すのが自然です。現在の点 $x_k$ と次の点 $x_{k+1}$ に対して、ステップと勾配差を次のように定義します。
 \fi
 \begin{equation*}
     s_k \coloneqq x_{k+1} - x_k, \qquad   y_k \coloneqq \nabla f(x_{k+1}) - \nabla f(x_k).
@@ -117,8 +106,7 @@
 \ifEn
     We assume that $y_k^\top s_k \neq 0$ and $s_k \neq 0$. Here, the $s$ in $s_k$ stands for ``step.'' Since the new approximation is constructed around $x_{k+1}$, we approximate $\nabla f(x_k)$ using the Hessian matrix $\nabla^2 f(x_{k+1})$ and its approximation $B_{k+1}$ as follows:
 \else
-    $y_k^\top s_k \neq 0$ かつ $s_k \neq 0$ を仮定します。なお、$s_k$ の $s$ は step を意味します。
-    新しい近似は $x_{k+1}$ を中心に構築されるため、$\nabla f(x_k)$ をヘッセ行列 $\nabla^2 f(x_{k+1})$ およびその近似である $B_{k+1}$ を用いて次のように近似します。
+    $y_k^\top s_k \neq 0$ かつ $s_k \neq 0$ を仮定します。なお、$s_k$ の $s$ は step を意味します。新しい近似は $x_{k+1}$ を中心に構築されるため、$\nabla f(x_k)$ をヘッセ行列 $\nabla^2 f(x_{k+1})$ およびその近似である $B_{k+1}$ を用いて次のように近似します。
 \fi
 \begin{align*}
     \nabla f(x_k) & \approx \nabla f(x_{k+1}) + \nabla^2 f(x_{k+1})(x_k - x_{k+1}) \\

@@ -22,20 +22,14 @@
 \fi
 
 \ifEn
-    Although the secant condition is widely used in many quasi-Newton methods, it can fail to capture the curvature of the objective function accurately because it only utilizes gradient information.
-    We illustrate this limitation in \cref{fig:msec_overview}.
+    Although the secant condition is widely used in many quasi-Newton methods, it can fail to capture the curvature of the objective function accurately because it only utilizes gradient information. We illustrate this limitation in \cref{fig:msec_overview}.
 \else
-    セカント条件は準ニュートン法で広く用いられていますが、勾配情報のみを活用するため、目的関数の曲率を正確に捉えられないことがあります。
-    このことを\cref{fig:msec_overview}で説明します。
+    セカント条件は準ニュートン法で広く用いられていますが、勾配情報のみを活用するため、目的関数の曲率を正確に捉えられないことがあります。このことを\cref{fig:msec_overview}で説明します。
 \fi
 \ifEn
-    In \cref{fig:msec_overview}, we have two points $x_k$ and $x_{k+1}$ where function values and gradients are already known.
-    We see that the ideal quadratic model constructed from the exact Hessian fits well around the new point $x_{k+1}$, leading to a better convergence behavior.
-    However, the standard secant condition, which only uses gradient information, ignores function value information and may misestimate curvature significantly, resulting in a poor approximation of the true objective function.
+    In \cref{fig:msec_overview}, we have two points $x_k$ and $x_{k+1}$ where function values and gradients are already known. We see that the ideal quadratic model constructed from the exact Hessian fits well around the new point $x_{k+1}$, leading to a better convergence behavior. However, the standard secant condition, which only uses gradient information, ignores function value information and may misestimate curvature significantly, resulting in a poor approximation of the true objective function.
 \else
-    \Cref{fig:msec_overview} において、関数値と勾配が既知の2点 $x_k$ と $x_{k+1}$ があるとします。
-    正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットしており、より良い収束挙動をもたらすことが分かります。
-    しかし、標準的な勾配のみを用いて課されるセカント条件で作られるモデルでは、関数値の情報が無視され、曲率を大きく誤る可能性があり、真の目的関数の近似が悪くなります。
+    \Cref{fig:msec_overview} において、関数値と勾配が既知の2点 $x_k$ と $x_{k+1}$ があるとします。正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットしており、より良い収束挙動をもたらすことが分かります。しかし、標準的な勾配のみを用いて課されるセカント条件で作られるモデルでは、関数値の情報が無視され、曲率を大きく誤る可能性があり、真の目的関数の近似が悪くなります。
 \fi
 
 \begin{figure}[t]
@@ -69,14 +63,9 @@
 \end{figure}
 
 \ifEn
-    We can overcome this limitation by utilizing the function values.
-    The basic idea is illustrated in \cref{fig:cubic_interpolation}.
-    Even when the gradients are the same at two points $x_k$ and $x_{k+1}$, natural interpolation of function values differs depending on the function values $f(x_k)$ and $f(x_{k+1})$.
-    This observation motivates the modified secant condition, which incorporates function value information to improve Hessian approximation.
+    We can overcome this limitation by utilizing the function values. The basic idea is illustrated in \cref{fig:cubic_interpolation}. Even when the gradients are the same at two points $x_k$ and $x_{k+1}$, natural interpolation of function values differs depending on the function values $f(x_k)$ and $f(x_{k+1})$. This observation motivates the modified secant condition, which incorporates function value information to improve Hessian approximation.
 \else
-    この問題は、関数値を利用することで克服できます。基本的な考え方は \cref{fig:cubic_interpolation} に示した通りです。
-    2 点 $x_k$ と $x_{k+1}$ で勾配が同じであっても、適切な補完は関数値 $f(x_k)$ と $f(x_{k+1})$ によって異なります。
-    この観察こそが、関数値情報を取り込んでヘッセ行列の近似を改善する修正セカント条件の動機を端的に示しています。
+    この問題は、関数値を利用することで克服できます。基本的な考え方は \cref{fig:cubic_interpolation} に示した通りです。2 点 $x_k$ と $x_{k+1}$ で勾配が同じであっても、適切な補完は関数値 $f(x_k)$ と $f(x_{k+1})$ によって異なります。この観察こそが、関数値情報を取り込んでヘッセ行列の近似を改善する修正セカント条件の動機を端的に示しています。
 \fi
 
 \begin{figure}[t]
@@ -84,11 +73,9 @@
     \includegraphics[width=\textwidth]{../imgs/modified_secant/cubic_interpolation.pdf}
     \caption{
         \ifEn
-            Basic idea of the modified secant condition.
-            Even when the gradients are the same at two points $x_k$ and $x_{k+1}$, natural interpolation of function values differs depending on the function values $f(x_k)$ and $f(x_{k+1})$.
+            Basic idea of the modified secant condition. Even when the gradients are the same at two points $x_k$ and $x_{k+1}$, natural interpolation of function values differs depending on the function values $f(x_k)$ and $f(x_{k+1})$.
         \else
-            修正セカント条件の基本的な考え方。
-            $x_k$ と $x_{k+1}$ で同一の勾配を持つが異なる関数値を持つ場合、適切な補間は異なります。
+            修正セカント条件の基本的な考え方。$x_k$ と $x_{k+1}$ で同一の勾配を持つが異なる関数値を持つ場合、適切な補間は異なります。
         \fi
     }
     \label{fig:cubic_interpolation}
@@ -108,11 +95,9 @@
 \label{subsubsec:yuan}
 
 \ifEn
-    The first modification enforces the quadratic model to match the function value at the previous point~\citep{yuanModifiedBFGSAlgorithm1991,weiNewQuasiNewtonMethods2006, babaie-kafakiModifiedBFGSAlgorithm2011}.
-    Let us consider an alternate model with a different approximate Hessian $B_{k+1}^{\mathrm{F}}$:
+    The first modification enforces the quadratic model to match the function value at the previous point~\citep{yuanModifiedBFGSAlgorithm1991,weiNewQuasiNewtonMethods2006, babaie-kafakiModifiedBFGSAlgorithm2011}. Let us consider an alternate model with a different approximate Hessian $B_{k+1}^{\mathrm{F}}$:
 \else
-    最初の修正は、二次モデルが前の点での関数値と一致することを強制します~\citep{yuanModifiedBFGSAlgorithm1991,weiNewQuasiNewtonMethods2006, babaie-kafakiModifiedBFGSAlgorithm2011}。
-    異なる近似ヘッセ行列 $B_{k+1}^{\mathrm{F}}$ を持つ別のモデルを考えます。
+    最初の修正は、二次モデルが前の点での関数値と一致することを強制します~\citep{yuanModifiedBFGSAlgorithm1991,weiNewQuasiNewtonMethods2006, babaie-kafakiModifiedBFGSAlgorithm2011}。異なる近似ヘッセ行列 $B_{k+1}^{\mathrm{F}}$ を持つ別のモデルを考えます。
 \fi
 \begin{equation*}
     m_{k+1}^{\mathrm{F}}(x) \coloneqq f(x_{k+1}) + \nabla f(x_{k+1})^\top (x - x_{k+1}) + \frac{1}{2} (x - x_{k+1})^\top B_{k+1}^{\mathrm{F}} (x - x_{k+1}).
@@ -174,11 +159,9 @@
     B_{k+1}^{\mathrm{F}} s_k = \hat{y}^{\mathrm{F}}_k \coloneqq y_k + \frac{2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k}{\left\lVert s_k \right\rVert^2} s_k.
 \end{equation*}
 \ifEn
-    By using this modified $\hat{y}^\mathrm{F}_k$ instead of $y_k$ in various quasi-Newton updates, we can incorporate function value information while keeping almost the same algorithm.
-    Additionally, since condition $s_k^\top y_k > 0$ is important for maintaining positive definiteness in BFGS update, we can consider the following modification to ensure that the inner product with $s_k$ remains positive:
+    By using this modified $\hat{y}^\mathrm{F}_k$ instead of $y_k$ in various quasi-Newton updates, we can incorporate function value information while keeping almost the same algorithm. Additionally, since condition $s_k^\top y_k > 0$ is important for maintaining positive definiteness in BFGS update, we can consider the following modification to ensure that the inner product with $s_k$ remains positive:
 \else
-    よって、各種の準ニュートン法の更新において、$s_k, y_k$ の代わりに、この修正された $\hat{y}^\mathrm{F}_k$ を使用することで、殆ど同じアルゴリズムのまま、目的関数値の情報を取り込むことができます。
-    また、特にBFGS更新で $s_k^\top y_k > 0$ という条件は正定値性を保つために使われるなど重要な性質である為、$s_k$ との内積が正であることを保証した、次の修正も考えられます。
+    よって、各種の準ニュートン法の更新において、$s_k, y_k$ の代わりに、この修正された $\hat{y}^\mathrm{F}_k$ を使用することで、殆ど同じアルゴリズムのまま、目的関数値の情報を取り込むことができます。また、特にBFGS更新で $s_k^\top y_k > 0$ という条件は正定値性を保つために使われるなど重要な性質である為、$s_k$ との内積が正であることを保証した、次の修正も考えられます。
 \fi
 \begin{equation*}
     B_{k+1}^{\mathrm{F}'} s_k = y_k + \frac{\max(0, 2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k)}{\left\lVert s_k \right\rVert^2} s_k.
@@ -333,11 +316,9 @@
 \fi
 
 \ifEn
-    There are several other topics related to obtaining the curvature pairs $s_k, y_k$.
-    Agg-BFGS~\citep{berahasLimitedmemoryBFGSDisplacement2022} is an alternative approach to managing curvature information by aggregating data rather than discarding the oldest information and adding the newest.
+    There are several other topics related to obtaining the curvature pairs $s_k, y_k$. Agg-BFGS~\citep{berahasLimitedmemoryBFGSDisplacement2022} is an alternative approach to managing curvature information by aggregating data rather than discarding the oldest information and adding the newest.
 \else
-    曲率情報を表すベクトルペア $s_k, y_k$ を求めることについては、他にもいくつかのトピックがあります。
-    Agg-BFGS~\citep{berahasLimitedmemoryBFGSDisplacement2022} は、最も古い情報を破棄して最新のものを追加するのではなく、データを集約することにより曲率情報を管理する別のアプローチです。
+    曲率情報を表すベクトルペア $s_k, y_k$ を求めることについては、他にもいくつかのトピックがあります。Agg-BFGS~\citep{berahasLimitedmemoryBFGSDisplacement2022} は、最も古い情報を破棄して最新のものを追加するのではなく、データを集約することにより曲率情報を管理する別のアプローチです。
 \fi
 \ifEn
     Multi-Secant~\citep{leeAdvancingMultiSecantQuasiNewton2025} extends the secant condition framework by maintaining multiple pairs of step and gradient difference vectors. In standard form we have seen, it is defined as

@@ -6,7 +6,7 @@
 
 決めたい内容を決定変数 $x$、その良さを表す定量的な指標を目的関数 $f(x)$ としてモデル化すると、これらの最善な選択は最適化問題として抽象化できます。
 
-数理最適化とは、このような最善の選択、およびその為の数学的手法やその学問領域を指し、本稿ではその中でも連続最適化、特にその代表的な手法である、ニュートン法と準ニュートン法を中心として、基礎的な概念をまとめます。
+数理最適化とは、このような最善の選択、およびそれを遂行する数学的手法や学問領域を指し、本稿では連続最適化、そして特にその代表的な手法であるニュートン法と準ニュートン法を中心として、基礎的な概念をまとめます。
 
 <img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/sixhump.png" />
 
@@ -18,7 +18,7 @@
 
 ### 凸性と強凸性
 
-凸性(convexity)と強凸性(strong convexity)は最適化理論における基本概念です。
+凸性 (convexity) と強凸性 (strong convexity) は最適化理論における基本概念です。
 簡単のため、$f$ は $\mathbb{R}^n$ 全域で実数値を取る関数、つまり、$f \colon \mathbb{R}^n \to \mathbb{R}$ とします。また、$\mu>0$ を定数とします。
 この時、関数 $f$ が凸、または $\mu$-強凸であることは、任意の $x,y \in \mathbb{R}^n$ と $\lambda \in [0,1]$ について次が成り立つこととそれぞれ同値です。
 
@@ -30,9 +30,7 @@ f((1-\lambda) x + \lambda y)                                        & \le (1-\la
 \end{align*}
 ```
 
-より直感的な定義として、関数 $f$ の勾配を用いた凸性および強凸性の同値な定義も存在します。
-$f$ が $C^1$ 級で、その定義域 $\mathbb{R}^n$ 全体で実数値を取ると仮定します。
-関数 $f$ が凸、または $\mu$-強凸であることは、任意の $x,y \in \mathbb{R}^n$ について次が成り立つこととそれぞれ同値です。
+より直感的な定義として、関数 $f$ の勾配を用いた凸性および強凸性の同値な定義も存在します。$f$ が $C^1$ 級で、その定義域 $\mathbb{R}^n$ 全体で実数値を取ると仮定します。関数 $f$ が凸、または $\mu$-強凸であることは、任意の $x,y \in \mathbb{R}^n$ について次が成り立つこととそれぞれ同値です。
 
 ```math
 \begin{align*}
@@ -43,14 +41,6 @@ f(y) & \ge f(x)+\nabla f(x)^\top (y-x)+\frac{\mu}{2}\left\lVert y-x \right\rVert
 \end{align*}
 ```
 
-強凸性は、凸性に加えて目的関数が一様に正の曲率を持つことを意味します。
-Fig. 1 に示した通り、凸関数と強凸関数には曲率に違いがみられます。
-このような定義は、文献によって多少の揺れがありますが、例えば[^nesterovIntroductoryLecturesConvex2014][^kanamori2016continuous]などを参照してください。
-
-<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/convexity_comparison_convex.png" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/convexity_comparison_strongly_convex.png" />
-
-(Fig. 1 凸関数と強凸関数の例。 破線は $x=0$ における二次近似を示しています。 上2つの関数は凸ですが強凸ではなく、 下2つの関数は強凸性の定義を満たす $\mu>0$ が存在し、強凸となります。)
-
 これら二つの定義の同値性を以下で示します。
 
 **Proposition 1**
@@ -60,8 +50,7 @@ Fig. 1 に示した通り、凸関数と強凸関数には曲率に違いがみ�
 
 <details><summary>証明</summary>
 
-$\mu$-強凸の場合について示します。
-まず、前者の定義が成立することを仮定すると、勾配の定義と、$f$ が $C^1$ 級であることから、以下が成り立ちます。
+$\mu$-強凸の場合について示します。まず、前者の定義が成立することを仮定すると、勾配の定義と、$f$ が $C^1$ 級であることから、以下が成り立ちます。
 
 ```math
 \begin{align*}
@@ -74,30 +63,29 @@ $\mu$-強凸の場合について示します。
 
 従って、後者の定義が成立します。
 
-続いて、後者の定義が成立することを仮定します。
-$z \mathrel{\vcenter{:}}= (1-\lambda)x + \lambda y$ とおくと、次が成り立ちます。
+続いて、後者の定義が成立することを仮定します。$z \mathrel{\vcenter{:}}= (1-\lambda)x + \lambda y$ とおくと、次が成り立ちます。
 
 ```math
 \begin{align*}
-f(x) \geq f(z) + \nabla f(z)^\top (x-z) + \frac{\mu}{2} \left\lVert x-z \right\rVert^2, \\
-f(y) \geq f(z) + \nabla f(z)^\top (y-z) + \frac{\mu}{2} \left\lVert y-z \right\rVert^2.
+f(x) & \geq f(z) + \nabla f(z)^\top (x-z) + \frac{\mu}{2} \left\lVert x-z \right\rVert^2, \\
+f(y) & \geq f(z) + \nabla f(z)^\top (y-z) + \frac{\mu}{2} \left\lVert y-z \right\rVert^2.
 \end{align*}
 ```
 
-これらを、それぞれ $1-\lambda$ 倍、$\lambda$ 倍して足し合わせると、次が成り立ちます。
+これらを、それぞれ $1-\lambda$ 倍、$\lambda$ 倍して足し合わせると、次が成り立ちます。途中式で、$\nabla f(z)$ を含む項は、$z$ の定義から完全に打ち消し合うことに注意してください。
 
 ```math
 \begin{align*}
-(1-\lambda) f(x) + \lambda f(y)
-& \geq f(z) + \nabla f(z)^\top \left( (1-\lambda)(x-z) + \lambda (y-z) \right)
-+ \frac{\mu}{2} \left( (1-\lambda) \left\lVert x-z \right\rVert^2 + \lambda \left\lVert y-z \right\rVert^2 \right)                                   \\
-& = f(z) + \frac{\mu}{2} \left( (1-\lambda) \lambda^2 \left\lVert x-y \right\rVert^2 + \lambda (1-\lambda)^2 \left\lVert y-x \right\rVert^2 \right) \\
-& = f(z) + \frac{\mu}{2} \lambda (1-\lambda) \left\lVert x-y \right\rVert^2.
+& (1-\lambda) f(x) + \lambda f(y)
+\\
+\geq{} & f(z) + \nabla f(z)^\top \left( (1-\lambda)(x-z) + \lambda (y-z) \right)
++ \frac{\mu}{2} \left( (1-\lambda) \left\lVert x-z \right\rVert^2 + \lambda \left\lVert y-z \right\rVert^2 \right)                                       \\
+={}    & f(z) + \frac{\mu}{2} \left( (1-\lambda) \lambda^2 \left\lVert x-y \right\rVert^2 + \lambda (1-\lambda)^2 \left\lVert y-x \right\rVert^2 \right) \\
+={}    & f(z) + \frac{\mu}{2} \lambda (1-\lambda) \left\lVert x-y \right\rVert^2.
 \end{align*}
 ```
 
-従って、前者の定義が成立します。
-つまり、これらの定義は同値であることが示されました。
+従って、前者の定義が成立します。つまり、これらの定義は同値であることが示されました。
 
 $\mu=0$ の場合も、同様の議論により凸性について示すことができます。
 
@@ -105,13 +93,17 @@ $\mu=0$ の場合も、同様の議論により凸性について示すことが
 
 </details>
 
+強凸性は、凸性に加えて目的関数が一様に正の曲率を持つことを意味します。Fig. 1 に示した通り、凸関数と強凸関数には曲率に違いがみられます。$\mu=0$ を強凸の定義に含めるか否かは、文献によって多少の揺れがありますが、一般的な慣習に倣い本稿では含めません。例えば[^nesterovIntroductoryLecturesConvex2014][^kanamori2016continuous]などを参照してください。
+
+<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/convexity_comparison_convex.png" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/convexity_comparison_strongly_convex.png" />
+
+(Fig. 1 凸関数と強凸関数の例。 破線は $x=0$ における二次近似を示しています。 上2つの関数は凸ですが強凸ではなく、下2つの関数は強凸性の定義を満たす $\mu>0$ が存在し強凸となります。)
+
 ### Positive Definiteness of the Hessian
 
 続いて、$f$ が $C^2$ 級であるとして、凸性および強凸性がヘッセ行列 $\nabla^2 f(x)$ の正定値性とどのように関係するかを示します。
 
-行列の定値性について、先に定義しておきます。
-$A$ を $\mathbb{R}^{n \times n}$ の対称行列とします。
-行列 $A$ が(半)正定値 (positive (semi-)definite)・(半)負定値 (negative (semi-)definite) であるとは、次の条件で定義されます。
+行列の定値性について、先に定義しておきます。$A$ を $\mathbb{R}^{n \times n}$ の対称行列とします。行列 $A$ が(半)正定値 (positive (semi-)definite)・(半)負定値 (negative (semi-)definite) であるとは、次の条件で定義されます。
 
 ```math
 \begin{align*}
@@ -122,12 +114,7 @@ $A$ を $\mathbb{R}^{n \times n}$ の対称行列とします。
 \end{align*}
 ```
 
-正定値でも負定値でもない行列は不定値(indefinite)と呼ばれます。
-行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表します。
-特に $B$ が零行列のときは $A \succeq 0$ と書きます。
-同様に、$\preceq$ は半負定値に対して定義されます。
-$\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ と同値です。
-これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味し、さらに作用素ノルムについても $\left\lVert A \right\rVert \geq \mu$ であることを導きます。
+正定値でも負定値でもない行列は不定値 (indefinite) と呼ばれます。行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表します。特に $B$ が零行列のときは $A \succeq 0$ と書きます。同様に、$\preceq$ は半負定値に対して定義されます。$\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ と同値です。これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味し、さらに作用素ノルムについても $\left\lVert A \right\rVert \geq \mu$ であることを導きます。
 
 ここで、凸性および強凸性とヘッセ行列の正定値性との関係は次の通りです。
 
@@ -140,8 +127,7 @@ $\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ 
 
 <details><summary>証明</summary>
 
-まず $\mu>0$ とし、任意の $x \in \mathbb{R}^n$ に対して $\nabla^2 f(x)\succeq \mu I$ が成り立つと仮定します。
-微分積分学の基本定理より、任意の $x,y \in \mathbb{R}^n$ について次が成り立ちます。
+まず $\mu>0$ とし、任意の $x \in \mathbb{R}^n$ に対して $\nabla^2 f(x)\succeq \mu I$ が成り立つと仮定します。 微分積分学の基本定理より、任意の $x,y \in \mathbb{R}^n$ について次が成り立ちます。
 
 ```math
 \begin{equation*}
@@ -163,8 +149,7 @@ f(y)
 
 以上の結果を合わせると、$\mu$-強凸性の定義が導かれます。
 
-逆に、$f$ が $\mu$-強凸であると仮定します。
-任意の $x \in \mathbb{R}^n, \ v \in \mathbb{R}^n$ および $t>0$ に対し、$y=x \pm tv$ とおくと次が成り立ちます。
+逆に、$f$ が $\mu$-強凸であると仮定します。任意の $x \in \mathbb{R}^n, \ v \in \mathbb{R}^n$ および $t>0$ に対し、$y=x \pm tv$ とおくと次が成り立ちます。
 
 ```math
 \begin{equation*}
@@ -210,8 +195,7 @@ $v \in \mathbb{R}^n$ は任意なので、$\nabla^2 f(x)\succeq \mu I$ という
 
 </details>
 
-ヘッセ行列が正定値・不定値・負定値である二次関数を Fig. 2 に示しました。
-定値性と凸性の対応関係を確認できます。
+ヘッセ行列が正定値・不定値・負定値である二次関数を Fig. 2 に示しました。定値性と凸性の対応関係を確認できます。
 
 ![../imgs/quasi_newton/pd.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/pd.png)
 
@@ -219,8 +203,7 @@ $v \in \mathbb{R}^n$ は任意なので、$\nabla^2 f(x)\succeq \mu I$ という
 
 ### 平滑性
 
-最後に、関数の $L$-平滑性 ($L$-smoothness)を導入します。
-関数 $f$ が $L$-平滑であるとは、ある定数 $L>0$ が存在して
+最後に、関数の $L$-平滑性 ($L$-smoothness)を導入します。関数 $f$ が $L$-平滑であるとは、ある定数 $L>0$ が存在して
 
 ```math
 \begin{equation*}
@@ -228,20 +211,17 @@ $v \in \mathbb{R}^n$ は任意なので、$\nabla^2 f(x)\succeq \mu I$ という
 \end{equation*}
 ```
 
-が任意の $x,y$ について成り立つことと同値です。
-定義そのものですが、関数 $f$ が $L$-平滑であることは、勾配 $\nabla f$ が $L$-リプシッツ連続であることと同値です。
-Fig. 3も参照して下さい。
+が任意の $x,y$ について成り立つことと同値です。定義そのものですが、関数 $f$ が $L$-平滑であることは、勾配 $\nabla f$ が $L$-リプシッツ連続であることと同値です。Fig. 3も参照して下さい。
 
 ![../imgs/quasi_newton/l-smooth.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/l-smooth.png)
 
-(Fig. 3 1次元における $L$-平滑関数の例。 $L$-平滑性は、関数 $f$ の変動幅に有界性を与え(オレンジ色の破線が $f(x)$ の上界)、また $\nabla f$ のリプシッツ連続性と同値(灰色の領域にしか、$\nabla f(x)$ は存在しない)です。)
+(Fig. 3 1次元における $L$-平滑関数の例。$L$-平滑性は、オレンジ色の破線による $f(x)$ の上界など、関数 $f$ の変動幅に有界性を与え、また灰色の領域にしか、$\nabla f(x)$ は存在しないこと、つまり $\nabla f$ のリプシッツ連続性を意味します。)
 
 非凸な関数に対しても、次の上界が常に成立します。
 
 **Proposition 3**
 
-関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $L$-平滑であるとする。
-このとき、任意の $x,y \in \mathbb{R}^n$ について次が成り立つ。
+関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $L$-平滑であるとする。このとき、任意の $x,y \in \mathbb{R}^n$ について次が成り立つ。
 
 ```math
 \begin{equation*}
@@ -271,10 +251,9 @@ f(y) - f(x) & = \int_0^1 \nabla f(x+t(y-x))^\top (y-x) \mathrm{d}t              
 
 もし、更に $f$ が凸であれば、次の下界も成立します。
 
-**Proposition 4** ([[^FanZhongXiuMingLianSokZuiShiHuaarugorizumu2023] (Proposition 2.3.5)])
+**Proposition 4** ([^FanZhongXiuMingLianSokZuiShiHuaarugorizumu2023] (Proposition 2.3.5))
 
-関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が凸であり、かつ $L$-平滑であるとする。
-このとき、任意の $x,y \in \mathbb{R}^n$ について次が成り立つ。
+関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が凸であり、かつ $L$-平滑であるとする。このとき、任意の $x,y \in \mathbb{R}^n$ について次が成り立つ。
 
 ```math
 \begin{equation*}
@@ -294,8 +273,7 @@ g_x(z)        & \mathrel{\vcenter{:}}= f(z) - f(x) - \nabla f(x)^\top (z-x), \\
 ```
 
 関数 $f(z)$ と線形関数 $-f(x) - \nabla f(x)^\top (z-x)$ はどちらも $z$ について凸なので、$g_x(z)$ も凸であり、その最小値は $\nabla g_x(z) = 0$ を満たす $z=x$ でとる、つまり、最小値は $g_x(x)=0$ であることが分かります。
-また、$f(z)$ の $L$-平滑性より、$g_x(z)$ の $L$-平滑性も直ちに導かれます。
-よって、$g_x(z)$ の $L$-平滑性から次が成り立ちます。
+また、$f(z)$ の $L$-平滑性より、$g_x(z)$ の $L$-平滑性も直ちに導かれます。 よって、$g_x(z)$ の $L$-平滑性から次が成り立ちます。
 
 ```math
 \begin{align*}
@@ -316,8 +294,7 @@ g_x(z)        & \mathrel{\vcenter{:}}= f(z) - f(x) - \nabla f(x)^\top (z-x), \\
 
 **Proposition 5**
 
-関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^2$ 級であるとする。
-このとき、$f$ が $L$-平滑であることと、任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\preceq L I$ が成り立つことは同値である。
+関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^2$ 級であるとする。 このとき、$f$ が $L$-平滑であることと、任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\preceq L I$ が成り立つことは同値である。
 
 <details><summary>証明</summary>
 
@@ -417,7 +394,7 @@ Proposition 2, Proposition 5 より、全ての $x \in \mathbb{R}^n$ に対し�
 #### Baillon–Haddadの定理
 
 発展的な内容として、$L$-平滑性の有用な性質の一つが次の Baillon–Haddadの定理です。
-ここでは $C^1$ の微分可能性だけを仮定する点に注意してください。
+この定理では $C^2$ 級の仮定は不要で、$C^1$ 級の仮定だけで十分であることに注意してください。
 
 **Proposition 7** (Baillon–Haddad theorem)
 
@@ -452,7 +429,7 @@ f(x) \ge f(y) + \nabla f(y)^\top (x-y) + \frac{1}{2L} \left\lVert \nabla f(x) - 
 
 証明は他の文献も参照してください[^bauschkeBaillonHaddadTheoremRevisited2009][^rockafellarVariationalAnalysis1998] (Proposition 12.60)。
 
-最適化アルゴリズムが生成する列 $\lbrace x_k \rbrace$ に対し、
+最適化アルゴリズムが生成する列 $\lbrace x_k \rbrace_k$ に対し、
 
 ```math
 \begin{equation*}
@@ -498,9 +475,7 @@ x_{k+1} \gets x_k - \alpha_k \nabla^2 f(x_k)^{-1} g_k.
 \end{equation*}
 ```
 
-ここで $\alpha_k > 0$ は直線探索によって定められるステップサイズです。
-この更新規則は次のように導出できます。
-$x_k$ での $f$ の二次のテイラー近似は次式で与えられます。
+ここで $\alpha_k > 0$ は直線探索によって定められるステップサイズです。この更新規則は次のように導出できます。$x_k$ での $f$ の二次のテイラー近似は次式で与えられます。
 
 ```math
 \begin{equation*}
@@ -524,9 +499,7 @@ m_{k}^\ast(x) \mathrel{\vcenter{:}}= f(x_k) + g_k^\top (x - x_k) + \frac{1}{2} (
 \end{equation*}
 ```
 
-次の反復点として、直接 $x^\ast$ を選ぶことは自然に思えますが、後で見るように一般にこのままでは大域収束性を保証できません。
-そこで、関数値の十分な減少を確保するため、直線探索で定めるステップサイズ $\alpha_k > 0$ を導入すると、最初に示した更新式が得られます。
-これがニュートン法の基本的な手続きとなります。
+次の反復点として、直接 $x^\ast$ を選ぶことは自然に思えますが、後述するようにこのままでは大域収束性を保証できません。そこで、関数値の十分な減少を確保するため、直線探索で定めるステップサイズ $\alpha_k > 0$ を導入すると、最初に示した更新式が得られます。これがニュートン法の基本的な手続きとなります。
 
 <img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_opt_step0.png" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_opt_step1.png" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_opt_step2.png" />
 
@@ -540,8 +513,7 @@ g_k^\top d_k = -g_k^\top \nabla^2 f(x_k)^{-1} g_k < 0.
 \end{equation*}
 ```
 
-$f$ が非凸である、つまりヘッセ行列 $\nabla^2 f(x_k)$ が負定値または不定値である場合、降下方向であるとは限らないので、ニュートン法は収束しない可能性があります。
-このような場合への一つの対処法として修正ニュートン法[^nocedal1999numerical] (Sec. 3.4) が知られていますが、ここでは説明を省略します。
+$f$ が非凸である、つまりヘッセ行列 $\nabla^2 f(x_k)$ が負定値または不定値である場合、$d_k$ は降下方向であるとは限らず、ニュートン法は収束しない可能性があります。このような場合への一つの対処法として修正ニュートン法[^nocedal1999numerical] (Sec. 3.4) が知られていますが、ここでは説明を省略します。
 
 ### ニュートン法の収束性
 
@@ -581,8 +553,8 @@ f(x_k + \alpha_k d_k) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k, \\
 
 $0 < c_1 < c_2 < 1$ は定数です。
 一つ目の条件は、Armijo 条件とも呼ばれ、次の点での関数値 $f(x_k + \alpha_k d_k)$ が、現在の点での関数値 $f(x_k)$ よりも、勾配から導かれる予測値 $\alpha_k g_k^\top d_k$ の少なくとも $c_1$ 倍した値は減少していることを要求します。
-二つ目の条件は、曲率条件とも呼ばれ、探索方向に射影した次の点での減少率 $-g_{k+1}^\top d_k$ が、現在の点での射影された減少率 $-g_k^\top d_k$ よりも、少なくとも $c_2$ 倍した値は小さくなっている、つまり探索方向 $d_k$ 上においては、十分に最適化されていることを要求しています。
-Wolfe条件とは、この両者が同時に満たされるという条件のことです。
+二つ目の条件は、曲率条件 (curvature condition) とも呼ばれます。点 $x_{k+1}$ でも $d_k$ が降下方向ならば、$-g_{k+1}^\top d_k$ は正となり、$d_k$ 方向に微小でも進めば目的関数値は減少します。曲率条件を満たすとは、この減少率が大きすぎないこと、つまり $d_k$ 上で十分なステップサイズがとられていることを要求します。弱Wolfe条件における曲率条件では、逆にステップサイズが長すぎるということもあり得ますが、強Wolfe条件においては絶対値を取ることで、適切なステップサイズがとられていることを要求します。
+Wolfe条件とは、Armijo 条件と曲率条件の両方が同時に満たされることを指します。
 Fig. 5 にこれらの条件が満たされる範囲を図示しています。
 
 ![../imgs/quasi_newton/armijo_wolfe_conditions.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/armijo_wolfe_conditions.png)
@@ -601,8 +573,7 @@ Fig. 5 にこれらの条件が満たされる範囲を図示しています。
 
 **Theorem 1** ([^nocedal1999numerical] (Theorem 3.2))
 
-関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^1$ 級であり $\mathbb{R}^n$ 上で下に有界で、かつ $L$-平滑だとする。
-次の反復法を考える。
+関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^1$ 級であり $\mathbb{R}^n$ 上で下に有界で、かつ $L$-平滑だとする。次の反復法を考える。
 
 ```math
 \begin{equation*}
@@ -610,9 +581,7 @@ x_{k+1} \gets x_k + \alpha_k d_k.
 \end{equation*}
 ```
 
-初期点 $x_0 \in \mathbb{R}^n$ から開始され、ステップサイズ $\alpha_k$ は Wolfe 条件を満たすとする。
-角 $\lbrace \theta_k \rbrace_k$ に対して、ある正の定数 $\delta$ が存在して $\cos \theta_k \geq \delta > 0$ が全ての $k$ で成り立つならば、
-この反復法は次を満たす点列 $\lbrace x_k \rbrace_k$ を生成する。
+初期点 $x_0 \in \mathbb{R}^n$ から開始され、ステップサイズ $\alpha_k$ は Wolfe 条件を満たすとする。角 $\lbrace \theta_k \rbrace_k$ に対して、ある正の定数 $\delta$ が存在して $\cos \theta_k \geq \delta > 0$ が全ての $k$ で成り立つならば、この反復法は次を満たす点列 $\lbrace x_k \rbrace_k$ を生成する。
 
 ```math
 \begin{equation*}
@@ -700,7 +669,7 @@ $\cos \theta_k \geq \delta > 0$ がすべての $k$ で成り立つという仮�
 \cos \theta_k
 = \frac{g_k^\top \nabla^2 f(x_k)^{-1} g_k}{\left\lVert g_k \right\rVert\left\lVert \nabla^2 f(x_k)^{-1} g_k \right\rVert}
 \geq \frac{\left\lVert g_k \right\rVert^2 \lambda_{\min}(\nabla^2 f(x_k)^{-1})}{\left\lVert g_k \right\rVert^2 \lambda_{\max}(\nabla^2 f(x_k)^{-1})}
-\geq \frac{\mu}{L},
+\geq \frac{\mu}{L}.
 \end{equation*}
 ```
 
@@ -715,7 +684,7 @@ $\cos \theta_k \geq \delta > 0$ がすべての $k$ で成り立つという仮�
 **Theorem 2** ([^nocedal1999numerical] (Theorem 3.5))
 
 ヘッセ行列 $\nabla^2 f(x)$ が解 $x^\ast$ の近傍で Lipschitz連続であり、最適性の二次の十分条件が成り立つとする。すなわち $\nabla f(x^\ast)=0$ かつ $\nabla^2 f(x^\ast)$ は正定値である。
-前節までのニュートン法において、すべての $k$ で $\alpha_k=1$ が満たされるとし、初期点 $x_0$ が $x^\ast$ に十分近いとき、勾配ノルム列 $\lbrace\left\lVert \nabla f(x_k) \right\rVert\rbrace$ は二次収束する。
+前節までのニュートン法において、すべての $k$ で $\alpha_k=1$ が満たされるとし、初期点 $x_0$ が $x^\ast$ に十分近いとき、勾配ノルム列 $\lbrace\left\lVert \nabla f(x_k) \right\rVert\rbrace_k$ は二次収束する。
 
 <details><summary>証明</summary>
 
@@ -768,9 +737,7 @@ $\nabla^2 f(x^\ast)$ は正定値なので、ある半径 $r>0$ が存在して 
 \end{align*}
 ```
 
-$\widetilde L \mathrel{\vcenter{:}}= L^{\mathrm{H}}\left\lVert \left(\nabla^2 f(x^\ast)\right)^{-1} \right\rVert$ とおく。
-初期点が $\left\lVert x_0-x^\ast \right\rVert\le \min\lbrace r, 1/(2\widetilde L) \rbrace$ を満たすように選ばれていれば、帰納法により $\lbrace x_k \rbrace$ は近傍内に留まり $x^\ast$ に収束する。
-上の誤差評価は $\lbrace x_k \rbrace$ の二次収束を示す。
+$\widetilde L \mathrel{\vcenter{:}}= L^{\mathrm{H}}\left\lVert \left(\nabla^2 f(x^\ast)\right)^{-1} \right\rVert$ とおく。初期点が $\left\lVert x_0-x^\ast \right\rVert\le \min\lbrace r, 1/(2\widetilde L) \rbrace$ を満たすように選ばれていれば、帰納法により $\lbrace x_k \rbrace_k$ は近傍内に留まり $x^\ast$ に収束する。よって、上の誤差評価は $\lbrace x_k \rbrace_k$ の二次収束を示す。
 
 勾配ノルムの二次収束を示すために、$x_{k+1}-x_k=-\left(\nabla^2 f(x_k)\right)^{-1}\nabla f(x_k)$ と
 $\nabla f(x_k)+\nabla^2 f(x_k)(x_{k+1}-x_k)=0$ を用いると次を得る。
@@ -792,21 +759,15 @@ $\nabla f(x_k)+\nabla^2 f(x_k)(x_{k+1}-x_k)=0$ を用いると次を得る。
 
 </details>
 
-これらのTheorem 1, Theorem 2は、直線探索を伴うニュートン法が適切な条件の下で大域収束性と局所二次収束性の両方を持つことを示しています。
-この高速な収束性は、通常は線形収束にとどまる勾配降下法などの一階法と比べたときの大きな利点となります。
-一方で、ヘッセ行列 $\nabla^2 f(x_k) \in \mathbb{R}^{n \times n}$ の計算や線形方程式 $\nabla^2 f(x_k) d_k = -\nabla f(x_k)$ の求解には、特に大規模問題において、膨大な計算コストを要します。
-そのため、準ニュートン法などの他の最適化手法が一般的には用いられることも多く、これについて後の節では述べていきます。
+これらのTheorem 1, Theorem 2は、直線探索を伴うニュートン法が適切な条件の下で大域収束性と局所二次収束性の両方を持つことを示しています。この高速な収束性は、通常は線形収束にとどまる勾配降下法などの一階法と比べたときの大きな利点となります。
 
 ### 大域収束のために必要な要素
 
-先ほど述べたように、ヘッセ行列の正定値性と直線探索によるステップサイズの選択はニュートン法で重要な役割をそれぞれ担っています。
-本小節では、これらが必要となる理由について説明します。
+先ほど述べたように、ヘッセ行列の正定値性と直線探索によるステップサイズの選択はニュートン法で重要な役割をそれぞれ担っています。本小節では、これらが必要となる理由について説明します。
 
 #### ヘッセ行列の正定値性
 
-ここまで $f$ が強凸であると仮定してきましたが、これは各反復でヘッセ行列 $\nabla^2 f(x_k)$ が正定値であることを意味しています。
-この仮定は、ニュートン法が局所的に最適解へ収束するために重要です。
-ヘッセ行列が正定値であれば、次式よりニュートン法は降下方向を与えます。
+ここまで $f$ が強凸であると仮定してきましたが、これは各反復でヘッセ行列 $\nabla^2 f(x_k)$ が正定値であることを意味しています。この仮定は、ニュートン法が局所的に最適解へ収束するために重要です。ヘッセ行列が正定値であれば、次式よりニュートン法は降下方向を与えます。
 
 ```math
 \begin{equation*}
@@ -816,14 +777,11 @@ $\nabla f(x_k)+\nabla^2 f(x_k)(x_{k+1}-x_k)=0$ を用いると次を得る。
 \end{equation*}
 ```
 
-一方、ヘッセ行列が負定値または不定値の場合、関数値の減少は保証されず、ニュートン法が最適解から離れてしまう可能性があります。
-不定値の場合は関数値が減少することもありますが、鞍点へ収束するリスクも高まります。
-従って、ニュートン法を適用する際にはヘッセ行列の正定値性が重要となってきます。
+一方、ヘッセ行列が負定値または不定値の場合、関数値の減少は保証されず、ニュートン法が最適解から離れてしまう可能性があります。不定値の場合は関数値が減少することもありますが、鞍点へ収束するリスクも高まります。従って、ニュートン法を適用する際にはヘッセ行列の正定値性が重要となってきます。
 
 #### フルステップの問題
 
-ニュートン法では、各反復でステップサイズを $\alpha_k=1$ とすることが困難を引き起こす場合があります。
-ここではそのような失敗の具体例を挙げ、対処として直線探索が必要となることを述べます。
+ニュートン法では、各反復でステップサイズを $\alpha_k=1$ とすることが困難を引き起こす場合があります。ここではそのような失敗の具体例を挙げ、対処として直線探索が必要となることを述べます。
 
 ##### ニュートン法が発散する例
 
@@ -847,8 +805,7 @@ f''(x) & = \frac{1}{(1 + x^2)^{3/2}}.
 
 ##### 強凸関数に対するニュートン法の振動
 
-前の例では目的関数は強凸ではなく、必ずしも良い性質を持っている訳ではありませんでした。
-しかし、強凸性を持つ関数であってもニュートン法が収束しない例が知られています[^Doikov2021SecondOrderTensor] (Example 1.4.3)。
+前の例では目的関数は強凸ではなく、必ずしも良い性質を持っている訳ではありませんでした。しかし、強凸性を持つ関数であってもニュートン法が収束しない例が知られています[^Doikov2021SecondOrderTensor] (Example 1.4.3)。
 
 この例では $\mu>0$ に対し、次の関数を考えます。
 
@@ -876,14 +833,11 @@ f''''(x) & = \frac{e^x(1 - 4e^x + e^{2x})}{(1+e^x)^4}.
 
 ##### 直線探索の必要性
 
-これらの例から、ニュートン法でフルステップ $\alpha_k=1$ を採用すると、強凸かつ平滑な関数であっても発散や振動を引き起こす可能性があることが分かりました。
-従って、収束を保証するためにステップサイズ $\alpha_k$ を適切に選択することが不可欠です。
-このように直線探索を伴うニュートン法は、修正ニュートン法とも呼ばれています。
+これらの例から、ニュートン法でフルステップ $\alpha_k=1$ を採用すると、強凸かつ平滑な関数であっても発散や振動を引き起こす可能性があることが分かりました。従って、収束を保証するためにステップサイズ $\alpha_k$ を適切に選択することが不可欠です。このように直線探索を伴うニュートン法は、修正ニュートン法とも呼ばれています。
 
 ### 根探索としてのニュートン法との比較
 
-概念的な補足として、「根探索としてのニュートン法」 と 「最適化におけるニュートン法」 の関係を簡潔に整理します。
-両者は密接に関係した手法ですが、考え方や適用対象は異なります。
+概念的な補足として、「根探索としてのニュートン法」 と 「最適化におけるニュートン法」 の関係を簡潔に整理します。両者は密接に関係した手法ですが、考え方や適用対象は異なります。
 
 ![../imgs/quasi_newton/newton_raphson.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_raphson.png)
 
@@ -891,8 +845,7 @@ f''''(x) & = \frac{e^x(1 - 4e^x + e^{2x})}{(1+e^x)^4}.
 
 #### 根探索としてのニュートン法
 
-単にニュートン法(あるいはニュートン・ラフソン法)と言うときは、微分可能なスカラー関数 $g\colon \mathbb{R} \to \mathbb{R}$ に対して $g(x) = 0$ を解く根探索アルゴリズムを指すことも少なくありません。
-これは本節の主題ではないが、基本的でよく知られている手法と言えます。
+単にニュートン法(あるいはニュートン・ラフソン法)と言うと、微分可能なスカラー関数 $g\colon \mathbb{R} \to \mathbb{R}$ に対して $g(x) = 0$ を解く根探索アルゴリズムを指すこともあります。この手法も、基本的でよく知られた手法です。
 
 初期値 $x_0$ から開始するとして、この手法の反復は次式で与えられます。
 
@@ -920,9 +873,7 @@ x_{k+1} = x_k - \nabla^2 f(x_k)^{-1} \nabla f(x_k).
 
 #### 二つの定式化の関係
 
-具体例を通じて両者の等価性を確認してみます。
-Fig. 8は単純な三次関数 $f(x)$ を用いて両者の関係を示したものです。
-左図は $g(x) = \nabla f(x)$ に対する根探索であり、右図は $f(x)$ に対する最適化となっています。
+具体例を通じて両者の等価性を確認してみます。Fig. 8は単純な三次関数 $f(x)$ を用いて両者の関係を示したものです。左図は $g(x) = \nabla f(x)$ に対する根探索であり、右図は $f(x)$ に対する最適化となっています。
 
 根探索の定式化では、$\nabla f(x) = 3x^2 - 4x + 1$ を接線で近似します。すなわち、
 
@@ -954,12 +905,11 @@ m_k^\ast(x) = f(x_k) + \nabla f(x_k)(x - x_k) + \frac{1}{2}\nabla^2 f(x_k)(x - x
 
 (Fig. 9 ニュートン法、準ニュートン法、勾配降下法の比較。)
 
-本節では準ニュートン法について説明します。
-準ニュートン法はニュートン法に基づいていますが、その主要な欠点であるヘッセ行列やその逆行列の計算コストを低減することを目的としています。具体的には、真のヘッセ行列 $\nabla^2 f(x_k)$ の代わりに近似行列 $B_k$ とその逆行列 $H_k$ を用いることで、高速な収束性を保ちつつ計算コストを抑えます。
+本節では準ニュートン法について説明します。準ニュートン法はニュートン法に基づいていますが、その主要な欠点であるヘッセ行列やその逆行列の計算コストを低減することを目的としています。具体的には、真のヘッセ行列 $\nabla^2 f(x_k)$ の代わりに近似行列 $B_k$ とその逆行列 $H_k$ を用いることで、高速な収束性を保ちつつ計算コストを抑えます。
 
 Fig. 9 はニュートン法、準ニュートン法、勾配降下法の比較を示しています。勾配降下法は勾配の反対方向に単純に更新する方法です。1反復あたりの計算コストは最小ですが、収束は遅くなります。ニュートン法は反復回数が最も少ない一方で、1ステップあたりの計算コストが最も高いです。準ニュートン法はその中間に位置し、両者のバランスを取っています。特に、反復回数ではなく実際の計算時間で比較すると、準ニュートン法が最良の性能を示すことが多いです。
 
-直線探索に基づく準ニュートン法では、最適解 $x^\ast$ に収束する列 ${ x_k }*{k=0}^{\infty}$ を次のように生成します。
+直線探索に基づく準ニュートン法では、最適解 $x^\ast$ に収束する列 $\lbrace x_k \rbrace_{k=0}^{\infty}$ を次のように生成します。
 
 ```math
 \begin{equation*}
@@ -968,8 +918,7 @@ x_{k+1} = x_k - \alpha_k B_k^{-1} \nabla f(x_k)
 \end{equation*}
 ```
 
-ここで $\alpha_k > 0$ は直線探索で定めるステップサイズであり、$B_k$ は点 $x_k$ におけるヘッセ行列 $\nabla^2 f(x_k)$ の近似です。$H_k \mathrel{\vcenter{:}}= B_k^{-1}$ はその逆行列を表します。
-この更新則はニュートン法の更新則と酷似しており、その故にこの手法は準ニュートン法と呼ばれています。
+ここで $\alpha_k > 0$ は直線探索で定めるステップサイズであり、$B_k$ は点 $x_k$ におけるヘッセ行列 $\nabla^2 f(x_k)$ の近似です。$H_k \mathrel{\vcenter{:}}= B_k^{-1}$ はその逆行列を表します。この更新則はニュートン法の更新則と酷似しており、その故にこの手法は準ニュートン法と呼ばれています。
 
 <img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/quasi_newton_1.png" /><img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/quasi_newton_2.png" /><img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/quasi_newton_3.png" />
 
@@ -983,10 +932,7 @@ x_{k+1} = x_k - \alpha_k B_k^{-1} \nabla f(x_k)
 
 ### セカント条件
 
-関数 $f\colon \mathbb{R}^n \to \mathbb{R}$ を $C^2$ 級とします。
-対称行列 $B_k$ が点 $x_k$ におけるヘッセ行列 $\nabla^2 f(x_k)$ の近似として与えられたとき、次の点 $x_{k+1}$ における近似ヘッセ行列 $B_{k+1}$ への更新を考えます。
-このような行列の候補は無数に存在しますが、真のヘッセ行列が対称であることから、$B_{k+1}$ にも対称性を課すのが自然です。
-現在の点 $x_k$ と次の点 $x_{k+1}$ に対して、ステップと勾配差を次のように定義します。
+関数 $f\colon \mathbb{R}^n \to \mathbb{R}$ を $C^2$ 級とします。対称行列 $B_k$ が点 $x_k$ におけるヘッセ行列 $\nabla^2 f(x_k)$ の近似として与えられたとき、次の点 $x_{k+1}$ における近似ヘッセ行列 $B_{k+1}$ への更新を考えます。このような行列の候補は無数に存在しますが、真のヘッセ行列が対称であることから、$B_{k+1}$ にも対称性を課すのが自然です。現在の点 $x_k$ と次の点 $x_{k+1}$ に対して、ステップと勾配差を次のように定義します。
 
 ```math
 \begin{equation*}
@@ -994,8 +940,7 @@ s_k \mathrel{\vcenter{:}}= x_{k+1} - x_k, \qquad   y_k \mathrel{\vcenter{:}}= \n
 \end{equation*}
 ```
 
-$y_k^\top s_k \neq 0$ かつ $s_k \neq 0$ を仮定します。なお、$s_k$ の $s$ は step を意味します。
-新しい近似は $x_{k+1}$ を中心に構築されるため、$\nabla f(x_k)$ をヘッセ行列 $\nabla^2 f(x_{k+1})$ およびその近似である $B_{k+1}$ を用いて次のように近似します。
+$y_k^\top s_k \neq 0$ かつ $s_k \neq 0$ を仮定します。なお、$s_k$ の $s$ は step を意味します。新しい近似は $x_{k+1}$ を中心に構築されるため、$\nabla f(x_k)$ をヘッセ行列 $\nabla^2 f(x_{k+1})$ およびその近似である $B_{k+1}$ を用いて次のように近似します。
 
 ```math
 \begin{align*}
@@ -1057,13 +1002,11 @@ m_{k+1}(x_{k+1}) = f(x_{k+1}), \\
 
 ### 代表的な準ニュートン更新則
 
-$B_k$, $s_k$, $y_k$ が与えられたとき、セカント条件を満たす $B_{k+1}$ を与える更新則は多数存在します。ここでは代表的なものをその導出とともに示します[^dennisjr.QuasiNewtonMethodsMotivation1977a]。
-本小節に限り、簡潔さのため $B_k$, $B_{k+1}$, $s_k$, $y_k$ をそれぞれ $B$, $\bar{B}$, $s$, $y$ と略記します。
+$B_k$, $s_k$, $y_k$ が与えられたとき、セカント条件を満たす $B_{k+1}$ を与える更新則は多数存在します。ここでは代表的なものをその導出とともに示します[^dennisjr.QuasiNewtonMethodsMotivation1977a]。本小節に限り、簡潔さのため $B_k$, $B_{k+1}$, $s_k$, $y_k$ をそれぞれ $B$, $\bar{B}$, $s$, $y$ と略記します。
 
 #### Broyden更新
 
-[Broyden更新](https://en.wikipedia.org/wiki/Broyden%27s_method)は最も古くから知られる更新則の一つですが、準ニュートン法の文脈では、対称性を保たないため実用上はあまり用いられません。歴史的な観点もふまえ、簡潔に紹介します。
-更新則は次で与えられます。
+[Broyden更新](https://en.wikipedia.org/wiki/Broyden%27s_method)は最も古くから知られる更新則の一つですが、準ニュートン法の文脈では、対称性を保たないため実用上はあまり用いられません。歴史的な観点もふまえ、簡潔に紹介します。更新則は次で与えられます。
 
 ```math
 \begin{equation*}
@@ -1098,11 +1041,9 @@ $\bar{B}$ がセカント条件
 
 <details><summary>証明</summary>
 
-ベクトル $s$ と $s$ の直交補空間の基底は $\mathbb{R}^n$ の基底を成します。
-$\bar{B}$ の条件はこの基底に対する $\bar{B}$ の作用を完全に決定するため、$\bar{B}$ は一意に定まります。
+ベクトル $s$ と $s$ の直交補空間の基底は $\mathbb{R}^n$ の基底を成します。$\bar{B}$ の条件はこの基底に対する $\bar{B}$ の作用を完全に決定するため、$\bar{B}$ は一意に定まります。
 
-ここで $\bar{B}_{\mathrm{Broyden}}$ が課された条件を満たすことを示します。
-$z^\top s = 0$ を満たす任意のベクトル $z$ を取ります。このとき、次を得ます。
+ここで $\bar{B}_{\mathrm{Broyden}}$ が課された条件を満たすことを示します。$z^\top s = 0$ を満たす任意のベクトル $z$ を取ります。このとき、次を得ます。
 
 ```math
 \begin{align*}
@@ -1117,8 +1058,7 @@ $z^\top s = 0$ を満たす任意のベクトル $z$ を取ります。このと
 \end{align*}
 ```
 
-したがって、$\bar{B}_{\mathrm{Broyden}}$ は課された条件を満たします。
-よって、一意性より $\bar{B} = \bar{B}_{\mathrm{Broyden}}$ となります。
+したがって、$\bar{B}_{\mathrm{Broyden}}$ は課された条件を満たします。よって、一意性より $\bar{B} = \bar{B}_{\mathrm{Broyden}}$ となります。
 
 (証明終わり)
 
@@ -1139,8 +1079,7 @@ $B\in\mathbb{R}^{n\times n}$, $y\in\mathbb{R}^n$, $s\in\mathbb{R}^n\setminus\lbr
 
 <details><summary>証明</summary>
 
-関数 $\tilde{B}\mapsto\left\lVert \tilde{B}-B \right\rVert^2_F$ を最適化すると考えてよく、これは $\mathbb{R}^{n\times n}$ 上で凸です。
-制約集合
+関数 $\tilde{B}\mapsto\left\lVert \tilde{B}-B \right\rVert^2_F$ を最適化すると考えてよく、これは $\mathbb{R}^{n\times n}$ 上で凸です。制約集合
 
 ```math
 \begin{equation*}
@@ -1148,11 +1087,9 @@ $B\in\mathbb{R}^{n\times n}$, $y\in\mathbb{R}^n$, $s\in\mathbb{R}^n\setminus\lbr
 \end{equation*}
 ```
 
-はアフィン集合であり凸です。
-よって、この最適化問題は高々一つの最小解しか持ちません。
+はアフィン集合であり凸です。よって、この最適化問題は高々一つの最小解しか持ちません。
 
-$\bar{B}_{\mathrm{Broyden}}$ が実際に最小解であることを示します。
-制約 $\tilde{B}s=y$ を満たす任意の $\tilde{B}$ に対して
+$\bar{B}_{\mathrm{Broyden}}$ が実際に最小解であることを示します。制約 $\tilde{B}s=y$ を満たす任意の $\tilde{B}$ に対して
 
 ```math
 \begin{equation*}
@@ -1162,8 +1099,7 @@ $\bar{B}_{\mathrm{Broyden}}$ が実際に最小解であることを示します
 \end{equation*}
 ```
 
-ここでフロベニウスノルムの劣乗法性と $\left\lVert ss^\top/(s^\top s) \right\rVert_F=1$ を用いました。
-よって $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$ です。
+ここでフロベニウスノルムの劣乗法性と $\left\lVert ss^\top/(s^\top s) \right\rVert_F=1$ を用いました。よって $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$ となり、主張が得られます。
 
 (証明終わり)
 
@@ -1316,8 +1252,7 @@ G_t \mathrel{\vcenter{:}}= C_{2t}.
 \end{equation*}
 ```
 
-構成方法より各 $G_t$ は対称です。
-定義から次を得ます。
+構成方法より各 $G_t$ は対称です。定義から次を得ます。
 
 ```math
 \begin{equation*}
@@ -1363,9 +1298,7 @@ P \mathrel{\vcenter{:}}= \frac{1}{2}\left(I-\frac{cs^\top}{c^\top s}\right).
 \end{equation*}
 ```
 
-行列 $cs^\top/c^\top s$ はランク1で固有値は $1,0,\dots,0$ です。
-よって $P$ は固有値 $0$ を一つ持ち、残りはすべて $1/2$ となります。
-特にスペクトル半径は $1/2<1$ であるので、次のように級数が収束します。
+行列 $cs^\top/c^\top s$ はランク1で固有値は $1,0,\dots,0$ です。よって $P$ は固有値 $0$ を一つ持ち、残りはすべて $1/2$ となります。特にスペクトル半径は $1/2<1$ であるので、次のように級数が収束します。
 
 ```math
 \begin{align*}
@@ -1398,7 +1331,7 @@ B+\frac{1}{2c^\top s}
 \end{align*}
 ```
 
-これで偶数番目の部分列 $\lbrace C_{2t} \rbrace$ が $C_{\infty}$ に収束することが示されました。
+これで偶数番目の部分列 $\lbrace C_{2t} \rbrace_{t=0}^{\infty}$ が $C_{\infty}$ に収束することが示されました。
 
 次に奇数番目の部分列について、次の式が成立しています。
 
@@ -1418,7 +1351,7 @@ C_{2t+1} \to C_{\infty}.
 \end{equation*}
 ```
 
-従って、部分列 $\lbrace C_{2t} \rbrace$ と $\lbrace C_{2t+1} \rbrace$ はどちらも $C_{\infty}$ に収束し、証明が完了します。
+従って、部分列 $\lbrace C_{2t} \rbrace_{t=0}^{\infty}$ と $\lbrace C_{2t+1} \rbrace_{t=0}^{\infty}$ はどちらも $C_{\infty}$ に収束し、証明が完了します。
 
 (証明終わり)
 
@@ -1445,8 +1378,7 @@ $c = s$ のとき、$C_{\infty}$ の一般式は標準的な PSB 更新則を導
 
 ##### 導出
 
-先に述べた PSB 更新では $c=s$ としましたが、別の $c$ を選ぶことも可能です。
-具体的には $c=y$ を代入すると次のように DFP 更新が得られます。
+先に述べた PSB 更新では $c=s$ としましたが、別の $c$ を選ぶことも可能です。具体的には $c=y$ を代入すると次のように DFP 更新が得られます。
 
 ```math
 \begin{equation*}
@@ -1469,13 +1401,11 @@ $c = s$ のとき、$C_{\infty}$ の一般式は標準的な PSB 更新則を導
 
 ##### 双対による導出
 
-この更新はDFP更新の双対を考えることで導出できます。
-後で示すように、$B$ に対するBFGS更新は $H$ に対する DFP 更新と同じ形式となっています。
+この更新はDFP更新の双対を考えることで導出できます。後で示すように、$B$ に対するBFGS更新は $H$ に対する DFP 更新と同じ形式となっています。
 
 ##### KLダイバージェンス最小化による導出
 
-KLダイバージェンスとは、行列間の近さを測る一種の非対称な尺度です。
-正定値行列 $P,Q \in \mathbb{R}^{n \times n}$ に対して、次で定義されます。
+KLダイバージェンスとは、行列間の近さを測る一種の非対称な尺度です。正定値行列 $P,Q \in \mathbb{R}^{n \times n}$ に対して、次で定義されます。
 
 ```math
 \begin{equation*}
@@ -1483,8 +1413,7 @@ KLダイバージェンスとは、行列間の近さを測る一種の非対称
 \end{equation*}
 ```
 
-行列 $T \in \mathbb{R}^{n \times n}$ を任意の正則行列とします。
-$\mathrm{tr}$ は2つの行列の積に対して可換性を持つため、KLダイバージェンスは次の不変性を持ちます。
+行列 $T \in \mathbb{R}^{n \times n}$ を任意の正則行列とします。$\mathrm{tr}$ は2つの行列の積に対して可換性を持つため、KLダイバージェンスは次の不変性を持ちます。
 
 ```math
 \begin{align*}
@@ -1508,13 +1437,11 @@ $\mathrm{tr}$ は2つの行列の積に対して可換性を持つため、KLダ
 
 **Proposition 11** ([^kanamori2016continuous] (Section 7.2.4))
 
-$B \succ 0$ を正定値対称行列とする。
-このとき、上記の最適化問題の解はBFGS更新則で与えられる。
+$B \succ 0$ を正定値対称行列とする。このとき、上記の最適化問題の解はBFGS更新則で与えられる。
 
 <details><summary>証明</summary>
 
-$B$ が正定値対称行列であることに注意して、
-まず、次のように定義します。
+$B$ が正定値対称行列であることに注意して、まず、次のように定義します。
 
 ```math
 \begin{equation*}
@@ -1541,8 +1468,7 @@ s' \mathrel{\vcenter{:}}= B^{\frac{1}{2}} s, \quad y' \mathrel{\vcenter{:}}= B^{
 
 なお、本最適化問題において $B' \succ 0$ という制約は自動的に対称性を含むため、$B' = B'^\top$ を制約として陽に課しても解は変わりません。
 
-この問題の解を、ラグランジュの未定乗数法を用いて求めます。
-ラグランジュ乗数 $\lambda\in\mathbb{R}^n$ および $\Lambda\in\mathbb{R}^{n\times n}$ を用いて、ラグランジアンを次のように定義します。
+この問題の解を、ラグランジュの未定乗数法を用いて求めます。ラグランジュ乗数 $\lambda\in\mathbb{R}^n$ および $\Lambda\in\mathbb{R}^{n\times n}$ を用いて、ラグランジアンを次のように定義します。
 
 ```math
 \begin{equation*}
@@ -1550,8 +1476,7 @@ s' \mathrel{\vcenter{:}}= B^{\frac{1}{2}} s, \quad y' \mathrel{\vcenter{:}}= B^{
 \end{equation*}
 ```
 
-一般に、行列微分の公式として、$X \succ 0$ に対して、$\log\det(X)$ の微分が $X^{-\top}$ かつ、 $\mathrm{tr}(AX)$ の微分が $A^\top$ となります。
-KKT条件のうち停留性に関する条件は、$B'$ で微分し、$B'=B'^\top$ を用いることで次のように書けます。
+一般に、行列微分の公式として、$X \succ 0$ に対して、$\log\det(X)$ の微分が $X^{-\top}$ かつ、 $\mathrm{tr}(AX)$ の微分が $A^\top$ となります。KKT条件のうち停留性に関する条件は、$B'$ で微分し、$B'=B'^\top$ を用いることで次のように書けます。
 
 ```math
 \begin{equation*}
@@ -1570,8 +1495,7 @@ B'^{-1} = I+\lambda s'^\top+s'\lambda^\top.
 \end{equation*}
 ```
 
-制約条件 $B's'=y'$ より $B'^{-1}y'=s'$ であるから、
-上式に右から $y'$ を掛けた式と、さらに左から $y'^\top$ を掛けた式はそれぞれ、次のようになる。
+制約条件 $B's'=y'$ より $B'^{-1}y'=s'$ であるから、上式に右から $y'$ を掛けた式と、さらに左から $y'^\top$ を掛けた式はそれぞれ、次のようになる。
 
 ```math
 \begin{align*}
@@ -1584,9 +1508,7 @@ y'^\top s' & = y'^\top y' + (s'^\top y')(y'^\top \lambda) + (\lambda^\top y')(y'
 
 ```math
 \begin{equation*}
-\lambda^\top y'
-=
-\frac{y'^\top s'-y'^\top y'}{2(s'^\top y')}.
+\lambda^\top y' = \frac{y'^\top s'-y'^\top y'}{2(s'^\top y')}.
 \end{equation*}
 ```
 
@@ -1594,11 +1516,7 @@ y'^\top s' & = y'^\top y' + (s'^\top y')(y'^\top \lambda) + (\lambda^\top y')(y'
 
 ```math
 \begin{equation*}
-\lambda
-= \frac{s'-y'}{s'^\top y'} - \frac{\lambda^\top y'}{s'^\top y'}s'
-=
-\frac{s'^\top y'+y'^\top y'}{2(s'^\top y')^2}s'
--\frac{1}{s'^\top y'}y'.
+\lambda = \frac{s'-y'}{s'^\top y'} - \frac{\lambda^\top y'}{s'^\top y'}s' = \frac{s'^\top y'+y'^\top y'}{2(s'^\top y')^2}s' -\frac{1}{s'^\top y'}y'.
 \end{equation*}
 ```
 
@@ -1606,8 +1524,7 @@ y'^\top s' & = y'^\top y' + (s'^\top y')(y'^\top \lambda) + (\lambda^\top y')(y'
 
 ```math
 \begin{align*}
-B'^{-1} & = I + 2\frac{s'^\top y'+y'^\top y'}{2(s'^\top y')^2}(s' s'^\top)
--\frac{1}{s'^\top y'}(y' s'^\top + s' y'^\top)                                                                                         \\
+B'^{-1} & = I + 2\frac{s'^\top y'+y'^\top y'}{2(s'^\top y')^2}(s' s'^\top) - \frac{1}{s'^\top y'}(y' s'^\top + s' y'^\top)             \\
 & = \left( I-\frac{s'y'^\top}{s'^\top y'} \right) \left( I-\frac{y's'^\top}{s'^\top y'} \right) +\frac{s's'^\top}{s'^\top y'}.
 \end{align*}
 ```
@@ -1634,9 +1551,7 @@ B'^{-1} & = I + 2\frac{s'^\top y'+y'^\top y'}{2(s'^\top y')^2}(s' s'^\top)
 
 ### BFGS更新の詳細
 
-本小節ではBFGS更新に注目し、その公式の詳細な導出を示します。
-BFGS更新は実用上最も成功した準ニュートン更新則の一つとして知られています。
-BFGS更新則は次で与えられていたことを再掲しておきます。
+本小節ではBFGS更新に注目し、その公式の詳細な導出を示します。 BFGS更新は実用上最も成功した準ニュートン更新則の一つとして知られています。 BFGS更新則は次で与えられていたことを再掲しておきます。
 
 ```math
 \begin{equation*}
@@ -1654,8 +1569,7 @@ H_{k+1} = \left(I - \frac{s_k y_k^\top}{y_k^\top s_k}\right) H_k \left(I - \frac
 \end{equation*}
 ```
 
-なお、このBFGS更新における $H_{k+1}$ の公式は、DFP更新則における $B_{k+1}$ の形式と同じであることに注意してください。これらは双対の関係にあります。
-以下では、この式が確かにBFGS更新の逆行列を与えることを示します。
+なお、このBFGS更新における $H_{k+1}$ の公式は、DFP更新則における $B_{k+1}$ の形式と同じであることに注意してください。これらは双対の関係にあります。以下では、この式が確かにBFGS更新の逆行列を与えることを示します。
 
 **Proposition 12**
 
@@ -1721,8 +1635,7 @@ $B_k$ が正定値で $y_k^\top s_k > 0$ が成り立つなら、$B_{k+1}$ も�
 
 <details><summary>証明</summary>
 
-仮定より $B_k$ とその逆行列 $H_k$ は正定値です。
-任意の非零ベクトル $v \in \mathbb{R}^n$ に対して
+仮定より $B_k$ とその逆行列 $H_k$ は正定値です。任意の非零ベクトル $v \in \mathbb{R}^n$ に対して
 
 ```math
 \begin{equation*}
@@ -1732,8 +1645,7 @@ v^\top H_{k+1} v
 \end{equation*}
 ```
 
-ここで第1項は $H_k$ が正定値であるため非負であり、第2項は曲率条件 $y_k^\top s_k > 0$ により正です。
-よって $H_{k+1}$ は正定値であり、その逆行列 $B_{k+1} = H_{k+1}^{-1}$ も正定値であることが分かります。
+ここで第1項は $H_k$ が正定値であるため非負であり、第2項は曲率条件 $y_k^\top s_k > 0$ により正です。よって $H_{k+1}$ は正定値であり、その逆行列 $B_{k+1} = H_{k+1}^{-1}$ も正定値であることが分かります。
 
 (証明終わり)
 
@@ -1741,10 +1653,7 @@ v^\top H_{k+1} v
 
 #### BFGS更新のトレースと行列式の公式
 
-更新行列の固有値挙動の解析に有用な、BFGS更新のトレースと行列式の公式も示しておきます。
-対称行列においては、これらはそれぞれ固有値の総和と積に対応しています。
-従ってトレースと行列式が有界なら、固有値自体も有界に保たれると期待できます。
-これは $\mu$-強凸性や $L$-平滑性など、目的関数のヘッセ行列固有値に関する仮定と密接に関係するものとなっています。
+更新行列の固有値挙動の解析に有用な、BFGS更新のトレースと行列式の公式も示しておきます。対称行列においては、これらはそれぞれ固有値の総和と積に対応しています。従ってトレースと行列式が有界なら、固有値自体も有界に保たれると期待できます。これは $\mu$-強凸性や $L$-平滑性など、目的関数のヘッセ行列固有値に関する仮定と密接に関係するものとなっています。
 
 ##### トレースの公式
 
@@ -1812,9 +1721,7 @@ $B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ をBFGS更
 
 <details><summary>証明</summary>
 
-[行列式補題](https://en.wikipedia.org/wiki/Matrix_determinant_lemma)より、
-BFGS更新のランク2表現を思い出すと、
-$U, C, V$ は次を満たします。
+[行列式補題](https://en.wikipedia.org/wiki/Matrix_determinant_lemma)より、BFGS更新のランク2表現を思い出すと、$U, C, V$ は次を満たします。
 
 ```math
 \begin{equation*}
@@ -1863,10 +1770,7 @@ C^{-1} + V^\top B_k^{-1} U
 
 ### BFGSとDFPの比較
 
-これまで何度か言及したように、BFGSとDFPは双対関係にあります。
-しかし、実際の最適化問題に適用すると実用上の効率は大きく異なることが知られています。
-Powellによる解析[^powellHowBadAre1986]では、単純な二次元二次関数に対する両手法の挙動を調べて、この非対称性を検討しました。
-漸近的には同程度に振る舞うと示唆されることが多い両手法について、Powellはその実用上の効率が大きく異なること、特に近似ヘッセ行列が真のヘッセ行列から遠い場合に差が顕著であることを明らかにしました。ここでは、その数値実験を再現します。
+これまで何度か言及したように、BFGSとDFPは双対関係にあります。しかし、実際の最適化問題に適用すると実用上の効率は大きく異なることが知られています。Powellによる解析[^powellHowBadAre1986]では、単純な二次元二次関数に対する両手法の挙動を調べて、この非対称性を検討しました。漸近的には同程度に振る舞うと示唆されることが多い両手法について、Powellはその実用上の効率が大きく異なること、特に近似ヘッセ行列が真のヘッセ行列から遠い場合に差が顕著であることを明らかにしました。ここでは、その数値実験を再現します。
 
 #### 問題設定
 
@@ -1880,8 +1784,7 @@ f(x, y) = \frac{1}{2}(x^2 + y^2).
 
 BFGSとDFPのどちらも各反復で固定ステップサイズ $\alpha_k = 1$ を用いました。
 
-また、初期のヘッセ近似 $B_0$ は固有値 1 と $\lambda_1$ を持つように選びました。$\lambda_1$ は初期近似の誤差の程度を表しています。
-初期点 $x_0$ は次のように選びます。
+また、初期のヘッセ近似 $B_0$ は固有値 1 と $\lambda_1$ を持つように選びました。$\lambda_1$ は初期近似の誤差の程度を表しています。初期点 $x_0$ は次のように選びます。
 
 ```math
 \begin{equation*}
@@ -1889,17 +1792,13 @@ BFGSとDFPのどちらも各反復で固定ステップサイズ $\alpha_k = 1$ 
 \end{equation*}
 ```
 
-これはPowellの元の解析に沿ったものです。
-この選択の詳細は[^powellHowBadAre1986]を参照してください。
+これはPowellの元の解析に沿ったものです。この選択の詳細は[^powellHowBadAre1986]を参照してください。
 
-反復は現在点のノルムが初期ノルムに対する許容値を下回るまで続けました。
-そして、各 $\lambda_1$ に対して収束に要する反復回数を記録しました。
+反復は現在点のノルムが初期ノルムに対する許容値を下回るまで続けました。そして、各 $\lambda_1$ に対して収束に要する反復回数を記録しました。
 
 #### 数値結果
 
-数値結果を Table 1 に示します。
-これはPowellの元論文の表と部分的に一致しています。
-収束挙動は初期固有値 $\lambda_1$ に強く依存することが分かります。
+数値結果を Table 1 に示します。これはPowellの元論文の表と部分的に一致しています。収束挙動は初期固有値 $\lambda_1$ に強く依存することが分かります。
 
 | $\lambda_1$ | BFGS | DFP |
 | --- | --- | --- |
@@ -1914,8 +1813,7 @@ BFGSとDFPのどちらも各反復で固定ステップサイズ $\alpha_k = 1$ 
 
 (Table 1: 初期固有値 $\lambda_1$ に対するBFGSとDFPの収束比較。)
 
-Fig. 11 と Fig. 12 は特定の $\lambda_1$ に対する反復軌跡を示しています。
-これらの図は、同一の初期点から最小点(原点)へ向かう二つの手法の進み方を可視化し、収束速度と経路の違いを明確に示しています。
+Fig. 11 と Fig. 12 は特定の $\lambda_1$ に対する反復軌跡を示しています。これらの図は、同一の初期点から最小点(原点)へ向かう二つの手法の進み方を可視化し、収束速度と経路の違いを明確に示しています。
 
 ![../imgs/quasi_newton/bfgs_vs_dfp_100.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/bfgs_vs_dfp_100.png)
 
@@ -1927,33 +1825,23 @@ Fig. 11 と Fig. 12 は特定の $\lambda_1$ に対する反復軌跡を示し�
 
 #### 解析と議論
 
-数値結果はBFGSとDFPの間に顕著な非対称性があることを示しています。
-$\lambda_1 > 1$ のとき、すなわち初期ヘッセ近似が真の曲率を過大評価する場合、BFGS は大幅に高い効率を示しました。
-一方で、 $\lambda_1 < 1$ のとき、すなわち初期ヘッセ近似が真の曲率を過小評価する場合には、DFPはBFGSよりわずかに良い性能を示しましたが、その差は非常に小さいものでした。
-この傾向の逆転は理論的な対称性から予測されるものですが、その差の大小は注目に値します。
+数値結果はBFGSとDFPの間に顕著な非対称性があることを示しています。$\lambda_1 > 1$ のとき、すなわち初期ヘッセ近似が真の曲率を過大評価する場合、BFGS は大幅に高い効率を示しました。一方で、 $\lambda_1 < 1$ のとき、すなわち初期ヘッセ近似が真の曲率を過小評価する場合には、DFPはBFGSよりわずかに良い性能を示しましたが、その差は非常に小さいものでした。この傾向の逆転は理論的な対称性から予測されるものですが、その差の大小は注目に値します。
 
 ##### ヘッセ行列の補正における非対称性
 
-両者の性能の非対称性は、誤った固有値を補正する仕方の根本的な違いに起因します。
-大事な考察として、過大な固有値の補正が過小な固有値の補正よりも重要であることが挙げられます。
+両者の性能の非対称性は、誤った固有値を補正する仕方の根本的な違いに起因します。大事な考察として、過大な固有値の補正が過小な固有値の補正よりも重要であることが挙げられます。
 
-ヘッセ固有値が過大評価されると、アルゴリズムは過度に保守的なステップを取り、最適化の進みが遅くなります。
-この誤差を補正するには、更新則が大きな固有値を 1 へ縮小する必要があります。
-BFGS更新はこのようなタスクには強い効果を発揮しますが、DFP更新は苦手です。
+ヘッセ固有値が過大評価されると、アルゴリズムは過度に保守的なステップを取り、最適化の進みが遅くなります。この誤差を補正するには、更新則が大きな固有値を 1 へ縮小する必要があります。BFGS更新はこのようなタスクには強い効果を発揮しますが、DFP更新は苦手です。
 
-一方で、ヘッセ固有値が過小評価されると、アルゴリズムは大胆なステップを取りますが、その過小評価は自動で修正されやすいです。
-新しい点での勾配計算が近似の改善を促す為、このような過小評価の補正は本質的に容易で、必要な反復回数も少なくて済みます。
+一方で、ヘッセ固有値が過小評価されると、アルゴリズムは大胆なステップを取りますが、その過小評価は自動で修正されやすいです。新しい点での勾配計算が近似の改善を促す為、このような過小評価の補正は本質的に容易で、必要な反復回数も少なくて済みます。
 
 このような差異が、BFGS更新とDFP更新の性能の非対称性を生み出していると考えることが出来ます。
 
 ### 記憶制限BFGS (L-BFGS)
 
-以下では、準ニュートン法を大規模最適化問題へ拡張する際に重要となる、記憶制限準ニュートン法について説明します。
-通常の準ニュートン法では、近似ヘッセ行列 $B_k$ またはその逆行列 $H_k$ を密行列として陽に保存・更新するため、$n$ 変数に対して $\mathcal{O}(n^2)$ のメモリを要します。
-一方で、記憶制限準ニュートン法では、最新の $m$ 組のベクトルペア $\lbrace(s_i,y_i)\rbrace$ という限られた情報のみを保持して、その情報だけから近似ヘッセ行列に関する計算を行います。
-この工夫により空間計算量は $\mathcal{O}(nm)$ に減少し、$m$ が小さな定数(通常は $m\le 10$) のとき大幅な改善となります。
-特に、BFGS更新の記憶制限版であるL-BFGS法[^liuLimitedMemoryBFGS1989a]は、特にその代表的な手法です。
-このBFGS更新の場合に注目し、限られた情報だけを用いて準ニュートン方向 $d_k = -H_k g_k$ を空間計算量・時間計算量の両面で効率的に計算する方法を示します。
+以下では、準ニュートン法を大規模最適化問題へ拡張する際に重要となる、記憶制限準ニュートン法について説明します。通常の準ニュートン法では、近似ヘッセ行列 $B_k$ またはその逆行列 $H_k$ を密行列として陽に保存・更新するため、$n$ 変数に対して $\mathcal{O}(n^2)$ のメモリを要します。一方で、記憶制限準ニュートン法では、最新の $m$ 組のベクトルペア $\lbrace(s_i,y_i)\rbrace$ という限られた情報のみを保持して、その情報だけから近似ヘッセ行列に関する計算を行います。この工夫により空間計算量は $\mathcal{O}(nm)$ に減少し、$m$ が小さな定数(通常は $m\le 10$) のとき大幅な改善となります。
+
+特に、BFGS更新の記憶制限版であるL-BFGS法[^liuLimitedMemoryBFGS1989a]は、その代表的な手法です。このBFGS更新の場合に注目し、限られた情報だけを用いて準ニュートン方向 $d_k = -H_k g_k$ を空間計算量・時間計算量の両面で効率的に計算する方法を示します。
 
 本小節では次の有限長の行列の列を扱います。
 
@@ -2003,9 +1891,7 @@ V_{m-1}^\top \cdots V_0^\top H_0 V_0 \cdots V_{m-1}
 
 #### 二重ループ再帰
 
-準ニュートン法では、逆行列 $H_m$ と与えられたベクトル $q \in \mathbb{R}^n$ に対して $r = H_m q$ が効率的に計算できることが、アルゴリズムにおいて重要です。
-この計算は長さ $m$ の短いループを二回回すだけで実行でき、L-BFGS のtwo-loop recursionと呼ばれるアルゴリズムとして知られています[^nocedal1999numerical] (Algorithm 7.4)。
-このアルゴリズムは $\mathcal{O}(nm)$ の時間・空間計算量を要します。
+準ニュートン法では、逆行列 $H_m$ と与えられたベクトル $q \in \mathbb{R}^n$ に対して $r = H_m q$ が効率的に計算できることが、アルゴリズムにおいて重要です。この計算は長さ $m$ の短いループを二回回すだけで実行でき、L-BFGS のtwo-loop recursionと呼ばれるアルゴリズムとして知られています[^nocedal1999numerical] (Algorithm 7.4)。このアルゴリズムは $\mathcal{O}(nm)$ の時間・空間計算量を要します。
 
 ![999_two_loop_recursion](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/study/999_two_loop_recursion.png)
 
@@ -2100,8 +1986,7 @@ V_{m-1}^\top \cdots V_0^\top H_0 V_0 \cdots V_{m-1} q
 
 #### 初期スケーリング
 
-L-BFGS 法の重要な要素は初期行列 $H_0$ の選択です。
-広く使われるのは、単位行列にスケーリングを施したものです。
+L-BFGS 法の重要な要素は初期行列 $H_0$ の選択です。広く使われるのは、単位行列にスケーリングを施したものです。
 
 ```math
 \begin{equation*}
@@ -2117,8 +2002,7 @@ H_0 = \gamma I.
 \end{equation*}
 ```
 
-この選択は次の議論によって正当化できます[^liuLimitedMemoryBFGS1989a][^shannoMatrixConditioningNonlinear1978]。
-目的関数 $f$ が二回連続微分可能であると仮定し、最新のステップに沿った平均ヘッセ行列を考えます。
+この選択は次の議論によって正当化できます[^liuLimitedMemoryBFGS1989a][^shannoMatrixConditioningNonlinear1978]。目的関数 $f$ が二回連続微分可能であると仮定し、最新のステップに沿った平均ヘッセ行列を考えます。
 
 ```math
 \begin{equation*}
@@ -2149,10 +2033,9 @@ y_{m-1}
 \end{equation*}
 ```
 
-これは、ベクトル $\bar{G}^{1/2} s_{m-1}$ に関する行列 $\bar{G}$ のRayleigh商の逆数です。
-従って、このスケーリングはこれらの方向に沿った平均逆曲率を大まかに近似しています。
+これは、ベクトル $\bar{G}^{1/2} s_{m-1}$ に関する行列 $\bar{G}$ のRayleigh商の逆数です。従って、このスケーリングはこれらの方向に沿った平均逆曲率を大まかに近似しています。
 
-さらにこの $\gamma$ の選択は Barzilai–Borwein 法の短ステップサイズ[^barzilaiTwoPointStepSize1988] と一致しており、L-BFGS の初期化と古典的なステップ長選択戦略の密接な関係を示しています。
+さらにこの $\gamma$ の選択は Barzilai–Borwein 法の短ステップサイズ[^barzilaiTwoPointStepSize1988] と一致しており、L-BFGSの初期化と古典的なステップ長選択戦略の密接な関係を示しています。
 
 <!-- From 4_modified_secant.tex -->
 
@@ -2162,31 +2045,25 @@ y_{m-1}
 
 ### 修正セカント条件の導出
 
-セカント条件は準ニュートン法で広く用いられていますが、勾配情報のみを活用するため、目的関数の曲率を正確に捉えられないことがあります。
-このことをFig. 13で説明します。
+セカント条件は準ニュートン法で広く用いられていますが、勾配情報のみを活用するため、目的関数の曲率を正確に捉えられないことがあります。このことをFig. 13で説明します。
 
-Fig. 13 において、関数値と勾配が既知の2点 $x_k$ と $x_{k+1}$ があるとします。
-正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットしており、より良い収束挙動をもたらすことが分かります。
-しかし、標準的な勾配のみを用いて課されるセカント条件で作られるモデルでは、関数値の情報が無視され、曲率を大きく誤る可能性があり、真の目的関数の近似が悪くなります。
+Fig. 13 において、関数値と勾配が既知の2点 $x_k$ と $x_{k+1}$ があるとします。正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットしており、より良い収束挙動をもたらすことが分かります。しかし、標準的な勾配のみを用いて課されるセカント条件で作られるモデルでは、関数値の情報が無視され、曲率を大きく誤る可能性があり、真の目的関数の近似が悪くなります。
 
 <img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_EXPLAIN.png" /><img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_HESS.png" /><img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_BFGS.png" />
 
 (Fig. 13 標準的なセカント条件の欠点。 (a) $x_k$ と $x_{k+1}$ での関数値と勾配が既に分かっている。 (b) 正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットする。 (c) 標準的なセカント条件では、必ずしも十分に曲率を捉えられない。)
 
-この問題は、関数値を利用することで克服できます。基本的な考え方は Fig. 14 に示した通りです。
-2 点 $x_k$ と $x_{k+1}$ で勾配が同じであっても、適切な補完は関数値 $f(x_k)$ と $f(x_{k+1})$ によって異なります。
-この観察こそが、関数値情報を取り込んでヘッセ行列の近似を改善する修正セカント条件の動機を端的に示しています。
+この問題は、関数値を利用することで克服できます。基本的な考え方は Fig. 14 に示した通りです。2 点 $x_k$ と $x_{k+1}$ で勾配が同じであっても、適切な補完は関数値 $f(x_k)$ と $f(x_{k+1})$ によって異なります。この観察こそが、関数値情報を取り込んでヘッセ行列の近似を改善する修正セカント条件の動機を端的に示しています。
 
 ![../imgs/modified_secant/cubic_interpolation.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/cubic_interpolation.png)
 
-(Fig. 14 修正セカント条件の基本的な考え方。 $x_k$ と $x_{k+1}$ で同一の勾配を持つが異なる関数値を持つ場合、適切な補間は異なります。)
+(Fig. 14 修正セカント条件の基本的な考え方。$x_k$ と $x_{k+1}$ で同一の勾配を持つが異なる関数値を持つ場合、適切な補間は異なります。)
 
 以下では、2つの既知の修正セカント条件を提示します。
 
 #### 関数値一致の修正セカント条件
 
-最初の修正は、二次モデルが前の点での関数値と一致することを強制します[^yuanModifiedBFGSAlgorithm1991][^weiNewQuasiNewtonMethods2006][^babaie-kafakiModifiedBFGSAlgorithm2011]。
-異なる近似ヘッセ行列 $B_{k+1}^{\mathrm{F}}$ を持つ別のモデルを考えます。
+最初の修正は、二次モデルが前の点での関数値と一致することを強制します[^yuanModifiedBFGSAlgorithm1991][^weiNewQuasiNewtonMethods2006][^babaie-kafakiModifiedBFGSAlgorithm2011]。異なる近似ヘッセ行列 $B_{k+1}^{\mathrm{F}}$ を持つ別のモデルを考えます。
 
 ```math
 \begin{equation*}
@@ -2246,8 +2123,7 @@ B_{k+1}^{\mathrm{F}} s_k = \hat{y}^{\mathrm{F}}_k \mathrel{\vcenter{:}}= y_k + \
 \end{equation*}
 ```
 
-よって、各種の準ニュートン法の更新において、$s_k, y_k$ の代わりに、この修正された $\hat{y}^\mathrm{F}_k$ を使用することで、殆ど同じアルゴリズムのまま、目的関数値の情報を取り込むことができます。
-また、特にBFGS更新で $s_k^\top y_k > 0$ という条件は正定値性を保つために使われるなど重要な性質である為、$s_k$ との内積が正であることを保証した、次の修正も考えられます。
+よって、各種の準ニュートン法の更新において、$s_k, y_k$ の代わりに、この修正された $\hat{y}^\mathrm{F}_k$ を使用することで、殆ど同じアルゴリズムのまま、目的関数値の情報を取り込むことができます。また、特にBFGS更新で $s_k^\top y_k > 0$ という条件は正定値性を保つために使われるなど重要な性質である為、$s_k$ との内積が正であることを保証した、次の修正も考えられます。
 
 ```math
 \begin{equation*}
@@ -2355,8 +2231,7 @@ B_{k+1}^{\mathrm{C}} s_k = y_k + \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nab
 
 ### その他の曲率関連手法
 
-曲率情報を表すベクトルペア $s_k, y_k$ を求めることについては、他にもいくつかのトピックがあります。
-Agg-BFGS[^berahasLimitedmemoryBFGSDisplacement2022] は、最も古い情報を破棄して最新のものを追加するのではなく、データを集約することにより曲率情報を管理する別のアプローチです。
+曲率情報を表すベクトルペア $s_k, y_k$ を求めることについては、他にもいくつかのトピックがあります。Agg-BFGS[^berahasLimitedmemoryBFGSDisplacement2022] は、最も古い情報を破棄して最新のものを追加するのではなく、データを集約することにより曲率情報を管理する別のアプローチです。
 
 Multi-Secant[^leeAdvancingMultiSecantQuasiNewton2025] とは、複数のステップと勾配差ベクトルのペアを維持することにより、セカント条件を拡張します。ここまでで見てきた標準的な形式では、次のように定義していました。
 
@@ -2381,7 +2256,7 @@ s_i = x_{k+1} - x_i, \quad y_i = \nabla f(x_{k+1}) - \nabla f(x_i). \quad (i = k
 以上です。お読みいただきありがとうございました。
 
 [^Doikov2021SecondOrderTensor]: Nikita Doikov. New Second-Order and Tensor Methods in Convex Optimization. PhD thesis, Universit\'e catholique de Louvain, 2021.
-[^FanZhongXiuMingLianSokZuiShiHuaarugorizumu2023]: 飯塚 秀明. 連続最適化アルゴリズム. オーム社, 2023.
+[^FanZhongXiuMingLianSokZuiShiHuaarugorizumu2023]: 飯塚 秀明. 連続最適化アルゴリズム. オーム社, 2023. ISBN 978-4-274-23006-6.
 [^babaie-kafakiModifiedBFGSAlgorithm2011]: Saman Babaie-Kafaki. A modified BFGS algorithm based on a hybrid secant equation. Science China Mathematics, 54 (9): 2019--2036, 2011. ISSN 1869-1862. https://doi.org/10.1007/s11425-011-4232-7.
 [^barzilaiTwoPointStepSize1988]: Jonathan Barzilai and Jonathan M. Borwein. Two-Point Step Size Gradient Methods. IMA Journal of Numerical Analysis, 8 (1): 141--148, 1988. ISSN 0272-4979. https://doi.org/10.1093/imanum/8.1.141.
 [^bauschkeBaillonHaddadTheoremRevisited2009]: Heinz H. Bauschke and Patrick L. Combettes. The Baillon-Haddad Theorem Revisited, 2009.

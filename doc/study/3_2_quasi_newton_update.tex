@@ -9,11 +9,9 @@
 \fi
 
 \ifEn
-    Given $B_k$, $s_k$, and $y_k$, there exist many update rules that produce $B_{k+1}$ satisfying the secant condition. We introduce several representative ones together with their derivations~\citep{dennisjr.QuasiNewtonMethodsMotivation1977a}.
-    In this subsection only, for brevity, we abbreviate $B_k$, $B_{k+1}$, $s_k$, and $y_k$ as $B$, $\bar{B}$, $s$, and $y$, respectively.
+    Given $B_k$, $s_k$, and $y_k$, there exist many update rules that produce $B_{k+1}$ satisfying the secant condition. We introduce several representative ones together with their derivations~\citep{dennisjr.QuasiNewtonMethodsMotivation1977a}. In this subsection only, for brevity, we abbreviate $B_k$, $B_{k+1}$, $s_k$, and $y_k$ as $B$, $\bar{B}$, $s$, and $y$, respectively.
 \else
-    $B_k$, $s_k$, $y_k$ が与えられたとき、セカント条件を満たす $B_{k+1}$ を与える更新則は多数存在します。ここでは代表的なものをその導出とともに示します~\citep{dennisjr.QuasiNewtonMethodsMotivation1977a}。
-    本小節に限り、簡潔さのため $B_k$, $B_{k+1}$, $s_k$, $y_k$ をそれぞれ $B$, $\bar{B}$, $s$, $y$ と略記します。
+    $B_k$, $s_k$, $y_k$ が与えられたとき、セカント条件を満たす $B_{k+1}$ を与える更新則は多数存在します。ここでは代表的なものをその導出とともに示します~\citep{dennisjr.QuasiNewtonMethodsMotivation1977a}。本小節に限り、簡潔さのため $B_k$, $B_{k+1}$, $s_k$, $y_k$ をそれぞれ $B$, $\bar{B}$, $s$, $y$ と略記します。
 \fi
 
 \ifEn
@@ -23,12 +21,9 @@
 \fi
 
 \ifEn
-    Broyden's update is one of the oldest known update rules, but it is not often used for quasi-Newton methods in practice due to its lack of symmetry.
-    We introduce it briefly for historical context.
-    The update formulas are given by
+    Broyden's update is one of the oldest known update rules, but it is not often used for quasi-Newton methods in practice due to its lack of symmetry. We introduce it briefly for historical context. The update formulas are given by
 \else
-    \href{https://en.wikipedia.org/wiki/Broyden%27s_method}{Broyden更新}は最も古くから知られる更新則の一つですが、準ニュートン法の文脈では、対称性を保たないため実用上はあまり用いられません。歴史的な観点もふまえ、簡潔に紹介します。
-    更新則は次で与えられます。
+    \href{https://en.wikipedia.org/wiki/Broyden%27s_method}{Broyden更新}は最も古くから知られる更新則の一つですが、準ニュートン法の文脈では、対称性を保たないため実用上はあまり用いられません。歴史的な観点もふまえ、簡潔に紹介します。更新則は次で与えられます。
 \fi
 \begin{equation*}
     \bar{B}_{\mathrm{Broyden}} \coloneqq B + \frac{(y - Bs)s^\top}{s^\top s}.
@@ -72,17 +67,13 @@
 \end{proposition}
 \begin{proof}
     \ifEn
-        A vector $s$ and a basis for the orthogonal complement of $s$ form a basis of $\mathbb{R}^n$.
-        Since the conditions on $\bar{B}$ completely determine the action of $\bar{B}$ with respect to this basis, $\bar{B}$ is uniquely determined.
+        A vector $s$ and a basis for the orthogonal complement of $s$ form a basis of $\mathbb{R}^n$. Since the conditions on $\bar{B}$ completely determine the action of $\bar{B}$ with respect to this basis, $\bar{B}$ is uniquely determined.
 
-        We now show that $\bar{B}_{\mathrm{Broyden}}$ satisfies the imposed conditions.
-        Let $z$ be any vector satisfying $z^\top s = 0$. Then
+        We now show that $\bar{B}_{\mathrm{Broyden}}$ satisfies the imposed conditions. Let $z$ be any vector satisfying $z^\top s = 0$. Then
     \else
-        ベクトル $s$ と $s$ の直交補空間の基底は $\mathbb{R}^n$ の基底を成します。
-        $\bar{B}$ の条件はこの基底に対する $\bar{B}$ の作用を完全に決定するため、$\bar{B}$ は一意に定まります。
+        ベクトル $s$ と $s$ の直交補空間の基底は $\mathbb{R}^n$ の基底を成します。$\bar{B}$ の条件はこの基底に対する $\bar{B}$ の作用を完全に決定するため、$\bar{B}$ は一意に定まります。
 
-        ここで $\bar{B}_{\mathrm{Broyden}}$ が課された条件を満たすことを示します。
-        $z^\top s = 0$ を満たす任意のベクトル $z$ を取ります。このとき、次を得ます。
+        ここで $\bar{B}_{\mathrm{Broyden}}$ が課された条件を満たすことを示します。$z^\top s = 0$ を満たす任意のベクトル $z$ を取ります。このとき、次を得ます。
     \fi
     \begin{align*}
         \bar{B}_{\mathrm{Broyden}} s
@@ -95,11 +86,9 @@
         = Bz.
     \end{align*}
     \ifEn
-        Hence $\bar{B}_{\mathrm{Broyden}}$ satisfies the imposed conditions.
-        Therefore, by uniqueness, we conclude that $\bar{B} = \bar{B}_{\mathrm{Broyden}}$.
+        Hence $\bar{B}_{\mathrm{Broyden}}$ satisfies the imposed conditions. Therefore, by uniqueness, we conclude that $\bar{B} = \bar{B}_{\mathrm{Broyden}}$.
     \else
-        したがって、$\bar{B}_{\mathrm{Broyden}}$ は課された条件を満たします。
-        よって、一意性より $\bar{B} = \bar{B}_{\mathrm{Broyden}}$ となります。
+        したがって、$\bar{B}_{\mathrm{Broyden}}$ は課された条件を満たします。よって、一意性より $\bar{B} = \bar{B}_{\mathrm{Broyden}}$ となります。
     \fi
     \myQED
 \end{proof}
@@ -112,8 +101,7 @@
 
 \begin{proposition}[{\citep[Theorem 4.1]{dennisjr.QuasiNewtonMethodsMotivation1977a}}]
     \ifEn
-        Let $B\in\mathbb{R}^{n\times n}$, $y\in\mathbb{R}^n$, and $s\in\mathbb{R}^n\setminus\{ 0 \}$ be given.
-        Then $\bar{B}_{\mathrm{Broyden}}$ is the unique solution of the following optimization problem:
+        Let $B\in\mathbb{R}^{n\times n}$, $y\in\mathbb{R}^n$, and $s\in\mathbb{R}^n\setminus\{ 0 \}$ be given. Then $\bar{B}_{\mathrm{Broyden}}$ is the unique solution of the following optimization problem:
     \else
         $B\in\mathbb{R}^{n\times n}$, $y\in\mathbb{R}^n$, $s\in\mathbb{R}^n\setminus\{ 0 \}$ が与えられているとき、行列 $\bar{B}_{\mathrm{Broyden}}$ は以下の最適化問題の一意解である。
     \fi
@@ -124,27 +112,21 @@
 \end{proposition}
 \begin{proof}
     \ifEn
-        Instead of directly solving the optimization problem, we note that we can think of optimizing the function $\tilde{B} \mapsto \left\lVert \tilde{B} - B \right\rVert_F^2$, which is convex on $\mathbb{R}^{n \times n}$.
-        The constraint set
+        Instead of directly solving the optimization problem, we note that we can think of optimizing the function $\tilde{B} \mapsto \left\lVert \tilde{B} - B \right\rVert_F^2$, which is convex on $\mathbb{R}^{n \times n}$. The constraint set
         \begin{equation*}
             \{\tilde{B}\in\mathbb{R}^{n\times n}:\tilde{B}s=y\}
         \end{equation*}
-        is affine and hence convex.
-        Therefore, the optimization problem admits at most one minimizer.
+        is affine and hence convex. Therefore, the optimization problem admits at most one minimizer.
 
-        We show that $\bar{B}_{\mathrm{Broyden}}$ is indeed the minimizer.
-        For any $\tilde{B}$ satisfying $\tilde{B}s=y$, we have
+        We show that $\bar{B}_{\mathrm{Broyden}}$ is indeed the minimizer. For any $\tilde{B}$ satisfying $\tilde{B}s=y$, we have
     \else
-        関数 $\tilde{B}\mapsto\left\lVert \tilde{B}-B \right\rVert^2_F$ を最適化すると考えてよく、これは $\mathbb{R}^{n\times n}$ 上で凸です。
-        制約集合
+        関数 $\tilde{B}\mapsto\left\lVert \tilde{B}-B \right\rVert^2_F$ を最適化すると考えてよく、これは $\mathbb{R}^{n\times n}$ 上で凸です。制約集合
         \begin{equation*}
             \{\tilde{B}\in\mathbb{R}^{n\times n}:\tilde{B}s=y\}
         \end{equation*}
-        はアフィン集合であり凸です。
-        よって、この最適化問題は高々一つの最小解しか持ちません。
+        はアフィン集合であり凸です。よって、この最適化問題は高々一つの最小解しか持ちません。
 
-        $\bar{B}_{\mathrm{Broyden}}$ が実際に最小解であることを示します。
-        制約 $\tilde{B}s=y$ を満たす任意の $\tilde{B}$ に対して
+        $\bar{B}_{\mathrm{Broyden}}$ が実際に最小解であることを示します。制約 $\tilde{B}s=y$ を満たす任意の $\tilde{B}$ に対して
     \fi
     \begin{equation*}
         \left\lVert \bar{B}_{\mathrm{Broyden}} - B \right\rVert_F^2
@@ -152,11 +134,9 @@
         \leq \left\lVert \tilde{B}-B \right\rVert_F^2.
     \end{equation*}
     \ifEn
-        We used the submultiplicativity of the Frobenius norm and the fact that $\left\lVert ss^\top/(s^\top s) \right\rVert_F=1$.
-        Hence $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$.
+        We used the submultiplicativity of the Frobenius norm and the fact that $\left\lVert ss^\top/(s^\top s) \right\rVert_F=1$. Hence $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$, and we obtain the claim.
     \else
-        ここでフロベニウスノルムの劣乗法性と $\left\lVert ss^\top/(s^\top s) \right\rVert_F=1$ を用いました。
-        よって $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$ です。
+        ここでフロベニウスノルムの劣乗法性と $\left\lVert ss^\top/(s^\top s) \right\rVert_F=1$ を用いました。よって $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$ となり、主張が得られます。
     \fi
     \myQED
 \end{proof}
@@ -189,8 +169,7 @@
 \fi
 
 \ifEn
-    To derive SR1 update, we construct the updated matrix $\bar{B}$ as a rank-one update.
-    That is, we assume that for some vector $z \in \mathbb{R}^n$,
+    To derive SR1 update, we construct the updated matrix $\bar{B}$ as a rank-one update. That is, we assume that for some vector $z \in \mathbb{R}^n$,
 \else
     SR1 更新を導出するため、更新行列 $\bar{B}$ をランク1更新として構成します。すなわち、あるベクトル $z \in \mathbb{R}^n$ に対して、次が満たされると仮定します。
 \fi
@@ -281,8 +260,7 @@
 \fi
 
 \ifEn
-    Recall that the SR1 update adds an update term as $z z^\top$.
-    Instead, we can consider an asymmetric rank-one update of the form $z c^\top$ for some vector $c \in \mathbb{R}^n$. We symmetrize the result at the end.
+    Recall that the SR1 update adds an update term as $z z^\top$. Instead, we can consider an asymmetric rank-one update of the form $z c^\top$ for some vector $c \in \mathbb{R}^n$. We symmetrize the result at the end.
 \else
     SR1 更新では更新項を $z z^\top$ として加えていました。代わりに、あるベクトル $c \in \mathbb{R}^n$ に対して、非対称なランク1更新 $z c^\top$ を考えることができます。そして最後に結果を対称化します。
 \fi
@@ -344,8 +322,7 @@
 \end{proposition}
 \begin{proof}
     \ifEn
-        We first analyze the even subsequence.
-        For $t=0,1,2,\dots$, we define
+        We first analyze the even subsequence. For $t=0,1,2,\dots$, we define
     \else
         まず偶数番目の部分列を解析します。 $t=0,1,2,\dots$ に対し、次のように定義します。
     \fi
@@ -353,11 +330,9 @@
         G_t \coloneqq C_{2t}.
     \end{equation*}
     \ifEn
-        By construction, each $G_t$ is symmetric.
-        From the definitions, we have
+        By construction, each $G_t$ is symmetric. From the definitions, we have
     \else
-        構成方法より各 $G_t$ は対称です。
-        定義から次を得ます。
+        構成方法より各 $G_t$ は対称です。定義から次を得ます。
     \fi
     \begin{equation*}
         G_{t+1} = G_t +\frac{1}{2c^\top s}\left((y-G_t s)c^\top+c(y-G_t s)^\top\right).
@@ -401,13 +376,9 @@
         P \coloneqq \frac{1}{2}\left(I-\frac{cs^\top}{c^\top s}\right).
     \end{equation*}
     \ifEn
-        The matrix $cs^\top/c^\top s$ is rank one and has eigenvalues $1,0,\dots,0$.
-        Therefore, $P$ has one eigenvalue $0$ and all remaining eigenvalues equal to $1/2$.
-        In particular, its spectral radius is $1/2<1$, and thus the series converges as follows:
+        The matrix $cs^\top/c^\top s$ is rank one and has eigenvalues $1,0,\dots,0$. Therefore, $P$ has one eigenvalue $0$ and all remaining eigenvalues equal to $1/2$. In particular, its spectral radius is $1/2<1$, and thus the series converges as follows:
     \else
-        行列 $cs^\top/c^\top s$ はランク1で固有値は $1,0,\dots,0$ です。
-        よって $P$ は固有値 $0$ を一つ持ち、残りはすべて $1/2$ となります。
-        特にスペクトル半径は $1/2<1$ であるので、次のように級数が収束します。
+        行列 $cs^\top/c^\top s$ はランク1で固有値は $1,0,\dots,0$ です。よって $P$ は固有値 $0$ を一つ持ち、残りはすべて $1/2$ となります。特にスペクトル半径は $1/2<1$ であるので、次のように級数が収束します。
     \fi
     \begin{align*}
         \sum_{t=0}^{\infty}w_t & =        \sum_{t=0}^{\infty}P^t(y-Bs)                         &  & (w_0=y-Bs)                \\
@@ -438,11 +409,11 @@
          & = C_{\infty}.
     \end{align*}
     \ifEn
-        This shows the convergence of the even subsequence $\{ C_{2t} \}$ to $C_{\infty}$.
+        This shows the convergence of the even subsequence $\{ C_{2t} \}_{t=0}^{\infty}$ to $C_{\infty}$.
 
         Next, for the odd subsequence, we have
     \else
-        これで偶数番目の部分列 $\{ C_{2t} \}$ が $C_{\infty}$ に収束することが示されました。
+        これで偶数番目の部分列 $\{ C_{2t} \}_{t=0}^{\infty}$ が $C_{\infty}$ に収束することが示されました。
 
         次に奇数番目の部分列について、次の式が成立しています。
     \fi
@@ -460,9 +431,9 @@
         C_{2t+1} \to C_{\infty}.
     \end{equation*}
     \ifEn
-        Therefore both subsequences $\{ C_{2t} \}$ and $\{ C_{2t+1} \}$ converge to $C_{\infty}$, completing the proof.
+        Therefore both subsequences $\{ C_{2t} \}_{t=0}^{\infty}$ and $\{ C_{2t+1} \}_{t=0}^{\infty}$ converge to $C_{\infty}$, completing the proof.
     \else
-        従って、部分列 $\{ C_{2t} \}$ と $\{ C_{2t+1} \}$ はどちらも $C_{\infty}$ に収束し、証明が完了します。
+        従って、部分列 $\{ C_{2t} \}_{t=0}^{\infty}$ と $\{ C_{2t+1} \}_{t=0}^{\infty}$ はどちらも $C_{\infty}$ に収束し、証明が完了します。
     \fi
     \myQED
 \end{proof}
@@ -501,8 +472,7 @@
 \ifEn
     In the PSB update rule discussed earlier, we substituted $c=s$, but we can consider taking a different $c$. Specifically, substituting $c=y$ yields the DFP update as follows.
 \else
-    先に述べた PSB 更新では $c=s$ としましたが、別の $c$ を選ぶことも可能です。
-    具体的には $c=y$ を代入すると次のように DFP 更新が得られます。
+    先に述べた PSB 更新では $c=s$ としましたが、別の $c$ を選ぶことも可能です。具体的には $c=y$ を代入すると次のように DFP 更新が得られます。
 \fi
 \begin{equation*}
     \bar{B}_{\mathrm{DFP}} = B + \frac{(y - Bs)y^\top + y(y - Bs)^\top}{y^\top s} - \frac{(y - Bs)^\top s}{(y^\top s)^2} yy^\top.
@@ -536,11 +506,9 @@
 \fi
 
 \ifEn
-    This update can be derived by considering the dual of the DFP update.
-    As we will see later, the BFGS update with respect to $B$ has the same form as the DFP update with respect to $H$.
+    This update can be derived by considering the dual of the DFP update. As we will see later, the BFGS update with respect to $B$ has the same form as the DFP update with respect to $H$.
 \else
-    この更新はDFP更新の双対を考えることで導出できます。
-    後で示すように、$B$ に対するBFGS更新は $H$ に対する DFP 更新と同じ形式となっています。
+    この更新はDFP更新の双対を考えることで導出できます。後で示すように、$B$ に対するBFGS更新は $H$ に対する DFP 更新と同じ形式となっています。
 \fi
 
 \ifEn
@@ -550,21 +518,17 @@
 \fi
 
 \ifEn
-    The KL divergence is a non-symmetric measure of proximity between matrices.
-    For positive definite matrices $P,Q \in \mathbb{R}^{n \times n}$, it is defined by
+    The KL divergence is a non-symmetric measure of proximity between matrices. For positive definite matrices $P,Q \in \mathbb{R}^{n \times n}$, it is defined by
 \else
-    KLダイバージェンスとは、行列間の近さを測る一種の非対称な尺度です。
-    正定値行列 $P,Q \in \mathbb{R}^{n \times n}$ に対して、次で定義されます。
+    KLダイバージェンスとは、行列間の近さを測る一種の非対称な尺度です。正定値行列 $P,Q \in \mathbb{R}^{n \times n}$ に対して、次で定義されます。
 \fi
 \begin{equation*}
     \mathrm{KL}(P,Q) \coloneqq \mathrm{tr}(P Q^{-1}) - \log\det(P Q^{-1}) - n.
 \end{equation*}
 \ifEn
-    Let $T \in \mathbb{R}^{n \times n}$ be an arbitrary nonsingular matrix.
-    Since the trace is invariant under cyclic permutations, the KL divergence satisfies
+    Let $T \in \mathbb{R}^{n \times n}$ be an arbitrary nonsingular matrix. Since the trace is invariant under cyclic permutations, the KL divergence satisfies
 \else
-    行列 $T \in \mathbb{R}^{n \times n}$ を任意の正則行列とします。
-    $\mathrm{tr}$ は2つの行列の積に対して可換性を持つため、KLダイバージェンスは次の不変性を持ちます。
+    行列 $T \in \mathbb{R}^{n \times n}$ を任意の正則行列とします。$\mathrm{tr}$ は2つの行列の積に対して可換性を持つため、KLダイバージェンスは次の不変性を持ちます。
 \fi
 \begin{align*}
     \mathrm{KL}(T P T^\top, T Q T^\top) & = \mathrm{tr}(T P T^\top (T Q T^\top)^{-1}) - \log\det(T P T^\top (T Q T^\top)^{-1}) - n \\
@@ -587,19 +551,16 @@
 
 \begin{proposition}[{\citep[Section 7.2.4]{kanamori2016continuous}}]
     \ifEn
-        Let $B \succ 0$ be a symmetric positive definite matrix.
-        The solution to the above optimization problem is given by the BFGS update formula.
+        Let $B \succ 0$ be a symmetric positive definite matrix. The solution to the above optimization problem is given by the BFGS update formula.
     \else
-        $B \succ 0$ を正定値対称行列とする。
-        このとき、上記の最適化問題の解はBFGS更新則で与えられる。
+        $B \succ 0$ を正定値対称行列とする。このとき、上記の最適化問題の解はBFGS更新則で与えられる。
     \fi
 \end{proposition}
 \begin{proof}
     \ifEn
         Since $B$ is a symmetric positive definite matrix, we first define
     \else
-        $B$ が正定値対称行列であることに注意して、
-        まず、次のように定義します。
+        $B$ が正定値対称行列であることに注意して、まず、次のように定義します。
     \fi
     \begin{equation*}
         s' \coloneqq B^{\frac{1}{2}} s, \quad y' \coloneqq B^{-\frac{1}{2}} y, \quad B' \coloneqq B^{-\frac{1}{2}} \bar{B} B^{-\frac{1}{2}}.
@@ -627,23 +588,18 @@
         なお、本最適化問題において $B' \succ 0$ という制約は自動的に対称性を含むため、$B' = B'^\top$ を制約として陽に課しても解は変わりません。
     \fi
 
-
     \ifEn
-        Let us solve this problem using the method of Lagrange multipliers.
-        We introduce the Lagrange multipliers $\lambda \in \mathbb{R}^n$ and $\Lambda \in \mathbb{R}^{n \times n}$, and define the Lagrangian as
+        Let us solve this problem using the method of Lagrange multipliers. We introduce the Lagrange multipliers $\lambda \in \mathbb{R}^n$ and $\Lambda \in \mathbb{R}^{n \times n}$, and define the Lagrangian as
     \else
-        この問題の解を、ラグランジュの未定乗数法を用いて求めます。
-        ラグランジュ乗数 $\lambda\in\mathbb{R}^n$ および $\Lambda\in\mathbb{R}^{n\times n}$ を用いて、ラグランジアンを次のように定義します。
+        この問題の解を、ラグランジュの未定乗数法を用いて求めます。ラグランジュ乗数 $\lambda\in\mathbb{R}^n$ および $\Lambda\in\mathbb{R}^{n\times n}$ を用いて、ラグランジアンを次のように定義します。
     \fi
     \begin{equation*}
         \mathcal{L}(B',\lambda,\Lambda) = \mathrm{tr}(B') -\log\det(B') -n +2\lambda^\top(B's'-y') +\mathrm{tr}\left(\Lambda(B'-B'^\top)\right).
     \end{equation*}
     \ifEn
-        In general, for matrix differentiation, the derivative of $\log\det(X)$ with respect to $X$ for $X \succ 0$ is $X^{-\top}$, and the derivative of $\mathrm{tr}(AX)$ is $A^\top$.
-        By differentiating with respect to $B'$ and using $B' = B'^\top$, we can write down the stationarity condition of the KKT conditions as follows:
+        In general, for matrix differentiation, the derivative of $\log\det(X)$ with respect to $X$ for $X \succ 0$ is $X^{-\top}$, and the derivative of $\mathrm{tr}(AX)$ is $A^\top$. By differentiating with respect to $B'$ and using $B' = B'^\top$, we can write down the stationarity condition of the KKT conditions as follows:
     \else
-        一般に、行列微分の公式として、$X \succ 0$ に対して、$\log\det(X)$ の微分が $X^{-\top}$ かつ、 $\mathrm{tr}(AX)$ の微分が $A^\top$ となります。
-        KKT条件のうち停留性に関する条件は、$B'$ で微分し、$B'=B'^\top$ を用いることで次のように書けます。
+        一般に、行列微分の公式として、$X \succ 0$ に対して、$\log\det(X)$ の微分が $X^{-\top}$ かつ、 $\mathrm{tr}(AX)$ の微分が $A^\top$ となります。KKT条件のうち停留性に関する条件は、$B'$ で微分し、$B'=B'^\top$ を用いることで次のように書けます。
     \fi
     \begin{equation*}
         I-B'^{-\top}
@@ -662,8 +618,7 @@
     \ifEn
         By the constraint $B's' = y'$, we have $B'^{-1}y' = s'$, so multiplying the above equation by $y'$ from the right and then by $y'^\top$ from the left yields
     \else
-        制約条件 $B's'=y'$ より $B'^{-1}y'=s'$ であるから、
-        上式に右から $y'$ を掛けた式と、さらに左から $y'^\top$ を掛けた式はそれぞれ、次のようになる。
+        制約条件 $B's'=y'$ より $B'^{-1}y'=s'$ であるから、上式に右から $y'$ を掛けた式と、さらに左から $y'^\top$ を掛けた式はそれぞれ、次のようになる。
     \fi
     \begin{align*}
         s'         & = y' +(s'^\top y')\lambda +(\lambda^\top y')s'                                \\
@@ -675,9 +630,7 @@
         第2式より
     \fi
     \begin{equation*}
-        \lambda^\top y'
-        =
-        \frac{y'^\top s'-y'^\top y'}{2(s'^\top y')}.
+        \lambda^\top y' = \frac{y'^\top s'-y'^\top y'}{2(s'^\top y')}.
     \end{equation*}
     \ifEn
         Substituting this into the first equation gives
@@ -685,11 +638,7 @@
         これを第1式に代入すると、
     \fi
     \begin{equation*}
-        \lambda
-        = \frac{s'-y'}{s'^\top y'} - \frac{\lambda^\top y'}{s'^\top y'}s'
-        =
-        \frac{s'^\top y'+y'^\top y'}{2(s'^\top y')^2}s'
-        -\frac{1}{s'^\top y'}y'.
+        \lambda = \frac{s'-y'}{s'^\top y'} - \frac{\lambda^\top y'}{s'^\top y'}s' = \frac{s'^\top y'+y'^\top y'}{2(s'^\top y')^2}s' -\frac{1}{s'^\top y'}y'.
     \end{equation*}
     \ifEn
         By substituting this $\lambda$ into the expression for $B'^{-1}$ and simplifying, we obtain
@@ -697,8 +646,7 @@
         この $\lambda$ を $B'^{-1}$ の表式に代入して整理すると、
     \fi
     \begin{align*}
-        B'^{-1} & = I + 2\frac{s'^\top y'+y'^\top y'}{2(s'^\top y')^2}(s' s'^\top)
-        -\frac{1}{s'^\top y'}(y' s'^\top + s' y'^\top)                                                                                         \\
+        B'^{-1} & = I + 2\frac{s'^\top y'+y'^\top y'}{2(s'^\top y')^2}(s' s'^\top) - \frac{1}{s'^\top y'}(y' s'^\top + s' y'^\top)             \\
                 & = \left( I-\frac{s'y'^\top}{s'^\top y'} \right) \left( I-\frac{y's'^\top}{s'^\top y'} \right) +\frac{s's'^\top}{s'^\top y'}.
     \end{align*}
     \ifEn
@@ -735,13 +683,9 @@
 \fi
 
 \ifEn
-    In this subsection, we focus on the BFGS update and provide a detailed derivation of its formula.
-    BFGS update is known as one of the most successful quasi-Newton update rules in practice.
-    Recall that the BFGS update formula is given by
+    In this subsection, we focus on the BFGS update and provide a detailed derivation of its formula. BFGS update is known as one of the most successful quasi-Newton update rules in practice. Recall that the BFGS update formula is given by
 \else
-    本小節ではBFGS更新に注目し、その公式の詳細な導出を示します。
-    BFGS更新は実用上最も成功した準ニュートン更新則の一つとして知られています。
-    BFGS更新則は次で与えられていたことを再掲しておきます。
+    本小節ではBFGS更新に注目し、その公式の詳細な導出を示します。 BFGS更新は実用上最も成功した準ニュートン更新則の一つとして知られています。 BFGS更新則は次で与えられていたことを再掲しておきます。
 \fi
 \begin{equation*}
     B_{k+1}   = B_k - \frac{B_k s_k s_k^\top B_k}{s_k^\top B_k s_k} + \frac{y_k y_k^\top}{y_k^\top s_k}.
@@ -762,11 +706,9 @@
     H_{k+1} = \left(I - \frac{s_k y_k^\top}{y_k^\top s_k}\right) H_k \left(I - \frac{y_k s_k^\top}{y_k^\top s_k}\right) + \frac{s_k s_k^\top}{y_k^\top s_k}.
 \end{equation*}
 \ifEn
-    Note that this BFGS update formula for $H_{k+1}$ has the same form as the DFP update formula for $B_{k+1}$. These are dual to each other.
-    We now prove that this equation indeed gives the inverse of the BFGS update.
+    Note that this BFGS update formula for $H_{k+1}$ has the same form as the DFP update formula for $B_{k+1}$. These are dual to each other. We now prove that this equation indeed gives the inverse of the BFGS update.
 \else
-    なお、このBFGS更新における $H_{k+1}$ の公式は、DFP更新則における $B_{k+1}$ の形式と同じであることに注意してください。これらは双対の関係にあります。
-    以下では、この式が確かにBFGS更新の逆行列を与えることを示します。
+    なお、このBFGS更新における $H_{k+1}$ の公式は、DFP更新則における $B_{k+1}$ の形式と同じであることに注意してください。これらは双対の関係にあります。以下では、この式が確かにBFGS更新の逆行列を与えることを示します。
 \fi
 
 \begin{proposition}
@@ -848,11 +790,9 @@
 \end{proposition}
 \begin{proof}
     \ifEn
-        By assumption, $B_k$ and its inverse $H_k$ are positive definite.
-        For any nonzero vector $v \in \mathbb{R}^n$, we have
+        By assumption, $B_k$ and its inverse $H_k$ are positive definite. For any nonzero vector $v \in \mathbb{R}^n$, we have
     \else
-        仮定より $B_k$ とその逆行列 $H_k$ は正定値です。
-        任意の非零ベクトル $v \in \mathbb{R}^n$ に対して
+        仮定より $B_k$ とその逆行列 $H_k$ は正定値です。任意の非零ベクトル $v \in \mathbb{R}^n$ に対して
     \fi
     \begin{equation*}
         v^\top H_{k+1} v
@@ -860,11 +800,9 @@
         \geq 0 + \frac{(s_k^\top v)^2}{y_k^\top s_k} > 0.
     \end{equation*}
     \ifEn
-        The first term is nonnegative since $H_k$ is positive definite, and the second term is positive due to the curvature condition $y_k^\top s_k > 0$.
-        Thus, $H_{k+1}$ is positive definite, and consequently, $B_{k+1} = H_{k+1}^{-1}$ is also positive definite.
+        The first term is nonnegative since $H_k$ is positive definite, and the second term is positive due to the curvature condition $y_k^\top s_k > 0$. Thus, $H_{k+1}$ is positive definite, and consequently, $B_{k+1} = H_{k+1}^{-1}$ is also positive definite.
     \else
-        ここで第1項は $H_k$ が正定値であるため非負であり、第2項は曲率条件 $y_k^\top s_k > 0$ により正です。
-        よって $H_{k+1}$ は正定値であり、その逆行列 $B_{k+1} = H_{k+1}^{-1}$ も正定値であることが分かります。
+        ここで第1項は $H_k$ が正定値であるため非負であり、第2項は曲率条件 $y_k^\top s_k > 0$ により正です。よって $H_{k+1}$ は正定値であり、その逆行列 $B_{k+1} = H_{k+1}^{-1}$ も正定値であることが分かります。
     \fi
     \myQED
 \end{proof}
@@ -876,14 +814,9 @@
 \fi
 
 \ifEn
-    We also present trace and determinant formulas for the BFGS update, which are useful in analyzing the eigenvalue behavior of the updated matrix.
-    For symmetric matrices, these quantities correspond to the sum and product of eigenvalues, respectively. Hence, if both the trace and the determinant are appropriately bounded, one may expect the eigenvalues themselves to remain bounded.
-    This is closely related to assumptions on the Hessian eigenvalues of the objective function, such as $\mu$-strong convexity and $L$-smoothness.
+    We also present trace and determinant formulas for the BFGS update, which are useful in analyzing the eigenvalue behavior of the updated matrix. For symmetric matrices, these quantities correspond to the sum and product of eigenvalues, respectively. Hence, if both the trace and the determinant are appropriately bounded, one may expect the eigenvalues themselves to remain bounded. This is closely related to assumptions on the Hessian eigenvalues of the objective function, such as $\mu$-strong convexity and $L$-smoothness.
 \else
-    更新行列の固有値挙動の解析に有用な、BFGS更新のトレースと行列式の公式も示しておきます。
-    対称行列においては、これらはそれぞれ固有値の総和と積に対応しています。
-    従ってトレースと行列式が有界なら、固有値自体も有界に保たれると期待できます。
-    これは $\mu$-強凸性や $L$-平滑性など、目的関数のヘッセ行列固有値に関する仮定と密接に関係するものとなっています。
+    更新行列の固有値挙動の解析に有用な、BFGS更新のトレースと行列式の公式も示しておきます。対称行列においては、これらはそれぞれ固有値の総和と積に対応しています。従ってトレースと行列式が有界なら、固有値自体も有界に保たれると期待できます。これは $\mu$-強凸性や $L$-平滑性など、目的関数のヘッセ行列固有値に関する仮定と密接に関係するものとなっています。
 \fi
 
 \ifEn
@@ -974,12 +907,9 @@
 \end{proposition}
 \begin{proof}
     \ifEn
-        Recall the rank-two formulation of the BFGS update.
-        By the matrix determinant lemma, the matrices $U, C, V$ satisfy
+        Recall the rank-two formulation of the BFGS update. By the matrix determinant lemma, the matrices $U, C, V$ satisfy
     \else
-        \href{https://en.wikipedia.org/wiki/Matrix_determinant_lemma}{行列式補題}より、
-        BFGS更新のランク2表現を思い出すと、
-        $U, C, V$ は次を満たします。
+        \href{https://en.wikipedia.org/wiki/Matrix_determinant_lemma}{行列式補題}より、BFGS更新のランク2表現を思い出すと、$U, C, V$ は次を満たします。
     \fi
     \begin{equation*}
         \det(B_{k+1}) =\det(B_k + U C V^\top)=\det(B_k)\det(C) \det \left(C^{-1} + V^\top B_k^{-1} U\right).
@@ -1035,15 +965,9 @@
 \fi
 
 \ifEn
-    As mentioned several times earlier, although BFGS and DFP are dual to each other, they exhibit remarkably different practical efficiency when applied to real optimization problems.
-    Powell's analysis~\citep{powellHowBadAre1986} investigates this asymmetry by studying the behavior of both methods on a simple two-dimensional quadratic function.
-    While asymptotic convergence theory often suggests that both methods should perform similarly, Powell reveals that their practical efficiency can differ dramatically, especially when the approximate Hessian is far from the true Hessian.
-    Here, we reproduce his numerical experiments.
+    As mentioned several times earlier, although BFGS and DFP are dual to each other, they exhibit remarkably different practical efficiency when applied to real optimization problems. Powell's analysis~\citep{powellHowBadAre1986} investigates this asymmetry by studying the behavior of both methods on a simple two-dimensional quadratic function. While asymptotic convergence theory often suggests that both methods should perform similarly, Powell reveals that their practical efficiency can differ dramatically, especially when the approximate Hessian is far from the true Hessian. Here, we reproduce his numerical experiments.
 \else
-    これまで何度か言及したように、BFGSとDFPは双対関係にあります。
-    しかし、実際の最適化問題に適用すると実用上の効率は大きく異なることが知られています。
-    Powellによる解析~\citep{powellHowBadAre1986}では、単純な二次元二次関数に対する両手法の挙動を調べて、この非対称性を検討しました。
-    漸近的には同程度に振る舞うと示唆されることが多い両手法について、Powellはその実用上の効率が大きく異なること、特に近似ヘッセ行列が真のヘッセ行列から遠い場合に差が顕著であることを明らかにしました。ここでは、その数値実験を再現します。
+    これまで何度か言及したように、BFGSとDFPは双対関係にあります。しかし、実際の最適化問題に適用すると実用上の効率は大きく異なることが知られています。Powellによる解析~\citep{powellHowBadAre1986}では、単純な二次元二次関数に対する両手法の挙動を調べて、この非対称性を検討しました。漸近的には同程度に振る舞うと示唆されることが多い両手法について、Powellはその実用上の効率が大きく異なること、特に近似ヘッセ行列が真のヘッセ行列から遠い場合に差が顕著であることを明らかにしました。ここでは、その数値実験を再現します。
 \fi
 
 \ifEn
@@ -1066,28 +990,22 @@
     BFGSとDFPのどちらも各反復で固定ステップサイズ $\alpha_k = 1$ を用いました。
 \fi
 \ifEn
-    The initial Hessian approximation $B_0$ is chosen to have eigenvalues 1 and $\lambda_1$, where $\lambda_1$ represents the degree of error in the initial approximation.
-    The initial point $x_0$ is selected as
+    The initial Hessian approximation $B_0$ is chosen to have eigenvalues 1 and $\lambda_1$, where $\lambda_1$ represents the degree of error in the initial approximation. The initial point $x_0$ is selected as
 \else
-    また、初期のヘッセ近似 $B_0$ は固有値 1 と $\lambda_1$ を持つように選びました。$\lambda_1$ は初期近似の誤差の程度を表しています。
-    初期点 $x_0$ は次のように選びます。
+    また、初期のヘッセ近似 $B_0$ は固有値 1 と $\lambda_1$ を持つように選びました。$\lambda_1$ は初期近似の誤差の程度を表しています。初期点 $x_0$ は次のように選びます。
 \fi
 \begin{equation*}
     \theta = \arctan(\sqrt{\lambda_1}), \quad x_0 = \begin{bmatrix}\cos(\theta) \\ \sin(\theta)\end{bmatrix}.
 \end{equation*}
 \ifEn
-    This aligns with Powell's original analysis.
-    See~\citep{powellHowBadAre1986} for details on this choice.
+    This aligns with Powell's original analysis. See~\citep{powellHowBadAre1986} for details on this choice.
 \else
-    これはPowellの元の解析に沿ったものです。
-    この選択の詳細は~\citep{powellHowBadAre1986}を参照してください。
+    これはPowellの元の解析に沿ったものです。この選択の詳細は~\citep{powellHowBadAre1986}を参照してください。
 \fi
 \ifEn
-    The iteration continues until the norm of the current point falls below a tolerance relative to its initial norm.
-    For each value of $\lambda_1$, we record the number of iterations required for convergence.
+    The iteration continues until the norm of the current point falls below a tolerance relative to its initial norm. For each value of $\lambda_1$, we record the number of iterations required for convergence.
 \else
-    反復は現在点のノルムが初期ノルムに対する許容値を下回るまで続けました。
-    そして、各 $\lambda_1$ に対して収束に要する反復回数を記録しました。
+    反復は現在点のノルムが初期ノルムに対する許容値を下回るまで続けました。そして、各 $\lambda_1$ に対して収束に要する反復回数を記録しました。
 \fi
 
 \ifEn
@@ -1097,12 +1015,9 @@
 \fi
 
 \ifEn
-    The numerical results are presented in \cref{tab:bfgs_dfp_comparison}, which partially reproduces the content of Powell's original tables.
-    We can see that the convergence behavior depends critically on the initial eigenvalue $\lambda_1$.
+    The numerical results are presented in \cref{tab:bfgs_dfp_comparison}, which partially reproduces the content of Powell's original tables. We can see that the convergence behavior depends critically on the initial eigenvalue $\lambda_1$.
 \else
-    数値結果を \cref{tab:bfgs_dfp_comparison} に示します。
-    これはPowellの元論文の表と部分的に一致しています。
-    収束挙動は初期固有値 $\lambda_1$ に強く依存することが分かります。
+    数値結果を \cref{tab:bfgs_dfp_comparison} に示します。これはPowellの元論文の表と部分的に一致しています。収束挙動は初期固有値 $\lambda_1$ に強く依存することが分かります。
 \fi
 
 \begin{table}[t]
@@ -1134,8 +1049,7 @@
 \ifEn
     \Cref{fig:bfgs_dfp_100} and \cref{fig:bfgs_dfp_0p1} illustrate the iterative trajectories for specific values of $\lambda_1$. These figures visualize how the two methods navigate toward the minimum (at the origin) from the same initial point, clearly showing the difference in convergence speed and path.
 \else
-    \Cref{fig:bfgs_dfp_100} と \cref{fig:bfgs_dfp_0p1} は特定の $\lambda_1$ に対する反復軌跡を示しています。
-    これらの図は、同一の初期点から最小点(原点)へ向かう二つの手法の進み方を可視化し、収束速度と経路の違いを明確に示しています。
+    \Cref{fig:bfgs_dfp_100} と \cref{fig:bfgs_dfp_0p1} は特定の $\lambda_1$ に対する反復軌跡を示しています。これらの図は、同一の初期点から最小点(原点)へ向かう二つの手法の進み方を可視化し、収束速度と経路の違いを明確に示しています。
 \fi
 
 \begin{figure}[t]
@@ -1171,15 +1085,9 @@
 \fi
 
 \ifEn
-    The numerical results reveal a striking asymmetry between BFGS and DFP.
-    When $\lambda_1 > 1$ (i.e., the initial Hessian approximation overestimates the true Hessian curvature), BFGS demonstrates significantly better efficiency.
-    Conversely, when $\lambda_1 < 1$ (i.e., the initial Hessian approximation underestimates the true curvature), DFP performs slightly better than BFGS, though the difference is modest.
-    This trend reversal is predicted by the theoretical symmetry between the two methods, but the magnitude of the difference is notable.
+    The numerical results reveal a striking asymmetry between BFGS and DFP. When $\lambda_1 > 1$ (i.e., the initial Hessian approximation overestimates the true Hessian curvature), BFGS demonstrates significantly better efficiency. Conversely, when $\lambda_1 < 1$ (i.e., the initial Hessian approximation underestimates the true curvature), DFP performs slightly better than BFGS, though the difference is modest. This trend reversal is predicted by the theoretical symmetry between the two methods, but the magnitude of the difference is notable.
 \else
-    数値結果はBFGSとDFPの間に顕著な非対称性があることを示しています。
-    $\lambda_1 > 1$ のとき、すなわち初期ヘッセ近似が真の曲率を過大評価する場合、BFGS は大幅に高い効率を示しました。
-    一方で、 $\lambda_1 < 1$ のとき、すなわち初期ヘッセ近似が真の曲率を過小評価する場合には、DFPはBFGSよりわずかに良い性能を示しましたが、その差は非常に小さいものでした。
-    この傾向の逆転は理論的な対称性から予測されるものですが、その差の大小は注目に値します。
+    数値結果はBFGSとDFPの間に顕著な非対称性があることを示しています。$\lambda_1 > 1$ のとき、すなわち初期ヘッセ近似が真の曲率を過大評価する場合、BFGS は大幅に高い効率を示しました。一方で、 $\lambda_1 < 1$ のとき、すなわち初期ヘッセ近似が真の曲率を過小評価する場合には、DFPはBFGSよりわずかに良い性能を示しましたが、その差は非常に小さいものでした。この傾向の逆転は理論的な対称性から予測されるものですが、その差の大小は注目に値します。
 \fi
 
 \ifEn
@@ -1189,28 +1097,19 @@
 \fi
 
 \ifEn
-    The asymmetry of the performance arises from a fundamental difference in how these two methods correct erroneous eigenvalues.
-    The core insight is that correcting erroneously large eigenvalues is more critical than correcting erroneously small ones.
+    The asymmetry of the performance arises from a fundamental difference in how these two methods correct erroneous eigenvalues. The core insight is that correcting erroneously large eigenvalues is more critical than correcting erroneously small ones.
 
-    When a Hessian eigenvalue is overestimated, the algorithm takes steps that are too conservative, resulting in slow progress of the optimization.
-    Correcting such errors requires the update formula to reduce these large eigenvalues toward one.
-    The BFGS update is highly effective at this task, while the DFP update struggles.
+    When a Hessian eigenvalue is overestimated, the algorithm takes steps that are too conservative, resulting in slow progress of the optimization. Correcting such errors requires the update formula to reduce these large eigenvalues toward one. The BFGS update is highly effective at this task, while the DFP update struggles.
 
-    In contrast, when a Hessian eigenvalue is underestimated, the algorithm takes steps that are slightly too aggressive, but the error is self-correcting.
-    Subsequent gradient computations provide information that helps refine the approximation.
-    Thus, correcting underestimated eigenvalues is inherently easier and requires fewer iterations.
+    In contrast, when a Hessian eigenvalue is underestimated, the algorithm takes steps that are slightly too aggressive, but the error is self-correcting. Subsequent gradient computations provide information that helps refine the approximation. Thus, correcting underestimated eigenvalues is inherently easier and requires fewer iterations.
 
     This explains why the asymmetry in performance exists between BFGS and DFP.
 \else
-    両者の性能の非対称性は、誤った固有値を補正する仕方の根本的な違いに起因します。
-    大事な考察として、過大な固有値の補正が過小な固有値の補正よりも重要であることが挙げられます。
+    両者の性能の非対称性は、誤った固有値を補正する仕方の根本的な違いに起因します。大事な考察として、過大な固有値の補正が過小な固有値の補正よりも重要であることが挙げられます。
 
-    ヘッセ固有値が過大評価されると、アルゴリズムは過度に保守的なステップを取り、最適化の進みが遅くなります。
-    この誤差を補正するには、更新則が大きな固有値を 1 へ縮小する必要があります。
-    BFGS更新はこのようなタスクには強い効果を発揮しますが、DFP更新は苦手です。
+    ヘッセ固有値が過大評価されると、アルゴリズムは過度に保守的なステップを取り、最適化の進みが遅くなります。この誤差を補正するには、更新則が大きな固有値を 1 へ縮小する必要があります。BFGS更新はこのようなタスクには強い効果を発揮しますが、DFP更新は苦手です。
 
-    一方で、ヘッセ固有値が過小評価されると、アルゴリズムは大胆なステップを取りますが、その過小評価は自動で修正されやすいです。
-    新しい点での勾配計算が近似の改善を促す為、このような過小評価の補正は本質的に容易で、必要な反復回数も少なくて済みます。
+    一方で、ヘッセ固有値が過小評価されると、アルゴリズムは大胆なステップを取りますが、その過小評価は自動で修正されやすいです。新しい点での勾配計算が近似の改善を促す為、このような過小評価の補正は本質的に容易で、必要な反復回数も少なくて済みます。
 
     このような差異が、BFGS更新とDFP更新の性能の非対称性を生み出していると考えることが出来ます。
 \fi
@@ -1223,19 +1122,13 @@
 \fi
 
 \ifEn
-    Next, we discuss the limited memory quasi-Newton methods, which are crucial for extending quasi-Newton methods to large-scale optimization problems.
-    In standard quasi-Newton methods, the approximate Hessian $B_k$ or its inverse $H_k$ is stored and updated explicitly as a dense matrix, requiring $\mathcal{O}(n^2)$ memory for $n$ variables.
-    In contrast, limited memory quasi-Newton methods maintain only a limited amount of information, i.e., the most recent $m$ curvature pairs $\{(s_i,y_i)\}$ and perform computations related to the approximate Hessian using just this information.
-    This reduces the space complexity to $\mathcal{O}(nm)$, which is a dramatic improvement when $m$ is a small constant (typically $m\le 10$).
-    The L-BFGS method~\citep{liuLimitedMemoryBFGS1989a}, which is a limited memory version of the BFGS update, is particularly representative.
-    We focus on this BFGS update case and show how the quasi-Newton direction $d_k = -H_k g_k$ can be computed efficiently in terms of both space and time complexity using only the limited information.
+    Next, we discuss the limited memory quasi-Newton methods, which are crucial for extending quasi-Newton methods to large-scale optimization problems. In standard quasi-Newton methods, the approximate Hessian $B_k$ or its inverse $H_k$ is stored and updated explicitly as a dense matrix, requiring $\mathcal{O}(n^2)$ memory for $n$ variables. In contrast, limited memory quasi-Newton methods maintain only a limited amount of information, i.e., the most recent $m$ curvature pairs $\{(s_i,y_i)\}$ and perform computations related to the approximate Hessian using just this information. This reduces the space complexity to $\mathcal{O}(nm)$, which is a dramatic improvement when $m$ is a small constant (typically $m\le 10$).
+
+    The L-BFGS method~\citep{liuLimitedMemoryBFGS1989a}, which is a limited memory version of the BFGS update, is particularly representative. We focus on this BFGS update case and show how the quasi-Newton direction $d_k = -H_k g_k$ can be computed efficiently in terms of both space and time complexity using only the limited information.
 \else
-    以下では、準ニュートン法を大規模最適化問題へ拡張する際に重要となる、記憶制限準ニュートン法について説明します。
-    通常の準ニュートン法では、近似ヘッセ行列 $B_k$ またはその逆行列 $H_k$ を密行列として陽に保存・更新するため、$n$ 変数に対して $\mathcal{O}(n^2)$ のメモリを要します。
-    一方で、記憶制限準ニュートン法では、最新の $m$ 組のベクトルペア $\{(s_i,y_i)\}$ という限られた情報のみを保持して、その情報だけから近似ヘッセ行列に関する計算を行います。
-    この工夫により空間計算量は $\mathcal{O}(nm)$ に減少し、$m$ が小さな定数(通常は $m\le 10$) のとき大幅な改善となります。
-    特に、BFGS更新の記憶制限版であるL-BFGS法~\citep{liuLimitedMemoryBFGS1989a}は、特にその代表的な手法です。
-    このBFGS更新の場合に注目し、限られた情報だけを用いて準ニュートン方向 $d_k = -H_k g_k$ を空間計算量・時間計算量の両面で効率的に計算する方法を示します。
+    以下では、準ニュートン法を大規模最適化問題へ拡張する際に重要となる、記憶制限準ニュートン法について説明します。通常の準ニュートン法では、近似ヘッセ行列 $B_k$ またはその逆行列 $H_k$ を密行列として陽に保存・更新するため、$n$ 変数に対して $\mathcal{O}(n^2)$ のメモリを要します。一方で、記憶制限準ニュートン法では、最新の $m$ 組のベクトルペア $\{(s_i,y_i)\}$ という限られた情報のみを保持して、その情報だけから近似ヘッセ行列に関する計算を行います。この工夫により空間計算量は $\mathcal{O}(nm)$ に減少し、$m$ が小さな定数(通常は $m\le 10$) のとき大幅な改善となります。
+
+    特に、BFGS更新の記憶制限版であるL-BFGS法~\citep{liuLimitedMemoryBFGS1989a}は、その代表的な手法です。このBFGS更新の場合に注目し、限られた情報だけを用いて準ニュートン方向 $d_k = -H_k g_k$ を空間計算量・時間計算量の両面で効率的に計算する方法を示します。
 \fi
 
 \ifEn
@@ -1303,13 +1196,9 @@
 \fi
 
 \ifEn
-    In quasi-Newton methods, it is crucial for the algorithm to efficiently compute $r = H_m q$ for the inverse matrix $H_m$ and a given vector $q \in \mathbb{R}^n$.
-    This operation can be carried out using two short loops of length $m$, known as the L-BFGS two-loop recursion~\citep[Algorithm 7.4]{nocedal1999numerical}.
-    This algorithm requires $\mathcal{O}(nm)$ time and space complexity.
+    In quasi-Newton methods, it is crucial for the algorithm to efficiently compute $r = H_m q$ for the inverse matrix $H_m$ and a given vector $q \in \mathbb{R}^n$. This operation can be carried out using two short loops of length $m$, known as the L-BFGS two-loop recursion~\citep[Algorithm 7.4]{nocedal1999numerical}. This algorithm requires $\mathcal{O}(nm)$ time and space complexity.
 \else
-    準ニュートン法では、逆行列 $H_m$ と与えられたベクトル $q \in \mathbb{R}^n$ に対して $r = H_m q$ が効率的に計算できることが、アルゴリズムにおいて重要です。
-    この計算は長さ $m$ の短いループを二回回すだけで実行でき、L-BFGS のtwo-loop recursionと呼ばれるアルゴリズムとして知られています~\citep[Algorithm 7.4]{nocedal1999numerical}。
-    このアルゴリズムは $\mathcal{O}(nm)$ の時間・空間計算量を要します。
+    準ニュートン法では、逆行列 $H_m$ と与えられたベクトル $q \in \mathbb{R}^n$ に対して $r = H_m q$ が効率的に計算できることが、アルゴリズムにおいて重要です。この計算は長さ $m$ の短いループを二回回すだけで実行でき、L-BFGS のtwo-loop recursionと呼ばれるアルゴリズムとして知られています~\citep[Algorithm 7.4]{nocedal1999numerical}。このアルゴリズムは $\mathcal{O}(nm)$ の時間・空間計算量を要します。
 \fi
 
 \subfile{999_two_loop_recursion.tex}
@@ -1421,11 +1310,9 @@
 \fi
 
 \ifEn
-    A crucial component of the L-BFGS method is the choice of the initial matrix $H_0$.
-    A widely used option is a scaled identity:
+    A crucial component of the L-BFGS method is the choice of the initial matrix $H_0$. A widely used option is a scaled identity:
 \else
-    L-BFGS 法の重要な要素は初期行列 $H_0$ の選択です。
-    広く使われるのは、単位行列にスケーリングを施したものです。
+    L-BFGS 法の重要な要素は初期行列 $H_0$ の選択です。広く使われるのは、単位行列にスケーリングを施したものです。
 \fi
 \begin{equation*}
     H_0 = \gamma I.
@@ -1439,11 +1326,9 @@
     \gamma = \frac{s_{m-1}^\top y_{m-1}}{y_{m-1}^\top y_{m-1}}.
 \end{equation*}
 \ifEn
-    This choice is motivated by the following discussion~\citep{liuLimitedMemoryBFGS1989a,shannoMatrixConditioningNonlinear1978}.
-    Assume that the objective function $f$ is twice continuously differentiable and consider the mean Hessian along the most recent step:
+    This choice is motivated by the following discussion~\citep{liuLimitedMemoryBFGS1989a,shannoMatrixConditioningNonlinear1978}. Assume that the objective function $f$ is twice continuously differentiable and consider the mean Hessian along the most recent step:
 \else
-    この選択は次の議論によって正当化できます~\citep{liuLimitedMemoryBFGS1989a,shannoMatrixConditioningNonlinear1978}。
-    目的関数 $f$ が二回連続微分可能であると仮定し、最新のステップに沿った平均ヘッセ行列を考えます。
+    この選択は次の議論によって正当化できます~\citep{liuLimitedMemoryBFGS1989a,shannoMatrixConditioningNonlinear1978}。目的関数 $f$ が二回連続微分可能であると仮定し、最新のステップに沿った平均ヘッセ行列を考えます。
 \fi
 \begin{equation*}
     \bar{G} = \int_0^1 \nabla^2 f(x + \tau s_{m-1}) \mathrm{d}\tau.
@@ -1472,17 +1357,15 @@
     {(\bar{G}^{1/2} s_{m-1})^\top \bar{G} (\bar{G}^{1/2} s_{m-1})}.
 \end{equation*}
 \ifEn
-    This is a reciprocal of a Rayleigh quotient of the matrix $\bar{G}$ with respect to the vector $\bar{G}^{1/2} s_{m-1}$.
-    Therefore, this scaling roughly approximates the average inverse curvature along those directions.
+    This is a reciprocal of a Rayleigh quotient of the matrix $\bar{G}$ with respect to the vector $\bar{G}^{1/2} s_{m-1}$. Therefore, this scaling roughly approximates the average inverse curvature along those directions.
 \else
-    これは、ベクトル $\bar{G}^{1/2} s_{m-1}$ に関する行列 $\bar{G}$ のRayleigh商の逆数です。
-    従って、このスケーリングはこれらの方向に沿った平均逆曲率を大まかに近似しています。
+    これは、ベクトル $\bar{G}^{1/2} s_{m-1}$ に関する行列 $\bar{G}$ のRayleigh商の逆数です。従って、このスケーリングはこれらの方向に沿った平均逆曲率を大まかに近似しています。
 \fi
 
 \ifEn
     Moreover, this choice of $\gamma$ coincides with the short step size of the Barzilai–Borwein method~\citep{barzilaiTwoPointStepSize1988}, highlighting a close connection between L-BFGS initialization and classical step-length selection strategies.
 \else
-    さらにこの $\gamma$ の選択は Barzilai–Borwein 法の短ステップサイズ~\citep{barzilaiTwoPointStepSize1988} と一致しており、L-BFGS の初期化と古典的なステップ長選択戦略の密接な関係を示しています。
+    さらにこの $\gamma$ の選択は Barzilai–Borwein 法の短ステップサイズ~\citep{barzilaiTwoPointStepSize1988} と一致しており、L-BFGSの初期化と古典的なステップ長選択戦略の密接な関係を示しています。
 \fi
 
 \ifSubfilesClassLoaded{

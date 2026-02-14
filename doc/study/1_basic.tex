@@ -27,7 +27,7 @@
     Also, let $\mu>0$ be a constant.
     The function $f$ is convex or $\mu$-strongly convex if and only if the following hold for any $x,y \in \mathbb{R}^n$ and $\lambda \in [0,1]$:
 \else
-    凸性(convexity)と強凸性(strong convexity)は最適化理論における基本概念です。
+    凸性 (convexity) と強凸性 (strong convexity) は最適化理論における基本概念です。
     簡単のため、$f$ は $\mathbb{R}^n$ 全域で実数値を取る関数、つまり、$f \colon \mathbb{R}^n \to \mathbb{R}$ とします。また、$\mu>0$ を定数とします。
     この時、関数 $f$ が凸、または $\mu$-強凸であることは、任意の $x,y \in \mathbb{R}^n$ と $\lambda \in [0,1]$ について次が成り立つこととそれぞれ同値です。
 \fi
@@ -37,13 +37,9 @@
     \textrm{($\mu$-strongly convex)} \quad f((1-\lambda) x + \lambda y) & \le (1-\lambda) f(x) + \lambda f(y) - \frac{\mu}{2} \lambda (1-\lambda) \left\lVert x-y \right\rVert^2.
 \end{align*}
 \ifEn
-    There are more intuitive equivalent definitions of convexity and strong convexity using the gradient of $f$.
-    Assume that $f$ is of class $C^1$ and it takes real values over the domain $\mathbb{R}^n$.
-    The function $f$ is convex or $\mu$-strongly convex if and only if the following hold for any $x,y \in \mathbb{R}^n$:
+    There are more intuitive equivalent definitions of convexity and strong convexity using the gradient of $f$. Assume that $f$ is of class $C^1$ and it takes real values over the domain $\mathbb{R}^n$. The function $f$ is convex or $\mu$-strongly convex if and only if the following hold for any $x,y \in \mathbb{R}^n$:
 \else
-    より直感的な定義として、関数 $f$ の勾配を用いた凸性および強凸性の同値な定義も存在します。
-    $f$ が $C^1$ 級で、その定義域 $\mathbb{R}^n$ 全体で実数値を取ると仮定します。
-    関数 $f$ が凸、または $\mu$-強凸であることは、任意の $x,y \in \mathbb{R}^n$ について次が成り立つこととそれぞれ同値です。
+    より直感的な定義として、関数 $f$ の勾配を用いた凸性および強凸性の同値な定義も存在します。$f$ が $C^1$ 級で、その定義域 $\mathbb{R}^n$ 全体で実数値を取ると仮定します。関数 $f$ が凸、または $\mu$-強凸であることは、任意の $x,y \in \mathbb{R}^n$ について次が成り立つこととそれぞれ同値です。
 \fi
 \begin{align*}
     \textrm{(convex)} \quad
@@ -51,34 +47,6 @@
     \textrm{($\mu$-strongly convex)} \quad
     f(y) & \ge f(x)+\nabla f(x)^\top (y-x)+\frac{\mu}{2}\left\lVert y-x \right\rVert^2.
 \end{align*}
-\ifEn
-    Strong convexity indicates that, in addition to convexity, the objective function has uniformly positive curvature.
-    We show examples of convex and strongly convex functions in \cref{fig:convexity_comparison}.
-    Such definitions may vary slightly in the literature. For example, see~\citep{nesterovIntroductoryLecturesConvex2014,kanamori2016continuous}.
-\else
-    強凸性は、凸性に加えて目的関数が一様に正の曲率を持つことを意味します。
-    \cref{fig:convexity_comparison} に示した通り、凸関数と強凸関数には曲率に違いがみられます。
-    このような定義は、文献によって多少の揺れがありますが、例えば~\citep{nesterovIntroductoryLecturesConvex2014,kanamori2016continuous}などを参照してください。
-\fi
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=\textwidth]{../imgs/quasi_newton/convexity_comparison_convex.pdf}
-    \includegraphics[width=\textwidth]{../imgs/quasi_newton/convexity_comparison_strongly_convex.pdf}
-    \caption{
-        \ifEn
-            Examples of convex and strongly convex functions.
-            The dashed line shows the quadratic approximation at $x=0$.
-            The upper two functions are convex but not strongly convex.
-            The lower two functions are strongly convex, as there exists $\mu>0$ satisfying the definition of strong convexity.
-        \else
-            凸関数と強凸関数の例。
-            破線は $x=0$ における二次近似を示しています。
-            上2つの関数は凸ですが強凸ではなく、
-            下2つの関数は強凸性の定義を満たす $\mu>0$ が存在し、強凸となります。
-        \fi
-    }
-    \label{fig:convexity_comparison}
-\end{figure}
 \ifEn
     We show the equivalence of these two definitions below.
 \else
@@ -95,11 +63,9 @@
 \begin{proof}
     \ifEn
         We show the case of $\mu$-strong convexity.
-        First, assume that the former definition holds.
-        By the definition of the gradient and the $C^1$ assumption on $f$, we have
+        First, assume that the former definition holds. By the definition of the gradient and the $C^1$ assumption on $f$, we have
     \else
-        $\mu$-強凸の場合について示します。
-        まず、前者の定義が成立することを仮定すると、勾配の定義と、$f$ が $C^1$ 級であることから、以下が成り立ちます。
+        $\mu$-強凸の場合について示します。まず、前者の定義が成立することを仮定すると、勾配の定義と、$f$ が $C^1$ 級であることから、以下が成り立ちます。
     \fi
     \begin{align*}
         \nabla f(x)^\top (y-x)
@@ -110,57 +76,78 @@
     \ifEn
         Thus, the latter definition holds.
 
-        Conversely, assume that the latter definition holds.
-        Let $z \coloneqq (1-\lambda)x + \lambda y$. Then we have
+        Conversely, assume that the latter definition holds. Let $z \coloneqq (1-\lambda)x + \lambda y$. Then we have
     \else
         従って、後者の定義が成立します。
 
-        続いて、後者の定義が成立することを仮定します。
-        $z \coloneqq (1-\lambda)x + \lambda y$ とおくと、次が成り立ちます。
+        続いて、後者の定義が成立することを仮定します。$z \coloneqq (1-\lambda)x + \lambda y$ とおくと、次が成り立ちます。
     \fi
     \begin{align*}
-        f(x) \geq f(z) + \nabla f(z)^\top (x-z) + \frac{\mu}{2} \left\lVert x-z \right\rVert^2, \\
-        f(y) \geq f(z) + \nabla f(z)^\top (y-z) + \frac{\mu}{2} \left\lVert y-z \right\rVert^2.
+        f(x) & \geq f(z) + \nabla f(z)^\top (x-z) + \frac{\mu}{2} \left\lVert x-z \right\rVert^2, \\
+        f(y) & \geq f(z) + \nabla f(z)^\top (y-z) + \frac{\mu}{2} \left\lVert y-z \right\rVert^2.
     \end{align*}
     \ifEn
-        Multiplying the first inequality by $1-\lambda$ and the second by $\lambda$, and adding them together, we obtain
+        Multiplying the first inequality by $1-\lambda$ and the second by $\lambda$, and adding them together, we deduce the following.
+        Note that the terms involving $\nabla f(z)$ cancel out entirely by the definition of $z$.
     \else
-        これらを、それぞれ $1-\lambda$ 倍、$\lambda$ 倍して足し合わせると、次が成り立ちます。
+        これらを、それぞれ $1-\lambda$ 倍、$\lambda$ 倍して足し合わせると、次が成り立ちます。途中式で、$\nabla f(z)$ を含む項は、$z$ の定義から完全に打ち消し合うことに注意してください。
     \fi
     \begin{align*}
-        (1-\lambda) f(x) + \lambda f(y)
-         & \geq f(z) + \nabla f(z)^\top \left( (1-\lambda)(x-z) + \lambda (y-z) \right)
-        + \frac{\mu}{2} \left( (1-\lambda) \left\lVert x-z \right\rVert^2 + \lambda \left\lVert y-z \right\rVert^2 \right)                                   \\
-         & = f(z) + \frac{\mu}{2} \left( (1-\lambda) \lambda^2 \left\lVert x-y \right\rVert^2 + \lambda (1-\lambda)^2 \left\lVert y-x \right\rVert^2 \right) \\
-         & = f(z) + \frac{\mu}{2} \lambda (1-\lambda) \left\lVert x-y \right\rVert^2.
+               & (1-\lambda) f(x) + \lambda f(y)
+        \\
+        \geq{} & f(z) + \nabla f(z)^\top \left( (1-\lambda)(x-z) + \lambda (y-z) \right)
+        + \frac{\mu}{2} \left( (1-\lambda) \left\lVert x-z \right\rVert^2 + \lambda \left\lVert y-z \right\rVert^2 \right)                                       \\
+        ={}    & f(z) + \frac{\mu}{2} \left( (1-\lambda) \lambda^2 \left\lVert x-y \right\rVert^2 + \lambda (1-\lambda)^2 \left\lVert y-x \right\rVert^2 \right) \\
+        ={}    & f(z) + \frac{\mu}{2} \lambda (1-\lambda) \left\lVert x-y \right\rVert^2.
     \end{align*}
     \ifEn
-        Thus, the former definition holds.
-        This shows that these definitions are equivalent.
+        Thus, the former definition holds. This shows that these definitions are equivalent.
 
         By considering the case of $\mu=0$, the convex case can be shown in the same way.
     \else
-        従って、前者の定義が成立します。
-        つまり、これらの定義は同値であることが示されました。
+        従って、前者の定義が成立します。つまり、これらの定義は同値であることが示されました。
 
         $\mu=0$ の場合も、同様の議論により凸性について示すことができます。
     \fi
     \myQED
 \end{proof}
 
+\ifEn
+    Strong convexity indicates that, in addition to convexity, the objective function has uniformly positive curvature.
+    We show examples of convex and strongly convex functions in \cref{fig:convexity_comparison}.
+    Such definitions may vary slightly in the literature. For example, see~\citep{nesterovIntroductoryLecturesConvex2014,kanamori2016continuous}.
+\else
+    強凸性は、凸性に加えて目的関数が一様に正の曲率を持つことを意味します。\cref{fig:convexity_comparison} に示した通り、凸関数と強凸関数には曲率に違いがみられます。$\mu=0$ を強凸の定義に含めるか否かは、文献によって多少の揺れがありますが、一般的な慣習に倣い本稿では含めません。例えば~\citep{nesterovIntroductoryLecturesConvex2014,kanamori2016continuous}などを参照してください。
+\fi
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth]{../imgs/quasi_newton/convexity_comparison_convex.pdf}
+    \includegraphics[width=\textwidth]{../imgs/quasi_newton/convexity_comparison_strongly_convex.pdf}
+    \caption{
+        \ifEn
+            Examples of convex and strongly convex functions.
+            The dashed line shows the quadratic approximation at $x=0$.
+            The upper two functions are convex but not strongly convex.
+            The lower two functions are strongly convex, as there exists $\mu>0$ satisfying the definition of strong convexity.
+        \else
+            凸関数と強凸関数の例。
+            破線は $x=0$ における二次近似を示しています。
+            上2つの関数は凸ですが強凸ではなく、下2つの関数は強凸性の定義を満たす $\mu>0$ が存在し強凸となります。
+        \fi
+    }
+    \label{fig:convexity_comparison}
+\end{figure}
+
 \subsection{Positive Definiteness of the Hessian}
 
 \ifEn
     Next, assuming that $f$ is of class $C^2$, we show how convexity and strong convexity relate to the definiteness of the Hessian matrix $\nabla^2 f(x)$.
 
-    We define the definiteness of matrices beforehand.
-    Let $A$ be a symmetric matrix in $\mathbb{R}^{n \times n}$. A matrix $A$ is called positive or negative definite (or semi-definite) based on the following conditions:
+    We define the definiteness of matrices beforehand. Let $A$ be a symmetric matrix in $\mathbb{R}^{n \times n}$. A matrix $A$ is called positive or negative definite (or semi-definite) based on the following conditions:
 \else
     続いて、$f$ が $C^2$ 級であるとして、凸性および強凸性がヘッセ行列 $\nabla^2 f(x)$ の正定値性とどのように関係するかを示します。
 
-    行列の定値性について、先に定義しておきます。
-    $A$ を $\mathbb{R}^{n \times n}$ の対称行列とします。
-    行列 $A$ が(半)正定値 (positive (semi-)definite)・(半)負定値 (negative (semi-)definite) であるとは、次の条件で定義されます。
+    行列の定値性について、先に定義しておきます。$A$ を $\mathbb{R}^{n \times n}$ の対称行列とします。行列 $A$ が(半)正定値 (positive (semi-)definite)・(半)負定値 (negative (semi-)definite) であるとは、次の条件で定義されます。
 \fi
 \begin{align*}
     \textrm{(positive definite)} \quad      & v^\top A v > 0 \quad \forall v \in \mathbb{R}^n \setminus \{ 0 \}, \\
@@ -169,19 +156,9 @@
     \textrm{(negative semi-definite)} \quad & v^\top A v \le 0 \quad \forall v \in \mathbb{R}^n.
 \end{align*}
 \ifEn
-    A matrix is indefinite if it is neither positive nor negative definite.
-    For matrices $A,B \in \mathbb{R}^{n \times n}$, the notation $A \succeq B$ indicates that $A-B$ is positive semi-definite.
-    In particular, if $B$ is a zero matrix, we simply write $A \succeq 0$.
-    We similarly define $\preceq$ for negative semi-definiteness.
-    For $\mu \geq 0$, the condition $A \succeq \mu I$ is equivalent to $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ for all $v \in \mathbb{R}^n$.
-    It directly implies that all eigenvalues of $A$ are at least $\mu$, which in turn implies that the operator norm $\left\lVert A \right\rVert$ is at least $\mu$, i.e., $\left\lVert A \right\rVert \geq \mu$.
+    A matrix is indefinite if it is neither positive nor negative definite. For matrices $A,B \in \mathbb{R}^{n \times n}$, the notation $A \succeq B$ indicates that $A-B$ is positive semi-definite. In particular, if $B$ is a zero matrix, we simply write $A \succeq 0$. We similarly define $\preceq$ for negative semi-definiteness. For $\mu \geq 0$, the condition $A \succeq \mu I$ is equivalent to $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ for all $v \in \mathbb{R}^n$. It directly implies that all eigenvalues of $A$ are at least $\mu$, which in turn implies that the operator norm $\left\lVert A \right\rVert$ is at least $\mu$, i.e., $\left\lVert A \right\rVert \geq \mu$.
 \else
-    正定値でも負定値でもない行列は不定値(indefinite)と呼ばれます。
-    行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表します。
-    特に $B$ が零行列のときは $A \succeq 0$ と書きます。
-    同様に、$\preceq$ は半負定値に対して定義されます。
-    $\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ と同値です。
-    これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味し、さらに作用素ノルムについても $\left\lVert A \right\rVert \geq \mu$ であることを導きます。
+    正定値でも負定値でもない行列は不定値 (indefinite) と呼ばれます。行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表します。特に $B$ が零行列のときは $A \succeq 0$ と書きます。同様に、$\preceq$ は半負定値に対して定義されます。$\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ と同値です。これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味し、さらに作用素ノルムについても $\left\lVert A \right\rVert \geq \mu$ であることを導きます。
 \fi
 
 \ifEn
@@ -207,11 +184,9 @@
 \end{proposition}
 \begin{proof}
     \ifEn
-        First, let $\mu>0$ and assume $\nabla^2 f(x)\succeq \mu I$ for all $x \in \mathbb{R}^n$.
-        By the fundamental theorem of calculus, for any $x,y \in \mathbb{R}^n$, we have
+        First, let $\mu>0$ and assume $\nabla^2 f(x)\succeq \mu I$ for all $x \in \mathbb{R}^n$. By the fundamental theorem of calculus, for any $x,y \in \mathbb{R}^n$, we have
     \else
-        まず $\mu>0$ とし、任意の $x \in \mathbb{R}^n$ に対して $\nabla^2 f(x)\succeq \mu I$ が成り立つと仮定します。
-        微分積分学の基本定理より、任意の $x,y \in \mathbb{R}^n$ について次が成り立ちます。
+        まず $\mu>0$ とし、任意の $x \in \mathbb{R}^n$ に対して $\nabla^2 f(x)\succeq \mu I$ が成り立つと仮定します。 微分積分学の基本定理より、任意の $x,y \in \mathbb{R}^n$ について次が成り立ちます。
     \fi
     \begin{equation*}
         f(y)
@@ -235,11 +210,9 @@
     \fi
 
     \ifEn
-        Conversely, assume that $f$ is $\mu$-strongly convex.
-        For any $x \in \mathbb{R}^n, \ v \in \mathbb{R}^n$ and $t > 0$, letting $y=x \pm tv$ gives
+        Conversely, assume that $f$ is $\mu$-strongly convex. For any $x \in \mathbb{R}^n, \ v \in \mathbb{R}^n$ and $t > 0$, letting $y=x \pm tv$ gives
     \else
-        逆に、$f$ が $\mu$-強凸であると仮定します。
-        任意の $x \in \mathbb{R}^n, \ v \in \mathbb{R}^n$ および $t>0$ に対し、$y=x \pm tv$ とおくと次が成り立ちます。
+        逆に、$f$ が $\mu$-強凸であると仮定します。任意の $x \in \mathbb{R}^n, \ v \in \mathbb{R}^n$ および $t>0$ に対し、$y=x \pm tv$ とおくと次が成り立ちます。
     \fi
     \begin{equation*}
         \begin{dcases}
@@ -291,8 +264,7 @@
 \ifEn
     Quadratic functions whose Hessians are positive definite, indefinite, and negative definite are illustrated in \cref{fig:pd}. We can confirm the correspondence between positive definiteness and convexity.
 \else
-    ヘッセ行列が正定値・不定値・負定値である二次関数を \cref{fig:pd} に示しました。
-    定値性と凸性の対応関係を確認できます。
+    ヘッセ行列が正定値・不定値・負定値である二次関数を \cref{fig:pd} に示しました。定値性と凸性の対応関係を確認できます。
 \fi
 
 \begin{figure}[t]
@@ -301,7 +273,7 @@
     \caption{
         \ifEn
             Quadratic model
-            $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ in 2-dimensional space with Hessians $H$ which is (left) positive definite, (center) indefinite, (right) negative definite. $f(x)$ is (left) convex, (center) non-convex, and (right) concave, respectively.
+            $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ in 2-dimensional space with Hessians $H$ which is (left) positive definite, (center) indefinite, (right) negative definite. $f(x)$ is (left) convex, (center) nonconvex, and (right) concave, respectively.
         \else
             二次モデル $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ を二次元空間で示したもの。 ヘッセ行列 $H$ が (左)正定値、(中央)不定値、(右)負定値の場合を示す。 $f(x)$ はそれぞれ (左)凸、(中央)非凸、(右)凹である。
         \fi
@@ -316,23 +288,17 @@
 \fi
 
 \ifEn
-    Finally, we introduce $L$-smoothness of functions.
-    A function $f$ is $L$-smooth if and only if there exists a constant $L>0$ such that
+    Finally, we introduce $L$-smoothness of functions. A function $f$ is $L$-smooth if and only if there exists a constant $L>0$ such that
 \else
-    最後に、関数の $L$-平滑性 ($L$-smoothness)を導入します。
-    関数 $f$ が $L$-平滑であるとは、ある定数 $L>0$ が存在して
+    最後に、関数の $L$-平滑性 ($L$-smoothness)を導入します。関数 $f$ が $L$-平滑であるとは、ある定数 $L>0$ が存在して
 \fi
 \begin{equation*}
     \left\lVert \nabla f(x)-\nabla f(y) \right\rVert \le L\left\lVert x-y \right\rVert
 \end{equation*}
 \ifEn
-    holds for all $x,y$.
-    The $L$-smoothness of $f$ is equivalent to the $L$-Lipschitz continuity of the gradient $\nabla f$ by definition.
-    Please also refer to \cref{fig:l-smooth}.
+    holds for all $x,y$. The $L$-smoothness of $f$ is equivalent to the $L$-Lipschitz continuity of the gradient $\nabla f$ by definition. Please also refer to \cref{fig:l-smooth}.
 \else
-    が任意の $x,y$ について成り立つことと同値です。
-    定義そのものですが、関数 $f$ が $L$-平滑であることは、勾配 $\nabla f$ が $L$-リプシッツ連続であることと同値です。
-    \Cref{fig:l-smooth}も参照して下さい。
+    が任意の $x,y$ について成り立つことと同値です。定義そのものですが、関数 $f$ が $L$-平滑であることは、勾配 $\nabla f$ が $L$-リプシッツ連続であることと同値です。\Cref{fig:l-smooth}も参照して下さい。
 \fi
 
 \begin{figure}[htbp]
@@ -340,11 +306,9 @@
     \includegraphics[width=\columnwidth]{../imgs/quasi_newton/l-smooth.pdf}
     \caption{
         \ifEn
-            An example of $L$-smooth function in one-dimensional space.
-            $L$-smoothness gives a bound on the variation of the function $f$ (the orange dashed line is an upper bound on $f(x)$), and it is equivalent to the Lipschitz continuity of $\nabla f$ ($\nabla f(x)$ only exists in the gray area).
+            An example of $L$-smooth function in one-dimensional space. $L$-smoothness gives a bound on the variation of $f$ such as an upper bound of $f(x)$ by the orange dashed line, and it is equivalent to the Lipschitz continuity of $\nabla f$, which means that $\nabla f$ only exists in the gray area.
         \else
-            1次元における $L$-平滑関数の例。
-            $L$-平滑性は、関数 $f$ の変動幅に有界性を与え(オレンジ色の破線が $f(x)$ の上界)、また $\nabla f$ のリプシッツ連続性と同値(灰色の領域にしか、$\nabla f(x)$ は存在しない)です。
+            1次元における $L$-平滑関数の例。$L$-平滑性は、オレンジ色の破線による $f(x)$ の上界など、関数 $f$ の変動幅に有界性を与え、また灰色の領域にしか、$\nabla f(x)$ は存在しないこと、つまり $\nabla f$ のリプシッツ連続性を意味します。
         \fi
     }
     \label{fig:l-smooth}
@@ -359,8 +323,7 @@
     \ifEn
         Let $f \colon \mathbb{R}^n \to \mathbb{R}$ be an $L$-smooth function. Then for any $x,y \in \mathbb{R}^n$, we have
     \else
-        関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $L$-平滑であるとする。
-        このとき、任意の $x,y \in \mathbb{R}^n$ について次が成り立つ。
+        関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $L$-平滑であるとする。このとき、任意の $x,y \in \mathbb{R}^n$ について次が成り立つ。
     \fi
     \begin{equation*}
         f(y) \le f(x) + \nabla f(x)^\top (y-x) + \frac{L}{2} \left\lVert y-x \right\rVert^2.
@@ -392,12 +355,11 @@
 \else
     もし、更に $f$ が凸であれば、次の下界も成立します。
 \fi
-\begin{proposition}[{[\citep[Proposition 2.3.5]{FanZhongXiuMingLianSokZuiShiHuaarugorizumu2023}]}]
+\begin{proposition}[{\citep[Proposition 2.3.5]{FanZhongXiuMingLianSokZuiShiHuaarugorizumu2023}}]
     \ifEn
         Let $f \colon \mathbb{R}^n \to \mathbb{R}$ be a convex and $L$-smooth function. Then for any $x,y \in \mathbb{R}^n$, we have
     \else
-        関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が凸であり、かつ $L$-平滑であるとする。
-        このとき、任意の $x,y \in \mathbb{R}^n$ について次が成り立つ。
+        関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が凸であり、かつ $L$-平滑であるとする。このとき、任意の $x,y \in \mathbb{R}^n$ について次が成り立つ。
     \fi
     \begin{equation*}
         f(y) \ge f(x) + \nabla f(x)^\top (y-x) + \frac{1}{2L} \left\lVert \nabla f(y) - \nabla f(x) \right\rVert^2.
@@ -415,12 +377,10 @@
     \end{align*}
     \ifEn
         Since both $f(z)$ and the linear function $-f(x) - \nabla f(x)^\top (z-x)$ are convex in $z$, $g_x(z)$ is also convex and attains its minimum at $z=x$ where $\nabla g_x(z) = 0$ and thus the minimum value is $g_x(x)=0$.
-        Moreover, the $L$-smoothness of $f(z)$ directly implies the $L$-smoothness of $g_x(z)$.
-        Thus, by the $L$-smoothness of $g_x(z)$, we have
+        Moreover, the $L$-smoothness of $f(z)$ directly implies the $L$-smoothness of $g_x(z)$. Thus, by the $L$-smoothness of $g_x(z)$, we have
     \else
         関数 $f(z)$ と線形関数 $-f(x) - \nabla f(x)^\top (z-x)$ はどちらも $z$ について凸なので、$g_x(z)$ も凸であり、その最小値は $\nabla g_x(z) = 0$ を満たす $z=x$ でとる、つまり、最小値は $g_x(x)=0$ であることが分かります。
-        また、$f(z)$ の $L$-平滑性より、$g_x(z)$ の $L$-平滑性も直ちに導かれます。
-        よって、$g_x(z)$ の $L$-平滑性から次が成り立ちます。
+        また、$f(z)$ の $L$-平滑性より、$g_x(z)$ の $L$-平滑性も直ちに導かれます。 よって、$g_x(z)$ の $L$-平滑性から次が成り立ちます。
     \fi
     \begin{align*}
         0 & \leq g_x\qty(y-\frac{\nabla g_x(y)}{L} )                                                                                    &  & (\text{minimum is $g_x(x)=0$}) \\
@@ -445,8 +405,7 @@
     \ifEn
         Let $f \colon \mathbb{R}^n \to \mathbb{R}$ be of class $C^2$. Then $f$ is $L$-smooth if and only if $\nabla^2 f(x)\preceq L I$ holds for all $x \in \mathbb{R}^n$.
     \else
-        関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^2$ 級であるとする。
-        このとき、$f$ が $L$-平滑であることと、任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\preceq L I$ が成り立つことは同値である。
+        関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^2$ 級であるとする。 このとき、$f$ が $L$-平滑であることと、任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\preceq L I$ が成り立つことは同値である。
     \fi
 \end{proposition}
 \begin{proof}
@@ -573,10 +532,10 @@
 
 \ifEn
     As an advanced topic, one of the useful properties of $L$-smooth functions is given by the following Baillon–Haddad theorem.
-    Note that only $C^1$ differentiability is required here.
+    Note that the $C^2$ assumption is not required in this theorem, and only the $C^1$ assumption is sufficient.
 \else
     発展的な内容として、$L$-平滑性の有用な性質の一つが次の Baillon–Haddadの定理です。
-    ここでは $C^1$ の微分可能性だけを仮定する点に注意してください。
+    この定理では $C^2$ 級の仮定は不要で、$C^1$ 級の仮定だけで十分であることに注意してください。
 \fi
 \begin{proposition}[Baillon–Haddad theorem]\label{prop:baillon_haddad}
     \ifEn
@@ -619,9 +578,9 @@
     証明は他の文献も参照してください~\citep{bauschkeBaillonHaddadTheoremRevisited2009}~\citep[Proposition 12.60]{rockafellarVariationalAnalysis1998}。
 \fi
 \ifEn
-    For the sequences $\{ x_k \}$ generated by an optimization algorithm, defining
+    For the sequences $\{ x_k \}_k$ generated by an optimization algorithm, defining
 \else
-    最適化アルゴリズムが生成する列 $\{ x_k \}$ に対し、
+    最適化アルゴリズムが生成する列 $\{ x_k \}_k$ に対し、
 \fi
 \begin{equation*}
     s_k \coloneqq x_{k+1}-x_k, \quad y_k \coloneqq \nabla f(x_{k+1}) - \nabla f(x_k)
