@@ -253,7 +253,19 @@ def convert_math_env_to_md(block: str, env_name: str, counter: int) -> str:
     """
     display_name = ENV_DISPLAY_NAMES.get(env_name, env_name)
     lines = block.split("\n")
-    result_lines = [f"**{display_name} {counter}**"]
+    first_line = f"**{display_name} {counter}**"
+
+    line_zero = lines[0].strip()
+    if line_zero.startswith(f"\\begin{{{env_name}}}["):
+        # Extract optional argument for environment (e.g., theorem name)
+        opt_arg_match = line_zero[line_zero.find("[") : line_zero.rfind("]") + 1]
+        if opt_arg_match:
+            opt_arg = opt_arg_match[2:-2].strip()
+            if opt_arg:
+                print(opt_arg)
+                first_line += f" ({opt_arg})"
+
+    result_lines = [first_line]
 
     for line in lines:
         stripped = line.strip()

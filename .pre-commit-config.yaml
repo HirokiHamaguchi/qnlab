@@ -29,7 +29,7 @@ repos:
       - id: check-yaml
       - id: check-merge-conflict
       - id: check-added-large-files
-        exclude: ^doc/.+\.pdf$
+        exclude: ^doc/(.+\.pdf|.+\.gif)$
 
   - repo: https://github.com/kynan/nbstripout
     rev: 0.8.1

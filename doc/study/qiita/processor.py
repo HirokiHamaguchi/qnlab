@@ -27,7 +27,7 @@ from utils import preprocess_latex
 class GlobalState:
     """Global state for LaTeX conversion."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize global state with counters and label map."""
         self.global_counters: Dict[str, int] = {
             "figure": 0,
@@ -323,6 +323,16 @@ class LatexToMarkdownConverter:
                 break
 
             line = line.strip()
+
+            if line.startswith("% QIITA_GIF"):
+                lines = [
+                    "以下のGIFも参照して下さい。$f(x)$ の最適化において、各step毎にモデル関数が更新されていく様子を示しています。",
+                    "",
+                    "![GIF illustrating the concept](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/sixhump.gif)",
+                ]
+                self.markdown_lines.extend(lines)
+                self.i += 1
+                continue
 
             if line.startswith("%"):
                 self.i += 1

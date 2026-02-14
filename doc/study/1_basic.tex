@@ -38,11 +38,11 @@
 \end{align*}
 \ifEn
     There are more intuitive equivalent definitions of convexity and strong convexity using the gradient of $f$.
-    Assume that $f$ is at least of class $C^1$ and it takes real values over the domain $\mathbb{R}^n$.
+    Assume that $f$ is of class $C^1$ and it takes real values over the domain $\mathbb{R}^n$.
     The function $f$ is convex or $\mu$-strongly convex if and only if the following hold for any $x,y \in \mathbb{R}^n$:
 \else
     より直感的な定義として、関数 $f$ の勾配を用いた凸性および強凸性の同値な定義も存在します。
-    $f$ が少なくとも $C^1$ 級で、その定義域 $\mathbb{R}^n$ 全体で実数値を取ると仮定します。
+    $f$ が $C^1$ 級で、その定義域 $\mathbb{R}^n$ 全体で実数値を取ると仮定します。
     関数 $f$ が凸、または $\mu$-強凸であることは、任意の $x,y \in \mathbb{R}^n$ について次が成り立つこととそれぞれ同値です。
 \fi
 \begin{align*}
@@ -344,16 +344,16 @@
             $L$-smoothness gives a bound on the variation of the function $f$ (the orange dashed line is an upper bound on $f(x)$), and it is equivalent to the Lipschitz continuity of $\nabla f$ ($\nabla f(x)$ only exists in the gray area).
         \else
             1次元における $L$-平滑関数の例。
-            $L$-平滑性は関数 $f$ の変動幅に有界性を与え(オレンジ色の破線が $f(x)$ の上界)、また $\nabla f$ のリプシッツ連続性と同値です(灰色の領域にしか、$\nabla f(x)$ は存在しない)。
+            $L$-平滑性は、関数 $f$ の変動幅に有界性を与え(オレンジ色の破線が $f(x)$ の上界)、また $\nabla f$ のリプシッツ連続性と同値(灰色の領域にしか、$\nabla f(x)$ は存在しない)です。
         \fi
     }
     \label{fig:l-smooth}
 \end{figure}
 
 \ifEn
-    In general, for nonconvex functions, the following upper bound holds for the function value $f(y)$.
+    In general, for nonconvex functions, the following upper bound holds.
 \else
-    非凸な関数に対しても、次の関数値 $f(y)$ に対する上界が常に成立します。
+    非凸な関数に対しても、次の上界が常に成立します。
 \fi
 \begin{proposition}
     \ifEn
@@ -373,10 +373,10 @@
         微分積分学の基本定理より、任意の $x,y \in \mathbb{R}^n$ について次が成り立ちます。
     \fi
     \begin{align*}
-        f(y) - f(x) & = \int_0^1 \nabla f(x+t(y-x))^\top (y-x) \mathrm{d}t                                                                                                                               \\
-                    & = \nabla f(x)^\top (y-x) + \int_0^1 (\nabla f(x+t(y-x)) - \nabla f(x))^\top (y-x) \mathrm{d}t                                                                                      \\
-                    & \leq \nabla f(x)^\top (y-x) + \int_0^1 \left\lVert \nabla f(x+t(y-x)) - \nabla f(x) \right\rVert \left\lVert y-x \right\rVert \mathrm{d}t &  & (\text{Cauchy--Schwarz inequality}) \\
-                    & \leq \nabla f(x)^\top (y-x) + \int_0^1 L t \left\lVert y-x \right\rVert^2 \mathrm{d}t                                                     &  & (\text{by $L$-smoothness})          \\
+        f(y) - f(x) & = \int_0^1 \nabla f(x+t(y-x))^\top (y-x) \mathrm{d}t                                                                                                                              \\
+                    & = \nabla f(x)^\top (y-x) + \int_0^1 (\nabla f(x+t(y-x)) - \nabla f(x))^\top (y-x) \mathrm{d}t                                                                                     \\
+                    & \leq \nabla f(x)^\top (y-x) + \int_0^1 \left\lVert \nabla f(x+t(y-x)) - \nabla f(x) \right\rVert \left\lVert y-x \right\rVert \mathrm{d}t &  & (\text{Cauchy–Schwarz inequality}) \\
+                    & \leq \nabla f(x)^\top (y-x) + \int_0^1 L t \left\lVert y-x \right\rVert^2 \mathrm{d}t                                                     &  & (\text{by $L$-smoothness})         \\
                     & = \nabla f(x)^\top (y-x) + \frac{L}{2} \left\lVert y-x \right\rVert^2.
     \end{align*}
     \ifEn
@@ -508,7 +508,7 @@
     \fi
     \begin{align*}
         v^\top \nabla^2 f(x) v & = \lim_{t \to 0} \left(\frac{\nabla f(x+tv)-\nabla f(x)}{t}\right)^\top v                                                                               \\
-                               & \leq \lim_{t \to 0} \frac{\left\lVert \nabla f(x+tv)-\nabla f(x) \right\rVert}{t} \left\lVert v \right\rVert &  & (\text{Cauchy--Schwarz inequality})   \\
+                               & \leq \lim_{t \to 0} \frac{\left\lVert \nabla f(x+tv)-\nabla f(x) \right\rVert}{t} \left\lVert v \right\rVert &  & (\text{Cauchy–Schwarz inequality})    \\
                                & \leq \lim_{t \to 0} \frac{L\left\lVert tv \right\rVert}{t} \left\lVert v \right\rVert                        &  & (\text{by $L$-smoothness definition}) \\
                                & = L \left\lVert v \right\rVert^2.
     \end{align*}
@@ -558,19 +558,27 @@
 \end{proof}
 
 \ifEn
-    \subsubsection{Baillon--Haddad Theorem}
+    Thus, we can see that $\mu$-strong convexity and $L$-smoothness correspond to the lower and upper bounds of the eigenvalues of the Hessian, respectively.
+    The eigenvalues of the Hessian play a significant role in determining the convergence performance of algorithms, and such bounds can be utilized in various convergence analyses.
 \else
-    \subsubsection{Baillon--Haddadの定理}
+    以上により、$\mu$-強凸性と $L$-平滑性が、それぞれヘッセ行列の固有値の下界と上界に対応することが分かります。
+    ヘッセ行列の固有値はアルゴリズムの収束性能を大きく決定づけることもあり、このようなバウンドによって、様々な収束解析に利用することができます。
 \fi
 
 \ifEn
-    As an advanced topic, one of the useful properties of $L$-smooth functions is given by the following Baillon--Haddad theorem.
+    \subsubsection{Baillon–Haddad Theorem}
+\else
+    \subsubsection{Baillon–Haddadの定理}
+\fi
+
+\ifEn
+    As an advanced topic, one of the useful properties of $L$-smooth functions is given by the following Baillon–Haddad theorem.
     Note that only $C^1$ differentiability is required here.
 \else
-    発展的な内容として、$L$-平滑性の有用な性質の一つが次の Baillon--Haddadの定理です。
+    発展的な内容として、$L$-平滑性の有用な性質の一つが次の Baillon–Haddadの定理です。
     ここでは $C^1$ の微分可能性だけを仮定する点に注意してください。
 \fi
-\begin{proposition}[Baillon--Haddad theorem]\label{prop:baillon_haddad}
+\begin{proposition}[Baillon–Haddad theorem]\label{prop:baillon_haddad}
     \ifEn
         Let $f \colon \mathbb{R}^n \to \mathbb{R}$ be of class $C^1$. If $f$ is $L$-smooth and convex, then for all $x,y \in \mathbb{R}^n$, $\nabla f$ is $1/L$-cocoercive, i.e.,
         \begin{equation*}
@@ -585,11 +593,30 @@
         が任意の $x,y \in \mathbb{R}^n$ について成り立つ。
     \fi
 \end{proposition}
+\begin{proof}
+    \ifEn
+        By the lower bound of $f$ for convex and $L$-smooth functions shown above, we have
+    \else
+        先ほど示した凸かつ $L$-平滑な関数の下界より、次が成り立ちます。
+    \fi
+    \begin{equation*}
+        \begin{dcases}
+            f(y) \ge f(x) + \nabla f(x)^\top (y-x) + \frac{1}{2L} \left\lVert \nabla f(y) - \nabla f(x) \right\rVert^2, \\
+            f(x) \ge f(y) + \nabla f(y)^\top (x-y) + \frac{1}{2L} \left\lVert \nabla f(x) - \nabla f(y) \right\rVert^2.
+        \end{dcases}
+    \end{equation*}
+    \ifEn
+        Adding these two inequalities gives the Baillon–Haddad theorem.
+    \else
+        これらを足し合わせると、Baillon–Haddadの定理が得られます。
+    \fi
+    \myQED
+\end{proof}
 
 \ifEn
-    We refer to other literature for the proof~\citep{bauschkeBaillonHaddadTheoremRevisited2009}~\citep[Proposition 12.60]{rockafellarVariationalAnalysis1998}.
+    We also guide readers to other literature for the proof~\citep{bauschkeBaillonHaddadTheoremRevisited2009}~\citep[Proposition 12.60]{rockafellarVariationalAnalysis1998}.
 \else
-    証明は他の文献を参照してください~\citep{bauschkeBaillonHaddadTheoremRevisited2009}~\citep[Proposition 12.60]{rockafellarVariationalAnalysis1998}。
+    証明は他の文献も参照してください~\citep{bauschkeBaillonHaddadTheoremRevisited2009}~\citep[Proposition 12.60]{rockafellarVariationalAnalysis1998}。
 \fi
 \ifEn
     For the sequences $\{ x_k \}$ generated by an optimization algorithm, defining
@@ -600,9 +627,9 @@
     s_k \coloneqq x_{k+1}-x_k, \quad y_k \coloneqq \nabla f(x_{k+1}) - \nabla f(x_k)
 \end{equation*}
 \ifEn
-    and applying Baillon--Haddad theorem with $x=x_{k+1}$ and $y=x_k$ yields
+    and applying Baillon–Haddad theorem with $x=x_{k+1}$ and $y=x_k$ yields
 \else
-    と定義した上で、Baillon--Haddad 定理を $x=x_{k+1}$、$y=x_k$ に適用すると、次の結果が得られます。
+    と定義した上で、Baillon–Haddad 定理を $x=x_{k+1}$、$y=x_k$ に適用すると、次の結果が得られます。
 \fi
 \begin{equation*}
     s_k^\top y_k \ge \frac{1}{L} \left\lVert y_k \right\rVert^2.

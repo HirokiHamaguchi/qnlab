@@ -3,6 +3,7 @@ from __future__ import annotations
 import fitz  # PyMuPDF
 import matplotlib.pyplot as plt
 import numpy as np
+import imageio.v2 as imageio_v2
 
 from qnlab.problem import SixHumpProblem
 from qnlab.solver.qn import qn
@@ -189,6 +190,27 @@ def generate_gif(
         frame_path = output_dir / f"sixhump_iteration_{k:03d}.pdf"
         fig.savefig(frame_path, bbox_inches="tight", pad_inches=0)
         plt.close(fig)
+
+        page = fitz.open(frame_path)[0]
+        page_rect = page.rect
+        x_margin = page_rect.width * 0.07
+        y_margin = page_rect.height * 0.05
+        clip = fitz.Rect(
+            page_rect.x0 + x_margin,
+            page_rect.y0 + y_margin,
+            page_rect.x1 - x_margin,
+            page_rect.y1 - y_margin * 2.5,
+        )
+        pix = page.get_pixmap(matrix=fitz.Matrix(2, 2), clip=clip)
+        png_path = frame_path.with_suffix(".png")
+        pix.save(str(png_path))
+
+    # generate GIF using imageio
+    png_paths = sorted(output_dir.glob("sixhump_iteration_*.png"))
+    images = [imageio_v2.imread(str(png)) for png in png_paths]
+    gif_path = output_dir / "sixhump.gif"
+    imageio_v2.mimwrite(gif_path, images, fps=2, loop=0)  # type: ignore
+    print(f"Generated GIF saved to {gif_path}")
 
 
 def generate_output(prob, path, path_z, xg, yg, zg, callback, output_dir):

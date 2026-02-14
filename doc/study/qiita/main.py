@@ -37,6 +37,10 @@ def main() -> None:
         main_content = "\n".join(line.strip() for line in main_content.splitlines())
         all_markdown_lines.extend([f"\n<!-- From {main_file} -->\n", main_content])
 
+    all_markdown_lines.append(
+        '\n<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/sixhump.png" />\n'
+    )
+
     tex_files = [f for f in sorted(current_dir.glob("[1-4]*.tex"))]
     assert tex_files, "No .tex files found in current directory."
 

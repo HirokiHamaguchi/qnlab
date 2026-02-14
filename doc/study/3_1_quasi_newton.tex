@@ -91,6 +91,8 @@
     準ニュートン法の核心は、各反復で $B_k$ をどのように更新して真のヘッセ行列に近づけるかにあります。\Cref{fig:quasi_newton_overview} は準ニュートン法の概念図です。まず現在の点 $x_k$ の周りで、$B_k$ を用いて目的関数 $f$ の二次近似モデルを構成します。次にこの二次モデルを最小化して次の点 $x_{k+1}$ を得ます。$x_{k+1}$ を得た後、$x_k$ と $x_{k+1}$ における勾配情報を用いて近似行列 $B_k$ を $B_{k+1}$ に更新します。この手続きを収束するまで繰り返すことが準ニュートン法です。
 \fi
 
+% QIITA_GIF (This is a placeholder for a GIF illustrating for qiita)
+
 \ifEn
     \subsection{Secant Condition}
 \else

@@ -151,7 +151,7 @@ def plot_opt_frame(step_idx, x, xs_opt, colors):
         arrowprops=dict(arrowstyle="->", color="black", lw=1.5),
     )
 
-    ax.set_title(f"Newton optimization: step {step_idx}")
+    ax.set_title(f"Newton's Method: step {step_idx}")
     ax.set_xlabel("$x$")
     ax.set_ylabel("$f(x)$")
     ax.legend(loc="upper left")

@@ -26,6 +26,8 @@ def convert_pdf_to_png(current_dir: Path) -> None:
         try:
             doc = fitz.open(str(pdf_file))
             page = doc[0]
+            if "sixhump" in pdf_file.name:
+                continue
             pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
             pix.save(str(png_file))
             doc.close()

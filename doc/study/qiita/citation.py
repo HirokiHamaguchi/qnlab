@@ -3,13 +3,14 @@
 import json
 import re
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Iterable, Tuple
 
 try:
     from config import CITE_MAPPING_FILE
 except ImportError:
     # Fallback for relative imports
     import sys
+
     sys.path.insert(0, str(Path(__file__).parent))
     from config import CITE_MAPPING_FILE
 
@@ -32,6 +33,89 @@ def load_cite_mapping(json_file: str = CITE_MAPPING_FILE) -> Dict[str, str]:
     except (FileNotFoundError, json.JSONDecodeError) as e:
         print(f"Warning: Could not load {json_file}: {e}")
         return {}
+
+
+def _sanitize_bbl_text(text: str) -> str:
+    """Normalize LaTeX-ish bibliography text into a single readable line."""
+    # Unwrap common LaTeX formatting commands.
+    text = re.sub(r"\\newblock\s*", " ", text)
+    text = re.sub(r"\\emph\{([^}]*)\}", r"\1", text)
+    text = re.sub(r"\\texttt\{([^}]*)\}", r"\1", text)
+    text = re.sub(r"\\url\{([^}]*)\}", r"\1", text)
+    text = re.sub(r"\\doi\{([^}]*)\}", r"doi: \1", text)
+    text = re.sub(r"\\penalty0\s*", " ", text)
+    text = re.sub(r"\\natexlab\s*[a-zA-Z]", "", text)
+    text = text.replace("~", " ")
+
+    # Convert DOI to link format.
+    text = re.sub(
+        r"\bdoi:\s*([^\s,;]+)",
+        r"https://doi.org/\1",
+        text,
+        flags=re.IGNORECASE,
+    )
+
+    # Remove remaining braces and collapse whitespace.
+    text = text.replace("{", "").replace("}", "")
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
+
+
+def _iter_bbl_entries(lines: Iterable[str]) -> Iterable[Tuple[str, str]]:
+    """Yield (key, raw_text) entries from a .bbl file."""
+    key = None
+    buffer: list[str] = []
+    bibitem_re = re.compile(r"^\\bibitem(?:\[[^\]]*\])?\{([^}]+)\}")
+    end_re = re.compile(r"^\\end\{thebibliography\}")
+
+    for line in lines:
+        if end_re.match(line):
+            break
+        match = bibitem_re.match(line)
+        if match:
+            if key is not None:
+                yield key, "".join(buffer)
+            key = match.group(1).strip()
+            buffer = []
+            continue
+
+        if key is not None:
+            buffer.append(line)
+
+    if key is not None:
+        yield key, "".join(buffer)
+
+
+def generate_cite_mapping_from_bbl(
+    bbl_file: str,
+    output_json: str = CITE_MAPPING_FILE,
+) -> Dict[str, str]:
+    """Generate cite_mapping.json from a fixed .bbl file.
+
+    Args:
+        bbl_file: Path to the .bbl file (e.g., 0_main.bbl)
+        output_json: Output JSON filename (relative to this file)
+
+    Returns:
+        The generated citation mapping dictionary.
+    """
+    bbl_path = Path(bbl_file)
+    if not bbl_path.is_absolute():
+        bbl_path = Path(__file__).parent / bbl_path
+
+    output_path = Path(__file__).parent / output_json
+
+    with open(bbl_path, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+
+    mapping: Dict[str, str] = {}
+    for key, raw_text in _iter_bbl_entries(lines):
+        mapping[key] = _sanitize_bbl_text(raw_text)
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(mapping, f, ensure_ascii=False, indent=2)
+
+    return mapping
 
 
 def convert_citep(content: str) -> str:
@@ -86,9 +170,9 @@ def convert_citep(content: str) -> str:
 
     # Replace all \citep commands (with optional arguments)
     content_converted = re.sub(
-        r"~\\citep(?:\[([^\]]*)\])?(?:\[([^\]]*)\])?\{([^}]+)\}",
+        r"~*\\citep(?:\[([^\]]*)\])?(?:\[([^\]]*)\])?\{([^}]+)\}",
         citep_replace,
-        content
+        content,
     )
 
     # Append footnote definitions at the end
@@ -106,3 +190,8 @@ def convert_citep(content: str) -> str:
         content_converted += "\n" + "\n".join(footnote_definitions)
 
     return content_converted
+
+
+if __name__ == "__main__":
+    # Regenerate mapping from a fixed bibliography file.
+    generate_cite_mapping_from_bbl("../0_main.bbl")

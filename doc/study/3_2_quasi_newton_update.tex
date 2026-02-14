@@ -110,7 +110,7 @@
     Broyden更新は、フロベニウスノルムにおける最小変化更新としても特徴づけられます。
 \fi
 
-\begin{proposition}[\citep{dennisjr.QuasiNewtonMethodsMotivation1977a}, Theorem~4.1]
+\begin{proposition}[{\citep[Theorem 4.1]{dennisjr.QuasiNewtonMethodsMotivation1977a}}]
     \ifEn
         Let $B\in\mathbb{R}^{n\times n}$, $y\in\mathbb{R}^n$, and $s\in\mathbb{R}^n\setminus\{ 0 \}$ be given.
         Then $\bar{B}_{\mathrm{Broyden}}$ is the unique solution of the following optimization problem:
@@ -328,7 +328,7 @@
     重要な結果として、列 $\{ C_{2t} \}_{t=0}^{\infty}$ はセカント条件を満たす対称行列に収束します。次の命題ではそれを示します。
 \fi
 
-\begin{proposition}[\citep{dennisjr.QuasiNewtonMethodsMotivation1977a}, Lemma~7.2]\label{prop:psb-convergence}
+\begin{proposition}[{\citep[Lemma 7.2]{dennisjr.QuasiNewtonMethodsMotivation1977a}}]\label{prop:psb-convergence}
     \ifEn
         The sequence $\{ C_{t} \}_{t=0}^{\infty}$ converges, and the limit is given by
     \else
@@ -477,15 +477,15 @@
 \end{equation*}
 
 \ifEn
-    \subsubsection{Davidon--Fletcher--Powell (DFP) Update}
+    \subsubsection{Davidon–Fletcher–Powell (DFP) Update}
 \else
-    \subsubsection{Davidon--Fletcher--Powell (DFP) 更新}
+    \subsubsection{Davidon–Fletcher–Powell (DFP) 更新}
 \fi
 
 \ifEn
-    The Davidon--Fletcher--Powell (DFP) update~\citep{nocedal1999numerical} is also a classical quasi-Newton update formula. The update formulas are given by
+    The Davidon–Fletcher–Powell (DFP) update~\citep{nocedal1999numerical} is also a classical quasi-Newton update formula. The update formulas are given by
 \else
-    \href{https://en.wikipedia.org/wiki/Davidon%E2%80%93Fletcher%E2%80%93Powell_formula}{Davidon--Fletcher--Powell (DFP) 更新}~\citep{nocedal1999numerical} も古典的な準ニュートン更新則です。
+    \href{https://en.wikipedia.org/wiki/Davidon%E2%80%93Fletcher%E2%80%93Powell_formula}{Davidon–Fletcher–Powell (DFP) 更新}~\citep{nocedal1999numerical} も古典的な準ニュートン更新則です。
     更新則は次で与えられます。
 \fi
 \begin{equation*}
@@ -514,15 +514,15 @@
 \fi
 
 \ifEn
-    \subsubsection{Broyden--Fletcher--Goldfarb--Shanno (BFGS) Update}
+    \subsubsection{Broyden–Fletcher–Goldfarb–Shanno (BFGS) Update}
 \else
-    \subsubsection{Broyden--Fletcher--Goldfarb--Shanno (BFGS) 更新}
+    \subsubsection{Broyden–Fletcher–Goldfarb–Shanno (BFGS) 更新}
 \fi
 
 \ifEn
-    The Broyden--Fletcher--Goldfarb--Shanno (BFGS) update is one of the most widely used quasi-Newton methods. The update formulas are given by
+    The Broyden–Fletcher–Goldfarb–Shanno (BFGS) update is one of the most widely used quasi-Newton methods. The update formulas are given by
 \else
-    \href{https://en.wikipedia.org/wiki/Broyden%E2%80%93Fletcher%E2%80%93Goldfarb%E2%80%93Shanno_algorithm}{Broyden--Fletcher--Goldfarb--Shanno (BFGS) 更新}は最も広く使われる準ニュートン法の一つです。
+    \href{https://en.wikipedia.org/wiki/Broyden%E2%80%93Fletcher%E2%80%93Goldfarb%E2%80%93Shanno_algorithm}{Broyden–Fletcher–Goldfarb–Shanno (BFGS) 更新}は最も広く使われる準ニュートン法の一つです。
     更新則は次で与えられます。
 \fi
 \begin{equation*}
@@ -721,13 +721,10 @@
 \end{proof}
 
 \ifEn
-    As for more details, see \citep{kanamoriBregmanExtensionQuasiNewton2010,kanamoriBregmanExtensionQuasiNewton2010a}.
+    As for more details, see~\citep{kanamoriBregmanExtensionQuasiNewton2010,kanamoriBregmanExtensionQuasiNewton2010a}.
 \else
-    更なる詳細については
-    \citep{kanamoriBregmanExtensionQuasiNewton2010,kanamoriBregmanExtensionQuasiNewton2010a}
-    をご参照ください。
-    \href{http://matsuzoe.web.nitech.ac.jp/infogeo/OCAMI2010/kanamori.pdf}{こちらのスライド}
-    も参考になります。
+    更なる詳細については~\citep{kanamoriBregmanExtensionQuasiNewton2010,kanamoriBregmanExtensionQuasiNewton2010a}をご参照ください。
+    \href{http://matsuzoe.web.nitech.ac.jp/infogeo/OCAMI2010/kanamori.pdf}{こちらのスライド}も参考になります。
 \fi
 
 
@@ -808,9 +805,9 @@
         = -\frac{B_k s_k s_k^\top B_k}{s_k^\top B_k s_k} + \frac{y_k y_k^\top}{y_k^\top s_k}.
     \end{equation*}
     \ifEn
-        By the Sherman--Morrison--Woodbury identity, we can compute $H_{k+1}$ as follows:
+        By the Sherman–Morrison–Woodbury identity, we can compute $H_{k+1}$ as follows:
     \else
-        Sherman--Morrison--Woodbury の恒等式より、$H_{k+1}$ を次のように計算できます。
+        Sherman–Morrison–Woodbury の恒等式より、$H_{k+1}$ を次のように計算できます。
     \fi
     \begin{align*}
         H_{k+1} & = (B_k + U C V^\top)^{-1}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      \\
@@ -1483,9 +1480,9 @@
 \fi
 
 \ifEn
-    Moreover, this choice of $\gamma$ coincides with the short step size of the Barzilai--Borwein method~\citep{barzilaiTwoPointStepSize1988}, highlighting a close connection between L-BFGS initialization and classical step-length selection strategies.
+    Moreover, this choice of $\gamma$ coincides with the short step size of the Barzilai–Borwein method~\citep{barzilaiTwoPointStepSize1988}, highlighting a close connection between L-BFGS initialization and classical step-length selection strategies.
 \else
-    さらにこの $\gamma$ の選択は Barzilai--Borwein 法の短ステップサイズ~\citep{barzilaiTwoPointStepSize1988} と一致しており、L-BFGS の初期化と古典的なステップ長選択戦略の密接な関係を示しています。
+    さらにこの $\gamma$ の選択は Barzilai–Borwein 法の短ステップサイズ~\citep{barzilaiTwoPointStepSize1988} と一致しており、L-BFGS の初期化と古典的なステップ長選択戦略の密接な関係を示しています。
 \fi
 
 \ifSubfilesClassLoaded{

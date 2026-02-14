@@ -5,7 +5,10 @@
 配分や計画を効率的に決定したい、信号やデータを高精度に処理したい、ロボットやシステムを安定に制御したい、低リスク高リターンな金融商品を購入したい、データからモデルのパラメータを学習したい。
 
 決めたい内容を決定変数 $x$、その良さを表す定量的な指標を目的関数 $f(x)$ としてモデル化すると、これらの最善な選択は最適化問題として抽象化できます。
+
 数理最適化とは、このような最善の選択、およびその為の数学的手法やその学問領域を指し、本稿ではその中でも連続最適化、特にその代表的な手法である、ニュートン法と準ニュートン法に関する基礎的な概念をまとめます。
+
+<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/sixhump.png" />
 
 <!-- From 1_basic.tex -->
 
@@ -28,7 +31,7 @@ f((1-\lambda) x + \lambda y)                                        & \le (1-\la
 ```
 
 より直感的な定義として、関数 $f$ の勾配を用いた凸性および強凸性の同値な定義も存在します。
-$f$ が少なくとも $C^1$ 級で、その定義域 $\mathbb{R}^n$ 全体で実数値を取ると仮定します。
+$f$ が $C^1$ 級で、その定義域 $\mathbb{R}^n$ 全体で実数値を取ると仮定します。
 関数 $f$ が凸、または $\mu$-強凸であることは、任意の $x,y \in \mathbb{R}^n$ について次が成り立つこととそれぞれ同値です。
 
 ```math
@@ -231,9 +234,9 @@ Fig. 3も参照して下さい。
 
 ![../imgs/quasi_newton/l-smooth.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/l-smooth.png)
 
-(Fig. 3 1次元における $L$-平滑関数の例。 $L$-平滑性は関数 $f$ の変動幅に有界性を与え(オレンジ色の破線が $f(x)$ の上界)、また $\nabla f$ のリプシッツ連続性と同値です(灰色の領域にしか、$\nabla f(x)$ は存在しない)。)
+(Fig. 3 1次元における $L$-平滑関数の例。 $L$-平滑性は、関数 $f$ の変動幅に有界性を与え(オレンジ色の破線が $f(x)$ の上界)、また $\nabla f$ のリプシッツ連続性と同値(灰色の領域にしか、$\nabla f(x)$ は存在しない)です。)
 
-非凸な関数に対しても、次の関数値 $f(y)$ に対する上界が常に成立します。
+非凸な関数に対しても、次の上界が常に成立します。
 
 **Proposition 3**
 
@@ -252,10 +255,10 @@ f(y) \le f(x) + \nabla f(x)^\top (y-x) + \frac{L}{2} \left\lVert y-x \right\rVer
 
 ```math
 \begin{align*}
-f(y) - f(x) & = \int_0^1 \nabla f(x+t(y-x))^\top (y-x) \mathrm{d}t                                                                                                                               \\
-& = \nabla f(x)^\top (y-x) + \int_0^1 (\nabla f(x+t(y-x)) - \nabla f(x))^\top (y-x) \mathrm{d}t                                                                                      \\
-& \leq \nabla f(x)^\top (y-x) + \int_0^1 \left\lVert \nabla f(x+t(y-x)) - \nabla f(x) \right\rVert \left\lVert y-x \right\rVert \mathrm{d}t &  & (\text{Cauchy--Schwarz inequality}) \\
-& \leq \nabla f(x)^\top (y-x) + \int_0^1 L t \left\lVert y-x \right\rVert^2 \mathrm{d}t                                                     &  & (\text{by $L$-smoothness})          \\
+f(y) - f(x) & = \int_0^1 \nabla f(x+t(y-x))^\top (y-x) \mathrm{d}t                                                                                                                              \\
+& = \nabla f(x)^\top (y-x) + \int_0^1 (\nabla f(x+t(y-x)) - \nabla f(x))^\top (y-x) \mathrm{d}t                                                                                     \\
+& \leq \nabla f(x)^\top (y-x) + \int_0^1 \left\lVert \nabla f(x+t(y-x)) - \nabla f(x) \right\rVert \left\lVert y-x \right\rVert \mathrm{d}t &  & (\text{Cauchy–Schwarz inequality}) \\
+& \leq \nabla f(x)^\top (y-x) + \int_0^1 L t \left\lVert y-x \right\rVert^2 \mathrm{d}t                                                     &  & (\text{by $L$-smoothness})         \\
 & = \nabla f(x)^\top (y-x) + \frac{L}{2} \left\lVert y-x \right\rVert^2.
 \end{align*}
 ```
@@ -268,7 +271,7 @@ f(y) - f(x) & = \int_0^1 \nabla f(x+t(y-x))^\top (y-x) \mathrm{d}t              
 
 もし、更に $f$ が凸であれば、次の下界も成立します。
 
-**Proposition 4**
+**Proposition 4** ([[^FanZhongXiuMingLianSokZuiShiHuaarugorizumu2023] (Proposition 2.3.5)])
 
 関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が凸であり、かつ $L$-平滑であるとする。
 このとき、任意の $x,y \in \mathbb{R}^n$ について次が成り立つ。
@@ -371,7 +374,7 @@ $v$ との内積を取ると次が得られます。
 ```math
 \begin{align*}
 v^\top \nabla^2 f(x) v & = \lim_{t \to 0} \left(\frac{\nabla f(x+tv)-\nabla f(x)}{t}\right)^\top v                                                                               \\
-& \leq \lim_{t \to 0} \frac{\left\lVert \nabla f(x+tv)-\nabla f(x) \right\rVert}{t} \left\lVert v \right\rVert &  & (\text{Cauchy--Schwarz inequality})   \\
+& \leq \lim_{t \to 0} \frac{\left\lVert \nabla f(x+tv)-\nabla f(x) \right\rVert}{t} \left\lVert v \right\rVert &  & (\text{Cauchy–Schwarz inequality})    \\
 & \leq \lim_{t \to 0} \frac{L\left\lVert tv \right\rVert}{t} \left\lVert v \right\rVert                        &  & (\text{by $L$-smoothness definition}) \\
 & = L \left\lVert v \right\rVert^2.
 \end{align*}
@@ -408,12 +411,15 @@ Proposition 2, Proposition 5 より、全ての $x \in \mathbb{R}^n$ に対し�
 
 </details>
 
-#### Baillon--Haddadの定理
+以上により、$\mu$-強凸性と $L$-平滑性が、それぞれヘッセ行列の固有値の下界と上界に対応することが分かります。
+ヘッセ行列の固有値はアルゴリズムの収束性能を大きく決定づけることもあり、このようなバウンドによって、様々な収束解析に利用することができます。
 
-発展的な内容として、$L$-平滑性の有用な性質の一つが次の Baillon--Haddadの定理です。
+#### Baillon–Haddadの定理
+
+発展的な内容として、$L$-平滑性の有用な性質の一つが次の Baillon–Haddadの定理です。
 ここでは $C^1$ の微分可能性だけを仮定する点に注意してください。
 
-**Proposition 7**
+**Proposition 7** (aillon–Haddad theore)
 
 関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^1$ 級であるとする。$f$ が $L$-平滑かつ凸であれば、任意の $x,y \in \mathbb{R}^n$ に対して $\nabla f$ は $1/L$-cocoercive である、すなわち
 
@@ -425,7 +431,26 @@ Proposition 2, Proposition 5 より、全ての $x \in \mathbb{R}^n$ に対し�
 
 が任意の $x,y \in \mathbb{R}^n$ について成り立つ。
 
-証明は他の文献を参照してください[^bauschkeBaillonHaddadTheoremRevisited2009][^rockafellarVariationalAnalysis1998] (Proposition 12.60)。
+<details><summary>証明</summary>
+
+先ほど示した凸かつ $L$-平滑な関数の下界より、次が成り立ちます。
+
+```math
+\begin{equation*}
+\begin{cases}
+f(y) \ge f(x) + \nabla f(x)^\top (y-x) + \frac{1}{2L} \left\lVert \nabla f(y) - \nabla f(x) \right\rVert^2, \\
+f(x) \ge f(y) + \nabla f(y)^\top (x-y) + \frac{1}{2L} \left\lVert \nabla f(x) - \nabla f(y) \right\rVert^2.
+\end{cases}
+\end{equation*}
+```
+
+これらを足し合わせると、Baillon–Haddadの定理が得られます。
+
+(証明終わり)
+
+</details>
+
+証明は他の文献も参照してください[^bauschkeBaillonHaddadTheoremRevisited2009][^rockafellarVariationalAnalysis1998] (Proposition 12.60)。
 
 最適化アルゴリズムが生成する列 $\lbrace x_k \rbrace$ に対し、
 
@@ -435,7 +460,7 @@ s_k \mathrel{\vcenter{:}}= x_{k+1}-x_k, \quad y_k \mathrel{\vcenter{:}}= \nabla 
 \end{equation*}
 ```
 
-と定義した上で、Baillon--Haddad 定理を $x=x_{k+1}$、$y=x_k$ に適用すると、次の結果が得られます。
+と定義した上で、Baillon–Haddad 定理を $x=x_{k+1}$、$y=x_k$ に適用すると、次の結果が得られます。
 
 ```math
 \begin{equation*}
@@ -568,7 +593,7 @@ $0 < c_1 < c_2 < 1$ は定数です。
 
 これらの設定の下で、次の古典的に良く知られた結果の簡略版を以下に示します。
 
-**Theorem 1**
+**Theorem 1** (\cite[Theorem 3.2]{nocedal1999numerical})
 
 関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^1$ 級であり $\mathbb{R}^n$ 上で下に有界で、かつ $L$-平滑だとする。
 次の反復法を考える。
@@ -591,7 +616,7 @@ x_{k+1} \gets x_k + \alpha_k d_k.
 
 <details><summary>証明</summary>
 
-Wolfe 条件、Cauchy--Schwarz の不等式、$f$ の $L$-平滑性より、次の二つの関係式が成り立ちます。
+Wolfe 条件、Cauchy–Schwarz の不等式、$f$ の $L$-平滑性より、次の二つの関係式が成り立ちます。
 
 ```math
 \begin{equation*}
@@ -681,7 +706,7 @@ $\cos \theta_k \geq \delta > 0$ がすべての $k$ で成り立つという仮�
 次に、ニュートン法の局所収束性に関する古典的結果を示します。
 ここでも簡潔さのために簡略版を示します。
 
-**Theorem 2**
+**Theorem 2** (\cite[Theorem 3.5]{nocedal1999numerical})
 
 ヘッセ行列 $\nabla^2 f(x)$ が解 $x^\ast$ の近傍で Lipschitz連続であり、最適性の二次の十分条件が成り立つとする。すなわち $\nabla f(x^\ast)=0$ かつ $\nabla^2 f(x^\ast)$ は正定値である。
 前節までのニュートン法において、すべての $k$ で $\alpha_k=1$ が満たされるとし、初期点 $x_0$ が $x^\ast$ に十分近いとき、勾配ノルム列 $\lbrace\left\lVert \nabla f(x_k) \right\rVert\rbrace$ は二次収束する。
@@ -946,6 +971,10 @@ x_{k+1} = x_k - \alpha_k B_k^{-1} \nabla f(x_k)
 
 準ニュートン法の核心は、各反復で $B_k$ をどのように更新して真のヘッセ行列に近づけるかにあります。Fig. 9 は準ニュートン法の概念図です。まず現在の点 $x_k$ の周りで、$B_k$ を用いて目的関数 $f$ の二次近似モデルを構成します。次にこの二次モデルを最小化して次の点 $x_{k+1}$ を得ます。$x_{k+1}$ を得た後、$x_k$ と $x_{k+1}$ における勾配情報を用いて近似行列 $B_k$ を $B_{k+1}$ に更新します。この手続きを収束するまで繰り返すことが準ニュートン法です。
 
+以下のGIFも参照して下さい。$f(x)$ の最適化において、各step毎にモデル関数が更新されていく様子を示しています。
+
+![GIF illustrating the concept](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/sixhump.gif)
+
 ### セカント条件
 
 関数 $f\colon \mathbb{R}^n \to \mathbb{R}$ を $C^2$ 級とします。
@@ -1091,7 +1120,7 @@ $z^\top s = 0$ を満たす任意のベクトル $z$ を取ります。このと
 
 Broyden更新は、フロベニウスノルムにおける最小変化更新としても特徴づけられます。
 
-**Proposition 9**
+**Proposition 9** ([^dennisjr.QuasiNewtonMethodsMotivation1977a] (Theorem 4.1))
 
 $B\in\mathbb{R}^{n\times n}$, $y\in\mathbb{R}^n$, $s\in\mathbb{R}^n\setminus\lbrace 0 \rbrace$ が与えられているとき、行列 $\bar{B}_{\mathrm{Broyden}}$ は以下の最適化問題の一意解である。
 
@@ -1257,7 +1286,7 @@ C_{2t+2} = \frac{C_{2t+1} + C_{2t+1}^\top}{2}            & (\text{symmetrization
 
 重要な結果として、列 $\lbrace C_{2t} \rbrace_{t=0}^{\infty}$ はセカント条件を満たす対称行列に収束します。次の命題ではそれを示します。
 
-**Proposition 10**
+**Proposition 10** ([^dennisjr.QuasiNewtonMethodsMotivation1977a] (Lemma 7.2))
 
 行列の列 $\lbrace C_{t} \rbrace_{t=0}^{\infty}$ は収束し、その極限は次で与えられる。
 
@@ -1397,9 +1426,9 @@ $c = s$ のとき、$C_{\infty}$ の一般式は標準的な PSB 更新則を導
 \end{equation*}
 ```
 
-#### Davidon--Fletcher--Powell (DFP) 更新
+#### Davidon–Fletcher–Powell (DFP) 更新
 
-[Davidon--Fletcher--Powell (DFP) 更新](https://en.wikipedia.org/wiki/Davidon%E2%80%93Fletcher%E2%80%93Powell_formula)[^nocedal1999numerical] も古典的な準ニュートン更新則です。
+[Davidon–Fletcher–Powell (DFP) 更新](https://en.wikipedia.org/wiki/Davidon%E2%80%93Fletcher%E2%80%93Powell_formula)[^nocedal1999numerical] も古典的な準ニュートン更新則です。
 更新則は次で与えられます。
 
 ```math
@@ -1421,9 +1450,9 @@ $c = s$ のとき、$C_{\infty}$ の一般式は標準的な PSB 更新則を導
 
 なお、DFP更新には他にも導出方法が存在し、それらの一部は、次のBFGS更新における導出の双対版として理解することもできます。
 
-#### Broyden--Fletcher--Goldfarb--Shanno (BFGS) 更新
+#### Broyden–Fletcher–Goldfarb–Shanno (BFGS) 更新
 
-[Broyden--Fletcher--Goldfarb--Shanno (BFGS) 更新](https://en.wikipedia.org/wiki/Broyden%E2%80%93Fletcher%E2%80%93Goldfarb%E2%80%93Shanno_algorithm)は最も広く使われる準ニュートン法の一つです。
+[Broyden–Fletcher–Goldfarb–Shanno (BFGS) 更新](https://en.wikipedia.org/wiki/Broyden%E2%80%93Fletcher%E2%80%93Goldfarb%E2%80%93Shanno_algorithm)は最も広く使われる準ニュートン法の一つです。
 更新則は次で与えられます。
 
 ```math
@@ -1471,7 +1500,7 @@ $\mathrm{tr}$ は2つの行列の積に対して可換性を持つため、KLダ
 \end{align*}
 ```
 
-**Proposition 11**
+**Proposition 11** ([^kanamori2016continuous] (Section 7.2.4))
 
 $B \succ 0$ を正定値対称行列とする。
 このとき、上記の最適化問題の解はBFGS更新則で与えられる。
@@ -1594,11 +1623,8 @@ B'^{-1} & = I + 2\frac{s'^\top y'+y'^\top y'}{2(s'^\top y')^2}(s' s'^\top)
 
 </details>
 
-更なる詳細については
-\citep{kanamoriBregmanExtensionQuasiNewton2010,kanamoriBregmanExtensionQuasiNewton2010a}
-をご参照ください。
-[こちらのスライド](http://matsuzoe.web.nitech.ac.jp/infogeo/OCAMI2010/kanamori.pdf)
-も参考になります。
+更なる詳細については[^kanamoriBregmanExtensionQuasiNewton2010][^kanamoriBregmanExtensionQuasiNewton2010a]をご参照ください。
+[こちらのスライド](http://matsuzoe.web.nitech.ac.jp/infogeo/OCAMI2010/kanamori.pdf)も参考になります。
 
 ### BFGS更新の詳細
 
@@ -1658,7 +1684,7 @@ U C V^\top   = \begin{bmatrix} -\frac{B_k s_k}{s_k^\top B_k s_k}&    \frac{y_k}{
 \end{equation*}
 ```
 
-Sherman--Morrison--Woodbury の恒等式より、$H_{k+1}$ を次のように計算できます。
+Sherman–Morrison–Woodbury の恒等式より、$H_{k+1}$ を次のように計算できます。
 
 ```math
 \begin{align*}
@@ -1718,7 +1744,7 @@ v^\top H_{k+1} v
 
 BFGS更新後の行列のトレースは、次のような明示的な公式で与えられます。
 
-**Proposition 14**
+**Proposition 14** ([^nocedal1999numerical] ((6.44)))
 
 $B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ をBFGS更新とする。このとき
 
@@ -1766,7 +1792,7 @@ BFGS更新則にトレースを適用すると
 
 BFGS更新後の行列式も閉形式で与えられます。
 
-**Proposition 15**
+**Proposition 15** ([^nocedal1999numerical] ((6.45)))
 
 $B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ をBFGS更新とし、$B$ が正則であるとする。このとき
 
@@ -2120,7 +2146,7 @@ y_{m-1}
 これは、ベクトル $\bar{G}^{1/2} s_{m-1}$ に関する行列 $\bar{G}$ のRayleigh商の逆数です。
 従って、このスケーリングはこれらの方向に沿った平均逆曲率を大まかに近似しています。
 
-さらにこの $\gamma$ の選択は Barzilai--Borwein 法の短ステップサイズ[^barzilaiTwoPointStepSize1988] と一致しており、L-BFGS の初期化と古典的なステップ長選択戦略の密接な関係を示しています。
+さらにこの $\gamma$ の選択は Barzilai–Borwein 法の短ステップサイズ[^barzilaiTwoPointStepSize1988] と一致しており、L-BFGS の初期化と古典的なステップ長選択戦略の密接な関係を示しています。
 
 <!-- From 4_modified_secant.tex -->
 
@@ -2345,25 +2371,28 @@ s_i = x_{k+1} - x_i, \quad y_i = \nabla f(x_{k+1}) - \nabla f(x_i). \quad (i = k
 このアプローチによって、場合によってはより良い近似が得られることもあります。
 
 
-[^Doikov2021SecondOrderTensor]: TODO
-[^babaie-kafakiModifiedBFGSAlgorithm2011]: TODO
-[^barzilaiTwoPointStepSize1988]: TODO
-[^bauschkeBaillonHaddadTheoremRevisited2009]: TODO
-[^berahasLimitedmemoryBFGSDisplacement2022]: TODO
-[^dennisjr.QuasiNewtonMethodsMotivation1977a]: TODO
-[^doi:10.1137/1.9781611971200]: TODO
-[^haeltermanAnalyticalStudyLeast2009]: TODO
-[^kanamori2016continuous]: TODO
-[^leeAdvancingMultiSecantQuasiNewton2025]: TODO
-[^liuLimitedMemoryBFGS1989a]: TODO
-[^m.j.d.powellNewAlgorithmUnconstrained1970]: TODO
-[^nesterovIntroductoryLecturesConvex2014]: TODO
-[^nocedal1999numerical]: TODO
-[^powellHowBadAre1986]: TODO
-[^rockafellarVariationalAnalysis1998]: TODO
-[^shannoMatrixConditioningNonlinear1978]: TODO
-[^weiNewQuasiNewtonMethods2006]: TODO
-[^yabeLocalSuperlinearConvergence2007]: TODO
-[^yuanModifiedBFGSAlgorithm1991]: TODO
-[^zhangNewQuasiNewtonEquation1999]: TODO
-[^zhangPropertiesNumericalPerformance2001]: TODO
+[^Doikov2021SecondOrderTensor]: Nikita Doikov. New Second-Order and Tensor Methods in Convex Optimization. PhD thesis, Universit\'e catholique de Louvain, 2021.
+[^FanZhongXiuMingLianSokZuiShiHuaarugorizumu2023]: 飯塚 秀明. 連続最適化アルゴリズム. オーム社, 2023.
+[^babaie-kafakiModifiedBFGSAlgorithm2011]: Saman Babaie-Kafaki. A modified BFGS algorithm based on a hybrid secant equation. Science China Mathematics, 54 (9): 2019--2036, 2011. ISSN 1869-1862. https://doi.org/10.1007/s11425-011-4232-7.
+[^barzilaiTwoPointStepSize1988]: Jonathan Barzilai and Jonathan M. Borwein. Two-Point Step Size Gradient Methods. IMA Journal of Numerical Analysis, 8 (1): 141--148, 1988. ISSN 0272-4979. https://doi.org/10.1093/imanum/8.1.141.
+[^bauschkeBaillonHaddadTheoremRevisited2009]: Heinz H. Bauschke and Patrick L. Combettes. The Baillon-Haddad Theorem Revisited, 2009.
+[^berahasLimitedmemoryBFGSDisplacement2022]: Albert S. Berahas, Frank E. Curtis, and Baoyu Zhou. Limited-memory BFGS with displacement aggregation. Mathematical Programming, 194 (1): 121--157, 2022. ISSN 1436-4646. https://doi.org/10.1007/s10107-021-01621-6.
+[^dennisjr.QuasiNewtonMethodsMotivation1977a]: J. E. Dennis, Jr. and Jorge J. Mor\'e. Quasi-Newton Methods, Motivation and Theory. SIAM Review, 19 (1): 46--89, 1977. ISSN 0036-1445. https://doi.org/10.1137/1019005.
+[^doi:10.1137/1.9781611971200]: J. E. Dennis and Robert B. Schnabel. Numerical Methods for Unconstrained Optimization and Nonlinear Equations. Society for Industrial and Applied Mathematics, 1996. https://doi.org/10.1137/1.9781611971200.
+[^haeltermanAnalyticalStudyLeast2009]: Robby Haelterman. Analytical study of the Least Squares Quasi-Newton method for interaction problems. PhD thesis, 2009.
+[^kanamori2016continuous]: 金森 敬文, 鈴木 大慈, 竹内 一郎, and 佐藤 一誠. 機械学習のための連続最適化. 機械学習プロフェッショナルシリーズ. 講談社サイエンティフィク, 2016. ISBN 978-4-06-152920-5.
+[^kanamoriBregmanExtensionQuasiNewton2010]: Takafumi Kanamori and Atsumi Ohara. A Bregman Extension of quasi-Newton updates II: Convergence and Robustness Properties, 2010\natexlaba.
+[^kanamoriBregmanExtensionQuasiNewton2010a]: Takafumi Kanamori and Atsumi Ohara. A Bregman Extension of quasi-Newton updates I: An Information Geometrical framework, 2010\natexlabb.
+[^leeAdvancingMultiSecantQuasiNewton2025]: Mokhwa Lee and Yifan Sun. Advancing Multi-Secant Quasi-Newton Methods for General Convex Functions, 2025.
+[^liuLimitedMemoryBFGS1989a]: Dong C. Liu and Jorge Nocedal. On the limited memory BFGS method for large scale optimization. Mathematical Programming, 45 (1): 503--528, 1989. ISSN 1436-4646. https://doi.org/10.1007/BF01589116.
+[^m.j.d.powellNewAlgorithmUnconstrained1970]: M.J.D. Powell. A New Algorithm for Unconstrained Optimization. In Nonlinear Programming, pages 31--65. Academic Press, 1970. https://doi.org/10.1016/B978-0-12-597050-1.50006-3.
+[^nesterovIntroductoryLecturesConvex2014]: Yurii Nesterov. Introductory Lectures on Convex Optimization: A Basic Course. Springer Publishing Company, Incorporated, 1 edition, 2014. ISBN 978-1-4613-4691-3.
+[^nocedal1999numerical]: Jorge Nocedal and Stephen J Wright. Numerical Optimization. Springer, 1999. ISBN 978-0-387-30303-1. https://doi.org/10.1007/978-0-387-40065-5.
+[^powellHowBadAre1986]: M. J. D. Powell. How bad are the BFGS and DFP methods when the objective function is quadratic? Mathematical Programming, 34 (1): 34--47, January 1986. ISSN 1436-4646. https://doi.org/10.1007/BF01582161.
+[^rockafellarVariationalAnalysis1998]: R. Tyrrell Rockafellar and Roger J. B. Wets. Variational Analysis, volume 317 of Grundlehren Der Mathematischen Wissenschaften. Springer, 1998. ISBN 978-3-540-62772-2 978-3-642-02431-3. https://doi.org/10.1007/978-3-642-02431-3.
+[^shannoMatrixConditioningNonlinear1978]: D. F. Shanno and Kang-Hoh Phua. Matrix conditioning and nonlinear optimization. Mathematical Programming, 14 (1): 149--160, December 1978. ISSN 1436-4646. https://doi.org/10.1007/BF01588962.
+[^weiNewQuasiNewtonMethods2006]: Zengxin Wei, Guoyin Li, and Liqun Qi. New quasi-Newton methods for unconstrained optimization problems. Applied Mathematics and Computation, 175 (2): 1156--1188, 2006. ISSN 0096-3003. https://doi.org/10.1016/j.amc.2005.08.027.
+[^yabeLocalSuperlinearConvergence2007]: Hiroshi Yabe, Hideho Ogasawara, and Masayuki Yoshino. Local and superlinear convergence of quasi-Newton methods based on modified secant conditions. Journal of Computational and Applied Mathematics, 205 (1): 617--632, 2007. ISSN 03770427. https://doi.org/10.1016/j.cam.2006.05.018.
+[^yuanModifiedBFGSAlgorithm1991]: Ya-Xiang Yuan. A Modified BFGS Algorithm for Unconstrained Optimization. IMA Journal of Numerical Analysis, 11 (3): 325--332, 1991. ISSN 0272-4979. https://doi.org/10.1093/imanum/11.3.325.
+[^zhangNewQuasiNewtonEquation1999]: J. Z. Zhang, N. Y. Deng, and L. H. Chen. New Quasi-Newton Equation and Related Methods for Unconstrained Optimization. Journal of Optimization Theory and Applications, 102 (1): 147--167, 1999. ISSN 0022-3239, 1573-2878. https://doi.org/10.1023/A:1021898630001.
+[^zhangPropertiesNumericalPerformance2001]: Jianzhong Zhang and Chengxian Xu. Properties and numerical performance of quasi-Newton methods with modified quasi-Newton equations. Journal of Computational and Applied Mathematics, 137 (2): 269--278, 2001. ISSN 0377-0427. https://doi.org/10.1016/S0377-0427(00)00713-5.
