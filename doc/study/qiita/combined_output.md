@@ -6,7 +6,7 @@
 
 決めたい内容を決定変数 $x$、その良さを表す定量的な指標を目的関数 $f(x)$ としてモデル化すると、これらの最善な選択は最適化問題として抽象化できます。
 
-数理最適化とは、このような最善の選択、およびその為の数学的手法やその学問領域を指し、本稿ではその中でも連続最適化、特にその代表的な手法である、ニュートン法と準ニュートン法に関する基礎的な概念をまとめます。
+数理最適化とは、このような最善の選択、およびその為の数学的手法やその学問領域を指し、本稿ではその中でも連続最適化、特にその代表的な手法である、ニュートン法と準ニュートン法を中心として、基礎的な概念をまとめます。
 
 <img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/sixhump.png" />
 
@@ -419,7 +419,7 @@ Proposition 2, Proposition 5 より、全ての $x \in \mathbb{R}^n$ に対し�
 発展的な内容として、$L$-平滑性の有用な性質の一つが次の Baillon–Haddadの定理です。
 ここでは $C^1$ の微分可能性だけを仮定する点に注意してください。
 
-**Proposition 7** (aillon–Haddad theore)
+**Proposition 7** (Baillon–Haddad theorem)
 
 関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^1$ 級であるとする。$f$ が $L$-平滑かつ凸であれば、任意の $x,y \in \mathbb{R}^n$ に対して $\nabla f$ は $1/L$-cocoercive である、すなわち
 
@@ -582,6 +582,12 @@ f(x_k + \alpha_k d_k) & \leq f(x_k) + c_1 \alpha_k g_k^\top d_k, \\
 $0 < c_1 < c_2 < 1$ は定数です。
 一つ目の条件は、Armijo 条件とも呼ばれ、次の点での関数値 $f(x_k + \alpha_k d_k)$ が、現在の点での関数値 $f(x_k)$ よりも、勾配から導かれる予測値 $\alpha_k g_k^\top d_k$ の少なくとも $c_1$ 倍した値は減少していることを要求します。
 二つ目の条件は、曲率条件とも呼ばれ、探索方向に射影した次の点での減少率 $-g_{k+1}^\top d_k$ が、現在の点での射影された減少率 $-g_k^\top d_k$ よりも、少なくとも $c_2$ 倍した値は小さくなっている、つまり探索方向 $d_k$ 上においては、十分に最適化されていることを要求しています。
+Wolfe条件とは、この両者が同時に満たされるという条件のことです。
+Fig. 5 にこれらの条件が満たされる範囲を図示しています。
+
+![../imgs/quasi_newton/armijo_wolfe_conditions.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/armijo_wolfe_conditions.png)
+
+(Fig. 5 Armijo 条件と曲率条件のイラスト。各矢印は、それぞれの条件が満たされる範囲を示しています。)
 
 また、方向 $d_k$ と負の勾配 $-g_k$ のなす角を $\theta_k \in [0, \pi]$ とし、次式を満たすように定めます。
 
@@ -593,7 +599,7 @@ $0 < c_1 < c_2 < 1$ は定数です。
 
 これらの設定の下で、次の古典的に良く知られた結果の簡略版を以下に示します。
 
-**Theorem 1** (\cite[Theorem 3.2]{nocedal1999numerical})
+**Theorem 1** ([^nocedal1999numerical] (Theorem 3.2))
 
 関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^1$ 級であり $\mathbb{R}^n$ 上で下に有界で、かつ $L$-平滑だとする。
 次の反復法を考える。
@@ -706,7 +712,7 @@ $\cos \theta_k \geq \delta > 0$ がすべての $k$ で成り立つという仮�
 次に、ニュートン法の局所収束性に関する古典的結果を示します。
 ここでも簡潔さのために簡略版を示します。
 
-**Theorem 2** (\cite[Theorem 3.5]{nocedal1999numerical})
+**Theorem 2** ([^nocedal1999numerical] (Theorem 3.5))
 
 ヘッセ行列 $\nabla^2 f(x)$ が解 $x^\ast$ の近傍で Lipschitz連続であり、最適性の二次の十分条件が成り立つとする。すなわち $\nabla f(x^\ast)=0$ かつ $\nabla^2 f(x^\ast)$ は正定値である。
 前節までのニュートン法において、すべての $k$ で $\alpha_k=1$ が満たされるとし、初期点 $x_0$ が $x^\ast$ に十分近いとき、勾配ノルム列 $\lbrace\left\lVert \nabla f(x_k) \right\rVert\rbrace$ は二次収束する。
@@ -831,13 +837,13 @@ f''(x) & = \frac{1}{(1 + x^2)^{3/2}}.
 \end{align*}
 ```
 
-初期点の絶対値が 1 を超えると、Fig. 5 に示すようにこの関数に対するニュートン法は発散します。
+初期点の絶対値が 1 を超えると、Fig. 6 に示すようにこの関数に対するニュートン法は発散します。
 
 これは、最適解 $x^\ast=0$ から離れた点では、2階微分の値、つまりヘッセ行列の固有値が非常に小さくなり、ニュートンステップが過大になる為です。反復を重ねるごとに、より遠くへ飛んでいき、最適解から離れてしまいます。
 
 ![../imgs/quasi_newton/newton_failure_sqrt_function_1.1.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_failure_sqrt_function_1.1.png)
 
-(Fig. 5 初期点 $x_0=1.1$ でニュートン法が発散する例)
+(Fig. 6 初期点 $x_0=1.1$ でニュートン法が発散する例)
 
 ##### 強凸関数に対するニュートン法の振動
 
@@ -862,11 +868,11 @@ f''''(x) & = \frac{e^x(1 - 4e^x + e^{2x})}{(1+e^x)^4}.
 2. $\max_x |f''(x)| = \frac{1}{4} + \mu$ であり、これは $e^x=1$ で達成される。従って $\nabla f$ は $L$-平滑である ($L=\frac{1}{4}+\mu$)。
 3. $\max_x |f'''(x)| = \frac{1}{6\sqrt{3}}$ であり、これは $e^x=2-\sqrt{3}$ で達成される。従って $\nabla^2 f$ は $M$-Lipschitz である ($M=\frac{1}{6\sqrt{3}}$)。
 
-それにもかかわらず、初期点 $x_0$ が $\mu$ に対して十分大きい場合、Fig. 6 に示すようにニュートン法は振動します。
+それにもかかわらず、初期点 $x_0$ が $\mu$ に対して十分大きい場合、Fig. 7 に示すようにニュートン法は振動します。
 
 <img width="50%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_failure_strongly_convex_function_0.1_-4.png" /><img width="50%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_failure_strongly_convex_function_0.01_-4.png" />
 
-(Fig. 6 (左) $x_0=-4, \ \mu=0.1$ ではニュートン法が収束する。(右) $x_0=-4, \ \mu=0.01$ ではニュートン法が振動する。)
+(Fig. 7 (左) $x_0=-4, \ \mu=0.1$ ではニュートン法が収束する。(右) $x_0=-4, \ \mu=0.01$ ではニュートン法が振動する。)
 
 ##### 直線探索の必要性
 
@@ -881,7 +887,7 @@ f''''(x) & = \frac{e^x(1 - 4e^x + e^{2x})}{(1+e^x)^4}.
 
 ![../imgs/quasi_newton/newton_raphson.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_raphson.png)
 
-(Fig. 7 勾配 $\nabla f(x)=3 x^2 - 4 x + 1$ に対する根探索と関数 $f(x)=x^3 - 2 x^2 + x$ に対する最適化。)
+(Fig. 8 勾配 $\nabla f(x)=3 x^2 - 4 x + 1$ に対する根探索と関数 $f(x)=x^3 - 2 x^2 + x$ に対する最適化。)
 
 #### 根探索としてのニュートン法
 
@@ -915,7 +921,7 @@ x_{k+1} = x_k - \nabla^2 f(x_k)^{-1} \nabla f(x_k).
 #### 二つの定式化の関係
 
 具体例を通じて両者の等価性を確認してみます。
-Fig. 7は単純な三次関数 $f(x)$ を用いて両者の関係を示したものです。
+Fig. 8は単純な三次関数 $f(x)$ を用いて両者の関係を示したものです。
 左図は $g(x) = \nabla f(x)$ に対する根探索であり、右図は $f(x)$ に対する最適化となっています。
 
 根探索の定式化では、$\nabla f(x) = 3x^2 - 4x + 1$ を接線で近似します。すなわち、
@@ -946,12 +952,12 @@ m^\ast_k(x) = f(x_k) + \nabla f(x_k)(x - x_k) + \frac{1}{2}\nabla^2 f(x_k)(x - x
 
 ![../imgs/quasi_newton/newton_vs_qs_vs_gd.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_vs_qs_vs_gd.png)
 
-(Fig. 8 ニュートン法、準ニュートン法、勾配降下法の比較。)
+(Fig. 9 ニュートン法、準ニュートン法、勾配降下法の比較。)
 
 本節では準ニュートン法について説明します。
 準ニュートン法はニュートン法に基づいていますが、その主要な欠点であるヘッセ行列やその逆行列の計算コストを低減することを目的としています。具体的には、真のヘッセ行列 $\nabla^2 f(x_k)$ の代わりに近似行列 $B_k$ とその逆行列 $H_k$ を用いることで、高速な収束性を保ちつつ計算コストを抑えます。
 
-Fig. 8 はニュートン法、準ニュートン法、勾配降下法の比較を示しています。勾配降下法は勾配の反対方向に単純に更新する方法です。1反復あたりの計算コストは最小ですが、収束は遅くなります。ニュートン法は反復回数が最も少ない一方で、1ステップあたりの計算コストが最も高いです。準ニュートン法はその中間に位置し、両者のバランスを取っています。特に、反復回数ではなく実際の計算時間で比較すると、準ニュートン法が最良の性能を示すことが多いです。
+Fig. 9 はニュートン法、準ニュートン法、勾配降下法の比較を示しています。勾配降下法は勾配の反対方向に単純に更新する方法です。1反復あたりの計算コストは最小ですが、収束は遅くなります。ニュートン法は反復回数が最も少ない一方で、1ステップあたりの計算コストが最も高いです。準ニュートン法はその中間に位置し、両者のバランスを取っています。特に、反復回数ではなく実際の計算時間で比較すると、準ニュートン法が最良の性能を示すことが多いです。
 
 直線探索に基づく準ニュートン法では、最適解 $x^\ast$ に収束する列 ${ x_k }*{k=0}^{\infty}$ を次のように生成します。
 
@@ -967,9 +973,9 @@ x_{k+1} = x_k - \alpha_k B_k^{-1} \nabla f(x_k)
 
 <img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/quasi_newton_1.png" /><img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/quasi_newton_2.png" /><img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/quasi_newton_3.png" />
 
-(Fig. 9 準ニュートン法の概念図。 (1) 目的関数 $f$ (青い曲面) と現在点 $x_k$ (赤点) が与えられます。 (2) 現在の近似ヘッセ行列によって得られる二次モデル $m_k(x)$ (橙色の曲面) を最小化し、その最小点 $x_{k+1}$ (黄色のバツ印) に移動します。 (3) 二次モデルを更新し (緑色の曲面)、この操作を繰り返します。)
+(Fig. 10 準ニュートン法の概念図。 (1) 目的関数 $f$ (青い曲面) と現在点 $x_k$ (赤点) が与えられます。 (2) 現在の近似ヘッセ行列によって得られる二次モデル $m_k(x)$ (橙色の曲面) を最小化し、その最小点 $x_{k+1}$ (黄色のバツ印) に移動します。 (3) 二次モデルを更新し (緑色の曲面)、この操作を繰り返します。)
 
-準ニュートン法の核心は、各反復で $B_k$ をどのように更新して真のヘッセ行列に近づけるかにあります。Fig. 9 は準ニュートン法の概念図です。まず現在の点 $x_k$ の周りで、$B_k$ を用いて目的関数 $f$ の二次近似モデルを構成します。次にこの二次モデルを最小化して次の点 $x_{k+1}$ を得ます。$x_{k+1}$ を得た後、$x_k$ と $x_{k+1}$ における勾配情報を用いて近似行列 $B_k$ を $B_{k+1}$ に更新します。この手続きを収束するまで繰り返すことが準ニュートン法です。
+準ニュートン法の核心は、各反復で $B_k$ をどのように更新して真のヘッセ行列に近づけるかにあります。Fig. 10 は準ニュートン法の概念図です。まず現在の点 $x_k$ の周りで、$B_k$ を用いて目的関数 $f$ の二次近似モデルを構成します。次にこの二次モデルを最小化して次の点 $x_{k+1}$ を得ます。$x_{k+1}$ を得た後、$x_k$ と $x_{k+1}$ における勾配情報を用いて近似行列 $B_k$ を $B_{k+1}$ に更新します。この手続きを収束するまで繰り返すことが準ニュートン法です。
 
 以下のGIFも参照して下さい。$f(x)$ の最適化において、各step毎にモデル関数が更新されていく様子を示しています。
 
@@ -1908,16 +1914,16 @@ BFGSとDFPのどちらも各反復で固定ステップサイズ $\alpha_k = 1$ 
 
 (Table 1: 初期固有値 $\lambda_1$ に対するBFGSとDFPの収束比較。)
 
-Fig. 10 と Fig. 11 は特定の $\lambda_1$ に対する反復軌跡を示しています。
+Fig. 11 と Fig. 12 は特定の $\lambda_1$ に対する反復軌跡を示しています。
 これらの図は、同一の初期点から最小点(原点)へ向かう二つの手法の進み方を可視化し、収束速度と経路の違いを明確に示しています。
 
 ![../imgs/quasi_newton/bfgs_vs_dfp_100.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/bfgs_vs_dfp_100.png)
 
-(Fig. 10 $\lambda_1 = 100$ におけるBFGSとDFPの反復軌跡。BFGSは10回で収束する一方、DFPは107回を要し、固有値誤差が大きい場合にBFGSが優位であることを示しています。)
+(Fig. 11 $\lambda_1 = 100$ におけるBFGSとDFPの反復軌跡。BFGSは10回で収束する一方、DFPは107回を要し、固有値誤差が大きい場合にBFGSが優位であることを示しています。)
 
 ![../imgs/quasi_newton/bfgs_vs_dfp_0.1.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/bfgs_vs_dfp_0.1.png)
 
-(Fig. 11 $\lambda_1 = 0.1$ におけるBFGSとDFPの反復軌跡。どちらも素早く収束し、DFPがBFGSよりわずかに速くなっています。)
+(Fig. 12 $\lambda_1 = 0.1$ におけるBFGSとDFPの反復軌跡。どちらも素早く収束し、DFPがBFGSよりわずかに速くなっています。)
 
 #### 解析と議論
 
@@ -2157,23 +2163,23 @@ y_{m-1}
 ### 修正セカント条件の導出
 
 セカント条件は準ニュートン法で広く用いられていますが、勾配情報のみを活用するため、目的関数の曲率を正確に捉えられないことがあります。
-このことをFig. 12で説明します。
+このことをFig. 13で説明します。
 
-Fig. 12 において、関数値と勾配が既知の2点 $x_k$ と $x_{k+1}$ があるとします。
+Fig. 13 において、関数値と勾配が既知の2点 $x_k$ と $x_{k+1}$ があるとします。
 正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットしており、より良い収束挙動をもたらすことが分かります。
 しかし、標準的な勾配のみを用いて課されるセカント条件で作られるモデルでは、関数値の情報が無視され、曲率を大きく誤る可能性があり、真の目的関数の近似が悪くなります。
 
 <img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_EXPLAIN.png" /><img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_HESS.png" /><img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_BFGS.png" />
 
-(Fig. 12 標準的なセカント条件の欠点。 (a) $x_k$ と $x_{k+1}$ での関数値と勾配が既に分かっている。 (b) 正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットする。 (c) 標準的なセカント条件では、必ずしも十分に曲率を捉えられない。)
+(Fig. 13 標準的なセカント条件の欠点。 (a) $x_k$ と $x_{k+1}$ での関数値と勾配が既に分かっている。 (b) 正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットする。 (c) 標準的なセカント条件では、必ずしも十分に曲率を捉えられない。)
 
-この問題は、関数値を利用することで克服できます。基本的な考え方は Fig. 13 に示した通りです。
+この問題は、関数値を利用することで克服できます。基本的な考え方は Fig. 14 に示した通りです。
 2 点 $x_k$ と $x_{k+1}$ で勾配が同じであっても、適切な補完は関数値 $f(x_k)$ と $f(x_{k+1})$ によって異なります。
 この観察こそが、関数値情報を取り込んでヘッセ行列の近似を改善する修正セカント条件の動機を端的に示しています。
 
 ![../imgs/modified_secant/cubic_interpolation.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/cubic_interpolation.png)
 
-(Fig. 13 修正セカント条件の基本的な考え方。 $x_k$ と $x_{k+1}$ で同一の勾配を持つが異なる関数値を持つ場合、適切な補間は異なります。)
+(Fig. 14 修正セカント条件の基本的な考え方。 $x_k$ と $x_{k+1}$ で同一の勾配を持つが異なる関数値を持つ場合、適切な補間は異なります。)
 
 以下では、2つの既知の修正セカント条件を提示します。
 
@@ -2249,11 +2255,11 @@ B_{k+1}^{\mathrm{F}'} s_k = y_k + \frac{\max(0, 2(f(x_k) - f(x_{k+1})) + (\nabla
 \end{equation*}
 ```
 
-これが関数値一致の修正セカント条件です。具体例としてFig. 14 も参照してください。
+これが関数値一致の修正セカント条件です。具体例としてFig. 15 も参照してください。
 
 ![../imgs/modified_secant/trial_2.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_2.png)
 
-(Fig. 14 関数値一致の修正セカント方程式。前の点 $x_{k-1}$ での関数値 $f(x_{k-1})$ と $m^{\mathrm{F}}_k(x_{k-1})$ が一致している。)
+(Fig. 15 関数値一致の修正セカント方程式。前の点 $x_{k-1}$ での関数値 $f(x_{k-1})$ と $m^{\mathrm{F}}_k(x_{k-1})$ が一致している。)
 
 #### 三次項による修正セカント条件
 
@@ -2341,11 +2347,11 @@ B_{k+1}^{\mathrm{C}} s_k = y_k + \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nab
 \end{equation*}
 ```
 
-これが三次項による修正セカント条件です。具体例としてFig. 15も参照してください。
+これが三次項による修正セカント条件です。具体例としてFig. 16も参照してください。
 
 <img width="49%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_1_cubic.png" /><img width="49%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_1_quadratic.png" />
 
-(Fig. 15 三次項による修正セカント方程式。三次項をモデルに組み込むことで、前の点で関数値と勾配の両方を一致させることが出来ます。その二次項までの展開によって、モデルを作成します。)
+(Fig. 16 三次項による修正セカント方程式。三次項をモデルに組み込むことで、前の点で関数値と勾配の両方を一致させることが出来ます。その二次項までの展開によって、モデルを作成します。)
 
 ### その他の曲率関連手法
 
