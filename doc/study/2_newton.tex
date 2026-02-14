@@ -56,7 +56,7 @@
     $x_k$ での $f$ の二次のテイラー近似は次式で与えられます。
 \fi
 \begin{equation*}
-    m^*_{k}(x) \coloneqq f(x_k) + g_k^\top (x - x_k) + \frac{1}{2} (x - x_k)^\top \nabla^2 f(x_k) (x - x_k).
+    m_{k}^*(x) \coloneqq f(x_k) + g_k^\top (x - x_k) + \frac{1}{2} (x - x_k)^\top \nabla^2 f(x_k) (x - x_k).
 \end{equation*}
 \ifEn
     The gradient of this model is
@@ -64,15 +64,15 @@
     このモデルの勾配は次のように書けます。
 \fi
 \begin{equation*}
-    \nabla m^*_k(x) = g_k + \nabla^2 f(x_k)(x - x_k).
+    \nabla m_k^*(x) = g_k + \nabla^2 f(x_k)(x - x_k).
 \end{equation*}
 \ifEn
-    Since the quadratic model is strongly convex by assumption, a point $x^* \in \mathbb{R}^n$ is the minimizer of $m^*_k$ if and only if $\nabla m^*_k(x) = 0$. Thus, solving this equation yields
+    Since the quadratic model is strongly convex by assumption, a point $x^* \in \mathbb{R}^n$ is the minimizer of $m_k^*$ if and only if $\nabla m_k^*(x) = 0$. Thus, solving this equation yields
 \else
-    仮定よりこの二次モデルは強凸であるため、点 $x^* \in \mathbb{R}^n$ が $m^*_k$ の最小点であることと $\nabla m^*_k(x) = 0$ が成り立つことは同値です。従って、解は以下の通りです。
+    仮定よりこの二次モデルは強凸であるため、点 $x^* \in \mathbb{R}^n$ が $m_k^*$ の最小点であることと $\nabla m_k^*(x) = 0$ が成り立つことは同値です。従って、解は以下の通りです。
 \fi
 \begin{equation*}
-    \underset{x \in \mathbb{R}^n}{\mathrm{arg \ min}} \ m^*_{k}(x) = x_k -\left(\nabla^2 f(x_k)\right)^{-1} g_k.
+    \underset{x \in \mathbb{R}^n}{\mathrm{arg \ min}} \ m_k^*(x) = x_k -\left(\nabla^2 f(x_k)\right)^{-1} g_k.
 \end{equation*}
 \ifEn
     Selecting $x^*$ directly as the next iterate may seem natural, but as we will see later, it does not generally guarantee global convergence.
@@ -735,7 +735,7 @@
     根探索の定式化では、$\nabla f(x) = 3x^2 - 4x + 1$ を接線で近似します。すなわち、
 \fi
 \begin{equation*}
-    \nabla m^*_k(x) = \nabla f(x_k) + \nabla^2 f(x_k)(x - x_k)
+    \nabla m_k^*(x) = \nabla f(x_k) + \nabla^2 f(x_k)(x - x_k)
 \end{equation*}
 \ifEn
     and the root of this linear model is chosen as $x_{k+1}$.
@@ -748,7 +748,7 @@
     一方、最適化の定式化では、$f(x) = x^3 - 2x^2 + x$ を二次のテイラー展開で近似し、
 \fi
 \begin{equation*}
-    m^*_k(x) = f(x_k) + \nabla f(x_k)(x - x_k) + \frac{1}{2}\nabla^2 f(x_k)(x - x_k)^2
+    m_k^*(x) = f(x_k) + \nabla f(x_k)(x - x_k) + \frac{1}{2}\nabla^2 f(x_k)(x - x_k)^2
 \end{equation*}
 \ifEn
     and the minimizer of this quadratic model is taken as $x_{k+1}$.

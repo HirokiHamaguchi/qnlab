@@ -504,7 +504,7 @@ $x_k$ での $f$ の二次のテイラー近似は次式で与えられます。
 
 ```math
 \begin{equation*}
-m^\ast_{k}(x) \mathrel{\vcenter{:}}= f(x_k) + g_k^\top (x - x_k) + \frac{1}{2} (x - x_k)^\top \nabla^2 f(x_k) (x - x_k).
+m_{k}^\ast(x) \mathrel{\vcenter{:}}= f(x_k) + g_k^\top (x - x_k) + \frac{1}{2} (x - x_k)^\top \nabla^2 f(x_k) (x - x_k).
 \end{equation*}
 ```
 
@@ -512,15 +512,15 @@ m^\ast_{k}(x) \mathrel{\vcenter{:}}= f(x_k) + g_k^\top (x - x_k) + \frac{1}{2} (
 
 ```math
 \begin{equation*}
-\nabla m^\ast_k(x) = g_k + \nabla^2 f(x_k)(x - x_k).
+\nabla m_k^\ast(x) = g_k + \nabla^2 f(x_k)(x - x_k).
 \end{equation*}
 ```
 
-仮定よりこの二次モデルは強凸であるため、点 $x^\ast \in \mathbb{R}^n$ が $m^\ast_k$ の最小点であることと $\nabla m^\ast_k(x) = 0$ が成り立つことは同値です。従って、解は以下の通りです。
+仮定よりこの二次モデルは強凸であるため、点 $x^\ast \in \mathbb{R}^n$ が $m_k^\ast$ の最小点であることと $\nabla m_k^\ast(x) = 0$ が成り立つことは同値です。従って、解は以下の通りです。
 
 ```math
 \begin{equation*}
-\underset{x \in \mathbb{R}^n}{\mathrm{arg \ min}} \ m^\ast_{k}(x) = x_k -\left(\nabla^2 f(x_k)\right)^{-1} g_k.
+\underset{x \in \mathbb{R}^n}{\mathrm{arg \ min}} \ m_k^\ast(x) = x_k -\left(\nabla^2 f(x_k)\right)^{-1} g_k.
 \end{equation*}
 ```
 
@@ -928,7 +928,7 @@ Fig. 8は単純な三次関数 $f(x)$ を用いて両者の関係を示したも
 
 ```math
 \begin{equation*}
-\nabla m^\ast_k(x) = \nabla f(x_k) + \nabla^2 f(x_k)(x - x_k)
+\nabla m_k^\ast(x) = \nabla f(x_k) + \nabla^2 f(x_k)(x - x_k)
 \end{equation*}
 ```
 
@@ -938,7 +938,7 @@ Fig. 8は単純な三次関数 $f(x)$ を用いて両者の関係を示したも
 
 ```math
 \begin{equation*}
-m^\ast_k(x) = f(x_k) + \nabla f(x_k)(x - x_k) + \frac{1}{2}\nabla^2 f(x_k)(x - x_k)^2
+m_k^\ast(x) = f(x_k) + \nabla f(x_k)(x - x_k) + \frac{1}{2}\nabla^2 f(x_k)(x - x_k)^2
 \end{equation*}
 ```
 
@@ -2198,13 +2198,13 @@ m_{k+1}^{\mathrm{F}}(x) \mathrel{\vcenter{:}}= f(x_{k+1}) + \nabla f(x_{k+1})^\t
 
 ```math
 \begin{equation*}
-m^{\mathrm{F}}_{k+1}(x_k) = f(x_k),
+m_{k+1}^{\mathrm{F}}(x_k) = f(x_k),
 \end{equation*}
 ```
 
 つまり、前の点での関数値が、モデル関数でも一致することを課します。
 
-対応する修正セカント条件を $B_{k+1}^{\mathrm{F}}$ に対して導出しましょう。$m^{\mathrm{F}}_{k+1}$ の定義を代入し、$s_k = x_{k+1} - x_k$ を使用することで、条件は以下になります。
+対応する修正セカント条件を $B_{k+1}^{\mathrm{F}}$ に対して導出しましょう。$m_{k+1}^{\mathrm{F}}$ の定義を代入し、$s_k = x_{k+1} - x_k$ を使用することで、条件は以下になります。
 
 ```math
 \begin{align*}
@@ -2217,23 +2217,23 @@ f(x_k) & = f(x_{k+1}) + \nabla f(x_{k+1})^\top (x_k - x_{k+1}) + \frac{1}{2} (x_
 
 ```math
 \begin{equation*}
-\left(B_{k+1}^{\mathrm{F}} + \sigma^\mathrm{F}_k I \right) s_k = y_k.
+\left(B_{k+1}^{\mathrm{F}} + \sigma_k^\mathrm{F} I \right) s_k = y_k.
 \end{equation*}
 ```
 
-ここで、$\sigma^\mathrm{F}_k \in \mathbb{R}$ は以下で決定するスカラーです。この方程式を代入すると、以下が得られます。
+ここで、$\sigma_k^\mathrm{F} \in \mathbb{R}$ は以下で決定するスカラーです。この方程式を代入すると、以下が得られます。
 
 ```math
 \begin{equation*}
-f(x_k) = f(x_{k+1}) - \nabla f(x_{k+1})^\top s_k + \frac{1}{2} s_k^\top y_k - \frac{\sigma^\mathrm{F}_k}{2} \left\lVert s_k \right\rVert^2.
+f(x_k) = f(x_{k+1}) - \nabla f(x_{k+1})^\top s_k + \frac{1}{2} s_k^\top y_k - \frac{\sigma_k^\mathrm{F}}{2} \left\lVert s_k \right\rVert^2.
 \end{equation*}
 ```
 
-$\sigma^\mathrm{F}_k$ について解き、$y_k = \nabla f(x_{k+1}) - \nabla f(x_k)$ を使用することで、以下を得ます。
+$\sigma_k^\mathrm{F}$ について解き、$y_k = \nabla f(x_{k+1}) - \nabla f(x_k)$ を使用することで、以下を得ます。
 
 ```math
 \begin{align*}
-\sigma^\mathrm{F}_k & = \frac{2(f(x_{k+1}) - f(x_k)) - (2\nabla f(x_{k+1}) - y_k)^\top s_k}{\left\lVert s_k \right\rVert^2}           \\
+\sigma_k^\mathrm{F} & = \frac{2(f(x_{k+1}) - f(x_k)) - (2\nabla f(x_{k+1}) - y_k)^\top s_k}{\left\lVert s_k \right\rVert^2}           \\
 & = \frac{2(f(x_{k+1}) - f(x_k)) - (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k}{\left\lVert s_k \right\rVert^2}.
 \end{align*}
 ```
@@ -2259,7 +2259,7 @@ B_{k+1}^{\mathrm{F}'} s_k = y_k + \frac{\max(0, 2(f(x_k) - f(x_{k+1})) + (\nabla
 
 ![../imgs/modified_secant/trial_2.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_2.png)
 
-(Fig. 15 関数値一致の修正セカント方程式。前の点 $x_{k-1}$ での関数値 $f(x_{k-1})$ と $m^{\mathrm{F}}_k(x_{k-1})$ が一致している。)
+(Fig. 15 関数値一致の修正セカント方程式。前の点 $x_{k-1}$ での関数値 $f(x_{k-1})$ と $m_k^{\mathrm{F}}(x_{k-1})$ が一致している。)
 
 #### 三次項による修正セカント条件
 
@@ -2279,7 +2279,7 @@ s_k^\top (T_{k+1} s_k) s_k = \sum_{i,j,l=1}^n \partial_{x_i x_j x_l} f(x_{k+1}) 
 
 ```math
 \begin{align*}
-m^\mathrm{C}_{k+1}(x) \mathrel{\vcenter{:}}={} & f(x_{k+1}) + \nabla f(x_{k+1})^\top (x - x_{k+1}) + \frac{1}{2} (x - x_{k+1})^\top B_{k+1}^{\mathrm{C}} (x - x_{k+1}) \\*
+m_{k+1}^\mathrm{C}(x) \mathrel{\vcenter{:}}={} & f(x_{k+1}) + \nabla f(x_{k+1})^\top (x - x_{k+1}) + \frac{1}{2} (x - x_{k+1})^\top B_{k+1}^{\mathrm{C}} (x - x_{k+1}) \\*
 & + \frac{1}{6}(x - x_{k+1})^\top (T_{k+1} (x - x_{k+1})) (x - x_{k+1}).
 \end{align*}
 ```
@@ -2289,13 +2289,13 @@ m^\mathrm{C}_{k+1}(x) \mathrel{\vcenter{:}}={} & f(x_{k+1}) + \nabla f(x_{k+1})^
 ```math
 \begin{equation*}
 \begin{cases}
-m^\mathrm{C}_{k+1}(x_k) = f(x_k), \\
-\nabla m^\mathrm{C}_{k+1}(x_k) = \nabla f(x_k).
+m_{k+1}^\mathrm{C}(x_k) = f(x_k), \\
+\nabla m_{k+1}^\mathrm{C}(x_k) = \nabla f(x_k).
 \end{cases}
 \end{equation*}
 ```
 
-$m^\mathrm{C}_{k+1}$ の定義を代入し、$s_k = x_{k+1} - x_k$ を使用することで、これらの条件を以下のように書き直せます。
+$m_{k+1}^\mathrm{C}$ の定義を代入し、$s_k = x_{k+1} - x_k$ を使用することで、これらの条件を以下のように書き直せます。
 
 ```math
 \begin{align*}
@@ -2319,15 +2319,15 @@ f(x_k)        & = f(x_{k+1}) - s_k^\top \nabla f(x_{k+1}) + \frac{1}{2} s_k^\top
 \begin{equation*}
 3(f(x_k) - f(x_{k+1}))
 + \frac{3}{2} s_k^\top (\nabla f(x_{k+1}) + \nabla f(x_k)) + \frac{1}{2} s_k^\top y_k
-= \frac{1}{2} s_k^\top B^{\mathrm{C}}_{k+1} s_k.
+= \frac{1}{2} s_k^\top B_{k+1}^{\mathrm{C}} s_k.
 \end{equation*}
 ```
 
-ここでも、あるスカラー $\sigma^\mathrm{C}_k$ に対して $\left( B^{\mathrm{C}}_{k+1} + \sigma^\mathrm{C}_k I \right) s_k = y_k$ と仮定します。そうすると、先の方程式は
+ここでも、あるスカラー $\sigma_k^\mathrm{C}$ に対して $\left( B_{k+1}^{\mathrm{C}} + \sigma_k^\mathrm{C} I \right) s_k = y_k$ と仮定します。そうすると、先の方程式は
 
 ```math
 \begin{equation*}
-3(f(x_k) - f(x_{k+1})) + \frac{3}{2} s_k^\top (\nabla f(x_{k+1}) + \nabla f(x_k)) = - \frac{\sigma^\mathrm{C}_k}{2} \left\lVert s_k \right\rVert^2,
+3(f(x_k) - f(x_{k+1})) + \frac{3}{2} s_k^\top (\nabla f(x_{k+1}) + \nabla f(x_k)) = - \frac{\sigma_k^\mathrm{C}}{2} \left\lVert s_k \right\rVert^2,
 \end{equation*}
 ```
 
@@ -2335,7 +2335,7 @@ f(x_k)        & = f(x_{k+1}) - s_k^\top \nabla f(x_{k+1}) + \frac{1}{2} s_k^\top
 
 ```math
 \begin{equation*}
-\sigma^\mathrm{C}_k = -\frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nabla f(x_k) + \nabla f(x_{k+1}))}{\left\lVert s_k \right\rVert^2}.
+\sigma_k^\mathrm{C} = -\frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nabla f(x_k) + \nabla f(x_{k+1}))}{\left\lVert s_k \right\rVert^2}.
 \end{equation*}
 ```
 
