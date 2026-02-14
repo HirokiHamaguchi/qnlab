@@ -1659,7 +1659,7 @@ v^\top H_{k+1} v
 
 BFGS更新後の行列のトレースは、次のような明示的な公式で与えられます。
 
-**Proposition 14** ([^nocedal1999numerical] ((6.44)))
+**Proposition 14** ([^nocedal1999numerical] (eq. 6.44))
 
 $B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ をBFGS更新とする。このとき
 
@@ -1707,7 +1707,7 @@ BFGS更新則にトレースを適用すると
 
 BFGS更新後の行列式も閉形式で与えられます。
 
-**Proposition 15** ([^nocedal1999numerical] ((6.45)))
+**Proposition 15** ([^nocedal1999numerical] (eq. 6.45))
 
 $B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ をBFGS更新とし、$B$ が正則であるとする。このとき
 
