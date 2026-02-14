@@ -104,6 +104,8 @@ for i in range(len(xs_opt) - 1):
     b = df(x_i) - d2f(x_i) * x_i
     c = f(x_i) - df(x_i) * x_i + 0.5 * d2f(x_i) * x_i**2
     quad = a * x**2 + b * x + c
+    x_model_min = -b / (2 * a)
+    y_model_min = a * x_model_min**2 + b * x_model_min + c
     ax.plot(x, quad, "--", color=colors[i], alpha=0.9)
     ax.plot([x_i], [f(x_i)], "o", color="tab:red", markersize=10)
     ax.text(x_i, f(x_i) + 0.2, f"$x_{i}$", ha="center", fontsize=20)
@@ -116,3 +118,49 @@ ax.legend()
 plt.tight_layout()
 plt.savefig(OUTPUT_DIR / "newton_raphson.pdf")
 plt.close()
+
+
+# --- Storyboard: optimization-only (3 frames) ---
+def plot_opt_frame(step_idx, x, xs_opt, colors):
+    fig, ax = plt.subplots(1, 1, figsize=(6, 4))
+    ax.plot(x, f(x), label="$f(x)$", color="tab:blue")
+
+    x_i = xs_opt[step_idx]
+    x_next = xs_opt[step_idx + 1]
+
+    # Quadratic approximation around current point
+    a = 0.5 * d2f(x_i)
+    b = df(x_i) - d2f(x_i) * x_i
+    c = f(x_i) - df(x_i) * x_i + 0.5 * d2f(x_i) * x_i**2
+    quad = a * x**2 + b * x + c
+    ax.plot(
+        x, quad, "--", color=colors[step_idx], alpha=0.9, label=f"$m_{step_idx}^*(x)$"
+    )
+
+    x_quad_min = -b / (2 * a)
+    y_quad_min = a * x_quad_min**2 + b * x_quad_min + c
+
+    # Current point and next point
+    ax.plot([x_i], [f(x_i)], "o", color="tab:red", markersize=10)
+    ax.text(x_i, float(f(x_i)) + 0.2, f"$x_{step_idx}$", ha="center", fontsize=18)
+    ax.plot([x_next], [f(x_next)], "o", color="tab:green", markersize=8)
+    ax.annotate(
+        "",
+        xy=(x_quad_min, y_quad_min),
+        xytext=(x_i, float(f(x_i))),
+        arrowprops=dict(arrowstyle="->", color="black", lw=1.5),
+    )
+
+    ax.set_title(f"Newton optimization: step {step_idx}")
+    ax.set_xlabel("$x$")
+    ax.set_ylabel("$f(x)$")
+    ax.legend(loc="upper left")
+    plt.tight_layout()
+    return fig
+
+
+for step_idx in range(3):
+    fig = plot_opt_frame(step_idx, x, xs_opt, colors)
+    out_path = OUTPUT_DIR / f"newton_opt_step{step_idx}.pdf"
+    plt.savefig(out_path, bbox_inches="tight")
+    plt.close(fig)

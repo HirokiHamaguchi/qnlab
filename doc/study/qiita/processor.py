@@ -12,7 +12,6 @@ from config import EQUATION_ENVS, MATH_ENVS, OTHER_ENVS
 from converters import (
     convert_cref,
     convert_enumerate_to_md,
-    convert_equation_environments,
     convert_figure_to_md,
     convert_href_to_md,
     convert_itemize_to_md,
@@ -155,7 +154,7 @@ class LatexToMarkdownConverter:
         elif env_name in MATH_ENVS:
             return self._convert_numbered_env(env_name, block, labels, env_start_line)
         elif env_name in EQUATION_ENVS:
-            return block # done in postprocessing
+            return block  # done in postprocessing
         elif env_name == "proof":
             return convert_proof_to_md(block)
         return ""
@@ -278,7 +277,7 @@ class LatexToMarkdownConverter:
         for label in labels:
             self.global_state.label_map[label] = (env_name, counter)
 
-    def process_normal_line(self, line: str) -> None:
+    def process_normal_line(self, line: str) -> str:
         """Process a normal (non-environment) line.
 
         Args:
@@ -330,7 +329,6 @@ class LatexToMarkdownConverter:
                 continue
 
             self.process_environment_block(line)
-
 
         return self.markdown_lines
 

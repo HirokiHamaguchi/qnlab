@@ -1,7 +1,7 @@
 """Utility functions for LaTeX parsing and conversion."""
 
 import re
-from typing import Dict, Tuple
+from typing import List
 
 
 def find_matching(s: str, start_pos: int, bracket_type: str = "brace") -> int:
@@ -49,7 +49,7 @@ def find_matching(s: str, start_pos: int, bracket_type: str = "brace") -> int:
     return -1
 
 
-def extract_braced_content(block: str, command: str) -> str:
+def extract_braced_content(block: str, command: str) -> List[str]:
     r"""Extract content from a LaTeX command with braced argument.
 
     Handles nested braces correctly.
@@ -62,17 +62,17 @@ def extract_braced_content(block: str, command: str) -> str:
         Content within the braces, or empty string if not found
     """
     pattern = rf"\\{command}\{{"
-    match = re.search(pattern, block)
-    if not match:
-        return ""
+    matches = re.finditer(pattern, block)
+    results = []
 
-    start_brace = match.end() - 1  # Position of the opening brace
-    end_brace = find_matching(block, start_brace, "brace")
+    for match in matches:
+        start_brace = match.end() - 1  # Position of the opening brace
+        end_brace = find_matching(block, start_brace, "brace")
 
-    if end_brace == -1:
-        return ""
+        if end_brace != -1:
+            results.append(block[start_brace + 1 : end_brace])
 
-    return block[start_brace + 1 : end_brace]
+    return results
 
 
 def preprocess_latex(content: str) -> str:

@@ -10,11 +10,9 @@
 \label{sec:background_modified_secant}
 
 \ifEn
-    This section explains the modified secant condition, a modification of the standard secant condition used in quasi-Newton methods.
-    The modified secant condition incorporates function value information in addition to gradient information, leading to more accurate Hessian approximations.
+    This section explains the modified secant condition, a modification of the standard secant condition. The modified secant condition incorporates function value information in addition to gradient information, leading to more accurate Hessian approximations.
 \else
-    このセクションでは、準ニュートン法で使用される標準的なセカント条件の修正版である修正セカント条件について説明します。
-    修正セカント条件は勾配情報に加えて関数値情報を取り込み、より正確なヘッセ行列の近似を実現します。
+    本節では、通常のセカント条件の修正版である修正セカント条件について説明します。修正セカント条件は勾配情報に加えて関数値情報を取り込み、より正確なヘッセ行列の近似を実現します。
 \fi
 
 \ifEn
@@ -27,68 +25,44 @@
     Although the secant condition is widely used in many quasi-Newton methods, it can fail to capture the curvature of the objective function accurately because it only utilizes gradient information.
     We illustrate this limitation in \cref{fig:msec_overview}.
 \else
-    セカント条件は多くの準ニュートン法で広く用いられていますが、勾配情報のみを活用するため、目的関数の曲率を正確に捉えられないことがあります。
+    セカント条件は準ニュートン法で広く用いられていますが、勾配情報のみを活用するため、目的関数の曲率を正確に捉えられないことがあります。
     このことを\cref{fig:msec_overview}で説明します。
 \fi
 \ifEn
-    In \cref{fig:msec_explain}, we have two points $x_k$ and $x_{k+1}$ with their corresponding function values and gradients.
-    In \cref{fig:ideal_model}, we see that the ideal quadratic model constructed from the exact Hessian fits well around the new point $x_{k+1}$, leading to a better convergence behavior.
-    However, in \cref{fig:standard_secant}, the standard secant update only matches the gradients at these points, neglecting the function value at $x_k$. It can severely misestimate the curvature, leading to a poor approximation of the true objective function.
+    In \cref{fig:msec_overview}, we have two points $x_k$ and $x_{k+1}$ where function values and gradients are already known.
+    We see that the ideal quadratic model constructed from the exact Hessian fits well around the new point $x_{k+1}$, leading to a better convergence behavior.
+    However, the standard secant condition, which only uses gradient information, ignores function value information and may misestimate curvature significantly, resulting in a poor approximation of the true objective function.
 \else
-    \cref{fig:msec_explain} では、対応する関数値と勾配を持つ2つの点 $x_k$ と $x_{k+1}$ があります。
-    \cref{fig:ideal_model} では、正確なヘッセ行列から構築された理想的な二次モデルが新しい点 $x_{k+1}$ の周りでよくフィットし、より良い収束性能をもたらすことが見られます。
-    しかし、\cref{fig:standard_secant} では、標準的なセカント更新はこれらの点での勾配のみを照合し、$x_k$ での関数値を無視します。曲率を大きく誤推定する可能性があり、真の目的関数の近似が悪くなります。
+    \Cref{fig:msec_overview} において、関数値と勾配が既知の2点 $x_k$ と $x_{k+1}$ があるとします。
+    正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットしており、より良い収束挙動をもたらすことが分かります。
+    しかし、標準的な勾配のみを用いて課されるセカント条件で作られるモデルでは、関数値の情報が無視され、曲率を大きく誤る可能性があり、真の目的関数の近似が悪くなります。
 \fi
 
 \begin{figure}[t]
     \centering
-    \begin{subfigure}[t]{0.33\textwidth}
-        \includegraphics[width=\linewidth]{../imgs/modified_secant/trial_EXPLAIN.pdf}
-        % \subcaption{Points $x_k$ and $x_{k+1}$.}
-        \subcaption{
-            \ifEn
-                Points $x_k$ and $x_{k+1}$.
-            \else
-                点 $x_k$ と $x_{k+1}$。
-            \fi
-        }
-        \label{fig:msec_explain}
-    \end{subfigure}%
-    \hfill
-    \begin{subfigure}[t]{0.33\textwidth}
-        \includegraphics[width=\linewidth]{../imgs/modified_secant/trial_HESS.pdf}
-        \subcaption{
-            \ifEn
-                Model with the exact Hessian.
-            \else
-                正確なヘッセ行列を用いたモデル。
-            \fi
-        }
-        \label{fig:ideal_model}
-    \end{subfigure}%
-    \hfill
-    \begin{subfigure}[t]{0.33\textwidth}
-        \includegraphics[width=\linewidth]{../imgs/modified_secant/trial_BFGS.pdf}
-        \subcaption{
-            \ifEn
-                Model with the secant condition.
-            \else
-                セカント条件を用いたモデル。
-            \fi
-        }
-        \label{fig:standard_secant}
-    \end{subfigure}
+    \begin{minipage}{0.33\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/modified_secant/trial_EXPLAIN.pdf}
+    \end{minipage}%
+    \begin{minipage}{0.33\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/modified_secant/trial_HESS.pdf}
+    \end{minipage}%
+    \begin{minipage}{0.33\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/modified_secant/trial_BFGS.pdf}
+    \end{minipage}
     \caption{
         \ifEn
             Limitations of the standard secant condition.
             (a) Function values and gradients at $x_k$ and $x_{k+1}$ are already known.
             (b) The ideal quadratic model constructed from the exact Hessian fits well around the new point $x_{k+1}$.
-            (c) The standard secant update may fail to capture curvature adequately.
+            (c) The standard secant condition may fail to capture curvature adequately.
         \else
             標準的なセカント条件の欠点。
             (a) $x_k$ と $x_{k+1}$ での関数値と勾配が既に分かっている。
             (b) 正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットする。
-            (c) 標準的なセカント更新では、必ずしも十分に曲率を捉えられない。
+            (c) 標準的なセカント条件では、必ずしも十分に曲率を捉えられない。
         \fi
     }
     \label{fig:msec_overview}
@@ -100,10 +74,9 @@
     Even when the gradients are the same at two points $x_k$ and $x_{k+1}$, natural interpolation of function values differs depending on the function values $f(x_k)$ and $f(x_{k+1})$.
     This observation motivates the modified secant condition, which incorporates function value information to improve Hessian approximation.
 \else
-    関数値を利用することでこの制限を克服できます。
-    基本的な考え方は\cref{fig:cubic_interpolation} に示されています。
-    2 点 $x_k$ と $x_{k+1}$ で勾配が同じであっても、関数値の自然な内挿は関数値 $f(x_k)$ と $f(x_{k+1})$ に応じて異なります。
-    この観察は、関数値情報を取り込んでヘッセ行列の近似を改善する修正セカント条件の動機となります。
+    この問題は、関数値を利用することで克服できます。基本的な考え方は \cref{fig:cubic_interpolation} に示した通りです。
+    2 点 $x_k$ と $x_{k+1}$ で勾配が同じであっても、適切な補完は関数値 $f(x_k)$ と $f(x_{k+1})$ によって異なります。
+    この観察こそが、関数値情報を取り込んでヘッセ行列の近似を改善する修正セカント条件の動機を端的に示しています。
 \fi
 
 \begin{figure}[t]
@@ -111,9 +84,11 @@
     \includegraphics[width=\textwidth]{../imgs/modified_secant/cubic_interpolation.pdf}
     \caption{
         \ifEn
-            Interpolation with identical gradients at $x_k$ and $x_{k+1}$ but different function values. This leads to distinct interpolants, highlighting the importance of incorporating function value information in Hessian approximation.
+            Basic idea of the modified secant condition.
+            Even when the gradients are the same at two points $x_k$ and $x_{k+1}$, natural interpolation of function values differs depending on the function values $f(x_k)$ and $f(x_{k+1})$.
         \else
-            $x_k$ と $x_{k+1}$ で同一の勾配を持つが異なる関数値による内挿。これは異なる内挿関数を生じさせ、ヘッセ行列の近似に関数値情報を組み込むことの重要性を強調しています。
+            修正セカント条件の基本的な考え方。
+            $x_k$ と $x_{k+1}$ で同一の勾配を持つが異なる関数値を持つ場合、適切な補間は異なります。
         \fi
     }
     \label{fig:cubic_interpolation}
@@ -134,18 +109,18 @@
 
 \ifEn
     The first modification enforces the quadratic model to match the function value at the previous point~\citep{yuanModifiedBFGSAlgorithm1991,weiNewQuasiNewtonMethods2006, babaie-kafakiModifiedBFGSAlgorithm2011}.
-    Let us consider an alternate model with a different approximate Hessian $B^{\mathrm{F}}_{k+1}$:
+    Let us consider an alternate model with a different approximate Hessian $B_{k+1}^{\mathrm{F}}$:
 \else
     最初の修正は、二次モデルが前の点での関数値と一致することを強制します~\citep{yuanModifiedBFGSAlgorithm1991,weiNewQuasiNewtonMethods2006, babaie-kafakiModifiedBFGSAlgorithm2011}。
-    異なる近似ヘッセ行列 $B^{\mathrm{F}}_{k+1}$ を持つ別のモデルを考えます。
+    異なる近似ヘッセ行列 $B_{k+1}^{\mathrm{F}}$ を持つ別のモデルを考えます。
 \fi
 \begin{equation*}
-    m_{k+1}^{\mathrm{F}}(x) \coloneqq f(x_{k+1}) + \nabla f(x_{k+1})^\top (x - x_{k+1}) + \frac{1}{2} (x - x_{k+1})^\top B^{\mathrm{F}}_{k+1} (x - x_{k+1}).
+    m_{k+1}^{\mathrm{F}}(x) \coloneqq f(x_{k+1}) + \nabla f(x_{k+1})^\top (x - x_{k+1}) + \frac{1}{2} (x - x_{k+1})^\top B_{k+1}^{\mathrm{F}} (x - x_{k+1}).
 \end{equation*}
 \ifEn
     We require this model to satisfy
 \else
-    ここでは、このモデルが
+    ここでは、
 \fi
 \begin{equation*}
     m^{\mathrm{F}}_{k+1}(x_k) = f(x_k),
@@ -157,15 +132,13 @@
 \fi
 
 \ifEn
-    Let us derive the corresponding modified secant condition for $B^{\mathrm{F}}_{k+1}$.
-    Substituting the definition of $m^{\mathrm{F}}_{k+1}$ and using $s_k = x_{k+1} - x_k$, the condition becomes
+    Let us derive the corresponding modified secant condition for $B_{k+1}^{\mathrm{F}}$. Substituting the definition of $m^{\mathrm{F}}_{k+1}$ and using $s_k = x_{k+1} - x_k$, the condition becomes
 \else
-    対応する修正セカント条件を $B^{\mathrm{F}}_{k+1}$ に対して導出しましょう。
-    $m^{\mathrm{F}}_{k+1}$ の定義を代入し、$s_k = x_{k+1} - x_k$ を使用することで、条件は以下になります。
+    対応する修正セカント条件を $B_{k+1}^{\mathrm{F}}$ に対して導出しましょう。$m^{\mathrm{F}}_{k+1}$ の定義を代入し、$s_k = x_{k+1} - x_k$ を使用することで、条件は以下になります。
 \fi
 \begin{align*}
-    f(x_k) & = f(x_{k+1}) + \nabla f(x_{k+1})^\top (x_k - x_{k+1}) + \frac{1}{2} (x_k - x_{k+1})^\top B^{\mathrm{F}}_{k+1} (x_k - x_{k+1}) \\
-           & = f(x_{k+1}) - \nabla f(x_{k+1})^\top s_k + \frac{1}{2} s_k^\top B^{\mathrm{F}}_{k+1} s_k.
+    f(x_k) & = f(x_{k+1}) + \nabla f(x_{k+1})^\top (x_k - x_{k+1}) + \frac{1}{2} (x_k - x_{k+1})^\top B_{k+1}^{\mathrm{F}} (x_k - x_{k+1}) \\
+           & = f(x_{k+1}) - \nabla f(x_{k+1})^\top s_k + \frac{1}{2} s_k^\top B_{k+1}^{\mathrm{F}} s_k.
 \end{align*}
 \ifEn
     Now, instead of the standard secant condition, we assume a modified form with an additional term involving the identity matrix:
@@ -173,14 +146,12 @@
     ここで、通常のセカント条件の代わりに、次のように単位行列による修正を加えた形を仮定します。
 \fi
 \begin{equation*}
-    \left(B^{\mathrm{F}}_{k+1} + \sigma^\mathrm{F}_k I \right) s_k = y_k.
+    \left(B_{k+1}^{\mathrm{F}} + \sigma^\mathrm{F}_k I \right) s_k = y_k.
 \end{equation*}
 \ifEn
-    Here, $\sigma^\mathrm{F}_k \in \mathbb{R}$ is a scalar to be determined as follows.
-    Substituting this equation yields
+    Here, $\sigma^\mathrm{F}_k \in \mathbb{R}$ is a scalar to be determined as follows. Substituting this equation yields
 \else
-    ここで、$\sigma^\mathrm{F}_k \in \mathbb{R}$ は以下で決定するスカラーです。
-    この方程式を代入すると、以下が得られます。
+    ここで、$\sigma^\mathrm{F}_k \in \mathbb{R}$ は以下で決定するスカラーです。この方程式を代入すると、以下が得られます。
 \fi
 \begin{equation*}
     f(x_k) = f(x_{k+1}) - \nabla f(x_{k+1})^\top s_k + \frac{1}{2} s_k^\top y_k - \frac{\sigma^\mathrm{F}_k}{2} \left\lVert s_k \right\rVert^2.
@@ -200,7 +171,7 @@
     従って、修正セカント条件は以下になります。
 \fi
 \begin{equation*}
-    B^{\mathrm{F}}_{k+1} s_k = \hat{y}^{\mathrm{F}}_k \coloneqq y_k + \frac{2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k}{\left\lVert s_k \right\rVert^2} s_k.
+    B_{k+1}^{\mathrm{F}} s_k = \hat{y}^{\mathrm{F}}_k \coloneqq y_k + \frac{2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k}{\left\lVert s_k \right\rVert^2} s_k.
 \end{equation*}
 \ifEn
     By using this modified $\hat{y}^\mathrm{F}_k$ instead of $y_k$ in various quasi-Newton updates, we can incorporate function value information while keeping almost the same algorithm.
@@ -210,14 +181,12 @@
     また、特にBFGS更新で $s_k^\top y_k > 0$ という条件は正定値性を保つために使われるなど重要な性質である為、$s_k$ との内積が正であることを保証した、次の修正も考えられます。
 \fi
 \begin{equation*}
-    B^{\mathrm{F}'}_{k+1} s_k = y_k + \frac{\max(0, 2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k)}{\left\lVert s_k \right\rVert^2} s_k.
+    B_{k+1}^{\mathrm{F}'} s_k = y_k + \frac{\max(0, 2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k)}{\left\lVert s_k \right\rVert^2} s_k.
 \end{equation*}
 \ifEn
-    This is the function-value-matching modified secant condition.
-    Refer to \cref{fig:yuan_msec} for an illustration.
+    This is the function-value-matching modified secant condition. Refer to \cref{fig:yuan_msec} for an illustration.
 \else
-    これが関数値一致の修正セカント条件です。
-    具体例として\cref{fig:yuan_msec} も参照してください。
+    これが関数値一致の修正セカント条件です。具体例として\cref{fig:yuan_msec} も参照してください。
 \fi
 
 \begin{figure}[t]
@@ -227,8 +196,7 @@
         \ifEn
             Function-value-matching modified secant equation. The function values $f(x_{k-1})$ and $m^{\mathrm{F}}_k(x_{k-1})$ are matched at the previous point $x_{k-1}$.
         \else
-            関数値一致の修正セカント方程式。
-            前の点 $x_{k-1}$ での関数値 $f(x_{k-1})$ と $m^{\mathrm{F}}_k(x_{k-1})$ が一致している。
+            関数値一致の修正セカント方程式。前の点 $x_{k-1}$ での関数値 $f(x_{k-1})$ と $m^{\mathrm{F}}_k(x_{k-1})$ が一致している。
         \fi
     }
     \label{fig:yuan_msec}
@@ -255,11 +223,9 @@
     s_k^\top (T_{k+1} s_k) s_k = \sum_{i,j,l=1}^n \partial_{x_i x_j x_l} f(x_{k+1}) s_k^{(i)} s_k^{(j)} s_k^{(l)}.
 \end{equation*}
 \ifEn
-    Here, $\partial_{x_i x_j x_l} f$ denotes the third derivative of $f$ with respect to $x_i$, $x_j$, and $x_l$, and $s_k^{(i)}$ is the $i$-th component of the vector $s_k$.
-    We introduced this tensor solely for analysis purposes, and it will be eliminated from the final formula.
+    Here, $\partial_{x_i x_j x_l} f$ denotes the third derivative of $f$ with respect to $x_i$, $x_j$, and $x_l$, and $s_k^{(i)}$ is the $i$-th component of the vector $s_k$. We introduced this tensor solely for analysis purposes, and it will be eliminated from the final formula.
 \else
-    ここで、$\partial_{x_i x_j x_l} f$ は $f$ の $x_i$、$x_j$、および $x_l$ に対する3階微分を表し、$s_k^{(i)}$ はベクトル $s_k$ の第 $i$ 成分です。
-    このテンソルは分析目的でのみ導入しており、最終的な式からは除去されます。
+    ここで、$\partial_{x_i x_j x_l} f$ は $f$ の $x_i$、$x_j$、および $x_l$ に対する3階微分を表し、$s_k^{(i)}$ はベクトル $s_k$ の第 $i$ 成分です。このテンソルは分析目的でのみ導入しており、最終的な式からは除去されます。
 \fi
 
 \ifEn
@@ -272,11 +238,9 @@
                                       & + \frac{1}{6}(x - x_{k+1})^\top (T_{k+1} (x - x_{k+1})) (x - x_{k+1}).
 \end{align*}
 \ifEn
-    With this model, we can enforce both function value and gradient matching at the previous point $x_k$.
-    Specifically, we require
+    With this model, we can enforce both function value and gradient matching at the previous point $x_k$. Specifically, we require
 \else
-    このモデルを使用して、前の点 $x_k$ での関数値と勾配の両方の一致を強制できます。
-    具体的には、以下を要求します。
+    このモデルを使用して、前の点 $x_k$ での関数値と勾配の両方の一致を強制できます。具体的には、以下を要求します。
 \fi
 \begin{equation*}
     \begin{dcases}
@@ -290,17 +254,17 @@
     $m^\mathrm{C}_{k+1}$ の定義を代入し、$s_k = x_{k+1} - x_k$ を使用することで、これらの条件を以下のように書き直せます。
 \fi
 \begin{align*}
-    f(x_k)        & = f(x_{k+1}) - s_k^\top \nabla f(x_{k+1}) + \frac{1}{2} s_k^\top B^\mathrm{C}_{k+1} s_k - \frac{1}{6} s_k^\top (T_{k+1} s_k) s_k, \\
-    \nabla f(x_k) & = \nabla f(x_{k+1}) - B^\mathrm{C}_{k+1} s_k + \frac{1}{2} (T_{k+1} s_k) s_k.
+    f(x_k)        & = f(x_{k+1}) - s_k^\top \nabla f(x_{k+1}) + \frac{1}{2} s_k^\top B_{k+1}^{\mathrm{C}} s_k - \frac{1}{6} s_k^\top (T_{k+1} s_k) s_k, \\
+    \nabla f(x_k) & = \nabla f(x_{k+1}) - B_{k+1}^{\mathrm{C}} s_k + \frac{1}{2} (T_{k+1} s_k) s_k.
 \end{align*}
 \ifEn
     Rearranging and multiplying both sides by $3$ for the first equation, and taking the inner product with $s_k$ for the second equation, we have
 \else
-    第1の方程式の両辺に3を乗じて整理し、第2の方程式については $s_k$ との内積をとることで、以下が得られます。
+    一番目の式の両辺に3を乗じ、二番目の方程式については $s_k$ との内積をとることで、以下が得られます。
 \fi
 \begin{align*}
-    3(f(x_k) - f(x_{k+1})) +3 s_k^\top \nabla f(x_{k+1}) & = \frac{3}{2} s_k^\top B^{\mathrm{C}}_{k+1} s_k - \frac{1}{2} s_k^\top (T_{k+1} s_k) s_k, \\
-    -s_k^\top y_k                                        & = -s_k^\top B^{\mathrm{C}}_{k+1} s_k + \frac{1}{2} s_k^\top (T_{k+1} s_k) s_k.
+    3(f(x_k) - f(x_{k+1})) +3 s_k^\top \nabla f(x_{k+1}) & = \frac{3}{2} s_k^\top B_{k+1}^{\mathrm{C}} s_k - \frac{1}{2} s_k^\top (T_{k+1} s_k) s_k, \\
+    -s_k^\top y_k                                        & = -s_k^\top B_{k+1}^{\mathrm{C}} s_k + \frac{1}{2} s_k^\top (T_{k+1} s_k) s_k.
 \end{align*}
 \ifEn
     By summing up and using $y_k = \nabla f(x_{k+1}) - \nabla f(x_k)$, we eliminate the tensor term and obtain the scalar identity
@@ -313,11 +277,9 @@
     = \frac{1}{2} s_k^\top B^{\mathrm{C}}_{k+1} s_k.
 \end{equation*}
 \ifEn
-    Again, for some scalar $\sigma^\mathrm{C}_k \in \mathbb{R}$, we assume $\left( B^{\mathrm{C}}_{k+1} + \sigma^\mathrm{C}_k I \right) s_k = y_k$.
-    Then, the previous equation yields
+    Again, for some scalar $\sigma^\mathrm{C}_k \in \mathbb{R}$, we assume $\left( B^{\mathrm{C}}_{k+1} + \sigma^\mathrm{C}_k I \right) s_k = y_k$. Then, the previous equation yields
 \else
-    ここでも、あるスカラー $\sigma^\mathrm{C}_k$ に対して $\left( B^{\mathrm{C}}_{k+1} + \sigma^\mathrm{C}_k I \right) s_k = y_k$ と仮定します。
-    そうすると、先の方程式は
+    ここでも、あるスカラー $\sigma^\mathrm{C}_k$ に対して $\left( B^{\mathrm{C}}_{k+1} + \sigma^\mathrm{C}_k I \right) s_k = y_k$ と仮定します。そうすると、先の方程式は
 \fi
 \begin{equation*}
     3(f(x_k) - f(x_{k+1})) + \frac{3}{2} s_k^\top (\nabla f(x_{k+1}) + \nabla f(x_k)) = - \frac{\sigma^\mathrm{C}_k}{2} \left\lVert s_k \right\rVert^2,
@@ -336,55 +298,36 @@
     従って、以下の修正セカント条件が得られます。
 \fi
 \begin{equation*}
-    B^{\mathrm{C}}_{k+1} s_k = y_k + \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nabla f(x_k) + \nabla f(x_{k+1}))}{\left\lVert s_k \right\rVert^2} s_k.
+    B_{k+1}^{\mathrm{C}} s_k = y_k + \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nabla f(x_k) + \nabla f(x_{k+1}))}{\left\lVert s_k \right\rVert^2} s_k.
 \end{equation*}
 \ifEn
-    This is a cubic-augmented modified secant condition.
-    Refer to \cref{fig:zhang_models} for an illustration.
+    This is a cubic-augmented modified secant condition. Refer to \cref{fig:zhang_models} for an illustration.
 \else
-    これが三次項による修正セカント条件です。
-    具体例として\cref{fig:zhang_models}も参照してください。
+    これが三次項による修正セカント条件です。具体例として\cref{fig:zhang_models}も参照してください。
 \fi
 
 \begin{figure}[t]
     \centering
-    \begin{subfigure}[t]{0.49\textwidth}
-        \includegraphics[width=\linewidth]{../imgs/modified_secant/trial_1_cubic.pdf}
-        % \subcaption{Cubic-augmented modified secant.}
-        \subcaption{
-            \ifEn
-                Cubic-augmented modified secant.
-            \else
-                三次項による修正セカント。
-            \fi
-        }
-        \label{fig:zhang_cubic}
-    \end{subfigure}%
-    \hfill
-    \begin{subfigure}[t]{0.49\textwidth}
-        \includegraphics[width=\linewidth]{../imgs/modified_secant/trial_1_quadratic.pdf}
-        \subcaption{
-            \ifEn
-                Quadratic expansion of the cubic-augmented model.
-            \else
-                三次モデルの二次展開。
-            \fi
-        }
-        \label{fig:zhang_quadratic}
-    \end{subfigure}
+    \begin{minipage}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/modified_secant/trial_1_cubic.pdf}
+    \end{minipage}%
+    \begin{minipage}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/modified_secant/trial_1_quadratic.pdf}
+    \end{minipage}
     \caption{
         \ifEn
-            Cubic-augmented modified secant equation. In \cref{fig:zhang_cubic}, by incorporating a cubic term to the model, both function value and gradient conditions are matched at the previous point.
-            In \cref{fig:zhang_quadratic}, we show the model with its expansion up to the quadratic term.
+            Cubic-augmented modified secant equation. The cubic term is incorporated into the model to simultaneously match both function value and gradient at the previous point. The model is constructed using the expansion up to the quadratic term.
         \else
-            三次項による修正セカント方程式。\cref{fig:zhang_cubic} では、三次項をモデルに組み込むことで、前の点で関数値と勾配の両方が一致します。\cref{fig:zhang_quadratic} では、その二次までの展開によるモデルを示しています。
+            三次項による修正セカント方程式。三次項をモデルに組み込むことで、前の点で関数値と勾配の両方を一致させることが出来ます。その二次項までの展開によって、モデルを作成します。
         \fi
     }
     \label{fig:zhang_models}
 \end{figure}
 
 \ifEn
-    \subsection{Other Curvature Related Method}
+    \subsection{Other Curvature Related Methods}
 \else
     \subsection{その他の曲率関連手法}
 \fi

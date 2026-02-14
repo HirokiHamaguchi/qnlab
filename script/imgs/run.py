@@ -55,7 +55,7 @@ def convert_pdf(pdf_path: Path) -> List[Path]:
     output_paths: List[Path] = []
     for page_num in range(len(doc)):
         page = doc[page_num]
-        pix = page.get_pixmap(matrix=mat)
+        pix = page.get_pixmap(matrix=mat)  # type: ignore
         suffix = f"_p{page_num + 1}" if multiple_pages else ""
         out_path = pdf_path.with_name(f"{pdf_path.stem}{suffix}.png")
         pix.save(out_path)

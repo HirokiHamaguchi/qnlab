@@ -2,34 +2,33 @@
 
 from pathlib import Path
 
-try:
-    import fitz
-except ImportError:
-    print("Warning: PyMuPDF (fitz) not installed. PDF conversion will be skipped.")
-    fitz = None
+import fitz
 
 
 def convert_pdf_to_png(current_dir: Path) -> None:
     """Convert all PDF files in current_dir to PNG.
 
-    Uses PyMuPDF to convert PDFs. Skips if fitz is not available.
+    Uses PyMuPDF to convert PDFs.
 
     Args:
         current_dir: Directory containing PDF files to convert
     """
-    if not fitz:
-        return
 
-    pdf_files = list(current_dir.glob("*.pdf"))
+    pdf_files = list(current_dir.glob("**/**.pdf"))
+    print(f"Found {len(pdf_files)} PDF files to convert.")
     for pdf_file in pdf_files:
+        if pdf_file.parent.name == "main" and any(
+            pdf_file.stem.startswith(str(i)) for i in range(1, 5)
+        ):
+            continue
+
         png_file = pdf_file.with_suffix(".png")
-        if not png_file.exists():
-            try:
-                doc = fitz.open(str(pdf_file))
-                page = doc[0]
-                pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
-                pix.save(str(png_file))
-                doc.close()
-                print(f"Converted {pdf_file.name} to {png_file.name}")
-            except Exception as e:
-                print(f"Error converting {pdf_file.name}: {e}")
+        try:
+            doc = fitz.open(str(pdf_file))
+            page = doc[0]
+            pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
+            pix.save(str(png_file))
+            doc.close()
+            print(f"Converted {pdf_file.name} to {png_file.name}")
+        except Exception as e:
+            print(f"Error converting {pdf_file.name}: {e}")

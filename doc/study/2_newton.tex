@@ -10,10 +10,19 @@
 \label{sec:background_newton}
 
 \ifEn
-    In this section, we outline Newton's method, which is a fundamental optimization algorithm for an unconstrained optimization problem.
+    We define $f \colon \mathbb{R}^n \to \mathbb{R}$ as an objective function of class $C^2$, where $n$ denotes the dimension of the decision variables.
+    In this context, the following unconstrained optimization problem is one of the most fundamental optimization problems:
 \else
-    本節では、無制約最適化問題に対する基本的な最適化アルゴリズム
-    である、ニュートン法の概要を示します。
+    目的関数を $C^2$ 級の関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ とし、また $n$ を決定変数の次元と定めます。
+    この時、次の無制約最適化問題は、最も基本的な最適化問題の一つです。
+\fi
+\begin{equation*}
+    \underset{x \in \mathbb{R}^n}{\text{minimize}} \quad f(x).
+\end{equation*}
+\ifEn
+    In this section, we outline Newton's method, which is a fundamental optimization algorithm for this unconstrained optimization problem.
+\else
+    本節では、無制約最適化問題に対する基本的な最適化アルゴリズムである、ニュートン法の概要を示します。
 \fi
 
 \ifEn
@@ -74,6 +83,29 @@
     そこで、関数値の十分な減少を確保するため、直線探索で定めるステップサイズ $\alpha_k > 0$ を導入すると、最初に示した更新式が得られます。
     これがニュートン法の基本的な手続きとなります。
 \fi
+
+\begin{figure}[t]
+    \begin{minipage}{0.33\columnwidth}
+        \centering
+        \includegraphics[width=\columnwidth]{../imgs/quasi_newton/newton_opt_step0.png}
+    \end{minipage}%
+    \begin{minipage}{0.33\columnwidth}
+        \centering
+        \includegraphics[width=\columnwidth]{../imgs/quasi_newton/newton_opt_step1.png}
+    \end{minipage}%
+    \begin{minipage}{0.33\columnwidth}
+        \centering
+        \includegraphics[width=\columnwidth]{../imgs/quasi_newton/newton_opt_step2.png}
+    \end{minipage}
+    \caption{
+        \ifEn
+            Illustration of iterations of Newton's method.
+            In this example, $\alpha_k=1$ holds for all steps, i.e., $x_{k+1} = x_k - \nabla^2 f(x_k)^{-1} g_k$.
+        \else
+            ニュートン法の反復の様子。この例では、全てのステップで $\alpha_k=1$、つまり $x_{k+1} = x_k - \nabla^2 f(x_k)^{-1} g_k$ が成り立つ。
+        \fi
+    }
+\end{figure}
 
 \ifEn
     The update direction $d_k \coloneqq -\nabla^2 f(x_k)^{-1} g_k$ is known as the Newton direction.

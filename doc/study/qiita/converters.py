@@ -8,7 +8,7 @@ from typing import Dict, List
 # Ensure imports work from doc/study directory
 sys.path.insert(0, str(Path(__file__).parent))
 
-from config import ENV_DISPLAY_NAMES, EQUATION_ENVS, GITHUB_RAW_URL_BASE, USE_GITHUB_URL
+from config import ENV_DISPLAY_NAMES, GITHUB_RAW_URL_BASE, USE_GITHUB_URL
 from utils import extract_braced_content
 
 
@@ -257,9 +257,9 @@ def convert_math_env_to_md(block: str, env_name: str, counter: int) -> str:
 
     for line in lines:
         stripped = line.strip()
-        if not stripped.startswith(f"\\begin{{{env_name}}}") and not stripped.startswith(
-            f"\\end{{{env_name}}}"
-        ):
+        if not stripped.startswith(
+            f"\\begin{{{env_name}}}"
+        ) and not stripped.startswith(f"\\end{{{env_name}}}"):
             result_lines.append(line)
 
     return "\n".join(result_lines)
@@ -299,9 +299,10 @@ def convert_figure_to_md(block: str, counter: int) -> str:
                 img_tags.append(f'<img src="{url}" />')
         result = "".join(img_tags) + "\n"
 
-    caption_text = extract_braced_content(block, "caption").replace("\n", " ").strip()
-    if caption_text:
-        print(f"Figure {counter} caption: {caption_text}")
+    caption_texts = extract_braced_content(block, "caption")
+    if caption_texts:
+        assert len(caption_texts) == 1
+        caption_text = caption_texts[0].replace("\n", " ").strip()
         result += f"\n({ENV_DISPLAY_NAMES['figure']} {counter} {caption_text})\n"
 
     return result
@@ -329,17 +330,14 @@ def extract_figure_images(block: str) -> List[Dict[str, str]]:
         if not img_match:
             continue
         path = img_match.group(1)
-        try:
-            width_percent = int(round(float(width_str) * 100))
-        except ValueError:
-            width_percent = None
+        width_percent = str(round(float(width_str) * 100))
         images.append({"path": path, "width_percent": width_percent})
 
     # Find standalone includegraphics
     if not images:
-        match = include_pattern.search(block)
-        if match:
-            images.append({"path": match.group(1)})
+        for match in include_pattern.finditer(block):
+            path = match.group(1)
+            images.append({"path": path, "width_percent": "100"})
 
     return images
 
@@ -351,11 +349,12 @@ def convert_table_to_md(block: str, counter: int) -> str:
     Adds caption below the table.
     """
     # Extract tabular block
-    tabular_match = re.search(r"\\begin\{tabular\}\{([^}]*)\}(.*?)\\end\{tabular\}", block, re.DOTALL)
+    tabular_match = re.search(
+        r"\\begin\{tabular\}\{([^}]*)\}(.*?)\\end\{tabular\}", block, re.DOTALL
+    )
     if not tabular_match:
         return ""
 
-    alignment = tabular_match.group(1)
     content = tabular_match.group(2)
 
     # Parse table rows and cells
@@ -365,9 +364,12 @@ def convert_table_to_md(block: str, counter: int) -> str:
     rows = []
     current_row = []
     for line in lines:
-        cells = [cell.strip().replace("\\\\", "").replace(" ", "") for cell in line.split("&")]
-        cells=[c for c in cells if c!="\\hline"]
-        if len(cells)==0:
+        cells = [
+            cell.strip().replace("\\\\", "").replace(" ", "")
+            for cell in line.split("&")
+        ]
+        cells = [c for c in cells if c != "\\hline"]
+        if len(cells) == 0:
             continue
         current_row.extend(cells)
         if "\\\\" in line:
@@ -397,9 +399,10 @@ def convert_table_to_md(block: str, counter: int) -> str:
     result = "\n".join(result_lines) + "\n"
 
     # Add caption
-    caption_text = extract_braced_content(block, "caption").replace("\n", " ").strip()
-    if caption_text:
-        print(f"Table {counter} caption: {caption_text}")
+    caption_texts = extract_braced_content(block, "caption")
+    if caption_texts:
+        assert len(caption_texts) == 1
+        caption_text = caption_texts[0].replace("\n", " ").strip()
         result += f"\n({ENV_DISPLAY_NAMES['table']} {counter}: {caption_text})\n"
 
     return result

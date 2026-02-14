@@ -10,27 +10,9 @@
 \label{sec:background_basic}
 
 \ifEn
-    One of the central goals of numerical optimization is to determine decision variables that optimize a given quantitative measure.
-    Examples of such measures include control stability, operational efficiency, and prediction error, each quantifying the quality of various phenomena or systems.
-    These measures are typically modeled as objective functions, which are mappings from decision variables to real numbers.
+    In this section, we explain the basic concepts of continuous optimization, including convexity, strong convexity, smoothness, and positive definiteness of the Hessian.
 \else
-    数理最適化の中心的な意義の一つは、与えられた定量的な指標を最適化する決定変数を求めることにあります。
-    そのような指標の例としては、制御の安定性・運用の効率性・予測誤差など、さまざまな現象やシステムの品質を定量化したものが挙げられます。
-    これらの指標は通常、決定変数から実数への写像である目的関数としてモデル化されます。
-\fi
-\ifEn
-    We define $f \colon \mathbb{R}^n \to \mathbb{R}$ as an objective function of class $C^2$, where $n$ denotes the dimension of the decision variables.
-    In this context, the following unconstrained optimization problem is one of the most fundamental optimization problems:
-\else
-    目的関数を $C^2$ 級の関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ とし、また $n$ を決定変数の次元と定めます。 この時、次の無制約最適化問題は、最も基本的な最適化問題の一つです。
-\fi
-\begin{equation*}
-    \underset{x \in \mathbb{R}^n}{\text{minimize}} \quad f(x).
-\end{equation*}
-\ifEn
-    In this section, we provide fundamental definitions and properties related to this optimization problem.
-\else
-    本節では、この最適化問題に関する基本的な定義と性質をまとめます。
+    本節では、連続最適化に関する基本概念として、凸性、強凸性、平滑性、およびヘッセ行列の正定値性について説明します。
 \fi
 
 \ifEn
@@ -71,11 +53,11 @@
 \end{align*}
 \ifEn
     Strong convexity indicates that, in addition to convexity, the objective function has uniformly positive curvature.
-    Examples of convex and strongly convex functions are shown in \cref{fig:convexity_comparison}.
+    We show examples of convex and strongly convex functions in \cref{fig:convexity_comparison}.
     Such definitions may vary slightly in the literature. For example, see~\citep{nesterovIntroductoryLecturesConvex2014,kanamori2016continuous}.
 \else
     強凸性は、凸性に加えて目的関数が一様に正の曲率を持つことを意味します。
-    凸関数と強凸関数の例を \cref{fig:convexity_comparison} に示しました。
+    \cref{fig:convexity_comparison} に示した通り、凸関数と強凸関数には曲率に違いがみられます。
     このような定義は、文献によって多少の揺れがありますが、例えば~\citep{nesterovIntroductoryLecturesConvex2014,kanamori2016continuous}などを参照してください。
 \fi
 \begin{figure}[t]
@@ -345,9 +327,114 @@
 \end{equation*}
 \ifEn
     holds for all $x,y$.
+    The $L$-smoothness of $f$ is equivalent to the $L$-Lipschitz continuity of the gradient $\nabla f$ by definition.
+    Please also refer to \cref{fig:l-smooth}.
 \else
     が任意の $x,y$ について成り立つことと同値です。
+    定義そのものですが、関数 $f$ が $L$-平滑であることは、勾配 $\nabla f$ が $L$-リプシッツ連続であることと同値です。
+    \Cref{fig:l-smooth}も参照して下さい。
 \fi
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\columnwidth]{../imgs/quasi_newton/l-smooth.pdf}
+    \caption{
+        \ifEn
+            An example of $L$-smooth function in one-dimensional space.
+            $L$-smoothness gives a bound on the variation of the function $f$ (the orange dashed line is an upper bound on $f(x)$), and it is equivalent to the Lipschitz continuity of $\nabla f$ ($\nabla f(x)$ only exists in the gray area).
+        \else
+            1次元における $L$-平滑関数の例。
+            $L$-平滑性は関数 $f$ の変動幅に有界性を与え(オレンジ色の破線が $f(x)$ の上界)、また $\nabla f$ のリプシッツ連続性と同値です(灰色の領域にしか、$\nabla f(x)$ は存在しない)。
+        \fi
+    }
+    \label{fig:l-smooth}
+\end{figure}
+
+\ifEn
+    In general, for nonconvex functions, the following upper bound holds for the function value $f(y)$.
+\else
+    非凸な関数に対しても、次の関数値 $f(y)$ に対する上界が常に成立します。
+\fi
+\begin{proposition}
+    \ifEn
+        Let $f \colon \mathbb{R}^n \to \mathbb{R}$ be an $L$-smooth function. Then for any $x,y \in \mathbb{R}^n$, we have
+    \else
+        関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $L$-平滑であるとする。
+        このとき、任意の $x,y \in \mathbb{R}^n$ について次が成り立つ。
+    \fi
+    \begin{equation*}
+        f(y) \le f(x) + \nabla f(x)^\top (y-x) + \frac{L}{2} \left\lVert y-x \right\rVert^2.
+    \end{equation*}
+\end{proposition}
+\begin{proof}
+    \ifEn
+        By the fundamental theorem of calculus, for any $x,y \in \mathbb{R}^n$, we have
+    \else
+        微分積分学の基本定理より、任意の $x,y \in \mathbb{R}^n$ について次が成り立ちます。
+    \fi
+    \begin{align*}
+        f(y) - f(x) & = \int_0^1 \nabla f(x+t(y-x))^\top (y-x) \mathrm{d}t                                                                                                                               \\
+                    & = \nabla f(x)^\top (y-x) + \int_0^1 (\nabla f(x+t(y-x)) - \nabla f(x))^\top (y-x) \mathrm{d}t                                                                                      \\
+                    & \leq \nabla f(x)^\top (y-x) + \int_0^1 \left\lVert \nabla f(x+t(y-x)) - \nabla f(x) \right\rVert \left\lVert y-x \right\rVert \mathrm{d}t &  & (\text{Cauchy--Schwarz inequality}) \\
+                    & \leq \nabla f(x)^\top (y-x) + \int_0^1 L t \left\lVert y-x \right\rVert^2 \mathrm{d}t                                                     &  & (\text{by $L$-smoothness})          \\
+                    & = \nabla f(x)^\top (y-x) + \frac{L}{2} \left\lVert y-x \right\rVert^2.
+    \end{align*}
+    \ifEn
+        This proves the upper bound.
+    \else
+        よって、上界が示されました。
+    \fi
+    \myQED
+\end{proof}
+
+\ifEn
+    If $f$ is convex in addition, the following lower bound also holds.
+\else
+    もし、更に $f$ が凸であれば、次の下界も成立します。
+\fi
+\begin{proposition}[{[\citep[Proposition 2.3.5]{FanZhongXiuMingLianSokZuiShiHuaarugorizumu2023}]}]
+    \ifEn
+        Let $f \colon \mathbb{R}^n \to \mathbb{R}$ be a convex and $L$-smooth function. Then for any $x,y \in \mathbb{R}^n$, we have
+    \else
+        関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が凸であり、かつ $L$-平滑であるとする。
+        このとき、任意の $x,y \in \mathbb{R}^n$ について次が成り立つ。
+    \fi
+    \begin{equation*}
+        f(y) \ge f(x) + \nabla f(x)^\top (y-x) + \frac{1}{2L} \left\lVert \nabla f(y) - \nabla f(x) \right\rVert^2.
+    \end{equation*}
+\end{proposition}
+\begin{proof}
+    \ifEn
+        Let us define the function $g_x(z)$ as follows.
+    \else
+        まず、関数 $g_x(z)$ を次のように定義します。
+    \fi
+    \begin{align*}
+        g_x(z)        & \coloneqq f(z) - f(x) - \nabla f(x)^\top (z-x), \\
+        \nabla g_x(z) & = \nabla f(z) - \nabla f(x).
+    \end{align*}
+    \ifEn
+        Since both $f(z)$ and the linear function $-f(x) - \nabla f(x)^\top (z-x)$ are convex in $z$, $g_x(z)$ is also convex and attains its minimum at $z=x$ where $\nabla g_x(z) = 0$ and thus the minimum value is $g_x(x)=0$.
+        Moreover, the $L$-smoothness of $f(z)$ directly implies the $L$-smoothness of $g_x(z)$.
+        Thus, by the $L$-smoothness of $g_x(z)$, we have
+    \else
+        関数 $f(z)$ と線形関数 $-f(x) - \nabla f(x)^\top (z-x)$ はどちらも $z$ について凸なので、$g_x(z)$ も凸であり、その最小値は $\nabla g_x(z) = 0$ を満たす $z=x$ でとる、つまり、最小値は $g_x(x)=0$ であることが分かります。
+        また、$f(z)$ の $L$-平滑性より、$g_x(z)$ の $L$-平滑性も直ちに導かれます。
+        よって、$g_x(z)$ の $L$-平滑性から次が成り立ちます。
+    \fi
+    \begin{align*}
+        0 & \leq g_x\qty(y-\frac{\nabla g_x(y)}{L} )                                                                                    &  & (\text{minimum is $g_x(x)=0$}) \\
+          & \leq g_x(y) - (\nabla g_x(y))^\top \frac{\nabla g_x(y)}{L} + \frac{L}{2} \left\lVert \frac{\nabla g_x(y)}{L} \right\rVert^2 &  & (\text{by $L$-smoothness})     \\
+          & = g_x(y) - \frac{1}{2L} \norm{\nabla g_x(y)}^2                                                                                                                  \\
+          & = f(y) - f(x) - \nabla f(x)^\top (y-x) - \frac{1}{2L} \left\lVert \nabla f(y) - \nabla f(x) \right\rVert^2.                 &  & (\text{definition of $g_x$})
+    \end{align*}
+    \ifEn
+        This proves the lower bound.
+    \else
+        よって、下界が示されました。
+    \fi
+    \myQED
+\end{proof}
 
 \ifEn
     The next proposition shows that $L$-smoothness can be characterized by the upper bound of the Hessian.
@@ -498,6 +585,7 @@
         が任意の $x,y \in \mathbb{R}^n$ について成り立つ。
     \fi
 \end{proposition}
+
 \ifEn
     We refer to other literature for the proof~\citep{bauschkeBaillonHaddadTheoremRevisited2009}~\citep[Proposition 12.60]{rockafellarVariationalAnalysis1998}.
 \else

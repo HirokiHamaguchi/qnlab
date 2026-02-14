@@ -4,7 +4,6 @@ LaTeX to Markdown converter for study documents.
 Processes all .tex files in the current directory and combines them into one Markdown file.
 """
 
-import re
 import sys
 from pathlib import Path
 
@@ -20,20 +19,26 @@ def main() -> None:
     """Main function to process all .tex files in current directory."""
     global_state = get_global_state()
     global_state.reset()
-
     current_dir = Path(__file__).parent.parent.resolve()
 
     # Convert PDFs to PNGs
-    convert_pdf_to_png(current_dir)
-    main_file = "0_main.tex"
-    tex_files = [
-        f for f in sorted(current_dir.glob("[1-4]*.tex")) if f.name != main_file
-    ]
-
-    assert tex_files, "No .tex files found in current directory."
+    convert_pdf_to_png(current_dir.parent / "imgs" / "quasi_newton")
+    convert_pdf_to_png(current_dir.parent / "imgs" / "modified_secant")
 
     all_markdown_lines = ["<!-- markdownlint-disable MD041 -->"]
-    each_markdown_lines = []
+
+    main_file = "0_main.tex"
+    main_content = ""
+    with open(current_dir / main_file, "r", encoding="utf-8") as f:
+        main_content = f.read()
+        main_content = main_content[
+            main_content.rfind("\\else") + 6 : main_content.rfind("\\fi")
+        ]
+        main_content = "\n".join(line.strip() for line in main_content.splitlines())
+        all_markdown_lines.extend([f"\n<!-- From {main_file} -->\n", main_content])
+
+    tex_files = [f for f in sorted(current_dir.glob("[1-4]*.tex"))]
+    assert tex_files, "No .tex files found in current directory."
 
     for tex_file in tex_files:
         print(f"Processing {tex_file.name}...")
@@ -42,7 +47,6 @@ def main() -> None:
         all_markdown_lines.extend(
             [f"\n<!-- From {tex_file.name} -->\n", *markdown_lines, "\n"]
         )
-        each_markdown_lines.append((tex_file.name, markdown_lines))
 
     output_file = current_dir / "qiita" / "combined_output.md"
     output_content = "\n".join(all_markdown_lines)

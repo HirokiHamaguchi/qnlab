@@ -5,6 +5,10 @@ from qnlab.util.doc_paths import doc_imgs_dir
 
 OUTPUT_DIR = doc_imgs_dir("quasi_newton")
 
+plt.rcParams["text.usetex"] = True
+plt.rcParams["font.family"] = "serif"
+plt.rcParams.update({"axes.titlesize": 20, "axes.labelsize": 20, "legend.fontsize": 16})
+
 
 class StronglyConvexFunction:
     def __init__(self, mu):
@@ -33,8 +37,8 @@ class StronglyConvexFunction:
         plt.figure(figsize=(8, 5))
         plt.plot(x, fx, label=r"$f(x)=\log(1+e^x)-x/2 + \mu x^2/2$")
         plt.title(rf"Graph of $f(x)$ with $\mu$={self.mu} and $x_0$={x0}")
-        plt.xlabel("x")
-        plt.ylabel("f(x)")
+        plt.xlabel("$x$")
+        plt.ylabel("$f(x)$")
         plt.grid(True)
 
         plt.scatter(xs, f_points, color="red", label="Newton steps")
@@ -82,8 +86,8 @@ class SqrtFunction:
         plt.figure(figsize=(8, 5))
         plt.plot(x, fx, label=r"$f(x)=\sqrt{1+x^2}$")
         plt.title(rf"Graph of $f(x)$ with $x_0$={x0}")
-        plt.xlabel("x")
-        plt.ylabel("f(x)")
+        plt.xlabel("$x$")
+        plt.ylabel("$f(x)$")
         plt.grid(True)
 
         plt.scatter(xs, f_points, color="red", label="Newton steps")
