@@ -171,7 +171,7 @@
 \ifEn
     To derive SR1 update, we construct the updated matrix $\bar{B}$ as a rank-one update. That is, we assume that for some vector $z \in \mathbb{R}^n$,
 \else
-    SR1 更新を導出するため、更新行列 $\bar{B}$ をランク1更新として構成します。すなわち、あるベクトル $z \in \mathbb{R}^n$ に対して、次が満たされると仮定します。
+    SR1更新を導出するため、更新行列 $\bar{B}$ をランク1更新として構成します。すなわち、あるベクトル $z \in \mathbb{R}^n$ に対して、次が満たされると仮定します。
 \fi
 \begin{equation*}
     \bar{B}_{\mathrm{SR1}} = B + z z^\top.
@@ -223,7 +223,7 @@
     Thus, we have derived the SR1 update formula.
     We omit the derivation of $\bar{H}_{\mathrm{SR1}}$.
 \else
-    よって、SR1 更新則が導出されました。
+    よって、SR1更新が導出されました。
 \fi
 
 \ifEn
@@ -235,7 +235,7 @@
 \ifEn
     The SR1 update requires $(y - Bs)^\top s \neq 0$ to be well-defined. When $(y - Bs)^\top s = 0$, the denominator of the SR1 update vanishes, and the update is typically skipped in practice.
 \else
-    SR1 更新は $(y - Bs)^\top s \neq 0$ であることを前提としています。$(y - Bs)^\top s = 0$ のとき分母が零となり、実用上は更新をスキップすることが多いです。
+    SR1更新は $(y - Bs)^\top s \neq 0$ であることを前提としています。$(y - Bs)^\top s = 0$ のとき分母が零となり、実用上は更新をスキップすることが多いです。
 \fi
 
 \ifEn
@@ -260,9 +260,9 @@
 \fi
 
 \ifEn
-    Recall that the SR1 update adds an update term as $z z^\top$. Instead, we can consider an asymmetric rank-one update of the form $z c^\top$ for some vector $c \in \mathbb{R}^n$. We symmetrize the result at the end.
+    Recall that the SR1 update adds $z z^\top$ to $B$ to obtain $\bar{B}$. Instead, we can consider an asymmetric rank-one update of the form $z c^\top$ for some vector $c \in \mathbb{R}^n$. We symmetrize the result at the end.
 \else
-    SR1 更新では更新項を $z z^\top$ として加えていました。代わりに、あるベクトル $c \in \mathbb{R}^n$ に対して、非対称なランク1更新 $z c^\top$ を考えることができます。そして最後に結果を対称化します。
+    SR1更新では $B$ に $z z^\top$ を加えることで $\bar{B}$ を得ていました。 代わりに、あるベクトル $c \in \mathbb{R}^n$ に対して、非対称なランク1更新 $z c^\top$ を考えることができます。そして最後に結果を対称化します。
 \fi
 \ifEn
     Assume $c^\top s \neq 0$, and from $Bs + z c^\top s = y$, we can derive $z$ as
@@ -472,7 +472,7 @@
 \ifEn
     In the PSB update rule discussed earlier, we substituted $c=s$, but we can consider taking a different $c$. Specifically, substituting $c=y$ yields the DFP update as follows.
 \else
-    先に述べた PSB 更新では $c=s$ としましたが、別の $c$ を選ぶことも可能です。具体的には $c=y$ を代入すると次のように DFP 更新が得られます。
+    先に述べた PSB 更新では $c=s$ としましたが、別の $c$ を選ぶことも可能です。具体的には $c=y$ を代入すると次のように DFP更新が得られます。
 \fi
 \begin{equation*}
     \bar{B}_{\mathrm{DFP}} = B + \frac{(y - Bs)y^\top + y(y - Bs)^\top}{y^\top s} - \frac{(y - Bs)^\top s}{(y^\top s)^2} yy^\top.
@@ -508,7 +508,7 @@
 \ifEn
     This update can be derived by considering the dual of the DFP update. As we will see later, the BFGS update with respect to $B$ has the same form as the DFP update with respect to $H$.
 \else
-    この更新はDFP更新の双対を考えることで導出できます。後で示すように、$B$ に対するBFGS更新は $H$ に対する DFP 更新と同じ形式となっています。
+    この更新はDFP更新の双対を考えることで導出できます。後で示すように、$B$ に対するBFGS更新は $H$ に対する DFP更新と同じ形式となっています。
 \fi
 
 \ifEn
@@ -553,7 +553,7 @@
     \ifEn
         Let $B \succ 0$ be a symmetric positive definite matrix. The solution to the above optimization problem is given by the BFGS update formula.
     \else
-        $B \succ 0$ を正定値対称行列とする。このとき、上記の最適化問題の解はBFGS更新則で与えられる。
+        $B \succ 0$ を正定値対称行列とする。このとき、上記の最適化問題の解はBFGS更新で与えられる。
     \fi
 \end{proposition}
 \begin{proof}
@@ -685,7 +685,7 @@
 \ifEn
     In this subsection, we focus on the BFGS update and provide a detailed derivation of its formula. BFGS update is known as one of the most successful quasi-Newton update rules in practice. Recall that the BFGS update formula is given by
 \else
-    本小節ではBFGS更新に注目し、その公式の詳細な導出を示します。 BFGS更新は実用上最も成功した準ニュートン更新則の一つとして知られています。 BFGS更新則は次で与えられていたことを再掲しておきます。
+    本小節ではBFGS更新に注目し、その公式の詳細な導出を示します。 BFGS更新は実用上最も成功した準ニュートン更新則の一つとして知られています。 BFGS更新は次で与えられていたことを再掲しておきます。
 \fi
 \begin{equation*}
     B_{k+1}   = B_k - \frac{B_k s_k s_k^\top B_k}{s_k^\top B_k s_k} + \frac{y_k y_k^\top}{y_k^\top s_k}.
@@ -708,7 +708,7 @@
 \ifEn
     Note that this BFGS update formula for $H_{k+1}$ has the same form as the DFP update formula for $B_{k+1}$. These are dual to each other. We now prove that this equation indeed gives the inverse of the BFGS update.
 \else
-    なお、このBFGS更新における $H_{k+1}$ の公式は、DFP更新則における $B_{k+1}$ の形式と同じであることに注意してください。これらは双対の関係にあります。以下では、この式が確かにBFGS更新の逆行列を与えることを示します。
+    なお、このBFGS更新における $H_{k+1}$ の公式は、DFP更新における $B_{k+1}$ の形式と同じであることに注意してください。これらは双対の関係にあります。以下では、この式が確かにBFGS更新の逆行列を与えることを示します。
 \fi
 
 \begin{proposition}
@@ -850,7 +850,7 @@
     \ifEn
         Applying the trace to the BFGS update formula, we have
     \else
-        BFGS更新則にトレースを適用すると
+        BFGS更新にトレースを適用すると
     \fi
     \begin{equation*}
         \mathrm{tr}(B_{+}) = \mathrm{tr}(B) - \mathrm{tr}\left(\frac{Bss^\top B}{s^\top Bs}\right) + \mathrm{tr}\left(\frac{yy^\top}{y^\top s}\right).
@@ -984,15 +984,15 @@
 \begin{equation*}
     f(x, y) = \frac{1}{2}(x^2 + y^2).
 \end{equation*}
+
 \ifEn
-    Both BFGS and DFP methods used a fixed step size of $\alpha_k = 1$ at every iteration.
+    The key aspect of this experiment is the choice of the initial Hessian approximation $B_0$. In principle, the true Hessian of this function is the identity matrix, but here we deliberately use a significantly incorrect initial approximation to test the robustness and corrective ability of the methods against such errors. Specifically, we choose the initial Hessian approximation $B_0$ to have eigenvalues 1 and $\lambda_1$, where $\lambda_1$ represents the degree of error in the initial approximation. Both BFGS and DFP methods used a fixed step size of $\alpha_k = 1$ at every iteration.
+
+    Additionally, we chose the initial point $x_0$ as follows:
 \else
-    BFGSとDFPのどちらも各反復で固定ステップサイズ $\alpha_k = 1$ を用いました。
-\fi
-\ifEn
-    The initial Hessian approximation $B_0$ is chosen to have eigenvalues 1 and $\lambda_1$, where $\lambda_1$ represents the degree of error in the initial approximation. The initial point $x_0$ is selected as
-\else
-    また、初期のヘッセ近似 $B_0$ は固有値 1 と $\lambda_1$ を持つように選びました。$\lambda_1$ は初期近似の誤差の程度を表しています。初期点 $x_0$ は次のように選びます。
+    この実験で最も大切なことは、初期ヘッセ行列 $B_0$ の選び方です。本来、この関数のヘッセ行列は単位行列ですが、ここではあえて大幅に誤った近似ヘッセ行列を用いることで、そのような誤りに対する耐性や、その修正能力を測ることを目的としています。具体的には、初期のヘッセ近似 $B_0$ が固有値 1 と $\lambda_1$ を持つように選びました。$\lambda_1$ は初期近似の誤差の程度を表しています。また、BFGSとDFPのどちらも各反復で固定ステップサイズ $\alpha_k = 1$ を用いました。
+
+    初期点 $x_0$ は次のように選びました。
 \fi
 \begin{equation*}
     \theta = \arctan(\sqrt{\lambda_1}), \quad x_0 = \begin{bmatrix}\cos(\theta) \\ \sin(\theta)\end{bmatrix}.
@@ -1002,6 +1002,7 @@
 \else
     これはPowellの元の解析に沿ったものです。この選択の詳細は~\citep{powellHowBadAre1986}を参照してください。
 \fi
+
 \ifEn
     The iteration continues until the norm of the current point falls below a tolerance relative to its initial norm. For each value of $\lambda_1$, we record the number of iterations required for convergence.
 \else

@@ -38,18 +38,18 @@
 \fi
 \ifEn
     We assume that $f$ is of class $C^2$ and strongly convex, so that the Hessian matrix $\nabla^2 f(x)$ is positive definite for all $x \in \mathbb{R}^n$, and thus invertible.
-    Using the gradient $g_k \coloneqq \nabla f(x_k)$ and Hessian $\nabla^2 f(x_k)$ at the $k$-th iterate $x_k$, the base procedure of Newton's method is to iteratively update as
+    Using the gradient $g_k \coloneqq \nabla f(x_k)$ and Hessian $\nabla^2 f(x_k)$ at the $k$-th iterate $x_k$, the one step of Newton's method can be expressed as follows:
 \else
     $f$ は $C^2$ 級かつ強凸であると仮定すると、ヘッセ行列 $\nabla^2 f(x)$ は任意の $x \in \mathbb{R}^n$ で正定値となり可逆です。
-    $k$ 反復目の点 $x_k$ における勾配 $g_k \coloneqq \nabla f(x_k)$ とヘッセ行列 $\nabla^2 f(x_k)$ を用いて、ニュートン法の基本手続きは次のように表せます。
+    $k$ 反復目の点 $x_k$ における勾配 $g_k \coloneqq \nabla f(x_k)$ とヘッセ行列 $\nabla^2 f(x_k)$ を用いて、ニュートン法の1ステップは次のように表せます。
 \fi
 \begin{equation*}
     x_{k+1} \gets x_k - \alpha_k \nabla^2 f(x_k)^{-1} g_k.
 \end{equation*}
 \ifEn
-    Here, $\alpha_k > 0$ is the step size determined by line search. We can derive this update rule as follows. The quadratic Taylor approximation of $f$ at $x_k$ is given by
+    Here, $\alpha_k > 0$ is the step size determined by line search. We can derive this update rule as follows. Firstly, the quadratic model of $f$ at $x_k$ is given by the Taylor expansion as follows:
 \else
-    ここで $\alpha_k > 0$ は直線探索によって定められるステップサイズです。この更新規則は次のように導出できます。$x_k$ での $f$ の二次のテイラー近似は次式で与えられます。
+    ここで $\alpha_k > 0$ は直線探索によって定められるステップサイズです。この更新則は次のように導出できます。まず、$x_k$ での $f$ の二次近似モデルはテイラー展開により次のように与えられます。
 \fi
 \begin{equation*}
     m_{k}^*(x) \coloneqq f(x_k) + g_k^\top (x - x_k) + \frac{1}{2} (x - x_k)^\top \nabla^2 f(x_k) (x - x_k).
@@ -73,7 +73,7 @@
 \ifEn
     Selecting $x^*$ directly as the next iterate may seem natural, but as we will see later, it does not generally guarantee global convergence. Thus, we introduce a step size $\alpha_k > 0$ determined by line search to ensure a sufficient decrease in function values, leading to the update rule presented initially. This is the basic procedure of Newton's method.
 \else
-    次の反復点として、直接 $x^*$ を選ぶことは自然に思えますが、後述するようにこのままでは大域収束性を保証できません。そこで、関数値の十分な減少を確保するため、直線探索で定めるステップサイズ $\alpha_k > 0$ を導入すると、最初に示した更新式が得られます。これがニュートン法の基本的な手続きとなります。
+    次の反復点として、直接 $x^*$ を選ぶことは自然に思えますが、後述するようにこのままでは大域収束性を保証できません。そこで、関数値の十分な減少を確保するため、直線探索で定めるステップサイズ $\alpha_k > 0$ を導入すると、最初に示した更新則が得られます。これがニュートン法の基本的なアルゴリズムとなります。
 \fi
 
 \begin{figure}[t]

@@ -40,6 +40,8 @@ def post_process_content(content: str) -> str:
     content = re.sub(r"\\label\{[^}]+\}", "", content)
     content = content.replace("\\myQED", "")
     content = content.replace("^*", "^\\ast")
+    assert "\\norm{" not in content
+    assert "\\qty" not in content
     # Note: citep conversion is applied in for_qiita_post_process
     return content
 

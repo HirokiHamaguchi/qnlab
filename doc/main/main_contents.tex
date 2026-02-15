@@ -25,15 +25,12 @@ The error is predominantly relative when $\abs{f(x)}$ is large and effectively a
 Closely related models are also employed in practical stopping criteria~\citep{2020SciPy-NMeth}.
 
 We next state assumptions regarding gradient evaluations.
-In practice, termination is typically based on a gradient tolerance $\gtol$, and considers $\norm{\nabla \overline{f}(x)} \le \gtol$ as a stopping criterion.
-In our numerical experiments, following common implementations~\citep{2020SciPy-NMeth}, we use the infinity norm for the gradient, though other norms could equally be employed.
-If the gradient noise were comparable to or larger than $\gtol$, the stopping criterion could not be reliably satisfied, no matter how close $x$ is to a stationary point.
-Therefore, $\gtol$ must be chosen sufficiently large than the gradient noise level.
-Accordingly, it is natural to assume that the error in gradient evaluations is small compared to the prescribed tolerance:
+In practice, termination is typically based on a gradient tolerance $\gtol$ and $\norm{\nabla \overline{f}(x)} \le \gtol$ is used as a stopping criterion. Thus, $\norm{\nabla \overline{f}(x)} > \gtol$ holds prior to termination.
+If the gradient noise $\geps$ were comparable to or larger than $\gtol$, the stopping criterion could not be reliably satisfied, no matter how close $x$ is to a stationary point.
+Accordingly, we require that the gradient noise $\geps$ be sufficiently small compared to $\gtol$ and the true gradient norm $\norm{\nabla \overline{f}(x)}$:
 \begin{equation*}
-    \norm{\nabla f(x)-\nabla\overline{f}(x)}\ll\gtol.
+    \norm{\nabla f(x)-\nabla\overline{f}(x)}\ll \geps \ll \gtol \leq \norm{\nabla \overline{f}(x)}.
 \end{equation*}
-Since $\norm{\nabla \overline{f}(x)} > \gtol$ holds prior to termination, the gradient noise is also negligible compared to the gradient norm itself.
 Consequently, in our theoretical analysis, we assume exact gradients:
 \begin{equation}\label{eq:exact_gradient_assumption}
     \norm{\nabla f(x)-\nabla\overline{f}(x)}=0.
@@ -863,7 +860,7 @@ This setting is the same as the one in~\citep{shiNoiseTolerantQuasiNewtonAlgorit
 
 We used performance profiles~\citep{dolanBenchmarkingOptimizationSoftware2002} to compare the algorithms.
 Let $P$ denote the set of test problems and $S$ the set of solvers.
-For each problem $p \in P$ and solver $s \in S$, let $t_{p,s} > 0$ denote the number of function and gradient evaluations required to reach a specified gradient norm tolerance $\gtol$.
+For each problem $p \in P$ and solver $s \in S$, let $t_{p,s} > 0$ denote the number of function and gradient evaluations required to reach a specified gradient norm tolerance $\gtol$. Following common implementations~\citep{2020SciPy-NMeth}, we used the infinity norm for the gradient, though other norms may equally be employed.
 Note that $t_{p,s}$ is not time in this experiment but the number of evaluations.
 When a solver fails to converge within the gradient tolerance or exceeds a maximum number of evaluations, we set $t_{p,s} = +\infty$.
 Then, the performance ratio $r_{p,s}$ is defined as

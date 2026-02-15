@@ -156,15 +156,15 @@
     \textrm{(negative semi-definite)} \quad & v^\top A v \le 0 \quad \forall v \in \mathbb{R}^n.
 \end{align*}
 \ifEn
-    A matrix is indefinite if it is neither positive nor negative definite. For matrices $A,B \in \mathbb{R}^{n \times n}$, the notation $A \succeq B$ indicates that $A-B$ is positive semi-definite. In particular, if $B$ is a zero matrix, we simply write $A \succeq 0$. We similarly define $\preceq$ for negative semi-definiteness. For $\mu \geq 0$, the condition $A \succeq \mu I$ is equivalent to $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ for all $v \in \mathbb{R}^n$. It directly implies that all eigenvalues of $A$ are at least $\mu$, which in turn implies that the operator norm $\left\lVert A \right\rVert$ is at least $\mu$, i.e., $\left\lVert A \right\rVert \geq \mu$.
+    A matrix is indefinite if it is neither positive nor negative definite. For matrices $A,B \in \mathbb{R}^{n \times n}$, the notation $A \succeq B$ indicates that $A-B$ is positive semi-definite. In particular, if $B$ is a zero matrix, we may simply write $A \succeq 0$. We similarly define $\preceq$ for negative semi-definiteness. For $\mu \geq 0$, the condition $A \succeq \mu I$ is equivalent to $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ for all $v \in \mathbb{R}^n$. It directly implies that all eigenvalues of $A$ are at least $\mu$, which in turn implies that the operator norm $\left\lVert A \right\rVert$ is at least $\mu$, i.e., $\left\lVert A \right\rVert \geq \mu$.
 \else
-    正定値でも負定値でもない行列は不定値 (indefinite) と呼ばれます。行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表します。特に $B$ が零行列のときは $A \succeq 0$ と書きます。同様に、$\preceq$ は半負定値に対して定義されます。$\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ と同値です。これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味し、さらに作用素ノルムについても $\left\lVert A \right\rVert \geq \mu$ であることを導きます。
+    正定値でも負定値でもない行列は不定値 (indefinite) と呼ばれます。行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表します。特に $B$ が零行列のときは $A \succeq 0$ と書くことがあります。同様に、$\preceq$ は半負定値に対して定義されます。$\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ と同値です。これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味し、さらに作用素ノルムについても $\left\lVert A \right\rVert \geq \mu$ であることを導きます。
 \fi
 
 \ifEn
-    Then, we can relate convexity and strong convexity to the definiteness of the Hessian as follows.
+    Here, strong convexity means that the function has uniformly positive curvature. This corresponds to the Hessian matrix also having uniformly positive curvature, i.e., being uniformly positive definite. In fact, it is known that convexity and strong convexity are equivalent to the definiteness of the Hessian matrix as follows.
 \else
-    ここで、凸性および強凸性とヘッセ行列の正定値性との関係は次の通りです。
+    ここで、強凸性は関数が一様に正の曲率を持つことを意味していました。これはヘッセ行列も一様に正の曲率を持つこと、つまり一様に正定値であることと対応しています。実際、凸性や強凸性は次のように、ヘッセ行列の定値性と同値になることが知られています。
 \fi
 \begin{proposition}\label{prop:convexity-hessian}
     \ifEn
@@ -272,10 +272,9 @@
     \includegraphics[width=\textwidth]{../imgs/quasi_newton/pd.pdf}
     \caption{
         \ifEn
-            Quadratic model
-            $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ in 2-dimensional space with Hessians $H$ which is (left) positive definite, (center) indefinite, (right) negative definite. $f(x)$ is (left) convex, (center) nonconvex, and (right) concave, respectively.
+            Quadratic function $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ in 2-dimensional space with Hessians $H$ which is (left) positive definite, (center) indefinite, (right) negative definite. $f(x)$ is (left) convex, (center) nonconvex, and (right) concave, respectively.
         \else
-            二次モデル $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ を二次元空間で示したもの。 ヘッセ行列 $H$ が (左)正定値、(中央)不定値、(右)負定値の場合を示す。 $f(x)$ はそれぞれ (左)凸、(中央)非凸、(右)凹である。
+            二次関数 $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ を二次元空間で示したもの。 ヘッセ行列 $H$ が (左)正定値、(中央)不定値、(右)負定値の場合を示す。 $f(x)$ はそれぞれ (左)凸、(中央)非凸、(右)凹である。
         \fi
     }
     \label{fig:pd}
@@ -306,9 +305,9 @@
     \includegraphics[width=\columnwidth]{../imgs/quasi_newton/l-smooth.pdf}
     \caption{
         \ifEn
-            An example of $L$-smooth function in one-dimensional space. $L$-smoothness gives a bound on the variation of $f$ such as an upper bound of $f(x)$ by the orange dashed line, and it is equivalent to the Lipschitz continuity of $\nabla f$, which means that $\nabla f$ only exists in the gray area.
+            An example of $L$-smooth function in one-dimensional space. $L$-smoothness gives a upper bound of $f(x)$ as shown by the orange dashed line, and it is equivalent to the Lipschitz continuity of $\nabla f$, which means that $\nabla f$ only exists in the gray area.
         \else
-            1次元における $L$-平滑関数の例。$L$-平滑性は、オレンジ色の破線による $f(x)$ の上界など、関数 $f$ の変動幅に有界性を与え、また灰色の領域にしか、$\nabla f(x)$ は存在しないこと、つまり $\nabla f$ のリプシッツ連続性を意味します。
+            一次元における $L$-平滑関数の例。$L$-平滑性は、オレンジ色の破線で示されたように $f(x)$ の上界を与え、また$\nabla f(x)$ が灰色の領域にしか存在させないこと、つまり $\nabla f$ のリプシッツ連続性を意味します。
         \fi
     }
     \label{fig:l-smooth}
@@ -383,9 +382,9 @@
         また、$f(z)$ の $L$-平滑性より、$g_x(z)$ の $L$-平滑性も直ちに導かれます。 よって、$g_x(z)$ の $L$-平滑性から次が成り立ちます。
     \fi
     \begin{align*}
-        0 & \leq g_x\qty(y-\frac{\nabla g_x(y)}{L} )                                                                                    &  & (\text{minimum is $g_x(x)=0$}) \\
+        0 & \leq g_x\left(y-\frac{\nabla g_x(y)}{L} \right)                                                                             &  & (\text{minimum is $g_x(x)=0$}) \\
           & \leq g_x(y) - (\nabla g_x(y))^\top \frac{\nabla g_x(y)}{L} + \frac{L}{2} \left\lVert \frac{\nabla g_x(y)}{L} \right\rVert^2 &  & (\text{by $L$-smoothness})     \\
-          & = g_x(y) - \frac{1}{2L} \norm{\nabla g_x(y)}^2                                                                                                                  \\
+          & = g_x(y) - \frac{1}{2L} \left\lVert \nabla g_x(y) \right\rVert^2                                                                                                \\
           & = f(y) - f(x) - \nabla f(x)^\top (y-x) - \frac{1}{2L} \left\lVert \nabla f(y) - \nabla f(x) \right\rVert^2.                 &  & (\text{definition of $g_x$})
     \end{align*}
     \ifEn
@@ -397,9 +396,9 @@
 \end{proof}
 
 \ifEn
-    The next proposition shows that $L$-smoothness can be characterized by the upper bound of the Hessian.
+    As we have seen so far, $L$-smoothness means that the rate of gradient change is bounded from above, and this can also be related to the definiteness of the Hessian matrix. In other words, as shown in the following proposition, the Hessian matrix is bounded from above by $L I$.
 \else
-    次の命題は、$L$-平滑性がヘッセ行列の上界で特徴づけられることを示します。
+    ここまで見てきたように、$L$-平滑性は勾配の変化率が上から抑えられることを意味してきましたが、これもヘッセ行列の定値性と関連付けることができます。つまり、次の命題で示すように、ヘッセ行列は $L I$ で上から抑えられることになります。
 \fi
 \begin{proposition}\label{prop:smoothness-hessian}
     \ifEn
@@ -486,9 +485,9 @@
 \fi
 
 \ifEn
-    The $L$-smoothness combined with $\mu$-strong convexity also provides bounds on the eigenvalues of the Hessian.
+    By combining the discussions on $L$-smoothness and $\mu$-strong convexity so far, we can also obtain bounds on the eigenvalues of the Hessian.
 \else
-    $L$-平滑性と $\mu$-強凸性を組み合わせると、ヘッセ行列の固有値に対するバウンドも得られます。
+    これまでの$L$-平滑性と $\mu$-強凸性に関する議論を組み合わせると、ヘッセ行列の固有値に対するバウンドも得られます。
 \fi
 \begin{proposition}\label{prop:hessian-eigenvalue-bound}
     \ifEn
@@ -531,11 +530,9 @@
 \fi
 
 \ifEn
-    As an advanced topic, one of the useful properties of $L$-smooth functions is given by the following Baillon–Haddad theorem.
-    Note that the $C^2$ assumption is not required in this theorem, and only the $C^1$ assumption is sufficient.
+    As an advanced topic, we introduce the following Baillon–Haddad theorem, which is one of the useful properties of $L$-smooth functions. Note that the $C^2$ assumption is not required in this theorem, and only the $C^1$ assumption is sufficient.
 \else
-    発展的な内容として、$L$-平滑性の有用な性質の一つが次の Baillon–Haddadの定理です。
-    この定理では $C^2$ 級の仮定は不要で、$C^1$ 級の仮定だけで十分であることに注意してください。
+    発展的な内容として、$L$-平滑性の有用な性質の一つである次の Baillon–Haddadの定理を紹介します。この定理では $C^2$ 級の仮定は不要で、$C^1$ 級の仮定だけで十分であることに注意してください。
 \fi
 \begin{proposition}[Baillon–Haddad theorem]\label{prop:baillon_haddad}
     \ifEn
@@ -577,6 +574,12 @@
 \else
     証明は他の文献も参照してください~\citep{bauschkeBaillonHaddadTheoremRevisited2009}~\citep[Proposition 12.60]{rockafellarVariationalAnalysis1998}。
 \fi
+
+\ifEn
+    This theorem is sometimes used to derive the following inequality, which is useful for analyzing the update rules of quasi-Newton methods such as BFGS and L-BFGS methods.
+\else
+    この定理は、準ニュートン法の一種であるBFGS法やL-BFGS法などの更新則の解析で有用な次の不等式を導く際に利用されることがあります。
+\fi
 \ifEn
     For the sequences $\{ x_k \}_k$ generated by an optimization algorithm, defining
 \else
@@ -588,15 +591,15 @@
 \ifEn
     and applying Baillon–Haddad theorem with $x=x_{k+1}$ and $y=x_k$ yields
 \else
-    と定義した上で、Baillon–Haddad 定理を $x=x_{k+1}$、$y=x_k$ に適用すると、次の結果が得られます。
+    と定義した上で、Baillon–Haddadの定理を $x=x_{k+1}$、$y=x_k$ に適用すると、次の結果が得られます。
 \fi
 \begin{equation*}
     s_k^\top y_k \ge \frac{1}{L} \left\lVert y_k \right\rVert^2.
 \end{equation*}
 \ifEn
-    This inequality is sometimes used in the analysis of update formulas in methods such as BFGS and L-BFGS.
+    This inequality is sometimes used as one of the conditions for ensuring the positive definiteness of the approximate Hessian in quasi-Newton methods, and it plays an important role in theoretical guarantees.
 \else
-    この不等式は準ニュートン法の一種であるBFGS法やL-BFGS法などの更新則の解析で用いられています。
+    この不等式は、準ニュートン法における近似ヘッセ行列の正定値性が保たれるための条件の一つとして利用され、理論保証の上で重要な役割を果たします。
 \fi
 
 \ifSubfilesClassLoaded{

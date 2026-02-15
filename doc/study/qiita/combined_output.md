@@ -114,9 +114,9 @@ $\mu=0$ の場合も、同様の議論により凸性について示すことが
 \end{align*}
 ```
 
-正定値でも負定値でもない行列は不定値 (indefinite) と呼ばれます。行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表します。特に $B$ が零行列のときは $A \succeq 0$ と書きます。同様に、$\preceq$ は半負定値に対して定義されます。$\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ と同値です。これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味し、さらに作用素ノルムについても $\left\lVert A \right\rVert \geq \mu$ であることを導きます。
+正定値でも負定値でもない行列は不定値 (indefinite) と呼ばれます。行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表します。特に $B$ が零行列のときは $A \succeq 0$ と書くことがあります。同様に、$\preceq$ は半負定値に対して定義されます。$\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ と同値です。これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味し、さらに作用素ノルムについても $\left\lVert A \right\rVert \geq \mu$ であることを導きます。
 
-ここで、凸性および強凸性とヘッセ行列の正定値性との関係は次の通りです。
+ここで、強凸性は関数が一様に正の曲率を持つことを意味していました。これはヘッセ行列も一様に正の曲率を持つこと、つまり一様に正定値であることと対応しています。実際、凸性や強凸性は次のように、ヘッセ行列の定値性と同値になることが知られています。
 
 **Proposition 2**
 
@@ -199,7 +199,7 @@ $v \in \mathbb{R}^n$ は任意なので、$\nabla^2 f(x)\succeq \mu I$ という
 
 ![../imgs/quasi_newton/pd.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/pd.png)
 
-(Fig. 2 二次モデル $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ を二次元空間で示したもの。 ヘッセ行列 $H$ が (左)正定値、(中央)不定値、(右)負定値の場合を示す。 $f(x)$ はそれぞれ (左)凸、(中央)非凸、(右)凹である。)
+(Fig. 2 二次関数 $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ を二次元空間で示したもの。 ヘッセ行列 $H$ が (左)正定値、(中央)不定値、(右)負定値の場合を示す。 $f(x)$ はそれぞれ (左)凸、(中央)非凸、(右)凹である。)
 
 ### 平滑性
 
@@ -215,7 +215,7 @@ $v \in \mathbb{R}^n$ は任意なので、$\nabla^2 f(x)\succeq \mu I$ という
 
 ![../imgs/quasi_newton/l-smooth.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/l-smooth.png)
 
-(Fig. 3 1次元における $L$-平滑関数の例。$L$-平滑性は、オレンジ色の破線による $f(x)$ の上界など、関数 $f$ の変動幅に有界性を与え、また灰色の領域にしか、$\nabla f(x)$ は存在しないこと、つまり $\nabla f$ のリプシッツ連続性を意味します。)
+(Fig. 3 一次元における $L$-平滑関数の例。$L$-平滑性は、オレンジ色の破線で示されたように $f(x)$ の上界を与え、また$\nabla f(x)$ が灰色の領域にしか存在させないこと、つまり $\nabla f$ のリプシッツ連続性を意味します。)
 
 非凸な関数に対しても、次の上界が常に成立します。
 
@@ -277,9 +277,9 @@ g_x(z)        & \mathrel{\vcenter{:}}= f(z) - f(x) - \nabla f(x)^\top (z-x), \\
 
 ```math
 \begin{align*}
-0 & \leq g_x\qty(y-\frac{\nabla g_x(y)}{L} )                                                                                    &  & (\text{minimum is $g_x(x)=0$}) \\
+0 & \leq g_x\left(y-\frac{\nabla g_x(y)}{L} \right)                                                                             &  & (\text{minimum is $g_x(x)=0$}) \\
 & \leq g_x(y) - (\nabla g_x(y))^\top \frac{\nabla g_x(y)}{L} + \frac{L}{2} \left\lVert \frac{\nabla g_x(y)}{L} \right\rVert^2 &  & (\text{by $L$-smoothness})     \\
-& = g_x(y) - \frac{1}{2L} \norm{\nabla g_x(y)}^2                                                                                                                  \\
+& = g_x(y) - \frac{1}{2L} \left\lVert \nabla g_x(y) \right\rVert^2                                                                                                \\
 & = f(y) - f(x) - \nabla f(x)^\top (y-x) - \frac{1}{2L} \left\lVert \nabla f(y) - \nabla f(x) \right\rVert^2.                 &  & (\text{definition of $g_x$})
 \end{align*}
 ```
@@ -290,7 +290,7 @@ g_x(z)        & \mathrel{\vcenter{:}}= f(z) - f(x) - \nabla f(x)^\top (z-x), \\
 
 </details>
 
-次の命題は、$L$-平滑性がヘッセ行列の上界で特徴づけられることを示します。
+ここまで見てきたように、$L$-平滑性は勾配の変化率が上から抑えられることを意味してきましたが、これもヘッセ行列の定値性と関連付けることができます。つまり、次の命題で示すように、ヘッセ行列は $L I$ で上から抑えられることになります。
 
 **Proposition 5**
 
@@ -365,7 +365,7 @@ $v \in \mathbb{R}^n$ は任意なので、$\nabla^2 f(x)\preceq L I$ という�
 
 #### ヘッセ行列の固有値のバウンド
 
-$L$-平滑性と $\mu$-強凸性を組み合わせると、ヘッセ行列の固有値に対するバウンドも得られます。
+これまでの$L$-平滑性と $\mu$-強凸性に関する議論を組み合わせると、ヘッセ行列の固有値に対するバウンドも得られます。
 
 **Proposition 6**
 
@@ -393,8 +393,7 @@ Proposition 2, Proposition 5 より、全ての $x \in \mathbb{R}^n$ に対し�
 
 #### Baillon–Haddadの定理
 
-発展的な内容として、$L$-平滑性の有用な性質の一つが次の Baillon–Haddadの定理です。
-この定理では $C^2$ 級の仮定は不要で、$C^1$ 級の仮定だけで十分であることに注意してください。
+発展的な内容として、$L$-平滑性の有用な性質の一つである次の Baillon–Haddadの定理を紹介します。この定理では $C^2$ 級の仮定は不要で、$C^1$ 級の仮定だけで十分であることに注意してください。
 
 **Proposition 7** (Baillon–Haddad theorem)
 
@@ -429,6 +428,8 @@ f(x) \ge f(y) + \nabla f(y)^\top (x-y) + \frac{1}{2L} \left\lVert \nabla f(x) - 
 
 証明は他の文献も参照してください[^bauschkeBaillonHaddadTheoremRevisited2009][^rockafellarVariationalAnalysis1998] (Proposition 12.60)。
 
+この定理は、準ニュートン法の一種であるBFGS法やL-BFGS法などの更新則の解析で有用な次の不等式を導く際に利用されることがあります。
+
 最適化アルゴリズムが生成する列 $\lbrace x_k \rbrace_k$ に対し、
 
 ```math
@@ -437,7 +438,7 @@ s_k \mathrel{\vcenter{:}}= x_{k+1}-x_k, \quad y_k \mathrel{\vcenter{:}}= \nabla 
 \end{equation*}
 ```
 
-と定義した上で、Baillon–Haddad 定理を $x=x_{k+1}$、$y=x_k$ に適用すると、次の結果が得られます。
+と定義した上で、Baillon–Haddadの定理を $x=x_{k+1}$、$y=x_k$ に適用すると、次の結果が得られます。
 
 ```math
 \begin{equation*}
@@ -445,7 +446,7 @@ s_k^\top y_k \ge \frac{1}{L} \left\lVert y_k \right\rVert^2.
 \end{equation*}
 ```
 
-この不等式は準ニュートン法の一種であるBFGS法やL-BFGS法などの更新則の解析で用いられています。
+この不等式は、準ニュートン法における近似ヘッセ行列の正定値性が保たれるための条件の一つとして利用され、理論保証の上で重要な役割を果たします。
 
 <!-- From 2_newton.tex -->
 
@@ -467,7 +468,7 @@ s_k^\top y_k \ge \frac{1}{L} \left\lVert y_k \right\rVert^2.
 ニュートン法は、初期点 $x_0$ から出発し、現在の点を逐次更新して点列 $\lbrace x_k \rbrace_{k=0}^\infty$ を生成する代表的な反復アルゴリズムです。
 
 $f$ は $C^2$ 級かつ強凸であると仮定すると、ヘッセ行列 $\nabla^2 f(x)$ は任意の $x \in \mathbb{R}^n$ で正定値となり可逆です。
-$k$ 反復目の点 $x_k$ における勾配 $g_k \mathrel{\vcenter{:}}= \nabla f(x_k)$ とヘッセ行列 $\nabla^2 f(x_k)$ を用いて、ニュートン法の基本手続きは次のように表せます。
+$k$ 反復目の点 $x_k$ における勾配 $g_k \mathrel{\vcenter{:}}= \nabla f(x_k)$ とヘッセ行列 $\nabla^2 f(x_k)$ を用いて、ニュートン法の1ステップは次のように表せます。
 
 ```math
 \begin{equation*}
@@ -475,7 +476,7 @@ x_{k+1} \gets x_k - \alpha_k \nabla^2 f(x_k)^{-1} g_k.
 \end{equation*}
 ```
 
-ここで $\alpha_k > 0$ は直線探索によって定められるステップサイズです。この更新規則は次のように導出できます。$x_k$ での $f$ の二次のテイラー近似は次式で与えられます。
+ここで $\alpha_k > 0$ は直線探索によって定められるステップサイズです。この更新則は次のように導出できます。まず、$x_k$ での $f$ の二次近似モデルはテイラー展開により次のように与えられます。
 
 ```math
 \begin{equation*}
@@ -499,7 +500,7 @@ m_{k}^\ast(x) \mathrel{\vcenter{:}}= f(x_k) + g_k^\top (x - x_k) + \frac{1}{2} (
 \end{equation*}
 ```
 
-次の反復点として、直接 $x^\ast$ を選ぶことは自然に思えますが、後述するようにこのままでは大域収束性を保証できません。そこで、関数値の十分な減少を確保するため、直線探索で定めるステップサイズ $\alpha_k > 0$ を導入すると、最初に示した更新式が得られます。これがニュートン法の基本的な手続きとなります。
+次の反復点として、直接 $x^\ast$ を選ぶことは自然に思えますが、後述するようにこのままでは大域収束性を保証できません。そこで、関数値の十分な減少を確保するため、直線探索で定めるステップサイズ $\alpha_k > 0$ を導入すると、最初に示した更新則が得られます。これがニュートン法の基本的なアルゴリズムとなります。
 
 <img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_opt_step0.png" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_opt_step1.png" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_opt_step2.png" />
 
@@ -1119,7 +1120,7 @@ $\bar{B}_{\mathrm{Broyden}}$ が実際に最小解であることを示します
 
 ##### 導出
 
-SR1 更新を導出するため、更新行列 $\bar{B}$ をランク1更新として構成します。すなわち、あるベクトル $z \in \mathbb{R}^n$ に対して、次が満たされると仮定します。
+SR1更新を導出するため、更新行列 $\bar{B}$ をランク1更新として構成します。すなわち、あるベクトル $z \in \mathbb{R}^n$ に対して、次が満たされると仮定します。
 
 ```math
 \begin{equation*}
@@ -1170,11 +1171,11 @@ z^\top s = \frac{(y - B s)^\top s}{z^\top s}.
 \end{equation*}
 ```
 
-よって、SR1 更新則が導出されました。
+よって、SR1更新が導出されました。
 
 ##### 補足
 
-SR1 更新は $(y - Bs)^\top s \neq 0$ であることを前提としています。$(y - Bs)^\top s = 0$ のとき分母が零となり、実用上は更新をスキップすることが多いです。
+SR1更新は $(y - Bs)^\top s \neq 0$ であることを前提としています。$(y - Bs)^\top s = 0$ のとき分母が零となり、実用上は更新をスキップすることが多いです。
 
 #### Powell Symmetric Broyden (PSB) 更新
 
@@ -1188,7 +1189,7 @@ Powell Symmetric Broyden (PSB) 更新[^m.j.d.powellNewAlgorithmUnconstrained1970
 
 ##### 導出
 
-SR1 更新では更新項を $z z^\top$ として加えていました。代わりに、あるベクトル $c \in \mathbb{R}^n$ に対して、非対称なランク1更新 $z c^\top$ を考えることができます。そして最後に結果を対称化します。
+SR1更新では $B$ に $z z^\top$ を加えることで $\bar{B}$ を得ていました。 代わりに、あるベクトル $c \in \mathbb{R}^n$ に対して、非対称なランク1更新 $z c^\top$ を考えることができます。そして最後に結果を対称化します。
 
 $c^\top s \neq 0$ と仮定し、$Bs + z c^\top s = y$ から $z$ を
 
@@ -1378,7 +1379,7 @@ $c = s$ のとき、$C_{\infty}$ の一般式は標準的な PSB 更新則を導
 
 ##### 導出
 
-先に述べた PSB 更新では $c=s$ としましたが、別の $c$ を選ぶことも可能です。具体的には $c=y$ を代入すると次のように DFP 更新が得られます。
+先に述べた PSB 更新では $c=s$ としましたが、別の $c$ を選ぶことも可能です。具体的には $c=y$ を代入すると次のように DFP更新が得られます。
 
 ```math
 \begin{equation*}
@@ -1401,7 +1402,7 @@ $c = s$ のとき、$C_{\infty}$ の一般式は標準的な PSB 更新則を導
 
 ##### 双対による導出
 
-この更新はDFP更新の双対を考えることで導出できます。後で示すように、$B$ に対するBFGS更新は $H$ に対する DFP 更新と同じ形式となっています。
+この更新はDFP更新の双対を考えることで導出できます。後で示すように、$B$ に対するBFGS更新は $H$ に対する DFP更新と同じ形式となっています。
 
 ##### KLダイバージェンス最小化による導出
 
@@ -1437,7 +1438,7 @@ KLダイバージェンスとは、行列間の近さを測る一種の非対称
 
 **Proposition 11** ([^kanamori2016continuous] (Section 7.2.4))
 
-$B \succ 0$ を正定値対称行列とする。このとき、上記の最適化問題の解はBFGS更新則で与えられる。
+$B \succ 0$ を正定値対称行列とする。このとき、上記の最適化問題の解はBFGS更新で与えられる。
 
 <details><summary>証明</summary>
 
@@ -1551,7 +1552,7 @@ B'^{-1} & = I + 2\frac{s'^\top y'+y'^\top y'}{2(s'^\top y')^2}(s' s'^\top) - \fr
 
 ### BFGS更新の詳細
 
-本小節ではBFGS更新に注目し、その公式の詳細な導出を示します。 BFGS更新は実用上最も成功した準ニュートン更新則の一つとして知られています。 BFGS更新則は次で与えられていたことを再掲しておきます。
+本小節ではBFGS更新に注目し、その公式の詳細な導出を示します。 BFGS更新は実用上最も成功した準ニュートン更新則の一つとして知られています。 BFGS更新は次で与えられていたことを再掲しておきます。
 
 ```math
 \begin{equation*}
@@ -1569,7 +1570,7 @@ H_{k+1} = \left(I - \frac{s_k y_k^\top}{y_k^\top s_k}\right) H_k \left(I - \frac
 \end{equation*}
 ```
 
-なお、このBFGS更新における $H_{k+1}$ の公式は、DFP更新則における $B_{k+1}$ の形式と同じであることに注意してください。これらは双対の関係にあります。以下では、この式が確かにBFGS更新の逆行列を与えることを示します。
+なお、このBFGS更新における $H_{k+1}$ の公式は、DFP更新における $B_{k+1}$ の形式と同じであることに注意してください。これらは双対の関係にあります。以下では、この式が確かにBFGS更新の逆行列を与えることを示します。
 
 **Proposition 12**
 
@@ -1673,7 +1674,7 @@ $B_{+} = B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}$ をBFGS更
 
 <details><summary>証明</summary>
 
-BFGS更新則にトレースを適用すると
+BFGS更新にトレースを適用すると
 
 ```math
 \begin{equation*}
@@ -1782,9 +1783,9 @@ f(x, y) = \frac{1}{2}(x^2 + y^2).
 \end{equation*}
 ```
 
-BFGSとDFPのどちらも各反復で固定ステップサイズ $\alpha_k = 1$ を用いました。
+この実験で最も大切なことは、初期ヘッセ行列 $B_0$ の選び方です。本来、この関数のヘッセ行列は単位行列ですが、ここではあえて大幅に誤った近似ヘッセ行列を用いることで、そのような誤りに対する耐性や、その修正能力を測ることを目的としています。具体的には、初期のヘッセ近似 $B_0$ が固有値 1 と $\lambda_1$ を持つように選びました。$\lambda_1$ は初期近似の誤差の程度を表しています。また、BFGSとDFPのどちらも各反復で固定ステップサイズ $\alpha_k = 1$ を用いました。
 
-また、初期のヘッセ近似 $B_0$ は固有値 1 と $\lambda_1$ を持つように選びました。$\lambda_1$ は初期近似の誤差の程度を表しています。初期点 $x_0$ は次のように選びます。
+また、初期点 $x_0$ は次のように選びます。
 
 ```math
 \begin{equation*}
