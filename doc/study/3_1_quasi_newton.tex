@@ -37,9 +37,9 @@
 \fi
 
 \ifEn
-    Line-search-based quasi-Newton methods generate a sequence $\{ x_k \}_{k=0}^{\infty}$ that converges to the optimal solution $x^*$ as follows:
+    Line-search-based quasi-Newton methods generate a sequence $\{ x_k \}_k$ that converges to the optimal solution $x^*$ as follows:
 \else
-    直線探索に基づく準ニュートン法では、最適解 $x^*$ に収束する列 $\{ x_k \}_{k=0}^{\infty}$ を次のように生成します。
+    直線探索に基づく準ニュートン法では、最適解 $x^*$ に収束する列 $\{ x_k \}_k$ を次のように生成します。
 \fi
 \begin{equation*}
     x_{k+1} = x_k - \alpha_k B_k^{-1} \nabla f(x_k)

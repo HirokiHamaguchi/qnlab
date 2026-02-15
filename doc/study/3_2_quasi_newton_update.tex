@@ -301,16 +301,16 @@
     \end{dcases}
 \end{equation*}
 \ifEn
-    The key result is that the sequence $\{ C_{2t} \}_{t=0}^{\infty}$ converges to a symmetric matrix satisfying the secant condition, as formalized in the following proposition.
+    The key result is that the sequence $\{ C_t \}_t$ converges to a symmetric matrix satisfying the secant condition, as formalized in the following proposition.
 \else
-    重要な結果として、列 $\{ C_{2t} \}_{t=0}^{\infty}$ はセカント条件を満たす対称行列に収束します。次の命題ではそれを示します。
+    重要な結果として、行列の列 $\{ C_t \}_t$ はセカント条件を満たす対称行列に収束します。次の命題ではそれを示します。
 \fi
 
 \begin{proposition}[{\citep[Lemma 7.2]{dennisjr.QuasiNewtonMethodsMotivation1977a}}]\label{prop:psb-convergence}
     \ifEn
-        The sequence $\{ C_{t} \}_{t=0}^{\infty}$ converges, and the limit is given by
+        The sequence $\{ C_t \}_t$ converges, and the limit is given by
     \else
-        行列の列 $\{ C_{t} \}_{t=0}^{\infty}$ は収束し、その極限は次で与えられる。
+        行列の列 $\{ C_t \}_t$ は収束し、その極限は次で与えられる。
     \fi
     \begin{equation*}
         \lim_{t \to \infty} C_{t}
@@ -409,11 +409,11 @@
          & = C_{\infty}.
     \end{align*}
     \ifEn
-        This shows the convergence of the even subsequence $\{ C_{2t} \}_{t=0}^{\infty}$ to $C_{\infty}$.
+        This shows the convergence of the even subsequence $\{ C_{2t} \}_t$ to $C_{\infty}$.
 
         Next, for the odd subsequence, we have
     \else
-        これで偶数番目の部分列 $\{ C_{2t} \}_{t=0}^{\infty}$ が $C_{\infty}$ に収束することが示されました。
+        これで偶数番目の部分列 $\{ C_{2t} \}_t$ が $C_{\infty}$ に収束することが示されました。
 
         次に奇数番目の部分列について、次の式が成立しています。
     \fi
@@ -431,9 +431,9 @@
         C_{2t+1} \to C_{\infty}.
     \end{equation*}
     \ifEn
-        Therefore both subsequences $\{ C_{2t} \}_{t=0}^{\infty}$ and $\{ C_{2t+1} \}_{t=0}^{\infty}$ converge to $C_{\infty}$, completing the proof.
+        Therefore both subsequences $\{ C_{2t} \}_t$ and $\{ C_{2t+1} \}_t$ converge to $C_{\infty}$, completing the proof.
     \else
-        従って、部分列 $\{ C_{2t} \}_{t=0}^{\infty}$ と $\{ C_{2t+1} \}_{t=0}^{\infty}$ はどちらも $C_{\infty}$ に収束し、証明が完了します。
+        従って、部分列 $\{ C_{2t} \}_t$ と $\{ C_{2t+1} \}_t$ はどちらも $C_{\infty}$ に収束し、証明が完了します。
     \fi
     \myQED
 \end{proof}

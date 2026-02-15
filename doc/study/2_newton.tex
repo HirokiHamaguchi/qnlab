@@ -32,9 +32,9 @@
 \fi
 
 \ifEn
-    Newton's method is a representative iterative algorithm that starts from an initial point $x_0$, successively updates the current point, and generates a sequence $\{ x_k \}_{k=0}^\infty$.
+    Newton's method is a representative iterative algorithm that starts from an initial point $x_0$, successively updates the current point, and generates a sequence $\{ x_k \}_k$.
 \else
-    ニュートン法は、初期点 $x_0$ から出発し、現在の点を逐次更新して点列 $\{ x_k \}_{k=0}^\infty$ を生成する代表的な反復アルゴリズムです。
+    ニュートン法は、初期点 $x_0$ から出発し、現在の点を逐次更新して点列 $\{ x_k \}_k$ を生成する代表的な反復アルゴリズムです。
 \fi
 \ifEn
     We assume that $f$ is of class $C^2$ and strongly convex, so that the Hessian matrix $\nabla^2 f(x)$ is positive definite for all $x \in \mathbb{R}^n$, and thus invertible.
@@ -472,9 +472,9 @@
 \label{sec:newton-fullstep}
 
 \ifEn
-    In Newton's method, adopting a step size $\alpha_k=1$ at every iteration may lead to difficulties. Here, we present specific examples of such failures and discuss the necessity of line search as a countermeasure.
+    In Newton's method, adopting a step size $\alpha_k=1$ at every iteration may lead to problematic behavior. Here, we present specific examples of such failures and discuss the necessity of line search as a countermeasure.
 \else
-    ニュートン法では、各反復でステップサイズを $\alpha_k=1$ とすることが困難を引き起こす場合があります。ここではそのような失敗の具体例を挙げ、対処として直線探索が必要となることを述べます。
+    ニュートン法では、各反復でステップサイズを $\alpha_k=1$ とすると問題を引き起こす場合があります。ここではそのような失敗の具体例を挙げ、対処として直線探索が必要となることを述べます。
 \fi
 
 \ifEn
@@ -598,9 +598,9 @@
 \fi
 
 \ifEn
-    As a conceptual supplement, we briefly clarify the relationship between “Newton's method as a root-finding algorithm” and “Newton's method in optimization.” These two formulations are closely related, but they have different perspectives and applications.
+    As a conceptual supplement, we briefly clarify the relationship between “Newton's method in optimization” and “Newton's method as a root-finding algorithm.” These two formulations are closely related, but they have different perspectives and applications.
 \else
-    概念的な補足として、「根探索としてのニュートン法」 と 「最適化におけるニュートン法」 の関係を簡潔に整理します。両者は密接に関係した手法ですが、考え方や適用対象は異なります。
+    概念的な補足として、「最適化におけるニュートン法」と「根探索としてのニュートン法」の関係を簡潔に整理します。両者は密接に関係した手法ですが、考え方や適用対象は異なります。
 \fi
 
 \begin{figure}[t]
@@ -608,39 +608,13 @@
     \includegraphics[width=\textwidth]{../imgs/quasi_newton/newton_raphson.pdf}
     \caption{
         \ifEn
-            Root-finding for the gradient $\nabla f(x)=3 x^2 - 4 x + 1$ and optimization of the function $f(x)=x^3 - 2 x^2 + x$.
+            Optimization of the function $f(x)=x^3 - 2 x^2 + x$ and root-finding for the gradient $\nabla f(x)=3 x^2 - 4 x + 1$.
         \else
-            勾配 $\nabla f(x)=3 x^2 - 4 x + 1$ に対する根探索と関数 $f(x)=x^3 - 2 x^2 + x$ に対する最適化。
+            関数 $f(x)=x^3 - 2 x^2 + x$ に対する最適化と勾配 $\nabla f(x)=3 x^2 - 4 x + 1$ に対する根探索。
         \fi
     }
     \label{fig:newton_raphson}
 \end{figure}
-
-\ifEn
-    \subsubsection{Newton's Method as a Root-Finding Algorithm}
-\else
-    \subsubsection{根探索としてのニュートン法}
-\fi
-
-\ifEn
-    When referring simply to Newton's method (or the Newton–Raphson method), one may mean a root-finding algorithm for a differentiable scalar function $g\colon \mathbb{R} \to \mathbb{R}$ that solves $g(x) = 0$. It is also arguably fundamental and widely known.
-\else
-    単にニュートン法(あるいはニュートン・ラフソン法)と言うと、微分可能なスカラー関数 $g\colon \mathbb{R} \to \mathbb{R}$ に対して $g(x) = 0$ を解く根探索アルゴリズムを指すこともあります。この手法も、基本的でよく知られた手法です。
-\fi
-
-\ifEn
-    Starting from an initial value $x_0$, the iteration is given by
-\else
-    初期値 $x_0$ から開始するとして、この手法の反復は次式で与えられます。
-\fi
-\begin{equation*}
-    x_{k+1} = x_k - \frac{g(x_k)}{g'(x_k)}.
-\end{equation*}
-\ifEn
-    Geometrically, this corresponds to approximating the graph of $g$ near $x_k$ by its tangent line and selecting the intersection of this tangent with the $x$-axis as the next approximate solution.
-\else
-    幾何学的には、$x_k$ 近傍での $g$ のグラフを接線で近似し、その接線と $x$ 軸の交点を次の近似解として選ぶことに、この式は対応しています。
-\fi
 
 \ifEn
     \subsubsection{Newton's Method in Optimization}
@@ -654,9 +628,9 @@
     最適化文脈におけるニュートン法は、二回微分可能な関数 $f\colon \mathbb R^{n} \to\mathbb{R}$ の局所最小点を求めるアルゴリズムを指すことが一般的です。
 \fi
 \ifEn
-    Newton's method in optimization applies the framework of the root-finding algorithm to the gradient $\nabla f(x)$:
+    The update of Newton's method with a step size $\alpha_k=1$ was given by
 \else
-    $f$ に対する最適化としてのニュートン法は、勾配 $\nabla f(x)$ に対する根探索としてのニュートン法を適用したものと捉えることもできます。
+    ニュートン法の更新は$\alpha_k=1$とすると、次のように与えられていました。
 \fi
 \begin{equation*}
     x_{k+1} = x_k - \nabla^2 f(x_k)^{-1} \nabla f(x_k).
@@ -664,7 +638,38 @@
 \ifEn
     In the scalar case, the above expression reduces to $x_{k+1}=x_k - \frac{f'(x_k)}{f''(x_k)}$.
 \else
-    スカラーの場合、上の式は $x_{k+1}=x_k - \frac{f'(x_k)}{f''(x_k)}$ に簡約されるからです。
+    スカラーの場合、上の式は $x_{k+1}=x_k - \frac{f'(x_k)}{f''(x_k)}$ に簡約されます。
+\fi
+
+\ifEn
+    \subsubsection{Newton's Method as a Root-Finding Algorithm}
+\else
+    \subsubsection{根探索としてのニュートン法}
+\fi
+
+\ifEn
+    When referring to Newton's method (or the Newton–Raphson method), one may mean a root-finding algorithm for a differentiable scalar function $g\colon \mathbb{R} \to \mathbb{R}$ that solves $g(x) = 0$. It is also arguably fundamental and widely known.
+\else
+    ニュートン法(あるいはニュートン・ラフソン法)と言うと、微分可能なスカラー関数 $g\colon \mathbb{R} \to \mathbb{R}$ に対して $g(x) = 0$ を解く根探索アルゴリズムを指すこともあります。この手法も、基本的でよく知られた手法です。
+\fi
+
+\ifEn
+    Starting from an initial value $x_0$, the iteration is given by
+\else
+    初期値 $x_0$ から開始するとして、この手法の反復は次式で与えられます。
+\fi
+\begin{equation*}
+    x_{k+1} = x_k - \frac{g(x_k)}{g'(x_k)}.
+\end{equation*}
+\ifEn
+    Note that in the scalar case, since $g(x_k)=f'(x_k)$, this is the same formula as the update of Newton's method in optimization we saw earlier.
+\else
+    スカラーの場合においては、$g(x_k)=f'(x_k)$ なことに注意すると、先ほどの最適化としてのニュートン法の更新と同じ式であることが分かります。
+\fi
+\ifEn
+    Geometrically, this corresponds to approximating the graph of $g$ near $x_k$ by its tangent line and selecting the intersection of this tangent with the $x$-axis as the next approximate solution.
+\else
+    幾何学的には、$x_k$ 近傍での $g$ のグラフを接線で近似し、その接線と $x$ 軸の交点を次の近似解として選ぶことに、この式は対応しています。
 \fi
 
 \ifEn
@@ -674,9 +679,24 @@
 \fi
 
 \ifEn
-    Let us examine the equivalence of the two formulations through a concrete example. \Cref{fig:newton_raphson} illustrates the relationship between these formulations using a simple cubic function $f(x)$. The left panel shows root-finding applied to $g(x) = \nabla f(x)$, while the right panel shows optimization applied to $f(x)$.
+    Let us examine the equivalence of the two formulations through a concrete example.
+    \Cref{fig:newton_raphson} illustrates the relationship between these formulations using a simple cubic function $f(x)$.
+    The left figure corresponds to optimization of $f(x)$, while the right figure corresponds to root-finding for $g(x) = \nabla f(x)$.
 \else
-    具体例を通じて両者の等価性を確認してみます。\Cref{fig:newton_raphson}は単純な三次関数 $f(x)$ を用いて両者の関係を示したものです。左図は $g(x) = \nabla f(x)$ に対する根探索であり、右図は $f(x)$ に対する最適化となっています。
+    具体例を通じて両者の等価性を確認してみます。\Cref{fig:newton_raphson}は単純な三次関数 $f(x)$ を用いて両者の関係を示したものです。左図は $f(x)$ に対する最適化であり、右図は $g(x) = \nabla f(x)$ に対する根探索となっています。
+\fi
+\ifEn
+    In the optimization formulation, $f(x) = x^3 - 2x^2 + x$ is approximated by its second-order Taylor expansion
+\else
+    最適化の定式化では、$f(x) = x^3 - 2x^2 + x$ を二次のテイラー展開で近似し、
+\fi
+\begin{equation*}
+    m_k^*(x) = f(x_k) + \nabla f(x_k)(x - x_k) + \frac{1}{2}\nabla^2 f(x_k)(x - x_k)^2
+\end{equation*}
+\ifEn
+    and the minimizer of this quadratic model is taken as $x_{k+1}$.
+\else
+    として、この二次モデルの最小解を $x_{k+1}$ として取ります。
 \fi
 \ifEn
     In the root-finding formulation, $\nabla f(x) = 3x^2 - 4x + 1$ is approximated by its tangent line, namely
@@ -690,19 +710,6 @@
     and the root of this linear model is chosen as $x_{k+1}$.
 \else
     として、この線形モデルの根を $x_{k+1}$ として選びます。
-\fi
-\ifEn
-    In contrast, in the optimization formulation, $f(x) = x^3 - 2x^2 + x$ is approximated by its second-order Taylor expansion
-\else
-    一方、最適化の定式化では、$f(x) = x^3 - 2x^2 + x$ を二次のテイラー展開で近似し、
-\fi
-\begin{equation*}
-    m_k^*(x) = f(x_k) + \nabla f(x_k)(x - x_k) + \frac{1}{2}\nabla^2 f(x_k)(x - x_k)^2
-\end{equation*}
-\ifEn
-    and the minimizer of this quadratic model is taken as $x_{k+1}$.
-\else
-    として、この二次モデルの最小点を $x_{k+1}$ として取ります。
 \fi
 \ifEn
     Thus, under the assumption of positive definiteness, it is clear that both formulations perform essentially equivalent operations, and their correspondence can be explicitly verified.
