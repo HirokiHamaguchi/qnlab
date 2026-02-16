@@ -1,5 +1,5 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 from qnlab.util.doc_paths import doc_imgs_dir
 
@@ -27,7 +27,7 @@ c2 = 0.5
 
 armijo_line = f0 + c1 * grad0 * (x - x0)
 
-plt.figure(figsize=(6, 4))
+plt.figure(figsize=(7, 4))
 plt.plot(x, f, color=COLOR_FUNCTION)
 plt.plot(x, armijo_line, linestyle="--", color=COLOR_ARMIJO)
 plt.scatter([x0], [f0], color=COLOR_FUNCTION, zorder=5)
@@ -102,6 +102,6 @@ plt.yticks([])
 plt.xlim(-0.5 - 0.5, 2.8 + 0.5)
 plt.ylim(min(f) - 1.5, f0 + 1)
 plt.box(False)
-plt.title("Armijo and (weak) Wolfe Conditions", fontsize=20)
+plt.title("Armijo and (weak) Wolfe Conditions", fontsize=15)
 plt.savefig(OUTPUT_DIR / "armijo_wolfe_conditions.pdf", bbox_inches="tight")
 plt.close()

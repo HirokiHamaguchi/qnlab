@@ -1,5 +1,6 @@
 """Converter functions for LaTeX to Markdown conversion."""
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -280,6 +281,16 @@ def convert_math_env_to_md(block: str, env_name: str, counter: int) -> str:
     return "\n".join(result_lines)
 
 
+def add_version_query(image_path: str, url: str) -> str:
+    with open(Path(__file__).parent / "image_versions.json", "rb") as f:
+        image_versions = json.load(f)
+    print(image_path)
+    image_version = image_versions.get(image_path, 0)
+    if image_version:
+        url += f"?v={image_version}"
+    return url
+
+
 def convert_figure_to_md(block: str, counter: int) -> str:
     r"""Convert LaTeX figure block to Markdown.
 
@@ -295,6 +306,7 @@ def convert_figure_to_md(block: str, counter: int) -> str:
         if USE_GITHUB_URL:
             assert image_path.startswith("../")
             url = f"{GITHUB_RAW_URL_BASE}doc/{image_path.replace('../', '')}"
+            url = add_version_query(image_path, url)
         else:
             url = image_path
         result = f"![{image_path}]({url})\n"
@@ -305,10 +317,13 @@ def convert_figure_to_md(block: str, counter: int) -> str:
             if USE_GITHUB_URL:
                 assert image_path.startswith("../")
                 url = f"{GITHUB_RAW_URL_BASE}doc/{image_path.replace('../', '')}"
+                url = add_version_query(image_path, url)
             else:
                 url = image_path
             width = entry.get("width_percent")
             if width is not None:
+                if "modified_secant/trial" in image_path:
+                    width = "100"
                 img_tags.append(f'<img width="{width}%" src="{url}" />')
             else:
                 img_tags.append(f'<img src="{url}" />')

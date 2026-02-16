@@ -8,7 +8,7 @@
 
 数理最適化とは、このような最善の選択、およびそれを遂行する数学的手法や学問領域を指し、本稿では連続最適化、そして特にその代表的な手法であるニュートン法と準ニュートン法を中心として、基礎的な概念をまとめます。
 
-<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/sixhump.png" />
+<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/sixhump.png?v=1" />
 
 <!-- From 1_basic.tex -->
 
@@ -95,7 +95,7 @@ $\mu=0$ の場合も、同様の議論により凸性について示すことが
 
 強凸性は、凸性に加えて目的関数が一様に正の曲率を持つことを意味します。Fig. 1 に示した通り、凸関数と強凸関数には曲率に違いがみられます。$\mu=0$ を強凸の定義に含めるか否かは、文献によって多少の揺れがありますが、一般的な慣習に倣い本稿では含めません。例えば[^nesterovIntroductoryLecturesConvex2014][^kanamori2016continuous]などを参照してください。
 
-<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/convexity_comparison_convex.png" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/convexity_comparison_strongly_convex.png" />
+<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/convexity_comparison_convex.png?v=1" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/convexity_comparison_strongly_convex.png?v=1" />
 
 (Fig. 1 凸関数と強凸関数の例。 破線は $x=0$ における二次近似を示しています。 上2つの関数は凸ですが強凸ではなく、下2つの関数は強凸性の定義を満たす $\mu>0$ が存在し強凸となります。)
 
@@ -558,7 +558,7 @@ $0 < c_1 < c_2 < 1$ は定数です。
 Wolfe条件とは、Armijo 条件と曲率条件の両方が同時に満たされることを指します。
 Fig. 5 にこれらの条件が満たされる範囲を図示しています。
 
-![../imgs/quasi_newton/armijo_wolfe_conditions.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/armijo_wolfe_conditions.png)
+![../imgs/quasi_newton/armijo_wolfe_conditions.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/armijo_wolfe_conditions.png?v=1)
 
 (Fig. 5 Armijo 条件と曲率条件のイラスト。各矢印は、それぞれの条件が満たされる範囲を示しています。)
 
@@ -800,7 +800,7 @@ f''(x) & = \frac{1}{(1 + x^2)^{3/2}}.
 
 これは、最適解 $x^\ast=0$ から離れた点では、2階微分の値、つまりヘッセ行列の固有値が非常に小さくなり、ニュートンステップが過大になる為です。反復を重ねるごとに、より遠くへ飛んでいき、最適解から離れてしまいます。
 
-![../imgs/quasi_newton/newton_failure_sqrt_function_1.1.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_failure_sqrt_function_1.1.png)
+![../imgs/quasi_newton/newton_failure_sqrt_function_1.1.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_failure_sqrt_function_1.1.png?v=1)
 
 (Fig. 6 初期点 $x_0=1.1$ でニュートン法が発散する例)
 
@@ -828,7 +828,7 @@ f''''(x) & = \frac{e^x(1 - 4e^x + e^{2x})}{(1+e^x)^4}.
 
 それにもかかわらず、初期点 $x_0$ が $\mu$ に対して十分大きい場合、Fig. 7 に示すようにニュートン法は振動します。
 
-<img width="50%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_failure_strongly_convex_function_0.1_-4.png" /><img width="50%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_failure_strongly_convex_function_0.01_-4.png" />
+<img width="50%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_failure_strongly_convex_function_0.1_-4.png?v=1" /><img width="50%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_failure_strongly_convex_function_0.01_-4.png?v=1" />
 
 (Fig. 7 (左) $x_0=-4, \ \mu=0.1$ ではニュートン法が収束する。(右) $x_0=-4, \ \mu=0.01$ ではニュートン法が振動する。)
 
@@ -840,7 +840,7 @@ f''''(x) & = \frac{e^x(1 - 4e^x + e^{2x})}{(1+e^x)^4}.
 
 概念的な補足として、「最適化におけるニュートン法」と「根探索としてのニュートン法」の関係を簡潔に整理します。両者は密接に関係した手法ですが、考え方や適用対象は異なります。
 
-![../imgs/quasi_newton/newton_raphson.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_raphson.png)
+![../imgs/quasi_newton/newton_raphson.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_raphson.png?v=1)
 
 (Fig. 8 関数 $f(x)=x^3 - 2 x^2 + x$ に対する最適化と勾配 $\nabla f(x)=3 x^2 - 4 x + 1$ に対する根探索。)
 
@@ -1803,26 +1803,26 @@ f(x, y) = \frac{1}{2}(x^2 + y^2).
 
 数値結果を Table 1 に示します。これはPowellの元論文の表と部分的に一致しています。収束挙動は初期固有値 $\lambda_1$ に強く依存することが分かります。
 
-| $\lambda_1$ | BFGS | DFP  |
-| ----------- | ---- | ---- |
-| 0.001       | 4    | 3    |
-| 0.01        | 5    | 3    |
-| 0.1         | 6    | 4    |
-| 1           | 1    | 1    |
-| 10          | 8    | 16   |
-| 100         | 10   | 107  |
-| 1000        | 12   | 1006 |
-| 10000       | 15   | 9987 |
+| $\lambda_1$ | BFGS | DFP |
+| --- | --- | --- |
+| 0.001 | 4 | 3 |
+| 0.01 | 5 | 3 |
+| 0.1 | 6 | 4 |
+| 1 | 1 | 1 |
+| 10 | 8 | 16 |
+| 100 | 10 | 107 |
+| 1000 | 12 | 1006 |
+| 10000 | 15 | 9987 |
 
 (Table 1: 初期固有値 $\lambda_1$ に対するBFGSとDFPの収束比較。)
 
 Fig. 11 と Fig. 12 は特定の $\lambda_1$ に対する反復軌跡を示しています。これらの図は、同一の初期点から最小点(原点)へ向かう二つの手法の進み方を可視化し、収束速度と経路の違いを明確に示しています。
 
-![../imgs/quasi_newton/bfgs_vs_dfp_100.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/bfgs_vs_dfp_100.png)
+![../imgs/quasi_newton/bfgs_vs_dfp_100.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/bfgs_vs_dfp_100.png?v=1)
 
 (Fig. 11 $\lambda_1 = 100$ におけるBFGSとDFPの反復軌跡。BFGSは10回で収束する一方、DFPは107回を要し、固有値誤差が大きい場合にBFGSが優位であることを示しています。)
 
-![../imgs/quasi_newton/bfgs_vs_dfp_0.1.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/bfgs_vs_dfp_0.1.png)
+![../imgs/quasi_newton/bfgs_vs_dfp_0.1.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/bfgs_vs_dfp_0.1.png?v=1)
 
 (Fig. 12 $\lambda_1 = 0.1$ におけるBFGSとDFPの反復軌跡。どちらも素早く収束し、DFPがBFGSよりわずかに速くなっています。)
 
@@ -2052,7 +2052,7 @@ y_{m-1}
 
 Fig. 13 において、関数値と勾配が既知の2点 $x_k$ と $x_{k+1}$ があるとします。正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットしており、より良い収束挙動をもたらすことが分かります。しかし、標準的な勾配のみを用いて課されるセカント条件で作られるモデルでは、関数値の情報が無視され、曲率を大きく誤る可能性があり、真の目的関数の近似が悪くなります。
 
-<img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_EXPLAIN.png" /><img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_HESS.png" /><img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_BFGS.png" />
+<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_EXPLAIN.png?v=1" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_HESS.png" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_BFGS.png" />
 
 (Fig. 13 標準的なセカント条件の欠点。 (a) $x_k$ と $x_{k+1}$ での関数値と勾配が既に分かっている。 (b) 正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットする。 (c) 標準的なセカント条件では、必ずしも十分に曲率を捉えられない。)
 
@@ -2228,7 +2228,7 @@ B_{k+1}^{\mathrm{C}} s_k = y_k + \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nab
 
 これが三次項による修正セカント条件です。具体例としてFig. 16も参照してください。
 
-<img width="49%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_1_cubic.png" /><img width="49%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_1_quadratic.png" />
+<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_1_cubic.png" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_1_quadratic.png" />
 
 (Fig. 16 三次項による修正セカント方程式。三次項をモデルに組み込むことで、前の点で関数値と勾配の両方を一致させることが出来ます。その二次項までの展開によって、モデルを作成します。)
 
