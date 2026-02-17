@@ -24,47 +24,20 @@ This model captures the typical behavior of rounding errors in IEEE~754 floating
 The error is predominantly relative when $\abs{f(x)}$ is large and effectively absolute when $\abs{f(x)}$ is small.
 Closely related models are also employed in practical stopping criteria~\citep{2020SciPy-NMeth}.
 
-% We next state assumptions regarding gradient evaluations.
-% In practice, termination is typically based on a gradient tolerance $\gtol$ and $\norm{\nabla \overline{f}(x)} \le \gtol$ is used as a stopping criterion. Thus, $\norm{\nabla \overline{f}(x)} > \gtol$ holds prior to termination.
-% If the gradient noise $\geps$ were comparable to or larger than $\gtol$, the stopping criterion could not be reliably satisfied, no matter how close $x$ is to a stationary point.
-% Accordingly, we require that the gradient noise $\geps$ be sufficiently small compared to $\gtol$ and the true gradient norm $\norm{\nabla \overline{f}(x)}$:
-% \begin{equation*}
-%     \norm{\nabla f(x)-\nabla\overline{f}(x)}\ll \geps \ll \gtol \leq \norm{\nabla \overline{f}(x)}.
-% \end{equation*}
-% It means that $\nabla \overline{f}(x) \approx \nabla f(x)$ holds prior to termination, and thus we simplify the analysis by assuming exact gradients:
-% \begin{equation}\label{eq:exact_gradient_assumption}
-%     \nabla \overline{f}(x) = \nabla f(x).
-% \end{equation}
-% The exactness of $\overline{f}$ serves as a theoretical modeling choice just for simplicity, rather than a claim about practical gradient accuracy.
-% Our algorithm does not rely on Wolfe conditions, which requires accurate gradient information at trial points, and thus it implicitly considers the effect of gradient.
-% Our numerical experiments in \cref{sec:experiments} also test the case where gradients are contaminated by noise, demonstrating the practical effectiveness of the proposed method even when \cref{eq:exact_gradient_assumption} is violated.
-
-
-We next specify the assumptions concerning gradient evaluations.
-
-In practice, termination is typically based on a gradient tolerance $\gtol$, and the condition
-\[
-    \|\nabla \overline{f}(x)\| \le \gtol
-\]
-is used as a stopping criterion. Hence, prior to termination, it holds that
-\[
-    \|\nabla \overline{f}(x)\| > \gtol.
-\]
-
-If the gradient noise level $\geps$ were comparable to or larger than $\gtol$, the stopping criterion could not be satisfied reliably, even when $x$ is sufficiently close to a stationary point. To ensure meaningful termination, the gradient noise must therefore be sufficiently small relative to both $\gtol$ and the true gradient norm. Specifically, we assume
-\[
-    \|\nabla f(x) - \nabla \overline{f}(x)\| \ll \geps \ll \gtol \le \|\nabla \overline{f}(x)\|.
-\]
-
+We next specify the assumptions of gradient evaluations.
+In practice, termination is typically based on a gradient tolerance $\gtol$, and the condition $\norm{\nabla \overline{f}(x)} \le \gtol$ is used as a stopping criterion.
+Hence, prior to termination, it holds that $\norm{\nabla \overline{f}(x)} > \gtol$.
+If the gradient noise level $\geps$ were comparable to or larger than $\gtol$, the stopping criterion could not be satisfied reliably, even when $x$ is sufficiently close to a stationary point. To ensure meaningful termination, the gradient noise must be sufficiently small relative to $\gtol$. Specifically, we assume
+\begin{equation*}
+    \norm{\nabla f(x) - \nabla \overline{f}(x)} \ll \geps \ll \gtol \le \norm{\nabla \overline{f}(x)}.
+\end{equation*}
 Under this regime, the computed gradient $\nabla \overline{f}(x)$ is a sufficiently accurate approximation of the true gradient $\nabla f(x)$ prior to termination. Accordingly, for the purpose of simplifying the theoretical analysis, we adopt the exact-gradient assumption
 \begin{equation}\label{eq:exact_gradient_assumption}
     \nabla \overline{f}(x) = \nabla f(x).
 \end{equation}
-
-We emphasize that this assumption is introduced solely as a modeling simplification for the analysis, rather than as a claim about practical gradient accuracy. Notably, the proposed algorithm does not rely on Wolfe-type conditions, which typically require accurate gradient information at trial points. Hence, it is inherently less sensitive to gradient inaccuracies.
-
-Furthermore, the numerical experiments in \cref{sec:experiments} include cases where gradients are contaminated by noise, demonstrating that the proposed method remains effective even when \cref{eq:exact_gradient_assumption} is violated.
-
+We emphasize that this assumption is introduced solely as a modeling simplification, rather than as a claim about practical gradient accuracy.
+Notably, the proposed algorithm does not rely on Wolfe-type conditions, which typically require accurate gradient information at trial points, making it robust to gradient inaccuracies.
+Our numerical experiments in \cref{sec:experiments} include cases where gradients are contaminated by noise, and it also demonstrates that the proposed method remains effective even when \cref{eq:exact_gradient_assumption} is violated.
 
 \subsection{Regularized Quasi-Newton Methods}
 \label{sec:prel_rqn}
@@ -147,9 +120,9 @@ The pseudo-code of our algorithm is given in \cref{alg:regularized_qn}, where we
         }
         \uElse{
             $K^+ \gets K^+ \cup \{k\}$ \label{line:update_K_plus}\;
-            $\mu_{k} \gets \theta_k \sqrt{\varsigma + \sum_{j \in K^+} \norm{g_{j}}^2}$ with $\theta_k \in [\theta_{\min}, \theta_{\max}]$ chosen adaptively. \label{line:update_theta}\;
+            $\mu_{k} \gets \theta_k \sqrt{\varsigma + \sum_{j \in K^+} \norm{g_{j}}^2}$ with $\theta_k \in [\theta_{\min}, \theta_{\max}]$ (\cref{sec:proposed_choice_mu}). \label{line:update_theta}\;
         }
-        $d_k \gets -(B_k + \mu_k I)^{-1} g_k$ with $B_k$ chosen properly (\cref{sec:proposed_choice_Bk}). \label{line:d_k}\;
+        $d_k \gets -(B_k + \mu_k I)^{-1} g_k$ with $B_k$ (\cref{sec:proposed_choice_Bk}). \label{line:d_k}\;
         Find $\alpha_k$ and $\Delta_k$ satisfying \cref{eq:relaxed_Armijo_condition} by \cref{alg:backtracking_linesearch}.  \label{line:armijo}\;
         $x_{k+1} \gets x_k + \alpha_k d_k$,\,
         $g_{k+1} \gets \nabla \overline{f}(x_{k+1})$ \label{line:update}\;
@@ -165,7 +138,7 @@ The pseudo-code of our algorithm is given in \cref{alg:regularized_qn}, where we
     $\alpha_k \gets 1$\; \label{line:ls_init}
     $\Delta_k \gets \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_k), -\overline{f}(x_k+\alpha_k d_k))$\;
     \While{$\overline{f}(x_k) + c \alpha_k g_k^\top d_k + \Delta_k < \overline{f}(x_k+\alpha_k d_k)$}{
-        $\alpha_k \leftarrow \beta \alpha_k$ with $\beta \in [\beta_{\min},\beta_{\max}]$ chosen adaptively (\cref{sec:proposed_choice_alpha}). \; \label{line:ls_backtracking}
+        $\alpha_k \leftarrow \beta \alpha_k$ with $\beta \in [\beta_{\min},\beta_{\max}]$ (\cref{sec:proposed_choice_alpha}). \; \label{line:ls_backtracking}
         $\Delta_k \gets \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_k), -\overline{f}(x_k+\alpha_k d_k))$\;
     }
     \Return{$\alpha_k$}\;
@@ -177,8 +150,8 @@ In the following, we explain the three main components of \cref{alg:regularized_
 
 \paragraph{Computation of the Regularized Quasi-Newton Direction (\refLine{line:d_k}): }\label{sec:algorithm_components_d}
 
-The first component is the computation of the regularized quasi-Newton direction $d_k$.
-Given $g_k=\nabla \overline{f}(x_k) = \nabla f(x_k)$, an approximate Hessian $B_k$, and a regularization parameter $\mu_k$, we compute the search direction $d_k = -(B_k+\mu_k I)^{-1} g_k$ as in \cref{sec:prel_rqn}.
+The first component is the computation of the regularized quasi-Newton direction $d_k$ stated in \cref{sec:prel_rqn}.
+Given $g_k=\nabla \overline{f}(x_k) = \nabla f(x_k)$, an approximate Hessian $B_k$, and a regularization parameter $\mu_k$, we compute the search direction $d_k = -(B_k+\mu_k I)^{-1} g_k$.
 For the theoretical analysis, any choice of $B_k$ satisfying \cref{ass:BBounds} stated in \cref{sec:assumptions} is admissible, which ensures $B_k$ is positive definite.
 A practical choice of $B_k$ is discussed in \cref{sec:proposed_choice_Bk}.
 
@@ -194,7 +167,7 @@ We compute $\alpha_k$ satisfying the relaxed Armijo condition
 \end{equation}
 where $\Delta_k$ is the error-absorbing term that is recomputed for each $\alpha_k$.
 This relaxation guarantees the existence of $\alpha_k \in (0,1]$ even in the presence of numerical errors in $\overline{f}$.
-When $d_k$ is a descent direction ($g_k^\top d_k \leq 0$), \cref{eq:relaxed_Armijo_condition} ensures a temporary increase of $\overline{f}$ is at most $\Delta_k$.
+When $d_k$ is a descent direction ($g_k^\top d_k \leq 0$), \cref{eq:relaxed_Armijo_condition} ensures that a temporary increase of $\overline{f}$ is at most $\Delta_k$.
 Since $\Delta_k$ depends on $-\overline{f}(x_k + \alpha_k d_k)$ but not on $\overline{f}(x_k + \alpha_k d_k)$, the value of $\Delta_k$ is independent of how much $\overline{f}(x_k + \alpha_k d_k)$ increases, preventing unbounded growth of $\Delta_k$.
 
 \paragraph{Adaptive Update of the Regularization Parameter (\refLines{line:mu_0_condition}{line:update_theta}): }\label{sec:algorithm_components_mu}
@@ -208,11 +181,11 @@ Let us partition the iteration indices $K\defeq \{0,1,2,\ldots, k_{\max}-1\}$ in
 \end{equation}
 We set $\mu_k=0$ if and only if the following condition is satisfied:
 \begin{equation}\label{eq:mu_0_condition}
-    \min_{j \in K^0, \, j < k} \qty(\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k)
+    \min_{j \in K^0, \, j < k} \qty(\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k).
 \end{equation}
 Note that $k=0$ satisfies \cref{eq:mu_0_condition} since $K^0$ is empty.
 This condition restricts $\mu_k=0$ to iterations for which a sufficient decrease in $\overline f$ has been observed.
-Thereby, while $\overline{f}$ can temporarily increase, this condition theoretically ensures that $\overline{f}$ does not grow unboundedly or oscillate indefinitely. See \cref{fig:algorithm_illustration} for an illustrative example.
+Thereby, while $\overline{f}$ can temporarily increase, this condition theoretically ensures that $\overline{f}$ does not grow unboundedly or oscillate indefinitely.
 
 Otherwise, to ensure convergence to first-order stationary points, we apply an OFFO-based update
 \begin{equation}\label{eq:offo_based_update}
@@ -259,9 +232,9 @@ The second assumption ensures smoothness of the objective function.
     \end{equation*}
 \end{assumption}
 
-The third assumption requires the sequence of matrices $\{B_k\}_k$ to be uniformly bounded and uniformly positive definite.
+The third assumption requires the matrices $\{B_k\}_{k=0}^{k_{\mathrm{max}}-1}$ to be uniformly bounded and uniformly positive definite.
 \begin{assumption}\label{ass:BBounds}
-    There exist constants $0 < m \leq M$ such that all $B_k$ in \cref{alg:regularized_qn} satisfy
+    There exist constants $0 < m \leq M$ such that all $B_k$ satisfy
     \begin{equation*}\label{eq:BBounds}
         mI \preceq B_k \preceq MI.
     \end{equation*}
@@ -282,7 +255,7 @@ In the following, we define the actual and observed function decreases as
     \overline{\delta}_k & \defeq \overline{f}(x_k) - \overline{f}(x_{k+1}).
     \label{eq:def_overline_small_delta_k}
 \end{align}
-We first prove a useful property of $\Delta_k$ defined in \cref{eq:relaxed_Armijo_condition}.
+We first prove a useful property of the error-absorbing term $\Delta_k$ defined in \cref{eq:relaxed_Armijo_condition}.
 The following lemma asserts that the error between the actual values difference $\delta_k$ and the observed values difference $\overline{\delta}_k$ can be bounded by $\Delta_k$.
 \begin{lemma}\label{lem:error_bound_on_function_evaluations}
     If $x_k$ and $x_{k+1}$ satisfies $f(x_{k+1}) \le f(x_k)$, it holds that
@@ -294,11 +267,13 @@ The following lemma asserts that the error between the actual values difference 
     We start from a general observation.
     We claim that, for all $x \in \bbR^n$,
     \begin{equation}\label{eq:fx_two_cases}
-        \max(1,\pm f(x)) \le \frac{1}{1-\feps}\max(1,\pm \overline f(x)).
+        \begin{cases}
+            \max(1,f(x))  \le \frac{1}{1-\feps} \max(1,\overline f(x)), \\
+            \max(1,-f(x)) \le \frac{1}{1-\feps} \max(1,-\overline f(x)).
+        \end{cases}
     \end{equation}
-    The proof of \cref{eq:fx_two_cases} is as follows.
-    We only consider the case with the plus sign, as the other case can be treated analogously.
-    If $f(x)\le 1$, then $\max(1,f(x))=1$ and the inequality is trivial.
+    We only consider the case with the plus sign, as the negative case can be treated analogously.
+    If $f(x)\le 1$, then $\max(1,f(x)) = 1 \leq \frac{1}{1-\feps}$ and the inequality is trivial.
     If $f(x) > 1$, \cref{eq:error_model} implies
     \begin{equation}\label{eq:error_model_fx_1}
         \abs{f(x)-\overline{f}(x)} \le \feps \max(1,\abs{f(x)}) = \feps f(x).
@@ -328,8 +303,7 @@ The following lemma asserts that the error between the actual values difference 
 
 We also derive the following lemma for later use.
 \begin{lemma}\label{lem:error_delta_bounded_by_Delta}
-    If $x_k$ and $x_{k+1}$ satisfy the relaxed Armijo condition (\cref{eq:relaxed_Armijo_condition}) with a descent direction $d_k$ (i.e., $g_k^\top d_k \leq 0$),
-    it holds that
+    If $x_k$ and $x_{k+1}$ satisfy the relaxed Armijo condition (\cref{eq:relaxed_Armijo_condition}) and $d_k$ is a descent direction (i.e., $g_k^\top d_k \leq 0$), it holds that
     \begin{equation*}
         \overline{\delta}_k \leq \delta_k + \frac{1 + \feps}{1 - \feps} \Delta_k.
     \end{equation*}
