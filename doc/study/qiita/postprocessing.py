@@ -38,6 +38,7 @@ def post_process_content(content: str) -> str:
     content = convert_nested_itemize_enumerate(content)
     # Remove labels and \myQED
     content = re.sub(r"\\label\{[^}]+\}", "", content)
+    content = re.sub(r"--(?=[A-Z])", "–", content)
     content = content.replace("\\myQED", "")
     content = content.replace("^*", "^\\ast")
     assert "\\norm{" not in content

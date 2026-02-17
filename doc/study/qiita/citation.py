@@ -164,7 +164,7 @@ def convert_citep(content: str) -> str:
             optional_parts.append(opt2)
 
         if optional_parts:
-            result += f" ({', '.join(optional_parts)})"
+            result += f" [{', '.join(optional_parts)}]"
 
         return result
 

@@ -75,7 +75,7 @@
         \ifEn
             Basic idea of the modified secant condition. Even when the gradients are the same at two points $x_k$ and $x_{k+1}$, natural interpolation of function values differs depending on the function values $f(x_k)$ and $f(x_{k+1})$.
         \else
-            修正セカント条件の基本的な考え方。$x_k$ と $x_{k+1}$ で同一の勾配を持つが異なる関数値を持つ場合、適切な補間は異なります。
+            修正セカント条件の基本的な考え方。$x_k$ と $x_{k+1}$ で同一の勾配を持つが異なる関数値を持つ場合、適切な補完は異なります。
         \fi
     }
     \label{fig:cubic_interpolation}
@@ -161,7 +161,7 @@
 \ifEn
     By using this modified $\hat{y}^\mathrm{F}_k$ instead of $y_k$ in various quasi-Newton updates, we can incorporate function value information while keeping almost the same algorithm. Additionally, since condition $s_k^\top y_k > 0$ is important for maintaining positive definiteness in BFGS update, we can consider the following modification to ensure that the inner product with $s_k$ remains positive:
 \else
-    よって、各種の準ニュートン法の更新において、$s_k, y_k$ の代わりに、この修正された $\hat{y}^\mathrm{F}_k$ を使用することで、殆ど同じアルゴリズムのまま、目的関数値の情報を取り込むことができます。また、特にBFGS更新で $s_k^\top y_k > 0$ という条件は正定値性を保つために使われるなど重要な性質である為、$s_k$ との内積が正であることを保証した、次の修正も考えられます。
+    よって、各種の準ニュートン法の更新において、$y_k$ の代わりに、この修正された $\hat{y}^\mathrm{F}_k$ を使用することで、殆ど同じアルゴリズムのまま、目的関数値の情報を取り込むことができます。また、特にBFGS更新で $s_k^\top y_k > 0$ という条件は正定値性を保つために使われるなど重要な性質である為、$s_k$ との内積が正であることを保証した、次の修正も考えられます。
 \fi
 \begin{equation*}
     B_{k+1}^{\mathrm{F}'} s_k = y_k + \frac{\max(0, 2(f(x_k) - f(x_{k+1})) + (\nabla f(x_{k+1}) + \nabla f(x_k))^\top s_k)}{\left\lVert s_k \right\rVert^2} s_k.
@@ -208,7 +208,7 @@
 \ifEn
     Here, $\partial_{x_i x_j x_l} f$ denotes the third derivative of $f$ with respect to $x_i$, $x_j$, and $x_l$, and $s_k^{(i)}$ is the $i$-th component of the vector $s_k$. We introduced this tensor solely for analysis purposes, and it will be eliminated from the final formula.
 \else
-    ここで、$\partial_{x_i x_j x_l} f$ は $f$ の $x_i$、$x_j$、および $x_l$ に対する3階微分を表し、$s_k^{(i)}$ はベクトル $s_k$ の第 $i$ 成分です。このテンソルは分析目的でのみ導入しており、最終的な式からは除去されます。
+    ここで、$\partial_{x_i x_j x_l} f$ は $f$ の $x_i$、$x_j$、および $x_l$ に対する3階微分を表し、$s_k^{(i)}$ はベクトル $s_k$ の第 $i$ 成分です。このテンソルは解析目的でのみ導入しており、最終的な式からは除去されます。
 \fi
 
 \ifEn
@@ -252,7 +252,7 @@
 \ifEn
     By summing up and using $y_k = \nabla f(x_{k+1}) - \nabla f(x_k)$, we eliminate the tensor term and obtain the scalar identity
 \else
-    合計し、$y_k = \nabla f(x_{k+1}) - \nabla f(x_k)$ を使用することで、テンソル項を除去し、以下のスカラー恒等式を得ます。
+    これらを合計し、$y_k = \nabla f(x_{k+1}) - \nabla f(x_k)$ を使用することで、テンソル項が除去できて、以下の等式を得ます。
 \fi
 \begin{equation*}
     3(f(x_k) - f(x_{k+1}))

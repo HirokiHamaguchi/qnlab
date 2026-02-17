@@ -46,23 +46,21 @@
         \begin{equation*}
             \bar{B}s = y,
         \end{equation*}
-        and the action constraint
-        \begin{equation*}
-            \bar{B}z = Bz
-            \quad\text{for all } z\in\mathbb{R}^n \text{ such that } z^\top s = 0.
-        \end{equation*}
-        Then $\bar{B}$ is uniquely determined, and it is $\bar{B}_{\mathrm{Broyden}}$.
+        and the following constraint for all vectors $z \in \mathbb{R}^n$ such that $z^\top s = 0$:
     \else
         $\bar{B}$ がセカント条件
         \begin{equation*}
             \bar{B}s = y,
         \end{equation*}
-        と制約
-        \begin{equation*}
-            \bar{B}z = Bz
-            \quad\text{for all } z\in\mathbb{R}^n \text{ such that } z^\top s = 0.
-        \end{equation*}
-        を満たすと仮定します。このとき $\bar{B}$ は一意に定まり、$\bar{B}_{\mathrm{Broyden}}$ に一致します。
+        と、$z^\top s = 0$ を満たす全てのベクトル $z \in \mathbb{R}^n$ に対する次の制約を満たすと仮定します。
+    \fi
+    \begin{equation*}
+        \bar{B}z = Bz.
+    \end{equation*}
+    \ifEn
+        Then $\bar{B}$ is uniquely determined, and it is $\bar{B}_{\mathrm{Broyden}}$.
+    \else
+        このとき $\bar{B}$ は一意に定まり、$\bar{B}_{\mathrm{Broyden}}$ に一致します。
     \fi
 \end{proposition}
 \begin{proof}
@@ -86,9 +84,13 @@
         = Bz.
     \end{align*}
     \ifEn
-        Hence $\bar{B}_{\mathrm{Broyden}}$ satisfies the imposed conditions. Therefore, by uniqueness, we conclude that $\bar{B} = \bar{B}_{\mathrm{Broyden}}$.
+        Hence $\bar{B}_{\mathrm{Broyden}}$ satisfies the imposed conditions.
+
+        Therefore, by uniqueness, we conclude that $\bar{B} = \bar{B}_{\mathrm{Broyden}}$.
     \else
-        したがって、$\bar{B}_{\mathrm{Broyden}}$ は課された条件を満たします。よって、一意性より $\bar{B} = \bar{B}_{\mathrm{Broyden}}$ となります。
+        したがって、$\bar{B}_{\mathrm{Broyden}}$ は課された条件を満たします。
+
+        よって、一意性より $\bar{B} = \bar{B}_{\mathrm{Broyden}}$ となります。
     \fi
     \myQED
 \end{proof}
@@ -126,17 +128,18 @@
         \end{equation*}
         はアフィン集合であり凸です。よって、この最適化問題は高々一つの最小解しか持ちません。
 
-        $\bar{B}_{\mathrm{Broyden}}$ が実際に最小解であることを示します。制約 $\tilde{B}s=y$ を満たす任意の $\tilde{B}$ に対して
+        $\bar{B}_{\mathrm{Broyden}}$ が実際に最小解であることを示します。制約 $\tilde{B}s=y$ を満たす任意の $\tilde{B}$ に対して、次の評価が成り立ちます。
     \fi
-    \begin{equation*}
+    \begin{align*}
         \left\lVert \bar{B}_{\mathrm{Broyden}} - B \right\rVert_F^2
-        = \left\lVert (\tilde{B}-B) \frac{s s^\top}{s^\top s} \right\rVert_F^2
-        \leq \left\lVert \tilde{B}-B \right\rVert_F^2.
-    \end{equation*}
+         & = \left\lVert \frac{(y - Bs)s^\top}{s^\top s} \right\rVert_F^2         &  & (\text{definition of $\bar{B}_{\mathrm{Broyden}}$}) \\
+         & = \left\lVert (\tilde{B}-B) \frac{s s^\top}{s^\top s} \right\rVert_F^2 &  & (\tilde{B}s=y)                                      \\
+         & \leq \left\lVert \tilde{B}-B \right\rVert_F^2.
+    \end{align*}
     \ifEn
-        We used the submultiplicativity of the Frobenius norm and the fact that $\left\lVert ss^\top/(s^\top s) \right\rVert_F=1$. Hence $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$, and we obtain the claim.
+        In the last inequality, we used the submultiplicativity of the Frobenius norm and the fact that $\left\lVert ss^\top/(s^\top s) \right\rVert_F=1$. Hence $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$, and we obtain the claim.
     \else
-        ここでフロベニウスノルムの劣乗法性と $\left\lVert ss^\top/(s^\top s) \right\rVert_F=1$ を用いました。よって $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$ となり、主張が得られます。
+        最後の不等式評価でフロベニウスノルムの劣乗法性と $\left\lVert ss^\top/(s^\top s) \right\rVert_F=1$ を用いました。よって $\tilde{B}=\bar{B}_{\mathrm{Broyden}}$ となり、主張が得られます。
     \fi
     \myQED
 \end{proof}
@@ -262,7 +265,7 @@
 \ifEn
     Recall that the SR1 update adds $z z^\top$ to $B$ to obtain $\bar{B}$. Instead, we can consider an asymmetric rank-one update of the form $z c^\top$ for some vector $c \in \mathbb{R}^n$. We symmetrize the result at the end.
 \else
-    SR1更新では $B$ に $z z^\top$ を加えることで $\bar{B}$ を得ていました。 代わりに、あるベクトル $c \in \mathbb{R}^n$ に対して、非対称なランク1更新 $z c^\top$ を考えることができます。そして最後に結果を対称化します。
+    SR1更新では $B$ に $z z^\top$ を加えることで $\bar{B}$ を得ていました。代わりに、あるベクトル $c \in \mathbb{R}^n$ に対して、非対称なランク1更新 $z c^\top$ を考えることができます。そして最後に結果を対称化します。
 \fi
 \ifEn
     Assume $c^\top s \neq 0$, and from $Bs + z c^\top s = y$, we can derive $z$ as
@@ -308,9 +311,9 @@
 
 \begin{proposition}[{\citep[Lemma 7.2]{dennisjr.QuasiNewtonMethodsMotivation1977a}}]\label{prop:psb-convergence}
     \ifEn
-        The sequence $\{ C_t \}_t$ converges, and the limit is given by
+        Suppose that $c^\top s \neq 0$. Then, the sequence $\{ C_t \}_t$ converges, and the limit is given by
     \else
-        行列の列 $\{ C_t \}_t$ は収束し、その極限は次で与えられる。
+        $c^\top s \neq 0$ と仮定します。このとき、行列の列 $\{ C_t \}_t$ は収束し、その極限は次で与えられる。
     \fi
     \begin{equation*}
         \lim_{t \to \infty} C_{t}
@@ -324,7 +327,7 @@
     \ifEn
         We first analyze the even subsequence. For $t=0,1,2,\dots$, we define
     \else
-        まず偶数番目の部分列を解析します。 $t=0,1,2,\dots$ に対し、次のように定義します。
+        まず偶数番目の部分列を解析します。$t=0,1,2,\dots$ に対し、次のように定義します。
     \fi
     \begin{equation*}
         G_t \coloneqq C_{2t}.
@@ -448,15 +451,15 @@
 \end{equation*}
 
 \ifEn
-    \subsubsection{Davidon–Fletcher–Powell (DFP) Update}
+    \subsubsection{Davidon--Fletcher--Powell (DFP) Update}
 \else
-    \subsubsection{Davidon–Fletcher–Powell (DFP) 更新}
+    \subsubsection{Davidon--Fletcher--Powell (DFP) 更新}
 \fi
 
 \ifEn
-    The Davidon–Fletcher–Powell (DFP) update~\citep{nocedal1999numerical} is also a classical quasi-Newton update formula. The update formulas are given by
+    The Davidon--Fletcher--Powell (DFP) update~\citep{nocedal1999numerical} is also a classical quasi-Newton update formula. The update formulas are given by
 \else
-    \href{https://en.wikipedia.org/wiki/Davidon%E2%80%93Fletcher%E2%80%93Powell_formula}{Davidon–Fletcher–Powell (DFP) 更新}~\citep{nocedal1999numerical} も古典的な準ニュートン更新則です。
+    \href{https://en.wikipedia.org/wiki/Davidon%E2%80%93Fletcher%E2%80%93Powell_formula}{Davidon--Fletcher--Powell (DFP) 更新}~\citep{nocedal1999numerical} も古典的な準ニュートン更新則です。
     更新則は次で与えられます。
 \fi
 \begin{equation*}
@@ -484,19 +487,18 @@
 \fi
 
 \ifEn
-    \subsubsection{Broyden–Fletcher–Goldfarb–Shanno (BFGS) Update}
+    \subsubsection{Broyden--Fletcher--Goldfarb--Shanno (BFGS) Update}
 \else
-    \subsubsection{Broyden–Fletcher–Goldfarb–Shanno (BFGS) 更新}
+    \subsubsection{Broyden--Fletcher--Goldfarb--Shanno (BFGS) 更新}
 \fi
 
 \ifEn
-    The Broyden–Fletcher–Goldfarb–Shanno (BFGS) update is one of the most widely used quasi-Newton methods. The update formulas are given by
+    The Broyden--Fletcher--Goldfarb--Shanno (BFGS) update is one of the most widely used quasi-Newton methods. The update formulas are given by
 \else
-    \href{https://en.wikipedia.org/wiki/Broyden%E2%80%93Fletcher%E2%80%93Goldfarb%E2%80%93Shanno_algorithm}{Broyden–Fletcher–Goldfarb–Shanno (BFGS) 更新}は最も広く使われる準ニュートン法の一つです。
-    更新則は次で与えられます。
+    \href{https://en.wikipedia.org/wiki/Broyden%E2%80%93Fletcher%E2%80%93Goldfarb%E2%80%93Shanno_algorithm}{Broyden--Fletcher--Goldfarb--Shanno (BFGS) 更新}は最も広く使われる準ニュートン法の一つです。更新則は次で与えられます。
 \fi
 \begin{equation*}
-    \bar{B}_{\mathrm{BFGS}} = B - \frac{B s s^\top B}{s^\top B s} + \frac{y y^\top}{y^\top s}
+    \bar{B}_{\mathrm{BFGS}} = B - \frac{B s s^\top B}{s^\top B s} + \frac{y y^\top}{y^\top s}.
 \end{equation*}
 
 \ifEn
@@ -506,10 +508,19 @@
 \fi
 
 \ifEn
-    This update can be derived by considering the dual of the DFP update. As we will see later, the BFGS update with respect to $B$ has the same form as the DFP update with respect to $H$.
+    This update can be derived by considering the dual of the DFP update. The secant condition is $\bar{B} s = y$, and assuming $\bar{B}$ is invertible, we can also write it as $\bar{H} y = s$. By performing the same operations of enforcing the secant condition and symmetrization on this condition, we obtain
 \else
-    この更新はDFP更新の双対を考えることで導出できます。後で示すように、$B$ に対するBFGS更新は $H$ に対する DFP更新と同じ形式となっています。
+    この更新はDFP更新の双対を考えることで導出できます。セカント条件とは、$\bar{B} s = y$ ですが、$\bar{B}$ が可逆であるとすると、$\bar{H} y = s$ とも書けます。こちらの条件に対して、先ほどと同様の、セカント条件の強制と対称化の操作の繰り返しを行うと、次の式が得られます。
 \fi
+\begin{equation*}
+    \bar{H}_{\mathrm{BFGS}} = \left(I - \frac{s y^\top}{y^\top s}\right) H \left(I - \frac{y s^\top}{y^\top s}\right) + \frac{s s^\top}{y^\top s}.
+\end{equation*}
+\ifEn
+    As we will see later, this is indeed the inverse of $\bar{B}_{\mathrm{BFGS}}$. Note that this has the same form as the DFP update with $(B,s,y)$ replaced by $(H,y,s)$. Therefore, we can say that the BFGS update is the dual of the DFP update.
+\else
+    後で示す通り、これは確かに $\bar{B}_{\mathrm{BFGS}}$ の逆行列です。これは、DFP更新の $(B,s,y)$ を $(H,y,s)$ に置き換えたものと同じ形をしています。したがって、BFGS更新はDFP更新の双対であると言えます。
+\fi
+
 
 \ifEn
     \paragraph{Derivation by KL Divergence Minimization}
@@ -551,9 +562,9 @@
 
 \begin{proposition}[{\citep[Section 7.2.4]{kanamori2016continuous}}]
     \ifEn
-        Let $B \succ 0$ be a symmetric positive definite matrix. The solution to the above optimization problem is given by the BFGS update formula.
+        Let $y^\top s > 0$ and $B \succ 0$ be a symmetric positive definite matrix. The solution to the above optimization problem is given by the BFGS update formula.
     \else
-        $B \succ 0$ を正定値対称行列とする。このとき、上記の最適化問題の解はBFGS更新で与えられる。
+        $y^\top s > 0$ とし、また $B \succ 0$ を正定値対称行列とする。このとき、上記の最適化問題の解はBFGS更新で与えられる。
     \fi
 \end{proposition}
 \begin{proof}
@@ -610,7 +621,7 @@
     \ifEn
         By adding this equation and its transpose, and dividing by 2 again using $B' = B'^\top$, we obtain
     \else
-        この式とその転置を加えて2で割り、再び $B' = B'^\top$ を用いると次を得る。
+        この式とその転置を加えて2で割り、再び $B' = B'^\top$ を用いると次を得ます。
     \fi
     \begin{equation*}
         B'^{-1} = I+\lambda s'^\top+s'\lambda^\top.
@@ -621,7 +632,7 @@
         制約条件 $B's'=y'$ より $B'^{-1}y'=s'$ であるから、上式に右から $y'$ を掛けた式と、さらに左から $y'^\top$ を掛けた式はそれぞれ、次のようになる。
     \fi
     \begin{align*}
-        s'         & = y' +(s'^\top y')\lambda +(\lambda^\top y')s'                                \\
+        s'         & = y' +(s'^\top y')\lambda +(\lambda^\top y')s',                               \\
         y'^\top s' & = y'^\top y' + (s'^\top y')(y'^\top \lambda) + (\lambda^\top y')(y'^\top s').
     \end{align*}
     \ifEn
@@ -661,9 +672,9 @@
                      & = \left( I - \frac{s y^\top}{y^\top s} \right) B^{-1} \left( I - \frac{y s^\top}{y^\top s} \right) + \frac{s s^\top}{y^\top s}.
     \end{align*}
     \ifEn
-        As we will see later, this is indeed the formula for the inverse of the BFGS update, which completes the proof.
+        As we will see later, this is indeed the inverse of the BFGS update and positive definite, the proof is complete.
     \else
-        後述の通り、これは確かにBFGS更新の逆行列の公式であるため、証明が完了します。
+        後述の通り、これは確かにBFGS更新の逆行列かつ正定値であるため、証明が完了します。
     \fi
     \myQED
 \end{proof}
@@ -671,10 +682,8 @@
 \ifEn
     As for more details, see~\citep{kanamoriBregmanExtensionQuasiNewton2010,kanamoriBregmanExtensionQuasiNewton2010a}.
 \else
-    更なる詳細については~\citep{kanamoriBregmanExtensionQuasiNewton2010,kanamoriBregmanExtensionQuasiNewton2010a}をご参照ください。
-    \href{http://matsuzoe.web.nitech.ac.jp/infogeo/OCAMI2010/kanamori.pdf}{こちらのスライド}も参考になります。
+    更なる詳細については~\citep{kanamoriBregmanExtensionQuasiNewton2010,kanamoriBregmanExtensionQuasiNewton2010a}をご参照ください。\href{http://matsuzoe.web.nitech.ac.jp/infogeo/OCAMI2010/kanamori.pdf}{こちらのスライド}も参考になります。
 \fi
-
 
 \ifEn
     \subsection{Details of BFGS Update}
@@ -685,7 +694,7 @@
 \ifEn
     In this subsection, we focus on the BFGS update and provide a detailed derivation of its formula. BFGS update is known as one of the most successful quasi-Newton update rules in practice. Recall that the BFGS update formula is given by
 \else
-    本小節ではBFGS更新に注目し、その公式の詳細な導出を示します。 BFGS更新は実用上最も成功した準ニュートン更新則の一つとして知られています。 BFGS更新は次で与えられていたことを再掲しておきます。
+    本小節ではBFGS更新に注目し、その公式の詳細な導出を示します。BFGS更新は実用上最も成功した準ニュートン更新則の一つとして知られています。BFGS更新は次で与えられていたことを再掲しておきます。
 \fi
 \begin{equation*}
     B_{k+1}   = B_k - \frac{B_k s_k s_k^\top B_k}{s_k^\top B_k s_k} + \frac{y_k y_k^\top}{y_k^\top s_k}.
@@ -715,7 +724,7 @@
     \ifEn
         The matrix $H_{k+1}$ is the inverse of $B_{k+1}$.
     \else
-        行列 $H_{k+1}$ は $B_{k+1}$ の逆行列である。
+        行列 $H_k$ は $B_k$ の逆行列であり、$y_k^\top s_k \neq 0$ とすると、行列 $H_{k+1}$ は $B_{k+1}$ の逆行列である。
     \fi
 \end{proposition}
 \begin{proof}
@@ -747,9 +756,9 @@
         = -\frac{B_k s_k s_k^\top B_k}{s_k^\top B_k s_k} + \frac{y_k y_k^\top}{y_k^\top s_k}.
     \end{equation*}
     \ifEn
-        By the Sherman–Morrison–Woodbury identity, we can compute $H_{k+1}$ as follows:
+        By the \href{https://en.wikipedia.org/wiki/Woodbury_matrix_identity}{Sherman--Morrison--Woodbury identity}, we can compute $H_{k+1}$ as follows:
     \else
-        Sherman–Morrison–Woodbury の恒等式より、$H_{k+1}$ を次のように計算できます。
+        \href{https://en.wikipedia.org/wiki/Woodbury_matrix_identity}{Sherman--Morrison--Woodbury}の恒等式より、$H_{k+1}$ を次のように計算できます。
     \fi
     \begin{align*}
         H_{k+1} & = (B_k + U C V^\top)^{-1}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      \\
@@ -915,11 +924,6 @@
         \det(B_{k+1}) =\det(B_k + U C V^\top)=\det(B_k)\det(C) \det \left(C^{-1} + V^\top B_k^{-1} U\right).
     \end{equation*}
     \ifEn
-        Here, $I_2$ is the $2\times 2$ identity matrix.
-    \else
-        ここで $I_2$ は $2\times 2$ の単位行列です。
-    \fi
-    \ifEn
         Since $U=V=\begin{bmatrix}B_k s_k & y_k\end{bmatrix}$, we have
     \else
         $U=V=\begin{bmatrix}B_k s_k & y_k\end{bmatrix}$ なので
@@ -938,7 +942,7 @@
         \begin{bmatrix}-s_k^\top B_k s_k & 0 \\ 0 & y_k^\top s_k\end{bmatrix} +
         \begin{bmatrix} s_k^\top B_k s_k & s_k^\top y_k \\ y_k^\top s_k     & y_k^\top B_k^{-1} y_k \end{bmatrix}
         =
-        \begin{bmatrix}0 & s_k^\top y_k \\ y_k^\top s_k & y_k^\top B_k^{-1} y_k \end{bmatrix}.
+        \begin{bmatrix}0 & s_k^\top y_k \\ y_k^\top s_k & y_k^\top s_k + y_k^\top B_k^{-1} y_k \end{bmatrix}.
     \end{equation*}
     \ifEn
         Thus, combining these results, we obtain
@@ -1086,9 +1090,9 @@
 \fi
 
 \ifEn
-    The numerical results reveal a striking asymmetry between BFGS and DFP. When $\lambda_1 > 1$ (i.e., the initial Hessian approximation overestimates the true Hessian curvature), BFGS demonstrates significantly better efficiency. Conversely, when $\lambda_1 < 1$ (i.e., the initial Hessian approximation underestimates the true curvature), DFP performs slightly better than BFGS, though the difference is modest. This trend reversal is predicted by the theoretical symmetry between the two methods, but the magnitude of the difference is notable.
+    The numerical results reveal a striking asymmetry between BFGS and DFP. When $\lambda_1 > 1$ (i.e., the initial Hessian approximation overestimates the true Hessian curvature), BFGS demonstrates significantly better efficiency. Conversely, when $\lambda_1 < 1$ (i.e., the initial Hessian approximation underestimates the true curvature), DFP performs slightly better than BFGS, though the difference is modest. This trend reversal can be predicted by the theoretical symmetry between the two methods, but the asymmetry in the magnitude is noteworthy.
 \else
-    数値結果はBFGSとDFPの間に顕著な非対称性があることを示しています。$\lambda_1 > 1$ のとき、すなわち初期ヘッセ近似が真の曲率を過大評価する場合、BFGS は大幅に高い効率を示しました。一方で、 $\lambda_1 < 1$ のとき、すなわち初期ヘッセ近似が真の曲率を過小評価する場合には、DFPはBFGSよりわずかに良い性能を示しましたが、その差は非常に小さいものでした。この傾向の逆転は理論的な対称性から予測されるものですが、その差の大小は注目に値します。
+    数値結果はBFGSとDFPの間に顕著な非対称性があることを示しています。$\lambda_1 > 1$ のとき、すなわち初期ヘッセ近似が真の曲率を過大評価する場合、BFGSは大幅に高い効率を示しました。一方で、 $\lambda_1 < 1$ のとき、すなわち初期ヘッセ近似が真の曲率を過小評価する場合には、DFPはBFGSよりわずかに良い性能を示しましたが、その差は非常に小さいものでした。この傾向の逆転自体は理論的な対称性から予測されるものですが、その大きさの非対称性は注目に値します。
 \fi
 
 \ifEn
@@ -1133,7 +1137,7 @@
 \fi
 
 \ifEn
-    Throughout this subsection, we work with a finite sequence of matrices
+    Throughout this subsection, we work with a finite sequence of matrices.
 \else
     本小節では次の有限長の行列の列を扱います。
 \fi
@@ -1141,9 +1145,9 @@
     H_0, H_1, \dots, H_m.
 \end{equation*}
 \ifEn
-    Here, $H_\ell$ denotes the inverse Hessian approximation obtained after $\ell$ BFGS updates applied to a given initial matrix $H_0$.
+    Here, $H_\ell$ denotes the inverse Hessian approximation obtained after $\ell$ BFGS updates applied to a given initial matrix $H_0$. This is done for the sake of clarity in the discussion, but it can also be thought of as maintaining a rolling window of the most recent $m$ inverse Hessian approximations corresponding to the past $m$ BFGS updates when the current iteration count is $k$.
 \else
-    ここで $H_\ell$ は初期行列 $H_0$ に対して $\ell$ 回のBFGS更新を適用して得られる逆ヘッセ近似を表します。
+    ここで $H_\ell$ は初期行列 $H_0$ に対して $\ell$ 回のBFGS更新を適用して得られる逆ヘッセ近似を表します。このようにしているのは議論の簡潔さのためですが、現在のイテレーション数が $k$ であるとき、その内の過去 $m$ 回のBFGS更新に対応する逆ヘッセ近似の列を新たに取り直しているとも考えられます。
 \fi
 
 \ifEn
@@ -1175,19 +1179,12 @@
     この関係を再帰的に展開すると次のコンパクト表現が得られます。
 \fi
 \begin{equation*}
-    H_m
-    =
-    V_{m-1}^\top \cdots V_0^\top H_0 V_0 \cdots V_{m-1}
-    +
-    \sum_{j=0}^{m-1}
-    (V_{m-1}^\top \cdots V_{j+1}^\top)
-    \rho_j s_j s_j^\top
-    (V_{j+1} \cdots V_{m-1}).
+    H_m = V_{m-1}^\top \cdots V_0^\top H_0 V_0 \cdots V_{m-1} + \left(\sum_{j=0}^{m-2} (V_{m-1}^\top \cdots V_{j+1}^\top) \rho_j s_j s_j^\top (V_{j+1} \cdots V_{m-1})\right) + \rho_{m-1} s_{m-1} s_{m-1}^\top.
 \end{equation*}
 \ifEn
-    Here, $H_0$ denotes the chosen initial inverse Hessian approximation, typically a scaled identity matrix.
+    $H_0$ denotes the chosen initial inverse Hessian approximation, typically a scaled identity matrix.
 \else
-    ここで $H_0$ は選ばれた初期逆ヘッセ近似であり、通常はスケールされた単位行列です。
+    $H_0$ は選ばれた初期逆ヘッセ近似であり、通常はスケールされた単位行列です。
 \fi
 
 \ifEn
@@ -1199,7 +1196,7 @@
 \ifEn
     In quasi-Newton methods, it is crucial for the algorithm to efficiently compute $r = H_m q$ for the inverse matrix $H_m$ and a given vector $q \in \mathbb{R}^n$. This operation can be carried out using two short loops of length $m$, known as the L-BFGS two-loop recursion~\citep[Algorithm 7.4]{nocedal1999numerical}. This algorithm requires $\mathcal{O}(nm)$ time and space complexity.
 \else
-    準ニュートン法では、逆行列 $H_m$ と与えられたベクトル $q \in \mathbb{R}^n$ に対して $r = H_m q$ が効率的に計算できることが、アルゴリズムにおいて重要です。この計算は長さ $m$ の短いループを二回回すだけで実行でき、L-BFGS のtwo-loop recursionと呼ばれるアルゴリズムとして知られています~\citep[Algorithm 7.4]{nocedal1999numerical}。このアルゴリズムは $\mathcal{O}(nm)$ の時間・空間計算量を要します。
+    準ニュートン法では、逆行列 $H_m$ と与えられたベクトル $q \in \mathbb{R}^n$ に対して積 $r = H_m q$ が効率的に計算できることが、アルゴリズムにおいて重要です。この計算は長さ $m$ の短いループを二回回すだけで実行でき、L-BFGSの二重ループ再帰 (two-loop recursion) と呼ばれるアルゴリズムとして知られています~\citep[Algorithm 7.4]{nocedal1999numerical}。このアルゴリズムは $\mathcal{O}(nm)$ の時間・空間計算量を要します。
 \fi
 
 \subfile{999_two_loop_recursion.tex}
@@ -1220,7 +1217,7 @@
     \ifEn
         In the first loop of the algorithm ($i = m-1, m-2, \dots, 0$), from the input vector $q^{(m)} \coloneqq q$, the algorithm computes
     \else
-        アルゴリズムの1つ目のループ ($i = m-1, m-2, \dots, 0$) では、入力ベクトル $q^{(m)} \coloneqq q$ から次を計算する。
+        アルゴリズムの1つ目のループ ($i = m-1, m-2, \dots, 0$) では、入力ベクトル $q^{(m)} \coloneqq q$ から次を計算します。
     \fi
     \begin{equation*}
         \alpha_i \coloneqq \rho_i s_i^\top q^{(i+1)}, \qquad
@@ -1260,35 +1257,36 @@
         r^{(i+1)}   = r^{(i)} + s_i \left(\alpha_i - \beta_i\right).
     \end{equation*}
     \ifEn
-        Substituting the definitions of $\alpha_i$, $\beta_i$, and $q^{(i+1)}$, we have
+        Substituting the definitions of $\alpha_i$, $\beta_i$, and $q^{(i+1)}$, we find that when $i < m-1$,
     \else
-        $\alpha_i$, $\beta_i$, $q^{(i+1)}$ の定義を代入すると
+        $\alpha_i$, $\beta_i$, $q^{(i+1)}$ の定義を代入すると、$i < m-1$ のとき
     \fi
     \begin{align*}
         r^{(i+1)}
-         & =
-        r^{(i)} + \rho_i s_i s_i^\top \left(V_{i+1} V_{i+2} \cdots V_{m-1}\right) q - \rho_i s_i y_i^\top r^{(i)}            \\
+         & = r^{(i)} + s_i \left(\rho_i s_i^\top q^{(i+1)} - \rho_i y_i^\top r^{(i)}\right)                                  \\
+         & = r^{(i)} + \rho_i s_i s_i^\top \left(V_{i+1} V_{i+2} \cdots V_{m-1}\right) q - \rho_i s_i y_i^\top r^{(i)}       \\
          & = \left(I- \rho_i y_i s_i^\top\right) r^{(i)} + \rho_i s_i s_i^\top \left(V_{i+1} V_{i+2} \cdots V_{m-1}\right) q \\
          & =
         V_i^\top r^{(i)}
         +
         \rho_i s_i s_i^\top
-        \left(V_{i+1} V_{i+2} \cdots V_{m-1}\right) q.
+        \left(V_{i+1} V_{i+2} \cdots V_{m-1}\right) q,
     \end{align*}
+    \ifEn
+        and when $i = m-1$,
+    \else
+        であり、$i = m-1$ のときは
+    \fi
+    \begin{equation*}
+        r^{(m)} = V_{m-1}^\top r^{(m-1)} + \rho_{m-1} s_{m-1} s_{m-1}^\top q.
+    \end{equation*}
     \ifEn
         By recursively expanding this relation from the initial value $r^{(0)} = H_0 q^{(0)}$, we obtain
     \else
         初期値 $r^{(0)} = H_0 q^{(0)}$ からこの関係を再帰的に展開すると
     \fi
     \begin{equation*}
-        r^{(m)}
-        =
-        V_{m-1}^\top \cdots V_0^\top H_0 V_0 \cdots V_{m-1} q
-        +
-        \sum_{j=0}^{m-1}
-        (V_{m-1}^\top \cdots V_{j+1}^\top)
-        \rho_j s_j s_j^\top
-        (V_{j+1} \cdots V_{m-1}) q.
+        r^{(m)} = V_{m-1}^\top \cdots V_0^\top H_0 V_0 \cdots V_{m-1} q + \left(\sum_{j=0}^{m-2} (V_{m-1}^\top \cdots V_{j+1}^\top) \rho_j s_j s_j^\top (V_{j+1} \cdots V_{m-1}) q\right) + \rho_{m-1} s_{m-1} s_{m-1}^\top q.
     \end{equation*}
     \ifEn
         This matches the compact representation of $H_m$ applied to $q$, and thus we have shown that the output of the algorithm satisfies $r = H_m q$, completing the proof.
@@ -1301,7 +1299,7 @@
 \ifEn
     Thus, the two-loop recursion exactly evaluates the action of the matrix $H_m$ on a vector without explicitly constructing the matrix $H_m$.
 \else
-    従って、このtwo-loop recursionによって、行列 $H_m$ を陽に構成せずに、ベクトルに対する作用を正確に評価できることがわかります。
+    従って、この二重ループ再帰によって、行列 $H_m$ を陽に構成せずに、ベクトルに対する作用を正確に評価できることがわかります。
 \fi
 
 \ifEn
@@ -1321,12 +1319,13 @@
 \ifEn
     Here, the scaling parameter $\gamma$ is often chosen as
 \else
-    ここでスケーリング係数 $\gamma$ は、例えば次のように選ばれます。
+    ここでスケーリング係数 $\gamma$ は、例えば次のように選ばれます。ベクトルペア $(s_{m-1}, y_{m-1})$ は最新のものであることに注意してください。
 \fi
 \begin{equation*}
     \gamma = \frac{s_{m-1}^\top y_{m-1}}{y_{m-1}^\top y_{m-1}}.
 \end{equation*}
 \ifEn
+    Note that the pair $(s_{m-1}, y_{m-1})$ is the most recent one.
     This choice is motivated by the following discussion~\citep{liuLimitedMemoryBFGS1989a,shannoMatrixConditioningNonlinear1978}. Assume that the objective function $f$ is twice continuously differentiable and consider the mean Hessian along the most recent step:
 \else
     この選択は次の議論によって正当化できます~\citep{liuLimitedMemoryBFGS1989a,shannoMatrixConditioningNonlinear1978}。目的関数 $f$ が二回連続微分可能であると仮定し、最新のステップに沿った平均ヘッセ行列を考えます。
@@ -1364,9 +1363,9 @@
 \fi
 
 \ifEn
-    Moreover, this choice of $\gamma$ coincides with the short step size of the Barzilai–Borwein method~\citep{barzilaiTwoPointStepSize1988}, highlighting a close connection between L-BFGS initialization and classical step-length selection strategies.
+    Moreover, this choice of $\gamma$ coincides with the short step size of the Barzilai--Borwein method~\citep{barzilaiTwoPointStepSize1988}, highlighting a close connection between L-BFGS initialization and classical step-length selection strategies.
 \else
-    さらにこの $\gamma$ の選択は Barzilai–Borwein 法の短ステップサイズ~\citep{barzilaiTwoPointStepSize1988} と一致しており、L-BFGSの初期化と古典的なステップ長選択戦略の密接な関係を示しています。
+    さらにこの $\gamma$ の選択は Barzilai--Borwein 法の短ステップサイズ~\citep{barzilaiTwoPointStepSize1988} と一致しており、L-BFGSの初期化と古典的なステップ長選択戦略の密接な関係を示しています。
 \fi
 
 \ifSubfilesClassLoaded{

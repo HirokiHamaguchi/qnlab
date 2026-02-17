@@ -24,19 +24,47 @@ This model captures the typical behavior of rounding errors in IEEE~754 floating
 The error is predominantly relative when $\abs{f(x)}$ is large and effectively absolute when $\abs{f(x)}$ is small.
 Closely related models are also employed in practical stopping criteria~\citep{2020SciPy-NMeth}.
 
-We next state assumptions regarding gradient evaluations.
-In practice, termination is typically based on a gradient tolerance $\gtol$ and $\norm{\nabla \overline{f}(x)} \le \gtol$ is used as a stopping criterion. Thus, $\norm{\nabla \overline{f}(x)} > \gtol$ holds prior to termination.
-If the gradient noise $\geps$ were comparable to or larger than $\gtol$, the stopping criterion could not be reliably satisfied, no matter how close $x$ is to a stationary point.
-Accordingly, we require that the gradient noise $\geps$ be sufficiently small compared to $\gtol$ and the true gradient norm $\norm{\nabla \overline{f}(x)}$:
-\begin{equation*}
-    \norm{\nabla f(x)-\nabla\overline{f}(x)}\ll \geps \ll \gtol \leq \norm{\nabla \overline{f}(x)}.
-\end{equation*}
-Consequently, in our theoretical analysis, we assume exact gradients:
+% We next state assumptions regarding gradient evaluations.
+% In practice, termination is typically based on a gradient tolerance $\gtol$ and $\norm{\nabla \overline{f}(x)} \le \gtol$ is used as a stopping criterion. Thus, $\norm{\nabla \overline{f}(x)} > \gtol$ holds prior to termination.
+% If the gradient noise $\geps$ were comparable to or larger than $\gtol$, the stopping criterion could not be reliably satisfied, no matter how close $x$ is to a stationary point.
+% Accordingly, we require that the gradient noise $\geps$ be sufficiently small compared to $\gtol$ and the true gradient norm $\norm{\nabla \overline{f}(x)}$:
+% \begin{equation*}
+%     \norm{\nabla f(x)-\nabla\overline{f}(x)}\ll \geps \ll \gtol \leq \norm{\nabla \overline{f}(x)}.
+% \end{equation*}
+% It means that $\nabla \overline{f}(x) \approx \nabla f(x)$ holds prior to termination, and thus we simplify the analysis by assuming exact gradients:
+% \begin{equation}\label{eq:exact_gradient_assumption}
+%     \nabla \overline{f}(x) = \nabla f(x).
+% \end{equation}
+% The exactness of $\overline{f}$ serves as a theoretical modeling choice just for simplicity, rather than a claim about practical gradient accuracy.
+% Our algorithm does not rely on Wolfe conditions, which requires accurate gradient information at trial points, and thus it implicitly considers the effect of gradient.
+% Our numerical experiments in \cref{sec:experiments} also test the case where gradients are contaminated by noise, demonstrating the practical effectiveness of the proposed method even when \cref{eq:exact_gradient_assumption} is violated.
+
+
+We next specify the assumptions concerning gradient evaluations.
+
+In practice, termination is typically based on a gradient tolerance $\gtol$, and the condition
+\[
+    \|\nabla \overline{f}(x)\| \le \gtol
+\]
+is used as a stopping criterion. Hence, prior to termination, it holds that
+\[
+    \|\nabla \overline{f}(x)\| > \gtol.
+\]
+
+If the gradient noise level $\geps$ were comparable to or larger than $\gtol$, the stopping criterion could not be satisfied reliably, even when $x$ is sufficiently close to a stationary point. To ensure meaningful termination, the gradient noise must therefore be sufficiently small relative to both $\gtol$ and the true gradient norm. Specifically, we assume
+\[
+    \|\nabla f(x) - \nabla \overline{f}(x)\| \ll \geps \ll \gtol \le \|\nabla \overline{f}(x)\|.
+\]
+
+Under this regime, the computed gradient $\nabla \overline{f}(x)$ is a sufficiently accurate approximation of the true gradient $\nabla f(x)$ prior to termination. Accordingly, for the purpose of simplifying the theoretical analysis, we adopt the exact-gradient assumption
 \begin{equation}\label{eq:exact_gradient_assumption}
-    \norm{\nabla f(x)-\nabla\overline{f}(x)}=0.
+    \nabla \overline{f}(x) = \nabla f(x).
 \end{equation}
-The exactness of $\overline{f}$ in \cref{eq:exact_gradient_assumption} serves as a theoretical modeling choice just for simplicity, rather than a claim about practical gradient accuracy.
-Our numerical experiments in \cref{sec:experiments} also test the case where gradients are contaminated by noise, demonstrating the practical effectiveness of the proposed method even when \cref{eq:exact_gradient_assumption} is violated.
+
+We emphasize that this assumption is introduced solely as a modeling simplification for the analysis, rather than as a claim about practical gradient accuracy. Notably, the proposed algorithm does not rely on Wolfe-type conditions, which typically require accurate gradient information at trial points. Hence, it is inherently less sensitive to gradient inaccuracies.
+
+Furthermore, the numerical experiments in \cref{sec:experiments} include cases where gradients are contaminated by noise, demonstrating that the proposed method remains effective even when \cref{eq:exact_gradient_assumption} is violated.
+
 
 \subsection{Regularized Quasi-Newton Methods}
 \label{sec:prel_rqn}

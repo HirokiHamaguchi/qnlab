@@ -81,12 +81,11 @@ def main() -> None:
                 .replace(")", "")
                 .replace(" ", "-")
                 .replace("–", "")
+                .replace("--", "")
             )
             top_sentences.append(
                 f"{'  ' * (heading_level - 2)}- [{heading_text}]({'#' + escaped_heading_text})"
             )
-
-    top_sentences.append("\n---\n")
 
     all_markdown_lines = top_sentences + all_markdown_lines
 

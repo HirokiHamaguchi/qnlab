@@ -29,7 +29,7 @@
 \else
     凸性 (convexity) と強凸性 (strong convexity) は最適化理論における基本概念です。
     簡単のため、$f$ は $\mathbb{R}^n$ 全域で実数値を取る関数、つまり、$f \colon \mathbb{R}^n \to \mathbb{R}$ とします。また、$\mu>0$ を定数とします。
-    この時、関数 $f$ が凸、または $\mu$-強凸であることは、任意の $x,y \in \mathbb{R}^n$ と $\lambda \in [0,1]$ について次が成り立つこととそれぞれ同値です。
+    このとき、関数 $f$ が凸、または $\mu$-強凸であることは、任意の $x,y \in \mathbb{R}^n$ と $\lambda \in [0,1]$ について次が成り立つこととそれぞれ同値です。
 \fi
 \begin{align*}
     \textrm{(convex)} \quad
@@ -74,11 +74,11 @@
          & = f(y) - f(x) - \frac{\mu}{2} \left\lVert x-y \right\rVert^2.
     \end{align*}
     \ifEn
-        Thus, the latter definition holds.
+        By rearranging the terms appropriately, we can show that the latter definition holds.
 
         Conversely, assume that the latter definition holds. Let $z \coloneqq (1-\lambda)x + \lambda y$. Then we have
     \else
-        従って、後者の定義が成立します。
+        適切に移項することで、後者の定義の成立が示されます。
 
         続いて、後者の定義が成立することを仮定します。$z \coloneqq (1-\lambda)x + \lambda y$ とおくと、次が成り立ちます。
     \fi
@@ -138,7 +138,11 @@
     \label{fig:convexity_comparison}
 \end{figure}
 
-\subsection{Positive Definiteness of the Hessian}
+\ifEn
+    \subsection{Positive Definiteness of the Hessian}
+\else
+    \subsection{ヘッセ行列の正定値性}
+\fi
 
 \ifEn
     Next, assuming that $f$ is of class $C^2$, we show how convexity and strong convexity relate to the definiteness of the Hessian matrix $\nabla^2 f(x)$.
@@ -184,35 +188,9 @@
 \end{proposition}
 \begin{proof}
     \ifEn
-        First, let $\mu>0$ and assume $\nabla^2 f(x)\succeq \mu I$ for all $x \in \mathbb{R}^n$. By the fundamental theorem of calculus, for any $x,y \in \mathbb{R}^n$, we have
+        Firstly, assume that $f$ is $\mu$-strongly convex. For any $x \in \mathbb{R}^n, \ v \in \mathbb{R}^n$ and $t > 0$, letting $y=x \pm tv$ gives
     \else
-        まず $\mu>0$ とし、任意の $x \in \mathbb{R}^n$ に対して $\nabla^2 f(x)\succeq \mu I$ が成り立つと仮定します。 微分積分学の基本定理より、任意の $x,y \in \mathbb{R}^n$ について次が成り立ちます。
-    \fi
-    \begin{equation*}
-        f(y)
-        = f(x)+\nabla f(x)^\top (y-x)
-        +\frac{1}{2} \int_0^1 (y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t.
-    \end{equation*}
-    \ifEn
-        By the assumption $\nabla^2 f(x)\succeq \mu I$, we have
-    \else
-        また、仮定 $\nabla^2 f(x)\succeq \mu I$ から次が得られます。
-    \fi
-    \begin{equation*}
-        \int_0^1 (y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t
-        \ge \int_0^1 \mu\left\lVert y-x \right\rVert^2 \mathrm{d}t
-        = \mu\left\lVert y-x \right\rVert^2.
-    \end{equation*}
-    \ifEn
-        Thus, combining these results gives the definition of $\mu$-strong convexity.
-    \else
-        以上の結果を合わせると、$\mu$-強凸性の定義が導かれます。
-    \fi
-
-    \ifEn
-        Conversely, assume that $f$ is $\mu$-strongly convex. For any $x \in \mathbb{R}^n, \ v \in \mathbb{R}^n$ and $t > 0$, letting $y=x \pm tv$ gives
-    \else
-        逆に、$f$ が $\mu$-強凸であると仮定します。任意の $x \in \mathbb{R}^n, \ v \in \mathbb{R}^n$ および $t>0$ に対し、$y=x \pm tv$ とおくと次が成り立ちます。
+        まず、$f$ が $\mu$-強凸であると仮定します。任意の $x \in \mathbb{R}^n, \ v \in \mathbb{R}^n$ および $t>0$ に対し、$y=x \pm tv$ とおくと次が成り立ちます。
     \fi
     \begin{equation*}
         \begin{dcases}
@@ -254,6 +232,32 @@
     \fi
 
     \ifEn
+        Conversely, let $\mu>0$ and assume $\nabla^2 f(x)\succeq \mu I$ for all $x \in \mathbb{R}^n$. By the fundamental theorem of calculus, for any $x,y \in \mathbb{R}^n$, we have
+    \else
+        逆に、$\mu>0$ とし、任意の $x \in \mathbb{R}^n$ に対して $\nabla^2 f(x)\succeq \mu I$ が成り立つと仮定します。微分積分学の基本定理より、任意の $x,y \in \mathbb{R}^n$ について次が成り立ちます。
+    \fi
+    \begin{equation*}
+        f(y)
+        = f(x)+\nabla f(x)^\top (y-x)
+        +\frac{1}{2} \int_0^1 (y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t.
+    \end{equation*}
+    \ifEn
+        By the assumption $\nabla^2 f(x)\succeq \mu I$, we have
+    \else
+        また、仮定 $\nabla^2 f(x)\succeq \mu I$ から次が得られます。
+    \fi
+    \begin{equation*}
+        \int_0^1 (y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t
+        \ge \int_0^1 \mu\left\lVert y-x \right\rVert^2 \mathrm{d}t
+        = \mu\left\lVert y-x \right\rVert^2.
+    \end{equation*}
+    \ifEn
+        Thus, combining these results gives the definition of $\mu$-strong convexity.
+    \else
+        以上の結果を合わせると、$\mu$-強凸性の定義が導かれます。
+    \fi
+
+    \ifEn
         Setting $\mu=0$ in the above shows the convex case in the same way.
     \else
         上記の議論で $\mu=0$ とすれば、同様に凸の場合も示されます。
@@ -274,7 +278,7 @@
         \ifEn
             Quadratic function $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ in 2-dimensional space with Hessians $H$ which is (left) positive definite, (center) indefinite, (right) negative definite. $f(x)$ is (left) convex, (center) nonconvex, and (right) concave, respectively.
         \else
-            二次関数 $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ を二次元空間で示したもの。 ヘッセ行列 $H$ が (左)正定値、(中央)不定値、(右)負定値の場合を示す。 $f(x)$ はそれぞれ (左)凸、(中央)非凸、(右)凹である。
+            二次関数 $f(x)=\frac{1}{2}(x - x_k)^\top H (x - x_k) + \nabla f(x_k)^\top (x - x_k) + f(x_k)$ を二次元空間で示したもの。ヘッセ行列 $H$ が (左)正定値、(中央)不定値、(右)負定値の場合を示す。$f(x)$ はそれぞれ (左)凸、(中央)非凸、(右)凹である。
         \fi
     }
     \label{fig:pd}
@@ -335,10 +339,10 @@
         微分積分学の基本定理より、任意の $x,y \in \mathbb{R}^n$ について次が成り立ちます。
     \fi
     \begin{align*}
-        f(y) - f(x) & = \int_0^1 \nabla f(x+t(y-x))^\top (y-x) \mathrm{d}t                                                                                                                              \\
-                    & = \nabla f(x)^\top (y-x) + \int_0^1 (\nabla f(x+t(y-x)) - \nabla f(x))^\top (y-x) \mathrm{d}t                                                                                     \\
-                    & \leq \nabla f(x)^\top (y-x) + \int_0^1 \left\lVert \nabla f(x+t(y-x)) - \nabla f(x) \right\rVert \left\lVert y-x \right\rVert \mathrm{d}t &  & (\text{Cauchy–Schwarz inequality}) \\
-                    & \leq \nabla f(x)^\top (y-x) + \int_0^1 L t \left\lVert y-x \right\rVert^2 \mathrm{d}t                                                     &  & (\text{by $L$-smoothness})         \\
+        f(y) - f(x) & = \int_0^1 \nabla f(x+t(y-x))^\top (y-x) \mathrm{d}t                                                                                                                               \\
+                    & = \nabla f(x)^\top (y-x) + \int_0^1 (\nabla f(x+t(y-x)) - \nabla f(x))^\top (y-x) \mathrm{d}t                                                                                      \\
+                    & \leq \nabla f(x)^\top (y-x) + \int_0^1 \left\lVert \nabla f(x+t(y-x)) - \nabla f(x) \right\rVert \left\lVert y-x \right\rVert \mathrm{d}t &  & (\text{Cauchy--Schwarz inequality}) \\
+                    & \leq \nabla f(x)^\top (y-x) + \int_0^1 L t \left\lVert y-x \right\rVert^2 \mathrm{d}t                                                     &  & (\text{by $L$-smoothness})          \\
                     & = \nabla f(x)^\top (y-x) + \frac{L}{2} \left\lVert y-x \right\rVert^2.
     \end{align*}
     \ifEn
@@ -379,7 +383,7 @@
         Moreover, the $L$-smoothness of $f(z)$ directly implies the $L$-smoothness of $g_x(z)$. Thus, by the $L$-smoothness of $g_x(z)$, we have
     \else
         関数 $f(z)$ と線形関数 $-f(x) - \nabla f(x)^\top (z-x)$ はどちらも $z$ について凸なので、$g_x(z)$ も凸であり、その最小値は $\nabla g_x(z) = 0$ を満たす $z=x$ でとる、つまり、最小値は $g_x(x)=0$ であることが分かります。
-        また、$f(z)$ の $L$-平滑性より、$g_x(z)$ の $L$-平滑性も直ちに導かれます。 よって、$g_x(z)$ の $L$-平滑性から次が成り立ちます。
+        また、$f(z)$ の $L$-平滑性より、$g_x(z)$ の $L$-平滑性も直ちに導かれます。よって、$g_x(z)$ の $L$-平滑性から次が成り立ちます。
     \fi
     \begin{align*}
         0 & \leq g_x\left(y-\frac{\nabla g_x(y)}{L} \right)                                                                             &  & (\text{minimum is $g_x(x)=0$}) \\
@@ -404,7 +408,7 @@
     \ifEn
         Let $f \colon \mathbb{R}^n \to \mathbb{R}$ be of class $C^2$. Then $f$ is $L$-smooth if and only if $\nabla^2 f(x)\preceq L I$ holds for all $x \in \mathbb{R}^n$.
     \else
-        関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^2$ 級であるとする。 このとき、$f$ が $L$-平滑であることと、任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\preceq L I$ が成り立つことは同値である。
+        関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^2$ 級であるとする。このとき、$f$ が $L$-平滑であることと、任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\preceq L I$ が成り立つことは同値である。
     \fi
 \end{proposition}
 \begin{proof}
@@ -466,7 +470,7 @@
     \fi
     \begin{align*}
         v^\top \nabla^2 f(x) v & = \lim_{t \to 0} \left(\frac{\nabla f(x+tv)-\nabla f(x)}{t}\right)^\top v                                                                               \\
-                               & \leq \lim_{t \to 0} \frac{\left\lVert \nabla f(x+tv)-\nabla f(x) \right\rVert}{t} \left\lVert v \right\rVert &  & (\text{Cauchy–Schwarz inequality})    \\
+                               & \leq \lim_{t \to 0} \frac{\left\lVert \nabla f(x+tv)-\nabla f(x) \right\rVert}{t} \left\lVert v \right\rVert &  & (\text{Cauchy--Schwarz inequality})   \\
                                & \leq \lim_{t \to 0} \frac{L\left\lVert tv \right\rVert}{t} \left\lVert v \right\rVert                        &  & (\text{by $L$-smoothness definition}) \\
                                & = L \left\lVert v \right\rVert^2.
     \end{align*}
@@ -524,17 +528,17 @@
 \fi
 
 \ifEn
-    \subsubsection{Baillon–Haddad Theorem}
+    \subsubsection{Baillon--Haddad Theorem}
 \else
-    \subsubsection{Baillon–Haddadの定理}
+    \subsubsection{Baillon--Haddadの定理}
 \fi
 
 \ifEn
-    As an advanced topic, we introduce the following Baillon–Haddad theorem, which is one of the useful properties of $L$-smooth functions. Note that the $C^2$ assumption is not required in this theorem, and only the $C^1$ assumption is sufficient.
+    As an advanced topic, we introduce the following Baillon--Haddad theorem, which is one of the useful properties of $L$-smooth functions. Note that the $C^2$ assumption is not required in this theorem, and only the $C^1$ assumption is sufficient.
 \else
-    発展的な内容として、$L$-平滑性の有用な性質の一つである次の Baillon–Haddadの定理を紹介します。この定理では $C^2$ 級の仮定は不要で、$C^1$ 級の仮定だけで十分であることに注意してください。
+    発展的な内容として、$L$-平滑性の有用な性質の一つである次の Baillon--Haddadの定理を紹介します。この定理では $C^2$ 級の仮定は不要で、$C^1$ 級の仮定だけで十分であることに注意してください。
 \fi
-\begin{proposition}[Baillon–Haddad theorem]\label{prop:baillon_haddad}
+\begin{proposition}[Baillon--Haddad theorem]\label{prop:baillon_haddad}
     \ifEn
         Let $f \colon \mathbb{R}^n \to \mathbb{R}$ be of class $C^1$. If $f$ is $L$-smooth and convex, then for all $x,y \in \mathbb{R}^n$, $\nabla f$ is $1/L$-cocoercive, i.e.,
         \begin{equation*}
@@ -542,7 +546,7 @@
         \end{equation*}
         for all $x,y \in \mathbb{R}^n$.
     \else
-        関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^1$ 級であるとする。$f$ が $L$-平滑かつ凸であれば、任意の $x,y \in \mathbb{R}^n$ に対して $\nabla f$ は $1/L$-cocoercive である、すなわち
+        関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^1$ 級であるとする。$f$ が $L$-平滑かつ凸であれば、任意の $x,y \in \mathbb{R}^n$ に対して $\nabla f$ は $1/L$-cocoerciveである、すなわち
         \begin{equation*}
             (\nabla f(x)-\nabla f(y))^\top (x-y) \ge \frac{1}{L} \left\lVert \nabla f(x)-\nabla f(y) \right\rVert^2
         \end{equation*}
@@ -562,9 +566,9 @@
         \end{dcases}
     \end{equation*}
     \ifEn
-        Adding these two inequalities gives the Baillon–Haddad theorem.
+        Adding these two inequalities gives the Baillon--Haddad theorem.
     \else
-        これらを足し合わせると、Baillon–Haddadの定理が得られます。
+        これらを足し合わせると、Baillon--Haddadの定理が得られます。
     \fi
     \myQED
 \end{proof}
@@ -589,9 +593,9 @@
     s_k \coloneqq x_{k+1}-x_k, \quad y_k \coloneqq \nabla f(x_{k+1}) - \nabla f(x_k)
 \end{equation*}
 \ifEn
-    and applying Baillon–Haddad theorem with $x=x_{k+1}$ and $y=x_k$ yields
+    and applying Baillon--Haddad theorem with $x=x_{k+1}$ and $y=x_k$ yields
 \else
-    と定義した上で、Baillon–Haddadの定理を $x=x_{k+1}$、$y=x_k$ に適用すると、次の結果が得られます。
+    と定義した上で、Baillon--Haddadの定理を $x=x_{k+1}$、$y=x_k$ に適用すると、次の結果が得られます。
 \fi
 \begin{equation*}
     s_k^\top y_k \ge \frac{1}{L} \left\lVert y_k \right\rVert^2.
