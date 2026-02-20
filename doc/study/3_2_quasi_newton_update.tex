@@ -172,7 +172,7 @@
 \fi
 
 \ifEn
-    To derive SR1 update, we construct the updated matrix $\bar{B}$ as a rank-one update. That is, we assume that for some vector $z \in \mathbb{R}^n$,
+    To derive the SR1 update, we construct the updated matrix $\bar{B}$ as a rank-one update. That is, we assume that for some vector $z \in \mathbb{R}^n$,
 \else
     SR1更新を導出するため、更新行列 $\bar{B}$ をランク1更新として構成します。すなわち、あるベクトル $z \in \mathbb{R}^n$ に対して、次が満たされると仮定します。
 \fi
@@ -790,6 +790,7 @@
     BFGS更新の重要な性質として、現在の近似 $B_k$ が正定値で曲率条件 $y_k^\top s_k > 0$ が成り立つなら、更新後の近似 $B_{k+1}$ も正定値であることが保証されます。
 \fi
 
+% if you change the proposition to other one, please also change the explanation after the proof.
 \begin{proposition}
     \ifEn
         If $B_k$ is positive definite and $y_k^\top s_k > 0$, then $B_{k+1}$ is also positive definite.
@@ -815,6 +816,32 @@
     \fi
     \myQED
 \end{proof}
+
+\ifEn
+    This proposition is crucial for ensuring the positive definiteness of the approximate Hessian matrices $B_k$ throughout the iterations, which in turn guarantees that the search directions are descent directions. In practice, it is common to use a line search that satisfies the following strong curvature condition, included in the strong Wolfe conditions:
+\else
+    この命題は、反復の過程で近似ヘッセ行列 $B_k$ の正定値性を確保するために重要であり、特に探索方向が降下方向になることを保証します。実際には、次の強曲率条件を含む強ウルフ条件を課す直線探索を用いることが多いです。
+\fi
+\begin{equation*}
+    \lvert g_{k+1}^\top d_k \rvert \leq c_2 \lvert g_k^\top d_k \rvert.
+\end{equation*}
+\ifEn
+    Here, $0 < c_2 < 1$ is a constant. By imposing this condition, we can verify that $B_k$ remains positive definite throughout the iterations. First, we initialize $B_0$ to be positive definite. Assuming that $B_k$ is positive definite for some $k$, since $d_k$ is a descent direction with $g_k^\top d_k < 0$, and from $s_k = \alpha_k d_k$ and $y_k = g_{k+1} - g_k$, we have
+\else
+    ただし、$0 < c_2 < 1$ は定数です。この条件を課すと、実際に $B_k$ が反復の過程で正定値に保たれることを確認できます。まず、$B_0$ を正定値に初期化します。ある $k$ で $B_k$ が正定値であると仮定すると、$d_k$ は降下方向で $g_k^\top d_k < 0$ であり、$s_k = \alpha_k d_k$ と $y_k = g_{k+1} - g_k$ から、次のようになります。
+\fi
+\begin{align*}
+    y_k^\top s_k & = (g_{k+1} - g_k)^\top (\alpha_k d_k)                                                                                            \\
+                 & = \alpha_k (g_{k+1}^\top d_k - g_k^\top d_k)                                                                                     \\
+                 & \geq \alpha_k \left(-\lvert g_{k+1}^\top d_k \rvert + \lvert g_k^\top d_k \rvert\right) &  & (g_k^\top d_k < 0)                  \\
+                 & \geq \alpha_k (1 - c_2) \lvert g_k^\top d_k \rvert                                      &  & (\text{by the curvature condition}) \\
+                 & > 0.                                                                                    &  & (c_2<1)
+\end{align*}
+\ifEn
+    Therefore, the curvature condition $y_k^\top s_k > 0$ is satisfied, and by the previous proposition, $B_{k+1}$ is also positive definite. Thus, by mathematical induction, all $B_k$ are guaranteed to be positive definite for every $k$.
+\else
+    よって、先ほどの命題より、$B_{k+1}$ も正定値になります。数学的帰納法により、すべての $k$ で $B_k$ が正定値であることが保証されます。
+\fi
 
 \ifEn
     \subsubsection{Trace and Determinant Formulas for the BFGS Update}

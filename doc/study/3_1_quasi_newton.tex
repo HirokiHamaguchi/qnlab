@@ -104,9 +104,10 @@
     s_k \coloneqq x_{k+1} - x_k, \qquad   y_k \coloneqq \nabla f(x_{k+1}) - \nabla f(x_k).
 \end{equation*}
 \ifEn
-    We assume that $y_k^\top s_k \neq 0$ and $s_k \neq 0$. Here, the $s$ in $s_k$ stands for ``step.'' Since the new approximation is constructed around $x_{k+1}$, we approximate $\nabla f(x_k)$ using the Hessian matrix $\nabla^2 f(x_{k+1})$ and its approximation $B_{k+1}$ as follows:
+    In the following, we generally assume that $s_k \neq 0$ and $y_k^\top s_k \neq 0$.
+    Note that the $s$ in $s_k$ stands for ``step.'' Since the new approximation is constructed around $x_{k+1}$, we approximate $\nabla f(x_k)$ using the Hessian matrix $\nabla^2 f(x_{k+1})$ and its approximation $B_{k+1}$ as follows:
 \else
-    $y_k^\top s_k \neq 0$ かつ $s_k \neq 0$ を仮定します。なお、$s_k$ の $s$ は step を意味します。新しい近似は $x_{k+1}$ を中心に構築されるため、$\nabla f(x_k)$ をヘッセ行列 $\nabla^2 f(x_{k+1})$ およびその近似である $B_{k+1}$ を用いて次のように近似します。
+    以降では基本的に $s_k \neq 0$ かつ $y_k^\top s_k \neq 0$ とします。 なお、$s_k$ の $s$ は step を意味します。新しい近似は $x_{k+1}$ を中心に構築されるため、$\nabla f(x_k)$ をヘッセ行列 $\nabla^2 f(x_{k+1})$ およびその近似である $B_{k+1}$ を用いて次のように近似します。
 \fi
 \begin{align*}
     \nabla f(x_k) & \approx \nabla f(x_{k+1}) + \nabla^2 f(x_{k+1})(x_k - x_{k+1}) \\

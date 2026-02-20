@@ -227,7 +227,7 @@ def convert_enumerate_to_md(block: str) -> str:
     return "\n".join(converted)
 
 
-def convert_proof_to_md(block: str) -> str:
+def convert_proof_to_md(block: str, is_japanese_mode: bool) -> str:
     """Convert proof environment to Markdown with italic 'Proof'.
 
     Removes \\begin{proof}...\\end{proof} lines and replaces with italic text.
@@ -237,9 +237,13 @@ def convert_proof_to_md(block: str) -> str:
     for line in lines:
         stripped = line.strip()
         if stripped == "\\begin{proof}":
-            converted.append("<details><summary>証明</summary>\n")
+            converted.append(
+                f"<details><summary>{'証明' if is_japanese_mode else 'Proof'}</summary>\n"
+            )
         elif stripped == "\\end{proof}":
-            converted.append("(証明終わり)\n\n</details>")
+            converted.append(
+                f"({'証明終わり' if is_japanese_mode else 'End of proof'})\n\n</details>"
+            )
         else:
             converted.append(line)
     return "\n".join(converted).strip()

@@ -62,13 +62,15 @@ def get_global_state() -> GlobalState:
 class LatexToMarkdownConverter:
     """LaTeX to Markdown converter class."""
 
-    def __init__(self, filepath: Path):
+    def __init__(self, filepath: Path, is_japanese_mode: bool) -> None:
         """Initialize converter with filepath.
 
         Args:
             filepath: Path to the LaTeX file to convert
+            is_japanese_mode: Whether to process in Japanese mode
         """
         self.filepath = filepath
+        self.is_japanese_mode = is_japanese_mode
         self.lines: List[str] = []
         self.markdown_lines: List[str] = []
         self.i = 0
@@ -156,7 +158,7 @@ class LatexToMarkdownConverter:
         elif env_name in EQUATION_ENVS:
             return block  # done in postprocessing
         elif env_name == "proof":
-            return convert_proof_to_md(block)
+            return convert_proof_to_md(block, self.is_japanese_mode)
         return ""
 
     def _convert_numbered_env(
@@ -300,7 +302,7 @@ class LatexToMarkdownConverter:
             List of Markdown lines
         """
         content = self.filepath.read_text(encoding="utf-8")
-        content = preprocess_latex(content)
+        content = preprocess_latex(content, self.is_japanese_mode)
 
         self.lines = content.split("\n")
         self.markdown_lines = []
@@ -326,7 +328,9 @@ class LatexToMarkdownConverter:
 
             if line.startswith("% QIITA_GIF"):
                 lines = [
-                    "以下のGIFも参照して下さい。$f(x)$ の最適化において、各step毎にモデル関数が更新されていく様子を示しています。",
+                    "以下のGIFも参照して下さい。$f(x)$ の最適化において、各step毎にモデル関数が更新されていく様子を示しています。"
+                    if self.is_japanese_mode
+                    else "Also check the following GIF illustrating how the model function is updated at each step in optimizing $f(x)$.",
                     "",
                     "![GIF illustrating the concept](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/sixhump.gif)",
                 ]
@@ -343,14 +347,15 @@ class LatexToMarkdownConverter:
         return self.markdown_lines
 
 
-def process_latex_file(filepath: Path) -> List[str]:
+def process_latex_file(filepath: Path, is_japanese_mode: bool) -> List[str]:
     """Process a single LaTeX file and return list of Markdown lines.
 
     Args:
         filepath: Path to the LaTeX file
+        is_japanese_mode: Whether to process in Japanese mode
 
     Returns:
         List of Markdown lines
     """
-    converter = LatexToMarkdownConverter(filepath)
+    converter = LatexToMarkdownConverter(filepath, is_japanese_mode)
     return converter.process_file()

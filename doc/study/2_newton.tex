@@ -279,7 +279,7 @@
         f(x_{k+1}) \leq f(x_0) - c_1 \frac{1 - c_2}{L} \sum_{j=0}^k \cos^2 \theta_j \left\lVert g_j \right\rVert^2.
     \end{equation*}
     \ifEn
-        Since we assumed that $f$ is bounded below, there exists a constant $f^*$ such that $f(x_{k+1}) \geq f^*$ for all $k$. Hence, we obtain the following condition known as the Zoutendijk condition:
+        Since we assumed that $f$ is bounded below, there exists a constant $f^*$ such that $f(x_{k+1}) \geq f^*$ for all $k$. Hence, we obtain the following condition, known as the Zoutendijk condition:
     \else
         仮定より $f$ は下に有界なので、ある定数 $f^*$ が存在して、全ての $k$ について $f(x_{k+1}) \geq f^*$ となります。従って、Zoutendijk 条件と呼ばれる次式が得られます。
     \fi
@@ -550,12 +550,12 @@
 \begin{enumerate}[nosep,label=\textbullet]
     \ifEn
     \item It is $\mu$-strongly convex.
-    \item $\max_x |f''(x)| = \frac{1}{4} + \mu$ (attained at $e^x=1$). Hence, $\nabla f$ is $L$-smooth with $L=\frac{1}{4}+\mu$.
-    \item $\max_x |f'''(x)| = \frac{1}{6\sqrt{3}}$ (attained at $e^x=2-\sqrt{3}$). Hence, $\nabla^2 f$ is $M$-Lipschitz with $M=\frac{1}{6\sqrt{3}}$.
+    \item $\max_x \lvert f''(x) \rvert = \frac{1}{4} + \mu$ (attained at $e^x=1$). Hence, $\nabla f$ is $L$-smooth with $L=\frac{1}{4}+\mu$.
+    \item $\max_x \lvert f'''(x) \rvert = \frac{1}{6\sqrt{3}}$ (attained at $e^x=2-\sqrt{3}$). Hence, $\nabla^2 f$ is $L^\mathrm{H}$-Lipschitz with $L^{\mathrm{H}}=\frac{1}{6\sqrt{3}}$.
           \else
     \item $\mu$-強凸である。
-    \item $\max_x |f''(x)| = \frac{1}{4} + \mu$ であり、これは $e^x=1$ で達成される。従って $\nabla f$ は $L$-平滑である ($L=\frac{1}{4}+\mu$)。
-    \item $\max_x |f'''(x)| = \frac{1}{6\sqrt{3}}$ であり、これは $e^x=2-\sqrt{3}$ で達成される。従って $\nabla^2 f$ は $M$-リプシッツ連続である ($M=\frac{1}{6\sqrt{3}}$)。
+    \item $\max_x \lvert f''(x) \rvert = \frac{1}{4} + \mu$ であり、これは $e^x=1$ で達成される。従って $\nabla f$ は $L$-平滑である ($L=\frac{1}{4}+\mu$)。
+    \item $\max_x \lvert f'''(x) \rvert = \frac{1}{6\sqrt{3}}$ であり、これは $e^x=2-\sqrt{3}$ で達成される。従って $\nabla^2 f$ は $L^\mathrm{H}$-リプシッツ連続である ($L^\mathrm{H}=\frac{1}{6\sqrt{3}}$)。
           \fi
 \end{enumerate}
 \ifEn

@@ -75,21 +75,27 @@ def extract_braced_content(block: str, command: str) -> List[str]:
     return results
 
 
-def preprocess_latex(content: str) -> str:
+def preprocess_latex(content: str, is_japanese_mode: bool) -> str:
     r"""Preprocess LaTeX content.
 
-    Removes \ifEn...\else...\fi blocks (keeps the \else part).
-    Removes \ifSubfilesClassLoaded{...}{} blocks (ignoring whitespace).
-    Keeps \label{...} commands for label tracking,
-    they will be removed during environment block processing.
+    Process \ifEn...\else...\fi blocks.
     """
-    # Remove \ifEn...\else...\fi blocks (delete from \ifEn to \else, then delete \fi)
-    # This removes the first branch and keeps the second branch
-    pattern = r"^\s*\\ifEn\s*$.*?^\s*\\else\s*$"
-    content = re.sub(pattern, "", content, flags=re.MULTILINE | re.DOTALL)
-    # Remove the \fi command
-    pattern = r"^\s*\\fi\s*$"
-    content = re.sub(pattern, "", content, flags=re.MULTILINE)
+    if is_japanese_mode:
+        # Remove \ifEn...\else...\fi blocks (delete from \ifEn to \else, then delete \fi)
+        # This removes the first branch and keeps the second branch
+        pattern = r"^\s*\\ifEn\s*$.*?^\s*\\else\s*$"
+        content = re.sub(pattern, "", content, flags=re.MULTILINE | re.DOTALL)
+        # Remove the \fi command
+        pattern = r"^\s*\\fi\s*$"
+        content = re.sub(pattern, "", content, flags=re.MULTILINE)
+    else:
+        # Remove \ifEn...\else...\fi blocks (delete from \else to \fi, then delete \ifEn)
+        # This removes the second branch and keeps the first branch
+        pattern = r"^\s*\\else\s*$.*?^\s*\\fi\s*$"
+        content = re.sub(pattern, "", content, flags=re.MULTILINE | re.DOTALL)
+        # Remove the \ifEn command
+        pattern = r"^\s*\\ifEn\s*$"
+        content = re.sub(pattern, "", content, flags=re.MULTILINE)
 
     # Remove \ifSubfilesClassLoaded{...}{} blocks
     pattern = r"\\ifSubfilesClassLoaded\s*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}\s*\{\}"

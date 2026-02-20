@@ -176,7 +176,7 @@ $\mu=0$ の場合も、同様の議論により凸性について示すことが
 \end{align*}
 ```
 
-正定値でも負定値でもない行列は不定値 (indefinite) と呼ばれます。行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表します。特に $B$ が零行列のときは $A \succeq 0$ と書くことがあります。同様に、$\preceq$ は半負定値に対して定義されます。$\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ と同値です。これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味し、さらに作用素ノルムについても $\left\lVert A \right\rVert \geq \mu$ であることを導きます。
+正定値でも負定値でもない行列は不定値 (indefinite) と呼ばれます。行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表します。特に $B$ が零行列のときは $A \succeq 0$ と書くことがあります。同様に、$\preceq$ は半負定値に対して定義されます。$\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ と同値です。これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味します。更に、対称行列ならば演算子ノルム $\left\lVert A \right\rVert$ は最大の固有値であるため、$\left\lVert A \right\rVert$ も少なくとも $\mu$ 以上であることを意味します。
 
 ここで、強凸性は関数が一様に正の曲率を持つことを意味していました。これはヘッセ行列も一様に正の曲率を持つこと、つまり一様に正定値であることと対応しています。実際、凸性や強凸性は次のように、ヘッセ行列の定値性と同値になることが知られています。
 
@@ -492,7 +492,7 @@ f(x) \ge f(y) + \nabla f(y)^\top (x-y) + \frac{1}{2L} \left\lVert \nabla f(x) - 
 
 この定理は、準ニュートン法の一種であるBFGS法やL-BFGS法などの更新則の解析で有用な次の不等式を導く際に利用されることがあります。
 
-最適化アルゴリズムが生成する列 $\lbrace x_k \rbrace_k$ に対し、
+関数 $f$ が凸かつ $L$-平滑であるとします。最適化アルゴリズムが生成する列 $\lbrace x_k \rbrace_k$ に対し、
 
 ```math
 \begin{equation*}
@@ -890,8 +890,8 @@ f''''(x) & = \frac{e^x(1 - 4e^x + e^{2x})}{(1+e^x)^4}.
 この関数は次の性質を持っています。
 
 1. $\mu$-強凸である。
-2. $\max_x |f''(x)| = \frac{1}{4} + \mu$ であり、これは $e^x=1$ で達成される。従って $\nabla f$ は $L$-平滑である ($L=\frac{1}{4}+\mu$)。
-3. $\max_x |f'''(x)| = \frac{1}{6\sqrt{3}}$ であり、これは $e^x=2-\sqrt{3}$ で達成される。従って $\nabla^2 f$ は $M$-リプシッツ連続である ($M=\frac{1}{6\sqrt{3}}$)。
+2. $\max_x \lvert f''(x) \rvert = \frac{1}{4} + \mu$ であり、これは $e^x=1$ で達成される。従って $\nabla f$ は $L$-平滑である ($L=\frac{1}{4}+\mu$)。
+3. $\max_x \lvert f'''(x) \rvert = \frac{1}{6\sqrt{3}}$ であり、これは $e^x=2-\sqrt{3}$ で達成される。従って $\nabla^2 f$ は $L^\mathrm{H}$-リプシッツ連続である ($L^\mathrm{H}=\frac{1}{6\sqrt{3}}$)。
 
 それにもかかわらず、初期点 $x_0$ が $\mu$ に対して十分大きい場合、Fig. 7 に示すようにニュートン法は振動します。
 
@@ -1010,7 +1010,7 @@ s_k \mathrel{\vcenter{:}}= x_{k+1} - x_k, \qquad   y_k \mathrel{\vcenter{:}}= \n
 \end{equation*}
 ```
 
-$y_k^\top s_k \neq 0$ かつ $s_k \neq 0$ を仮定します。なお、$s_k$ の $s$ は step を意味します。新しい近似は $x_{k+1}$ を中心に構築されるため、$\nabla f(x_k)$ をヘッセ行列 $\nabla^2 f(x_{k+1})$ およびその近似である $B_{k+1}$ を用いて次のように近似します。
+以降では基本的に $s_k \neq 0$ かつ $y_k^\top s_k \neq 0$ とします。 なお、$s_k$ の $s$ は step を意味します。新しい近似は $x_{k+1}$ を中心に構築されるため、$\nabla f(x_k)$ をヘッセ行列 $\nabla^2 f(x_{k+1})$ およびその近似である $B_{k+1}$ を用いて次のように近似します。
 
 ```math
 \begin{align*}
@@ -1728,6 +1728,28 @@ v^\top H_{k+1} v
 (証明終わり)
 
 </details>
+
+この命題は、反復の過程で近似ヘッセ行列 $B_k$ の正定値性を確保するために重要であり、特に探索方向が降下方向になることを保証します。実際には、次の強曲率条件を含む強ウルフ条件を課す直線探索を用いることが多いです。
+
+```math
+\begin{equation*}
+\lvert g_{k+1}^\top d_k \rvert \leq c_2 \lvert g_k^\top d_k \rvert.
+\end{equation*}
+```
+
+ただし、$0 < c_2 < 1$ は定数です。この条件を課すと、実際に $B_k$ が反復の過程で正定値に保たれることを確認できます。まず、$B_0$ を正定値に初期化します。ある $k$ で $B_k$ が正定値であると仮定すると、$d_k$ は降下方向で $g_k^\top d_k < 0$ であり、$s_k = \alpha_k d_k$ と $y_k = g_{k+1} - g_k$ から、次のようになります。
+
+```math
+\begin{align*}
+y_k^\top s_k & = (g_{k+1} - g_k)^\top (\alpha_k d_k)                                                                                            \\
+& = \alpha_k (g_{k+1}^\top d_k - g_k^\top d_k)                                                                                     \\
+& \geq \alpha_k \left(-\lvert g_{k+1}^\top d_k \rvert + \lvert g_k^\top d_k \rvert\right) &  & (g_k^\top d_k < 0)                  \\
+& \geq \alpha_k (1 - c_2) \lvert g_k^\top d_k \rvert                                      &  & (\text{by the curvature condition}) \\
+& > 0.                                                                                    &  & (c_2<1)
+\end{align*}
+```
+
+よって、先ほどの命題より、$B_{k+1}$ も正定値になります。数学的帰納法により、すべての $k$ で $B_k$ が正定値であることが保証されます。
 
 #### BFGS更新のトレースと行列式の公式
 
