@@ -2,72 +2,32 @@
 
 \begin{document}
 
-\section{Problem Setting and Preliminaries}
+\section{Preliminaries and Problem Setting}
 \label{sec:preliminaries}
 
-\subsection{Problem Setting}
-\label{sec:problem_setting}
+We begin by reviewing relevant background and formalizing the problem setting.
 
-We consider optimization problems in which exact objective function values are unavailable, following the recent literature on error-aware optimization~\citep{grattonNoteSolvingNonlinear2020,bellaviaImpactNoiseEvaluation2021,carterNumericalExperienceClass1993,clancyTROPHYTrustRegion2022,sunTrustRegionMethod2023,ruanAdaptiveRegularizedQuasiNewton2024}.
-When both objective values and gradients are heavily corrupted by noise, reliable optimization cannot be guaranteed.
-Thus, meaningful optimization requires that at least one source of information be sufficiently accurate.
-This work focuses on problems arising from finite-precision computations or inexact evaluations, where objective function evaluations are subject to non-negligible errors while gradient information can be computed with relatively high accuracy.
-Settings in which objective values are accurate but gradients are noisy, such as derivative-free optimization or stochastic approximation methods~\citep{berahasTheoreticalEmpiricalComparison2021,shiNoiseTolerantQuasiNewtonAlgorithm2022}, are beyond the scope of this work.
-
-In the following, we formalize the assumptions on function and gradient evaluations.
-We assume that only an error contaminated function $\overline{f}(x)$ is accessible, satisfying the hybrid absolute-relative error model~\citep{highamAccuracyStabilityNumerical2002,10.5555/3168451.3168462}:
-\begin{equation}\label{eq:error_model}
-    \abs{f(x)-\overline{f}(x)} \le \feps \max(1,\abs{f(x)}),
-\end{equation}
-where $0 \le \feps < 1$ is an error rate.
-This model captures the typical behavior of rounding errors in IEEE~754 floating-point arithmetic~\citep{highamAccuracyStabilityNumerical2002}, and in our numerical experiments, $\feps$ is chosen to range from $10^2$ to $10^7$ times the machine epsilon.
-The error is predominantly relative when $\abs{f(x)}$ is large and effectively absolute when $\abs{f(x)}$ is small.
-Closely related models are also employed in practical stopping criteria~\citep{2020SciPy-NMeth}.
-
-We next specify the assumptions of gradient evaluations.
-In practice, termination is typically based on a gradient tolerance $\gtol$, and the condition $\norm{\nabla \overline{f}(x)} \le \gtol$ is used as a stopping criterion.
-Hence, prior to termination, it holds that $\norm{\nabla \overline{f}(x)} > \gtol$.
-If the gradient noise level $\geps$ were comparable to or larger than $\gtol$, the stopping criterion could not be satisfied reliably, even when $x$ is sufficiently close to a stationary point. To ensure meaningful termination, the gradient noise must be sufficiently small relative to $\gtol$. Specifically, we assume
-\begin{equation*}
-    \norm{\nabla f(x) - \nabla \overline{f}(x)} \ll \geps \ll \gtol \le \norm{\nabla \overline{f}(x)}.
-\end{equation*}
-Under this regime, the computed gradient $\nabla \overline{f}(x)$ is a sufficiently accurate approximation of the true gradient $\nabla f(x)$ prior to termination. Accordingly, for the purpose of simplifying the theoretical analysis, we adopt the exact-gradient assumption
-\begin{equation}\label{eq:exact_gradient_assumption}
-    \nabla \overline{f}(x) = \nabla f(x).
-\end{equation}
-We emphasize that this assumption is introduced solely as a modeling simplification, rather than as a claim about practical gradient accuracy.
-Notably, the proposed algorithm does not rely on Wolfe-type conditions, which typically require accurate gradient information at trial points, making it robust to gradient inaccuracies.
-Our numerical experiments in \cref{sec:experiments} include cases where gradients are contaminated by noise, and it also demonstrates that the proposed method remains effective even when \cref{eq:exact_gradient_assumption} is violated.
-
-\subsection{Regularized Quasi-Newton Methods}
+\subsection{Regularized Quasi-Newton Method}
 \label{sec:prel_rqn}
 
-In classical Newton and quasi-Newton methods, line search techniques are commonly used in practice~\citep{2020SciPy-NMeth}.
-An alternative approach is to add regularization terms to the Hessian approximation.
+Regularized quasi-Newton method is one of the schemes for quasi-Newton methods that do not heavily rely on line search techniques, which is critical for optimization in noisy evaluation environments.
 Recent years have seen renewed interest in regularized Newton-type methods, including cubic regularization schemes~\citep{nesterovCubicRegularizationNewton2006a,ranganathSymmetricRankOneQuasiNewton2025,wangConvergenceRatesRegularized2025}.
 In this work, we focus on quadratic regularization~\citep{kanzowRegularizationLimitedMemory2023,doikovSuperUniversalRegularizedNewton2024,liTruncatedRegularizedNewton2009,zhangNewRegularizedQuasiNewton2018,uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,shengNewAdaptiveTrust2018}.
 
-Let $g_k \defeq \nabla f(x_k)$ and let $B_k \in \bbR^{n\times n}$ denote an approximate Hessian. In line-search-based quasi-Newton methods, the update is given by
-\begin{equation*}
-    x_{k+1} = x_k + \alpha_k d_k, \quad
-    d_k = -B_k^{-1} g_k,
-\end{equation*}
-where $\alpha_k$ is determined by a line search.
-In contrast, regularized quasi-Newton methods compute the step as
+For $g_k \defeq \nabla f(x_k)$ and an approximate Hessian $B_k \in \bbR^{n\times n}$, regularized quasi-Newton methods compute the step as
 \begin{equation*}
     x_{k+1} = x_k + d_k, \quad
     d_k = -(B_k + \mu_k I)^{-1} g_k,
 \end{equation*}
 with a regularization parameter $\mu_k \ge 0$.
 Combining regularization with line search is also possible and has been explored~\citep{uedaConvergencePropertiesRegularized2010}.
-
-A fundamental strategy for choosing $\mu_k$ in nonconvex optimization was proposed in earlier work on regularized Newton methods~\citep{uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,shengNewAdaptiveTrust2018}. Their formulation sets
+Several strategies for choosing $\mu_k$ in nonconvex optimization were proposed~\citep{uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,shengNewAdaptiveTrust2018}, and one of them is given by
 \begin{equation}
     \mu_k = c_1 \max(0, -\lambda_{\min}(B_k)) + c_2 \norm{\nabla f(x_k)}^\delta,
     \label{eq:ueda_mu}
 \end{equation}
-where $c_1 > 1$, $c_2 > 0$, $\delta \ge 0$
-and $\lambda_{\min}(B_k)$ denotes the smallest eigenvalue of $B_k$. $\norm{\cdot}$ is the Euclidean norm.
+where $c_1 > 1$, $c_2 > 0$, $\delta \ge 0$.
+Here, $\lambda_{\min}(B_k)$ denotes the smallest eigenvalue of $B_k$.
 This choice guarantees that $B_k + \mu_k I$ is positive definite,
 ensuring that $d_k$ is a descent direction.
 The regularization strategy adopted in this work is closely related in spirit,
@@ -84,12 +44,12 @@ Similar adaptive trust-region approaches are also discussed~\citep{grapigliaAdap
 Prominent examples of OFFO include adaptive gradient methods such as AdaGrad~\citep{duchiAdaptiveSubgradientMethods2011} and AdaGrad-Norm~\citep{wardAdaGradStepsizesSharp2020}.
 Their update rules are
 \begin{align*}
-    x_{k+1}^{(i)}                                                             & = x_k^{(i)} -
+    \text{(AdaGrad)} \quad x_{k+1}^{(i)}                                      & = x_k^{(i)} -
     \frac{1}{\theta \sqrt{\varsigma + \sum_{j=0}^k (g_j^{(i)})^2}} g_k^{(i)}, &               & (i=1,2,\ldots,n) \\
-    x_{k+1}                                                                   & = x_k -
-    \frac{1}{\theta \sqrt{\varsigma + \sum_{j=0}^k \norm{g_j}^2}} g_k,
+    \text{(AdaGrad-Norm)} \quad x_{k+1}                                       & = x_k -
+    \frac{1}{\theta \sqrt{\varsigma + \sum_{j=0}^k \norm{g_j}^2}} g_k
 \end{align*}
-respectively, where $\varsigma>0$ and $\theta>0$ are algorithmic parameters, and $x^{(i)}$ denotes the $i$-th component of a vector $x$.
+respectively, where $\varsigma>0$ and $\theta>0$ are algorithmic parameters. $x^{(i)}$ denotes the $i$-th component of a vector $x$.
 
 \if0 % ???
     We assume that only an approximate function value $\overline{f}(x)$ and true gradient $\nabla f(x)$ are available. For some constant $0 \le \feps < 1$, $\overline{f}(x)$ satisfies the relative error bound:
@@ -97,6 +57,40 @@ respectively, where $\varsigma>0$ and $\theta>0$ are algorithmic parameters, and
         \abs{\overline{f}(x)-f(x)} \le \feps \max(1,\abs{f(x)}).
     \end{equation}
 \fi
+
+\subsection{Problem Setting}
+\label{sec:problem_setting}
+
+We consider optimization problems in which exact objective function values are unavailable, following the recent literature on error-aware optimization~\citep{grattonNoteSolvingNonlinear2020,bellaviaImpactNoiseEvaluation2021,carterNumericalExperienceClass1993,clancyTROPHYTrustRegion2022,sunTrustRegionMethod2023,ruanAdaptiveRegularizedQuasiNewton2024}.
+When both objective values and gradients are heavily corrupted by noise, reliable optimization cannot be guaranteed.
+Thus, meaningful optimization requires that at least one source of information be sufficiently accurate.
+This work focuses on problems arising from finite-precision computations or inexact evaluations, where objective function evaluations are subject to non-negligible errors while gradient information can be computed with relatively high accuracy.
+Settings in which objective values are accurate but gradients are noisy, such as derivative-free optimization or stochastic approximation methods~\citep{berahasTheoreticalEmpiricalComparison2021,shiNoiseTolerantQuasiNewtonAlgorithm2022}, are beyond the scope of this work.
+
+In the following, we formalize the assumptions on function and gradient evaluations.
+We assume that only an error-contaminated function $\overline{f}(x)$ is accessible, satisfying the hybrid absolute-relative error model~\citep{highamAccuracyStabilityNumerical2002,10.5555/3168451.3168462}:
+\begin{equation}\label{eq:error_model}
+    \abs{f(x)-\overline{f}(x)} \le \feps \max(1,\abs{f(x)}),
+\end{equation}
+where $0 \le \feps < 1$ is an error rate.
+The error is predominantly relative when $\abs{f(x)}$ is large and effectively absolute when $\abs{f(x)}$ is small, capturing the typical behavior of rounding errors in IEEE~754 floating-point arithmetic~\citep{highamAccuracyStabilityNumerical2002}.
+In the numerical experiments, $\feps$ is taken as a large multiple of the machine epsilon to account for accumulated round-off effects.
+Closely related models are also employed in practical stopping criteria~\citep{2020SciPy-NMeth}.
+
+We next specify the assumptions of gradient evaluations.
+In practice, termination is typically based on a gradient tolerance $\gtol$, and the condition $\norm{\nabla \overline{f}(x)} \le \gtol$ is used as a stopping criterion.
+Hence, prior to termination, it holds that $\norm{\nabla \overline{f}(x)} > \gtol$.
+If the gradient noise $\norm{\nabla f(x) - \nabla \overline{f}(x)}$ were comparable to or larger than $\gtol$, the stopping criterion could not be satisfied reliably, even when $\nabla f(x) = 0$. To ensure meaningful termination, the gradient noise must be sufficiently small relative to $\gtol$. Specifically, during the optimization process, we assume
+\begin{equation*}
+    \norm{\nabla f(x) - \nabla \overline{f}(x)} \ll \gtol < \norm{\nabla \overline{f}(x)}.
+\end{equation*}
+Under this regime, the computed gradient $\nabla \overline{f}(x)$ is a sufficiently accurate approximation of the true gradient $\nabla f(x)$ prior to termination. Accordingly, for the purpose of simplifying the theoretical analysis, we adopt the exact-gradient assumption
+\begin{equation}\label{eq:exact_gradient_assumption}
+    \nabla \overline{f}(x) = \nabla f(x).
+\end{equation}
+We emphasize that this assumption is introduced solely as a modeling simplification, rather than as a claim about practical gradient accuracy.
+Notably, the proposed algorithm does not rely on Wolfe-type conditions, which typically require accurate gradient information at trial points, making it robust to gradient inaccuracies.
+Our numerical experiments in \cref{sec:experiments} include cases where gradients are contaminated by noise, and it also demonstrates that the proposed method remains effective even when \cref{eq:exact_gradient_assumption} is violated.
 
 \section{Proposed Algorithm}\label{sec:algorithm}
 
@@ -107,11 +101,12 @@ This hybrid behavior enables improved stability without sacrificing efficiency i
 
 The pseudo-code of our algorithm is given in \cref{alg:regularized_qn}, where we note that the minimum of the empty set is defined as $+\infty$ in \refLine{line:mu_0_condition}.
 \Cref{alg:backtracking_linesearch} is an auxiliary line search algorithm called in \cref{alg:regularized_qn}.
+In the following, we explain the three main components of \cref{alg:regularized_qn}.
 
 \DontPrintSemicolon
 \begin{algorithm}[ht]
     \normalsize
-    \KwIn{$x_0$, $0 < k_{\max}$, $0 \le \feps < 1$, $0 < c < 1$, $0 < \theta_{\min} \leq \theta_{\max}$ and $0 < \varsigma < 1$}
+    \KwIn{$x_0$, $0 < k_{\max}$, $0 \le \feps < 1$, $0 < \theta_{\min} \leq \theta_{\max}$ and $0 < \varsigma < 1$}
     $k \gets 0$, $g_0 \gets \nabla \overline{f}(x_0)$, $K^0 \gets \emptyset$, $K^+ \gets \emptyset$ \label{line:init}\;
     \For{$k=0,1,2,\ldots, k_{\max}-1$}{
         \uIf{$\min_{j \in K^0} (\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k)$\label{line:mu_0_condition}}{
@@ -146,23 +141,19 @@ The pseudo-code of our algorithm is given in \cref{alg:regularized_qn}, where we
     \label{alg:backtracking_linesearch}
 \end{algorithm}
 
-In the following, we explain the three main components of \cref{alg:regularized_qn}.
-
 \paragraph{Computation of the Regularized Quasi-Newton Direction (\refLine{line:d_k}): }\label{sec:algorithm_components_d}
 
 The first component is the computation of the regularized quasi-Newton direction $d_k$ stated in \cref{sec:prel_rqn}.
 Given $g_k=\nabla \overline{f}(x_k) = \nabla f(x_k)$, an approximate Hessian $B_k$, and a regularization parameter $\mu_k$, we compute the search direction $d_k = -(B_k+\mu_k I)^{-1} g_k$.
-For the theoretical analysis, any choice of $B_k$ satisfying \cref{ass:BBounds} stated in \cref{sec:assumptions} is admissible, which ensures $B_k$ is positive definite.
 A practical choice of $B_k$ is discussed in \cref{sec:proposed_choice_Bk}.
 
 \paragraph{Relaxed Armijo Condition with an Error-Absorbing Term (\refLine{line:armijo}): }\label{sec:algorithm_components_alpha}
 
-The second component is the computation of the step size $\alpha_k$ using a relaxed Armijo condition.
-We compute $\alpha_k$ satisfying the relaxed Armijo condition
+The second component is the computation of the step size $\alpha_k$ using a relaxed Armijo condition, which is defined as follows:
 \begin{equation}\label{eq:relaxed_Armijo_condition}
     \begin{dcases}
         \overline{f}(x_k)+c\alpha_k g_k^\top d_k+\Delta_k\ge\overline{f}(x_k+\alpha_k d_k), \\
-        \Delta_k = \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_k), -\overline{f}(x_k + \alpha_k d_k))
+        \Delta_k = \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_k), -\overline{f}(x_k + \alpha_k d_k)),
     \end{dcases}
 \end{equation}
 where $\Delta_k$ is the error-absorbing term that is recomputed for each $\alpha_k$.
@@ -194,6 +185,7 @@ Otherwise, to ensure convergence to first-order stationary points, we apply an O
 as described in \cref{sec:prel_offo}.
 Since OFFO schemes do not rely on function values, this update is robust to numerical errors in $\overline{f}$.
 
+
 \section{Theoretical Analysis}\label{sec:analysis}
 
 In this section, we establish the global convergence properties of
@@ -206,7 +198,7 @@ In this section, we establish the global convergence properties of
 Throughout this section, we make the following three assumptions.
 The first assumption guarantees that the objective function is bounded below.
 \begin{assumption}\label{ass:bounded}
-    The function $f$ is bounded below; that is, for all $x \in \bbR^n$,
+    The function $f$ is bounded below, meaning that for all $x \in \mathbb{R}^n$,
     \begin{equation*}
         f(x) \ge f^* \defeq \inf_{x \in \bbR^n} f(x) > -\infty .
     \end{equation*}
@@ -240,23 +232,24 @@ The third assumption requires the matrices $\{B_k\}_{k=0}^{k_{\mathrm{max}}-1}$ 
     \end{equation*}
 \end{assumption}
 As we will discuss in \cref{sec:proposed_choice}, the standard BFGS update with a slight modification ensures that \cref{ass:BBounds} holds in practice.
-By \cref{ass:BBounds}, we can derive two useful bounds involving $g_k$ and $d_k$.
-Using $d_k=-(B_k+\mu_k I)^{-1} g_k$ (\refLine{line:d_k}) and \cref{ass:BBounds} asserting $(m + \mu_k)I \preceq B_k + \mu_k I \preceq (M + \mu_k)I$, we obtain the following two bounds:
+By \cref{ass:BBounds}, we can derive useful bounds involving $g_k$ and $d_k$.
+Using $d_k=-(B_k+\mu_k I)^{-1} g_k$ (\refLine{line:d_k}) and \cref{ass:BBounds} asserting $(m + \mu_k)I \preceq B_k + \mu_k I \preceq (M + \mu_k)I$, we obtain the following bounds:
 \begin{align}
-    -g_k^\top d_k = g_k^\top (B_k+\mu_k I)^{-1} g_k & \ge \frac{1}{M+\mu_k}\norm{g_k}^2, \label{eq:BBounds_results_first}      \\
-    \norm{d_k}^2 = \norm{(B_k+\mu_k I)^{-1}g_k}^2   & \le \frac{1}{(m+\mu_k)^2}\norm{g_k}^2. \label{eq:BBounds_results_second}
+    -g_k^\top d_k & = d_k^\top (B_k+\mu_k I) d_k      \ge (m+\mu_k)\norm{d_k}^2 \ge m \norm{d_k}^2, \label{eq:BBounds_results_zero} \\
+    -g_k^\top d_k & = g_k^\top (B_k+\mu_k I)^{-1} g_k \ge \frac{1}{M+\mu_k}\norm{g_k}^2, \label{eq:BBounds_results_first}           \\
+    \norm{d_k}^2  & = \norm{(B_k+\mu_k I)^{-1}g_k}^2 \le \frac{1}{(m+\mu_k)^2}\norm{g_k}^2. \label{eq:BBounds_results_second}
 \end{align}
 
 \subsection{Error Bound on Function Evaluations}\label{sec:error_bound_on_function_evaluations}
 
+We first prove a useful property of the error-absorbing term $\Delta_k$ defined in \cref{eq:relaxed_Armijo_condition}.
 In the following, we define the actual and observed function decreases as
 \begin{align}
     \delta_k            & \defeq f(x_k) - f(x_{k+1}),           \label{eq:def_small_delta_k} \\
     \overline{\delta}_k & \defeq \overline{f}(x_k) - \overline{f}(x_{k+1}).
     \label{eq:def_overline_small_delta_k}
 \end{align}
-We first prove a useful property of the error-absorbing term $\Delta_k$ defined in \cref{eq:relaxed_Armijo_condition}.
-The following lemma asserts that the error between the actual values difference $\delta_k$ and the observed values difference $\overline{\delta}_k$ can be bounded by $\Delta_k$.
+We prove that the error between the actual values difference $\delta_k$ and the observed values difference $\overline{\delta}_k$ can be bounded by $\Delta_k$.
 \begin{lemma}\label{lem:error_bound_on_function_evaluations}
     If $x_k$ and $x_{k+1}$ satisfies $f(x_{k+1}) \le f(x_k)$, it holds that
     \begin{equation}
@@ -264,32 +257,37 @@ The following lemma asserts that the error between the actual values difference 
     \end{equation}
 \end{lemma}
 \begin{proof}
-    We start from a general observation.
-    We claim that, for all $x \in \bbR^n$,
+    We start from general observations.
+    We first claim that, for all $x \in \bbR^n$,
     \begin{equation}\label{eq:fx_two_cases}
         \begin{cases}
-            \max(1,f(x))  \le \frac{1}{1-\feps} \max(1,\overline f(x)), \\
+            \max(1,+f(x))  \le \frac{1}{1-\feps} \max(1,+\overline f(x)), \\
             \max(1,-f(x)) \le \frac{1}{1-\feps} \max(1,-\overline f(x)).
         \end{cases}
     \end{equation}
-    We only consider the case with the plus sign, as the negative case can be treated analogously.
-    If $f(x)\le 1$, then $\max(1,f(x)) = 1 \leq \frac{1}{1-\feps}$ and the inequality is trivial.
-    If $f(x) > 1$, \cref{eq:error_model} implies
+    We prove the case with the plus sign.
+    If $+f(x)\le 1$, then $\max(1,+f(x)) = 1 \leq \frac{1}{1-\feps}$ and the inequality is trivial.
+    If $+f(x) > 1$, \cref{eq:error_model} implies
     \begin{equation}\label{eq:error_model_fx_1}
-        \abs{f(x)-\overline{f}(x)} \le \feps \max(1,\abs{f(x)}) = \feps f(x).
+        f(x) - \overline f(x) \leq \abs{f(x)-\overline{f}(x)} \le \feps \max(1,\abs{f(x)}) = +\feps f(x).
     \end{equation}
-    Since $\feps<1$, \cref{eq:error_model_fx_1} implies that $f(x)$ and $\overline f(x)$ have the same sign. Moreover, by the triangle inequality,
-    $\abs{f(x)} - \abs{\overline f(x)} \le \feps \abs{f(x)}$,
-    which yields $\max(1,f(x)) = f(x) \le \frac{1}{1-\feps} \overline f(x)$.
-    Combining the two cases completes the proof of \cref{eq:fx_two_cases}.
+    Rearranging this yields
+    \begin{equation*}
+        \max(1,+f(x)) = +f(x) \le +\frac{1}{1-\feps} \overline f(x) \le \frac{1}{1-\feps} \max(1,+\overline f(x)).
+    \end{equation*}
+    The negative case can be treated analogously, and this completes the proof of \cref{eq:fx_two_cases}.
 
-    With these preparations, we now prove the lemma. For all $k \in K$, we have
+    We also have the following general bound for all $k \in K$:
     \begin{align}
-        \abs{\delta_k-\overline{\delta}_k} & = \abs{(f(x_k)-\overline{f}(x_k)) - (f(x_{k+1})-\overline{f}(x_{k+1}))} &  & (\text{rearrangement})                                \notag \\
-                                           & \le \feps\max(1,\abs{f(x_k)}) + \feps\max(1,\abs{f(x_{k+1})})           &  & (\text{definition in \cref{eq:error_model}}) \notag          \\
-                                           & \le 2\feps \max(1,\abs{f(x_k)},\abs{f(x_{k+1})})                        &  & (\text{max property}) \label{eq:delta_k_error_bound}
+        \abs{\delta_k-\overline{\delta}_k}
+         & = \abs{(f(x_k)-\overline{f}(x_k)) - (f(x_{k+1})-\overline{f}(x_{k+1}))}      &  & (\text{rearrangement})                                \notag \\
+         & \leq \abs{f(x_k)-\overline{f}(x_k)} + \abs{f(x_{k+1})-\overline{f}(x_{k+1})} &  & (\text{triangle inequality}) \notag                          \\
+         & \le \feps\max(1,\abs{f(x_k)}) + \feps\max(1,\abs{f(x_{k+1})})                &  & (\text{definition in \cref{eq:error_model}}) \notag          \\
+         & \le 2\feps \max(1,\abs{f(x_k)},\abs{f(x_{k+1})}).                            &  & (\text{max property}) \label{eq:delta_k_error_bound}
     \end{align}
-    From the condition of this lemma ($f(x_{k+1}) \le f(x_k)$), this can be further bounded as
+
+    With these preparations, we now prove the lemma.
+    From the condition $f(x_{k+1}) \le f(x_k)$, \cref{eq:delta_k_error_bound} can be further bounded as
     \begin{align*}
         2 \feps \max(1,\abs{f(x_k)},\abs{f(x_{k+1})})
          & = 2 \feps \max(1,f(x_k),-f(x_{k+1}))                                        &  & (\text{$f(x_{k+1}) \le f(x_k)$}) \\
@@ -297,7 +295,7 @@ The following lemma asserts that the error between the actual values difference 
          & = \Delta_k,                                                                 &  &
         (\text{\cref{eq:relaxed_Armijo_condition}})
     \end{align*}
-    which yields the desired inequality by the triangle inequality.
+    which yields the desired inequality with $\delta_k - \overline{\delta}_k \leq \abs{\delta_k - \overline{\delta}_k} \leq \Delta_k$.
     \myQED
 \end{proof}
 
@@ -315,19 +313,15 @@ We also derive the following lemma for later use.
         \geq - c \alpha_k g_k^\top d_k -\Delta_k
         \geq -\Delta_k.
     \end{equation}
-    Using \cref{eq:fx_two_cases,eq:overline_delta_k_lower_bound}, the right-hand side of \cref{eq:delta_k_error_bound} can be further bounded as
+    Thus, using the general result in \cref{eq:delta_k_error_bound}, we can further bound $\abs{\delta_k - \overline{\delta}_k}$ as
     \begin{align*}
-        2\feps \max(1,\abs{f(x_k)},\abs{f(x_{k+1})})
-         & \leq \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}), -\overline{f}(x_{k}), \overline{f}(x_{{k}+1}), -\overline{f}(x_{{k}+1})) \\
-         & \le \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}) + \Delta_{k}, -\overline{f}(x_{{k}+1}) + \Delta_{k})                       \\
-         & \le \frac{2\feps}{1-\feps} \qty(\max(1, \overline{f}(x_{k}), -\overline{f}(x_{{k}+1})) + \Delta_k).
+        \abs{\delta_k - \overline{\delta}_k} & \leq 2\feps \max(1,\abs{f(x_k)},\abs{f(x_{k+1})})                                                                                 &  & (\text{\cref{eq:delta_k_error_bound}})          \\
+                                             & \leq \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}), -\overline{f}(x_{k}), \overline{f}(x_{{k}+1}), -\overline{f}(x_{{k}+1})) &  & (\text{\cref{eq:fx_two_cases}})                 \\
+                                             & \le \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}) + \Delta_{k}, -\overline{f}(x_{{k}+1}) + \Delta_{k})                       &  & (\text{\cref{eq:overline_delta_k_lower_bound}}) \\
+                                             & \le \frac{2\feps}{1-\feps} \qty(\max(1, \overline{f}(x_{k}), -\overline{f}(x_{{k}+1})) + \Delta_k)                                                                                     \\
+                                             & = \qty(1 + \frac{2\feps}{1-\feps}) \Delta_k  = \frac{1 + \feps}{1 - \feps} \Delta_k,                                              &  & (\text{\cref{eq:relaxed_Armijo_condition}})
     \end{align*}
-    Combining this with \cref{eq:delta_k_error_bound} and the definition of $\Delta_k$ in \cref{eq:relaxed_Armijo_condition} yields
-    \begin{equation*}
-        \abs{\delta_k - \overline{\delta}_k} \leq \frac{2\feps}{1-\feps} \qty(\max(1, \overline{f}(x_{k}), -\overline{f}(x_{{k}+1})) + \Delta_k) = \qty(1 + \frac{2\feps}{1-\feps}) \Delta_k
-        = \frac{1 + \feps}{1 - \feps} \Delta_k.
-    \end{equation*}
-    Applying the triangle inequality completes the proof.
+    which yields the desired inequality with $\overline{\delta}_k - \delta_k \leq \abs{\delta_k - \overline{\delta}_k} \leq \frac{1 + \feps}{1 - \feps} \Delta_k$.
     \myQED
 \end{proof}
 
@@ -350,25 +344,17 @@ Recall that we assume that the parameters in \cref{alg:backtracking_linesearch} 
          & \ge -\alpha_k g_k^\top d_k - \frac{L}{2}\alpha_k^2\norm{d_k}^2                                   \notag                           \\
          & = -c \alpha_k g_k^\top d_k + \alpha_k \qty(-(1-c)g_k^\top d_k - \frac{L\alpha_k}{2}\norm{d_k}^2). \label{eq:backtracking_Lsmooth}
     \end{align}
-    From \refLine{line:d_k} of \cref{alg:regularized_qn}, it follows that $g_k=-(B_k+\mu_k I) d_k$.
-    Then, from \cref{ass:BBounds} and $\mu_k \ge 0$, we have
-    \begin{equation}\label{eq:backtracking_min_eig}
-        -g_k^\top d_k
-        = d_k^\top (B_k+\mu_k I)d_k
-        \ge (m+\mu_k)\norm{d_k}^2
-        \ge 0.
-    \end{equation}
-    Thus, when $\alpha_k$ satisfies the bound in \cref{eq:alpha_k_upper_bound},
-    we have
+    From \cref{ass:BBounds} and \cref{eq:BBounds_results_zero}, we have $-g_k^\top d_k \geq m \norm{d_k}^2$.
+    Under \cref{eq:alpha_k_upper_bound}, we have
     \begin{equation}\label{eq:backtracking_simple_bound}
         -(1-c)g_k^\top d_k - \frac{L\alpha_k}{2}\norm{d_k}^2
         \ge \qty((1-c)m - \frac{L\alpha_k}{2})\norm{d_k}^2 \ge 0.
     \end{equation}
     Combining \cref{eq:backtracking_Lsmooth,eq:backtracking_simple_bound} yields
     \begin{equation*}
-        f(x_k) - f(x_k+\alpha_k d_k) \geq -c \alpha_k g_k^\top d_k \geq 0.
+        f(x_k) - f(x_k+\alpha_k d_k) \geq -c \alpha_k g_k^\top d_k.
     \end{equation*}
-    Hence, the condition of \cref{lem:error_bound_on_function_evaluations} is satisfied with $x_{k+1} = x_k + \alpha_k d_k$ and thus we obtain $\delta_k \le \overline{\delta}_k + \Delta_k$, i.e.,
+    Since $-g_k^\top d_k \geq m \norm{d_k}^2 \geq 0$, the condition of \cref{lem:error_bound_on_function_evaluations} is satisfied with $x_{k+1} = x_k + \alpha_k d_k$. Thus we obtain $\delta_k \le \overline{\delta}_k + \Delta_k$, i.e.,
     \begin{equation*}
         -c\alpha_k g_k^\top d_k
         \le

@@ -3,8 +3,8 @@ In smooth unconstrained optimization, quasi-Newton methods combined with line se
 These methods implicitly assume accurate function evaluations and thus they may fail to converge in noisy settings.
 Developing fast and robust quasi-Newton methods for such scenarios is crucial.
 
-To address this issue, we propose a noise-tolerant regularized quasi-Newton method with an Armijo-type line search.
-The regularization parameter is updated using an Objective-Function-Free Optimization inspired rule that is closely related to the AdaGrad-Norm method.
+To address the issue, we propose a noise-tolerant regularized quasi-Newton method with an relaxed Armijo-type line search.
+The regularization parameter is updated using an Objective-Function-Free Optimization inspired rule that is related to the AdaGrad-Norm method.
 Under an error model of the objective function and standard assumptions, we establish a global convergence rate of $\order{1/\varepsilon^2}$ for reaching a first-order stationary point, matching the standard convergence rate for first-order methods.
 We performed extensive experiments on the CUTEst benchmark collection with artificially noisy objective function evaluations, as well as with low-precision floating-point arithmetic (64-, 32-, and 16-bit).
 The results show that the proposed method is substantially more robust than several existing methods, while maintaining competitive practical convergence speed and computational cost.
