@@ -160,9 +160,9 @@
     \textrm{(negative semi-definite)} \quad & v^\top A v \le 0 \quad \forall v \in \mathbb{R}^n.
 \end{align*}
 \ifEn
-    A matrix is indefinite if it is neither positive nor negative definite. For matrices $A,B \in \mathbb{R}^{n \times n}$, the notation $A \succeq B$ indicates that $A-B$ is positive semi-definite. In particular, if $B$ is a zero matrix, we may simply write $A \succeq 0$. We similarly define $\preceq$ for negative semi-definiteness. For $\mu \geq 0$, the condition $A \succeq \mu I$ is equivalent to $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ for all $v \in \mathbb{R}^n$. It directly implies that all eigenvalues of $A$ are at least $\mu$. It also implies that the operator norm $\left\lVert A \right\rVert$ is at least $\mu$ if $A$ is symmetric, since the operator norm of a symmetric matrix is equal to its largest eigenvalue.
+    A matrix is indefinite if it is neither positive nor negative definite. For matrices $A,B \in \mathbb{R}^{n \times n}$, the notation $A \succeq B$ indicates that $A-B$ is positive semi-definite. In particular, if $B$ is a zero matrix, we may simply write $A \succeq 0$. We similarly define $\preceq$ for negative semi-definiteness. For $\mu \geq 0$, the condition $A \succeq \mu I$ is equivalent to $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ for all $v \in \mathbb{R}^n$. It directly implies that all eigenvalues of $A$ are at least $\mu$. It also implies that the operator norm $\left\lVert A \right\rVert$ is at least $\mu$, since the operator norm of a symmetric matrix is equal to an absolute value of its largest eigenvalue.
 \else
-    正定値でも負定値でもない行列は不定値 (indefinite) と呼ばれます。行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表します。特に $B$ が零行列のときは $A \succeq 0$ と書くことがあります。同様に、$\preceq$ は半負定値に対して定義されます。$\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ と同値です。これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味します。更に、対称行列ならば演算子ノルム $\left\lVert A \right\rVert$ は最大の固有値であるため、$\left\lVert A \right\rVert$ も少なくとも $\mu$ 以上であることを意味します。
+    正定値でも負定値でもない行列は不定値 (indefinite) と呼ばれます。行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表します。特に $B$ が零行列のときは $A \succeq 0$ と書くことがあります。同様に、$\preceq$ は半負定値に対して定義されます。$\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ と同値です。これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味します。更に、対称行列ならば演算子ノルム $\left\lVert A \right\rVert$ は固有値の絶対値の最大値であるため、$\left\lVert A \right\rVert$ も少なくとも $\mu$ 以上であることを意味します。
 \fi
 
 \ifEn
@@ -232,24 +232,24 @@
     \fi
 
     \ifEn
-        Conversely, let $\mu>0$ and assume $\nabla^2 f(x)\succeq \mu I$ for all $x \in \mathbb{R}^n$. By the fundamental theorem of calculus, for any $x,y \in \mathbb{R}^n$, we have
+        Conversely, let $\mu>0$ and assume $\nabla^2 f(x)\succeq \mu I$ for all $x \in \mathbb{R}^n$. By Taylor's theorem, for any $x,y \in \mathbb{R}^n$, letting $\phi(t) \coloneqq f(x+t(y-x))$ gives
     \else
-        逆に、$\mu>0$ とし、任意の $x \in \mathbb{R}^n$ に対して $\nabla^2 f(x)\succeq \mu I$ が成り立つと仮定します。微分積分学の基本定理より、任意の $x,y \in \mathbb{R}^n$ について次が成り立ちます。
+        逆に、$\mu>0$ とし、任意の $x \in \mathbb{R}^n$ に対して $\nabla^2 f(x)\succeq \mu I$ が成り立つと仮定します。テイラーの定理より、任意の $x,y \in \mathbb{R}^n$ について $\phi(t) \coloneqq f(x+t(y-x))$ とおくと、次が成り立ちます。
     \fi
-    \begin{equation*}
-        f(y)
-        = f(x)+\nabla f(x)^\top (y-x)
-        +\frac{1}{2} \int_0^1 (y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t.
-    \end{equation*}
+    \begin{align*}
+        f(y) & =\phi(1)                                                                                        \\
+             & = \phi(0) + \phi'(0) + \int_0^1 (1-t) \phi''(t) \mathrm{d}t                                     \\
+             & = f(x)+\nabla f(x)^\top (y-x) + \int_0^1 (1-t)(y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t.
+    \end{align*}
     \ifEn
         By the assumption $\nabla^2 f(x)\succeq \mu I$, we have
     \else
         また、仮定 $\nabla^2 f(x)\succeq \mu I$ から次が得られます。
     \fi
     \begin{equation*}
-        \int_0^1 (y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t
-        \ge \int_0^1 \mu\left\lVert y-x \right\rVert^2 \mathrm{d}t
-        = \mu\left\lVert y-x \right\rVert^2.
+        \int_0^1 (1-t)(y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t
+        \ge \int_0^1 (1-t)\mu\left\lVert y-x \right\rVert^2 \mathrm{d}t
+        = \frac{\mu}{2} \left\lVert y-x \right\rVert^2.
     \end{equation*}
     \ifEn
         Thus, combining these results gives the definition of $\mu$-strong convexity.
@@ -334,15 +334,16 @@
 \end{proposition}
 \begin{proof}
     \ifEn
-        By the fundamental theorem of calculus, for any $x,y \in \mathbb{R}^n$, we have
+        By the fundamental theorem of calculus, for any $x,y \in \mathbb{R}^n$, letting $\phi(t) \coloneqq f(x+t(y-x))$ gives
     \else
-        微分積分学の基本定理より、任意の $x,y \in \mathbb{R}^n$ について次が成り立ちます。
+        微分積分学の基本定理より、任意の $x,y \in \mathbb{R}^n$ について $\phi(t) \coloneqq f(x+t(y-x))$ とおくと、次が成り立ちます。
     \fi
     \begin{align*}
-        f(y) - f(x) & = \int_0^1 \nabla f(x+t(y-x))^\top (y-x) \mathrm{d}t                                                                                                                               \\
+        f(y) - f(x) & = \phi(1) - \phi(0) = \int_0^1 \phi'(t) \mathrm{d}t                                                                                                                                \\
+                    & = \int_0^1 \nabla f(x+t(y-x))^\top (y-x) \mathrm{d}t                                                                                                                               \\
                     & = \nabla f(x)^\top (y-x) + \int_0^1 (\nabla f(x+t(y-x)) - \nabla f(x))^\top (y-x) \mathrm{d}t                                                                                      \\
                     & \leq \nabla f(x)^\top (y-x) + \int_0^1 \left\lVert \nabla f(x+t(y-x)) - \nabla f(x) \right\rVert \left\lVert y-x \right\rVert \mathrm{d}t &  & (\text{Cauchy--Schwarz inequality}) \\
-                    & \leq \nabla f(x)^\top (y-x) + \int_0^1 L t \left\lVert y-x \right\rVert^2 \mathrm{d}t                                                     &  & (\text{by $L$-smoothness})          \\
+                    & \leq \nabla f(x)^\top (y-x) + \int_0^1 L t \left\lVert y-x \right\rVert^2 \mathrm{d}t                                                     &  & (\text{$L$-smoothness})             \\
                     & = \nabla f(x)^\top (y-x) + \frac{L}{2} \left\lVert y-x \right\rVert^2.
     \end{align*}
     \ifEn
@@ -400,15 +401,15 @@
 \end{proof}
 
 \ifEn
-    As we have seen so far, $L$-smoothness means that the rate of gradient change is bounded from above, and this can also be related to the definiteness of the Hessian matrix. In other words, as shown in the following proposition, the Hessian matrix is bounded from above by $L I$.
+    As we have seen so far, $L$-smoothness means that the rate of gradient change is bounded from above, and this can also be related to the definiteness of the Hessian matrix. In other words, as shown in the following proposition, the Hessian matrix is bounded by $-L I$ and $+L I$.
 \else
-    ここまで見てきたように、$L$-平滑性は勾配の変化率が上から抑えられることを意味してきましたが、これもヘッセ行列の定値性と関連付けることができます。つまり、次の命題で示すように、ヘッセ行列は $L I$ で上から抑えられることになります。
+    ここまで見てきたように、$L$-平滑性は勾配の変化率が上から抑えられることを意味してきましたが、これもヘッセ行列の定値性と関連付けることができます。つまり、次の命題で示すように、ヘッセ行列は $-L I$ と $+L I$ の間に抑えられることになります。
 \fi
 \begin{proposition}\label{prop:smoothness-hessian}
     \ifEn
-        Let $f \colon \mathbb{R}^n \to \mathbb{R}$ be of class $C^2$. Then $f$ is $L$-smooth if and only if $\nabla^2 f(x)\preceq L I$ holds for all $x \in \mathbb{R}^n$.
+        Let $f \colon \mathbb{R}^n \to \mathbb{R}$ be of class $C^2$. Then $f$ is $L$-smooth if and only if $-L I \preceq \nabla^2 f(x)\preceq +L I$ holds for all $x \in \mathbb{R}^n$.
     \else
-        関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^2$ 級であるとする。このとき、$f$ が $L$-平滑であることと、任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\preceq L I$ が成り立つことは同値である。
+        関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^2$ 級であるとする。このとき、$f$ が $L$-平滑であることと、任意の $x \in \mathbb{R}^n$ で $-L I \preceq \nabla^2 f(x) \preceq L I$ が成り立つことは同値である。
     \fi
 \end{proposition}
 \begin{proof}
@@ -422,10 +423,10 @@
         = \int_0^1 \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t.
     \end{equation*}
     \ifEn
-        Assume $\nabla^2 f(x)\preceq L I$ for all $x \in \mathbb{R}^n$.
+        Assume $-L I \preceq \nabla^2 f(x) \preceq +L I$ for all $x \in \mathbb{R}^n$.
         It implies that the operator norm of $\nabla^2 f(x)$ satisfies $\left\lVert \nabla^2 f(x) \right\rVert \le L$, and thus
     \else
-        任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\preceq L I$ と仮定します。
+        任意の $x \in \mathbb{R}^n$ で $-L I \preceq \nabla^2 f(x) \preceq L I$ と仮定します。
         このとき $\left\lVert \nabla^2 f(x) \right\rVert \le L$ が成り立つので、
     \fi
     \begin{align*}
@@ -476,8 +477,10 @@
     \end{align*}
     \ifEn
         Because $v \in \mathbb{R}^n$ is arbitrary, we obtain $\nabla^2 f(x)\preceq L I$.
+        In the same manner, $\nabla^2 f(x)\succeq -L I$ can also be shown, which completes the proof.
     \else
         $v \in \mathbb{R}^n$ は任意なので、$\nabla^2 f(x)\preceq L I$ という結果が得られました。
+        同様にして、$\nabla^2 f(x)\succeq -L I$ も示されます。
     \fi
     \myQED
 \end{proof}

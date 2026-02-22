@@ -109,7 +109,8 @@ def main() -> None:
             heading_level = line.count("#")
             heading_text = line[heading_level:].strip()
             escaped_heading_text = (
-                heading_text.replace("(", "")
+                heading_text.lower()
+                .replace("(", "")
                 .replace(")", "")
                 .replace(" ", "-")
                 .replace("–", "")

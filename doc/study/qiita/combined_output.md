@@ -6,7 +6,7 @@
 
 決めたい内容を決定変数 $x$、その良さを表す定量的な指標を目的関数 $f(x)$ としてモデル化すると、これらの最善な選択は最適化問題として抽象化できます。
 
-数理最適化とは、このような最善の選択、およびそれを遂行する数学的手法や学問領域を指し、本稿では連続最適化、そして特にその代表的な手法であるニュートン法と準ニュートン法を中心として、基礎的な概念をまとめます。
+数理最適化とは、このような最善の選択、およびそれを遂行する数学的手法や学問領域を指し、本稿では連続最適化、特にその代表的な手法であるニュートン法と準ニュートン法を中心として、基礎的な概念をまとめます。
 
 <img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/sixhump.png?v=1" />
 
@@ -19,7 +19,7 @@
   - [ヘッセ行列の正定値性](#ヘッセ行列の正定値性)
   - [平滑性](#平滑性)
     - [ヘッセ行列の固有値のバウンド](#ヘッセ行列の固有値のバウンド)
-    - [Baillon–Haddadの定理](#BaillonHaddadの定理)
+    - [Baillon–Haddadの定理](#baillonhaddadの定理)
 - [ニュートン法](#ニュートン法)
   - [ニュートン法のアルゴリズム](#ニュートン法のアルゴリズム)
   - [ニュートン法の収束性](#ニュートン法の収束性)
@@ -38,30 +38,30 @@
 - [準ニュートン法](#準ニュートン法)
   - [セカント条件](#セカント条件)
   - [代表的な準ニュートン更新則](#代表的な準ニュートン更新則)
-    - [Broyden更新](#Broyden更新)
-      - [導出 (Broyden)](#導出-Broyden)
-    - [Symmetric Rank-One (SR1) 更新](#Symmetric-Rank-One-SR1-更新)
-      - [導出 (SR1)](#導出-SR1)
+    - [Broyden更新](#broyden更新)
+      - [導出 (Broyden)](#導出-broyden)
+    - [Symmetric Rank-One (SR1) 更新](#symmetric-rank-one-sr1-更新)
+      - [導出 (SR1)](#導出-sr1)
       - [補足](#補足)
-    - [Powell Symmetric Broyden (PSB) 更新](#Powell-Symmetric-Broyden-PSB-更新)
-      - [導出 (PSB)](#導出-PSB)
-    - [Davidon–Fletcher–Powell (DFP) 更新](#DavidonFletcherPowell-DFP-更新)
-      - [導出 (DFP)](#導出-DFP)
-    - [Broyden–Fletcher–Goldfarb–Shanno (BFGS) 更新](#BroydenFletcherGoldfarbShanno-BFGS-更新)
+    - [Powell Symmetric Broyden (PSB) 更新](#powell-symmetric-broyden-psb-更新)
+      - [導出 (PSB)](#導出-psb)
+    - [Davidon–Fletcher–Powell (DFP) 更新](#davidonfletcherpowell-dfp-更新)
+      - [導出 (DFP)](#導出-dfp)
+    - [Broyden–Fletcher–Goldfarb–Shanno (BFGS) 更新](#broydenfletchergoldfarbshanno-bfgs-更新)
       - [双対による導出](#双対による導出)
-      - [KLダイバージェンス最小化による導出](#KLダイバージェンス最小化による導出)
-  - [BFGS更新の詳細](#BFGS更新の詳細)
+      - [KLダイバージェンス最小化による導出](#klダイバージェンス最小化による導出)
+  - [BFGS更新の詳細](#bfgs更新の詳細)
     - [逆更新の公式](#逆更新の公式)
-    - [BFGS更新の正定値性](#BFGS更新の正定値性)
-    - [BFGS更新のトレースと行列式の公式](#BFGS更新のトレースと行列式の公式)
+    - [BFGS更新の正定値性](#bfgs更新の正定値性)
+    - [BFGS更新のトレースと行列式の公式](#bfgs更新のトレースと行列式の公式)
       - [トレースの公式](#トレースの公式)
       - [行列式の公式](#行列式の公式)
-  - [BFGSとDFPの比較](#BFGSとDFPの比較)
+  - [BFGSとDFPの比較](#bfgsとdfpの比較)
     - [問題設定](#問題設定)
     - [数値結果](#数値結果)
     - [解析と議論](#解析と議論)
       - [ヘッセ行列の補正における非対称性](#ヘッセ行列の補正における非対称性)
-  - [記憶制限BFGS (L-BFGS)](#記憶制限BFGS-L-BFGS)
+  - [記憶制限BFGS (L-BFGS)](#記憶制限bfgs-l-bfgs)
     - [逆行列のコンパクト表現](#逆行列のコンパクト表現)
     - [二重ループ再帰](#二重ループ再帰)
     - [初期スケーリング](#初期スケーリング)
@@ -176,7 +176,7 @@ $\mu=0$ の場合も、同様の議論により凸性について示すことが
 \end{align*}
 ```
 
-正定値でも負定値でもない行列は不定値 (indefinite) と呼ばれます。行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表します。特に $B$ が零行列のときは $A \succeq 0$ と書くことがあります。同様に、$\preceq$ は半負定値に対して定義されます。$\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ と同値です。これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味します。更に、対称行列ならば演算子ノルム $\left\lVert A \right\rVert$ は最大の固有値であるため、$\left\lVert A \right\rVert$ も少なくとも $\mu$ 以上であることを意味します。
+正定値でも負定値でもない行列は不定値 (indefinite) と呼ばれます。行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表します。特に $B$ が零行列のときは $A \succeq 0$ と書くことがあります。同様に、$\preceq$ は半負定値に対して定義されます。$\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ と同値です。これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味します。更に、対称行列ならば演算子ノルム $\left\lVert A \right\rVert$ は固有値の絶対値の最大値であるため、$\left\lVert A \right\rVert$ も少なくとも $\mu$ 以上であることを意味します。
 
 ここで、強凸性は関数が一様に正の曲率を持つことを意味していました。これはヘッセ行列も一様に正の曲率を持つこと、つまり一様に正定値であることと対応しています。実際、凸性や強凸性は次のように、ヘッセ行列の定値性と同値になることが知られています。
 
@@ -229,23 +229,23 @@ v^\top \nabla^2 f(x) v \ge \mu \left\lVert v \right\rVert^2.
 
 $v \in \mathbb{R}^n$ は任意なので、$\nabla^2 f(x)\succeq \mu I$ という結果が得られました。
 
-逆に、$\mu>0$ とし、任意の $x \in \mathbb{R}^n$ に対して $\nabla^2 f(x)\succeq \mu I$ が成り立つと仮定します。微分積分学の基本定理より、任意の $x,y \in \mathbb{R}^n$ について次が成り立ちます。
+逆に、$\mu>0$ とし、任意の $x \in \mathbb{R}^n$ に対して $\nabla^2 f(x)\succeq \mu I$ が成り立つと仮定します。テイラーの定理より、任意の $x,y \in \mathbb{R}^n$ について $\phi(t) \mathrel{\vcenter{:}}= f(x+t(y-x))$ とおくと、次が成り立ちます。
 
 ```math
-\begin{equation*}
-f(y)
-= f(x)+\nabla f(x)^\top (y-x)
-+\frac{1}{2} \int_0^1 (y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t.
-\end{equation*}
+\begin{align*}
+f(y) & =\phi(1)                                                                                        \\
+& = \phi(0) + \phi'(0) + \int_0^1 (1-t) \phi''(t) \mathrm{d}t                                     \\
+& = f(x)+\nabla f(x)^\top (y-x) + \int_0^1 (1-t)(y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t.
+\end{align*}
 ```
 
 また、仮定 $\nabla^2 f(x)\succeq \mu I$ から次が得られます。
 
 ```math
 \begin{equation*}
-\int_0^1 (y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t
-\ge \int_0^1 \mu\left\lVert y-x \right\rVert^2 \mathrm{d}t
-= \mu\left\lVert y-x \right\rVert^2.
+\int_0^1 (1-t)(y-x)^\top \nabla^2 f(x+t(y-x))(y-x) \mathrm{d}t
+\ge \int_0^1 (1-t)\mu\left\lVert y-x \right\rVert^2 \mathrm{d}t
+= \frac{\mu}{2} \left\lVert y-x \right\rVert^2.
 \end{equation*}
 ```
 
@@ -293,14 +293,15 @@ f(y) \le f(x) + \nabla f(x)^\top (y-x) + \frac{L}{2} \left\lVert y-x \right\rVer
 
 <details><summary>証明</summary>
 
-微分積分学の基本定理より、任意の $x,y \in \mathbb{R}^n$ について次が成り立ちます。
+微分積分学の基本定理より、任意の $x,y \in \mathbb{R}^n$ について $\phi(t) \mathrel{\vcenter{:}}= f(x+t(y-x))$ とおくと、次が成り立ちます。
 
 ```math
 \begin{align*}
-f(y) - f(x) & = \int_0^1 \nabla f(x+t(y-x))^\top (y-x) \mathrm{d}t                                                                                                                               \\
+f(y) - f(x) & = \phi(1) - \phi(0) = \int_0^1 \phi'(t) \mathrm{d}t                                                                                                                                \\
+& = \int_0^1 \nabla f(x+t(y-x))^\top (y-x) \mathrm{d}t                                                                                                                               \\
 & = \nabla f(x)^\top (y-x) + \int_0^1 (\nabla f(x+t(y-x)) - \nabla f(x))^\top (y-x) \mathrm{d}t                                                                                      \\
 & \leq \nabla f(x)^\top (y-x) + \int_0^1 \left\lVert \nabla f(x+t(y-x)) - \nabla f(x) \right\rVert \left\lVert y-x \right\rVert \mathrm{d}t &  & (\text{Cauchy–Schwarz inequality}) \\
-& \leq \nabla f(x)^\top (y-x) + \int_0^1 L t \left\lVert y-x \right\rVert^2 \mathrm{d}t                                                     &  & (\text{by $L$-smoothness})          \\
+& \leq \nabla f(x)^\top (y-x) + \int_0^1 L t \left\lVert y-x \right\rVert^2 \mathrm{d}t                                                     &  & (\text{$L$-smoothness})             \\
 & = \nabla f(x)^\top (y-x) + \frac{L}{2} \left\lVert y-x \right\rVert^2.
 \end{align*}
 ```
@@ -352,11 +353,11 @@ g_x(z)        & \mathrel{\vcenter{:}}= f(z) - f(x) - \nabla f(x)^\top (z-x), \\
 
 </details>
 
-ここまで見てきたように、$L$-平滑性は勾配の変化率が上から抑えられることを意味してきましたが、これもヘッセ行列の定値性と関連付けることができます。つまり、次の命題で示すように、ヘッセ行列は $L I$ で上から抑えられることになります。
+ここまで見てきたように、$L$-平滑性は勾配の変化率が上から抑えられることを意味してきましたが、これもヘッセ行列の定値性と関連付けることができます。つまり、次の命題で示すように、ヘッセ行列は $-L I$ と $+L I$ の間に抑えられることになります。
 
 **Proposition 5**
 
-関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^2$ 級であるとする。このとき、$f$ が $L$-平滑であることと、任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\preceq L I$ が成り立つことは同値である。
+関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が $C^2$ 級であるとする。このとき、$f$ が $L$-平滑であることと、任意の $x \in \mathbb{R}^n$ で $-L I \preceq \nabla^2 f(x) \preceq L I$ が成り立つことは同値である。
 
 <details><summary>証明</summary>
 
@@ -369,7 +370,7 @@ $f$ は $C^2$ 級なので、微分積分学の基本定理より任意の $x,y 
 \end{equation*}
 ```
 
-任意の $x \in \mathbb{R}^n$ で $\nabla^2 f(x)\preceq L I$ と仮定します。
+任意の $x \in \mathbb{R}^n$ で $-L I \preceq \nabla^2 f(x) \preceq L I$ と仮定します。
 このとき $\left\lVert \nabla^2 f(x) \right\rVert \le L$ が成り立つので、
 
 ```math
@@ -420,6 +421,7 @@ v^\top \nabla^2 f(x) v & = \lim_{t \to 0} \left(\frac{\nabla f(x+tv)-\nabla f(x)
 ```
 
 $v \in \mathbb{R}^n$ は任意なので、$\nabla^2 f(x)\preceq L I$ という結果が得られました。
+同様にして、$\nabla^2 f(x)\succeq -L I$ も示されます。
 
 (証明終わり)
 
