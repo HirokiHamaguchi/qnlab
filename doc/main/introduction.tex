@@ -25,12 +25,12 @@ In particular, it is desirable to design algorithms that (i) retain computationa
 In this work, we propose a noise-tolerant regularized quasi-Newton method that addresses these challenges.
 Our approach combines Armijo-type line search with quadratic regularization~\citep{uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023}
 and Objective-Function-Free Optimization (OFFO) inspired strategy~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
-When a sufficient decrease in function value is observed, the method behaves similarly to standard line search based quasi-Newton methods, preserving its practical efficiency.
+When a sufficient decrease in function value is observed, the method behaves similarly to standard quasi-Newton methods with line search, preserving its practical efficiency.
 When numerical noise dominates, we introduce regularization on the approximate Hessian to ensure numerical stability, which yields convergence properties similar to those of OFFO methods, particularly AdaGrad-Norm~\citep{wardAdaGradStepsizesSharp2020}.
 The resulting algorithm is particularly well-suited for low-precision or noisy environments.
 
 From a theoretical standpoint, we establish that the proposed method achieves the standard global convergence rate of $\order{1/\varepsilon^2}$ for smooth nonconvex optimization problems, even when objective function values are corrupted by noise.
-Extensive numerical experiments on the CUTEst benchmark collection, across various floating-point precisions and artificial noise settings, demonstrate that the proposed method is significantly more stable than standard line search based methods in settings with significant numerical noise, while maintaining practical convergence speed.
+Extensive numerical experiments on the CUTEst benchmark collection, across various floating-point precisions and artificial noise settings, demonstrate that the proposed method is significantly more stable than standard methods with line search in settings with significant numerical noise, while maintaining practical convergence speed.
 
 \ifSubfilesClassLoaded{
     \bibliographystyle{spbasic}

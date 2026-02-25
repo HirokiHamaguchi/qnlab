@@ -77,7 +77,7 @@ Under this regime, the computed gradient $\nabla \overline{f}(x)$ is a sufficien
 \end{equation}
 We emphasize that this assumption is introduced solely as a modeling simplification, rather than as a claim about practical gradient accuracy.
 Notably, the proposed algorithm does not rely on Wolfe-type conditions, which typically require accurate gradient information at trial points, making it robust to gradient inaccuracies.
-Our numerical experiments in \cref{sec:experiments} include cases where gradients are contaminated by noise, and they also demonstrates that the proposed method remains effective even when \cref{eq:exact_gradient_assumption} is violated.
+Our numerical experiments in \cref{sec:experiments} include cases where gradients are contaminated by noise, and they also demonstrate that the proposed method remains effective even when \cref{eq:exact_gradient_assumption} is violated.
 
 \section{Proposed Algorithm}\label{sec:algorithm}
 
@@ -211,7 +211,7 @@ The second assumption ensures smoothness of the objective function.
     \end{equation*}
 \end{assumption}
 
-The third assumption requires the matrices $\{B_k\}_{k=0}^{k_{\mathrm{max}}-1}$ to be uniformly bounded and uniformly positive definite.
+The third assumption requires the matrices $\{B_k\}_{k=0}^{k_{\mathrm{max}}-1}$ to be uniformly positive definite and bounded.
 \begin{assumption}\label{ass:BBounds}
     There exist constants $0 < m \leq M$ such that all $B_k$ satisfy
     \begin{equation*}\label{eq:BBounds}
@@ -245,31 +245,31 @@ The first property states that the error between the actual values difference $\
 \end{lemma}
 \begin{proof}
     We start from general observations.
-    We first claim that, for all $x \in \bbR^n$,
+    We first prove that, for all $x \in \bbR^n$,
     \begin{equation}\label{eq:fx_two_cases}
         \begin{cases}
             \max(1,+f(x))  \le \frac{1}{1-\feps} \max(1,+\overline f(x)), \\
             \max(1,-f(x)) \le \frac{1}{1-\feps} \max(1,-\overline f(x)).
         \end{cases}
     \end{equation}
-    We prove the case with the plus sign.
-    If $+f(x)\le 1$, then $\max(1,+f(x)) = 1 \leq \frac{1}{1-\feps}$ and the inequality is trivial.
+    We prove the inequality with the plus sign.
+    If $+f(x)\le 1$, then $\max(1,+f(x)) = 1 \leq \frac{1}{1-\feps} \leq \frac{1}{1-\feps} \max(1,+\overline f(x))$.
     If $+f(x) > 1$, \cref{eq:error_model} implies
     \begin{equation}\label{eq:error_model_fx_1}
-        f(x) - \overline f(x) \leq \abs{f(x)-\overline{f}(x)} \le \feps \max(1,\abs{f(x)}) = +\feps f(x).
+        \abs{f(x)-\overline{f}(x)} \le \feps \max(1,\abs{f(x)}) = +\feps f(x)
     \end{equation}
-    Rearranging this yields
+    and thus $f(x) - \overline f(x) \leq +\feps f(x)$. Hence,
     \begin{equation*}
         \max(1,+f(x)) = +f(x) \le +\frac{1}{1-\feps} \overline f(x) \le \frac{1}{1-\feps} \max(1,+\overline f(x)).
     \end{equation*}
-    The negative case can be treated analogously, and this completes the proof of \cref{eq:fx_two_cases}.
+    The case with the negative sign can be shown analogously, using $-f(x) + \overline f(x) \leq -\feps f(x)$, which follows from \cref{eq:error_model_fx_1}. This completes the proof of \cref{eq:fx_two_cases}.
 
     We also have the following general bound for all $k \in K$:
     \begin{align}
         \abs{\delta_k-\overline{\delta}_k}
          & = \abs{(f(x_k)-\overline{f}(x_k)) - (f(x_{k+1})-\overline{f}(x_{k+1}))}      &  & (\text{rearrangement})                                \notag \\
          & \leq \abs{f(x_k)-\overline{f}(x_k)} + \abs{f(x_{k+1})-\overline{f}(x_{k+1})} &  & (\text{triangle inequality}) \notag                          \\
-         & \le \feps\max(1,\abs{f(x_k)}) + \feps\max(1,\abs{f(x_{k+1})})                &  & (\text{definition in \cref{eq:error_model}}) \notag          \\
+         & \le \feps\max(1,\abs{f(x_k)}) + \feps\max(1,\abs{f(x_{k+1})})                &  & (\text{\cref{eq:error_model}}) \notag                        \\
          & \le 2\feps \max(1,\abs{f(x_k)},\abs{f(x_{k+1})}).                            &  & (\text{max property}) \label{eq:delta_k_error_bound}
     \end{align}
 
@@ -294,13 +294,13 @@ We also derive the following lemma for later use.
     \end{equation*}
 \end{lemma}
 \begin{proof}
-    Since $-g_k^\top d_k \geq 0$ from \cref{ass:BBounds} and \cref{eq:BBounds_results_zero}, \cref{eq:relaxed_Armijo_condition} implies
+    Since $-g_k^\top d_k \geq 0$ from \cref{ass:BBounds} and \cref{eq:BBounds_results_zero}, the relaxed Armijo condition (\cref{eq:relaxed_Armijo_condition}) implies
     \begin{equation}\label{eq:overline_delta_k_lower_bound}
         \overline{f}(x_k) - \overline{f}(x_{k+1})
         \geq - c \alpha_k g_k^\top d_k -\Delta_k
         \geq -\Delta_k.
     \end{equation}
-    Thus, using the general result in \cref{eq:delta_k_error_bound}, we can further bound as
+    Thus, using the general results in \cref{eq:delta_k_error_bound} and $\Delta_k \geq 0$, we can further bound as
     \begin{align*}
         \abs{\delta_k - \overline{\delta}_k} & \leq 2\feps \max(1,\abs{f(x_k)},\abs{f(x_{k+1})})                                                                                 &  & (\text{\cref{eq:delta_k_error_bound}})          \\
                                              & \leq \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k}), -\overline{f}(x_{k}), \overline{f}(x_{{k}+1}), -\overline{f}(x_{{k}+1})) &  & (\text{\cref{eq:fx_two_cases}})                 \\
@@ -341,7 +341,7 @@ Recall that the parameter $c$ in \cref{alg:backtracking_linesearch} satisfy $0 <
     \begin{equation*}
         f(x_k) - f(x_k+\alpha_k d_k) \geq -c \alpha_k g_k^\top d_k.
     \end{equation*}
-    Since $-g_k^\top d_k \geq m \norm{d_k}^2 \geq 0$, the condition of \cref{lem:error_bound_on_function_evaluations} is satisfied with $x_{k+1} = x_k + \alpha_k d_k$. Thus we obtain $\delta_k \le \overline{\delta}_k + \Delta_k$, i.e.,
+    Since $-g_k^\top d_k \geq m \norm{d_k}^2 \geq 0$ from \cref{ass:BBounds} and \cref{eq:BBounds_results_zero}, the condition of \cref{lem:error_bound_on_function_evaluations} is satisfied with $x_{k+1} = x_k + \alpha_k d_k$. Thus we obtain $\delta_k \le \overline{\delta}_k + \Delta_k$, i.e.,
     \begin{equation*}
         -c\alpha_k g_k^\top d_k
         \le
@@ -358,7 +358,7 @@ Define
 \begin{equation}
     \overline{\alpha}\defeq \min\qty(\beta_{\min} \frac{2(1-c)m}{L},1)>0.
 \end{equation}
-The following summarizes the behavior of the backtracking line search.
+The following states the key property of the backtracking procedure.
 
 \begin{proposition}\label{prop:backtracking_summary}
     Under \cref{ass:LSmooth,ass:BBounds}, the backtracking line search in \cref{alg:backtracking_linesearch} terminates after finitely many rejections, and the step size $\alpha_k$ satisfies
@@ -381,11 +381,10 @@ The following summarizes the behavior of the backtracking line search.
 
 \subsection{Bound for the case \texorpdfstring{$\mu_k=0$}{mu k = 0}}
 
-In this subsection, we bound the sum of actual function decreases $\delta_k$ over $k \in K^0$.
-Recall that $K^0$ denotes the set of iteration indices $k$ such that $\mu_k = 0$, as defined in \cref{eq:def_K0_Kplus}.
-
-To this end, we establish that the sum of $\Delta_k$ over $k \in K^0$ is bounded, where $\Delta_k$ is the error-absorbing term in the relaxed Armijo condition (\cref{eq:relaxed_Armijo_condition}).
-We introduce the following constant:
+In this subsection, we lower bound the sum of actual function decreases $\delta_k$ over $k \in K^0$.
+Recall that $K^0$ denotes the set of iteration indices $k$ such that $\mu_k = 0$, as in \cref{eq:def_K0_Kplus}.
+To this end, we establish that the sum of $\Delta_k$ over $k \in K^0$ is upper bounded, where $\Delta_k$ is the error-absorbing term in the relaxed Armijo condition (\cref{eq:relaxed_Armijo_condition}).
+We introduce the following constant $\Delta_{\max}$, which serves as an upper bound for $\Delta_k$ at $k \in K^0$.
 \begin{equation}\label{eq:def_Delta_max}
     \Delta_{\max} \defeq \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{0}), -\overline{f}^*).
 \end{equation}
@@ -397,19 +396,19 @@ We introduce the following constant:
     \end{equation*}
 \end{lemma}
 \begin{proof}
-    Let us define the last index of $\abs{K^0}$ as $\ell$, and enumerate the elements of $K^0$ in increasing order as $K^0 = (k_i)_{i=0}^{\ell}$.
-    For all $i < \ell$, using \cref{eq:mu_0_condition} with $j=k_i$ and $k=k_{i+1}$, we obtain
+    Let $(k_i)_{i=0}^{\ell}$ with $\ell \geq 0$ be the elements of $K^0$ in increasing order.
+    We have $\overline{f}(x_{k_{\ell}}) \le \overline{f}(x_0)$ from \cref{eq:mu_0_condition} with $k=k_{\ell}$, where the case $\ell=0$ follows from $k_0=0$.
+    Combining this with \cref{ass:bounded}, we have $\Delta_{k_{\ell}} \le \Delta_{\max}$.
+    For all $i < \ell$, \cref{eq:mu_0_condition} with $j=k_i$ and $k=k_{i+1}$ yields
     \begin{equation}\label{eq:Delta_i_for_tele_sum}
-        \Delta_{k_i} \leq \overline{f}(x_{k_i}) - \overline{f}(x_{k_{i+1}}).
+        \Delta_{k_i} \leq \overline{f}(x_{k_i}) - \overline{f}(x_{k_{i+1}}),
     \end{equation}
-    We also have $\overline{f}(x_0) \ge \overline{f}(x_{k_{\ell}})$ from \cref{eq:mu_0_condition} with $k=k_{\ell}$, or just $x_0 = x_{k_{\ell}}$.
-    Thus, by \cref{ass:bounded}, we have $\Delta_{k_{\ell}} = \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{k_{\ell}}), -\overline{f}(x_{k_{\ell}+1})) \le \Delta_{\max}$.
-    Hence, we have
+    and summing up over $k \in K^0$ gives
     \begin{align*}
         \sum_{k \in K^0} \Delta_{k}
-         & \le \sum_{i=0}^{\ell-1} (\overline{f}(x_{k_i}) - \overline{f}(x_{k_{i+1}})) + \Delta_{k_{\ell}} &  & (\text{\cref{eq:Delta_i_for_tele_sum}})                                                          \\
-         & = \overline{f}(x_0) - \overline{f}(x_{k_{\ell}}) + \Delta_{k_{\ell}}                            &  & (\text{telescoping sum})                                                                         \\
-         & \leq \overline{f}(x_0) - \overline{f}^* + \Delta_{\max}.                                        &  & (\overline{f}(x_{k_{\ell}}) \ge \overline{f}^* \text{ and } \Delta_{k_{\ell}} \le \Delta_{\max})
+         & \le \sum_{i=0}^{\ell-1} (\overline{f}(x_{k_i}) - \overline{f}(x_{k_{i+1}})) + \Delta_{k_{\ell}} &  & (\text{\cref{eq:Delta_i_for_tele_sum}})                                                            \\
+         & = \overline{f}(x_0) - \overline{f}(x_{k_{\ell}}) + \Delta_{k_{\ell}}                            &  & (\text{telescoping sum})                                                                           \\
+         & \leq \overline{f}(x_0) - \overline{f}^* + \Delta_{\max}.                                        &  & (-\overline{f}(x_{k_{\ell}}) \le -\overline{f}^* \text{ and } \Delta_{k_{\ell}} \le \Delta_{\max})
     \end{align*}
     This completes the proof.
     \myQED
@@ -441,16 +440,16 @@ We now bound the sum of $\delta_k = f(x_k) - f(x_{k+1})$ over $k \in K^0$ with $
         \leq \sum_{k \in K^0} \delta_{k} + \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}),
     \end{equation*}
     where the last inequality follows from \cref{lem:delta_bound_and_sum}.
-    Rearranging this yields the desired inequality.
+    Rearranging this completes the proof.
     \myQED
 \end{proof}
 
 \subsection{Bound for the case \texorpdfstring{$\mu_k > 0$}{mu k > 0}}
 
-Next, we show that the sum of $\delta_{k}$ over $k \in K^+$ is bounded.
+Next, we show that the sum of $\delta_{k}$ over $k \in K^+$ is lower bounded.
 Recall that $K^+$ be a set of iteration indices $k$ such that $\mu_k > 0$ as defined in \cref{eq:def_K0_Kplus}, and that $\mu_k$ is defined as $\theta_k \sqrt{\varsigma + \sum_{j \in K^+,\ j < k} \norm{g_{j}}^2}$ with $\theta_k \in [\theta_{\min}, \theta_{\max}]$ in \refLine{line:update_theta} of \cref{alg:regularized_qn}.
 
-Before proceeding to the main proof, we present \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}, which is standard inequalities in the AdaGrad-Norm algorithm analysis~\citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020},~\citep[Lemma~3.1]{Gratton08022024}.
+Before proceeding to the main proof, we present \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}, providing standard inequalities in the AdaGrad-Norm algorithm analysis~\citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020},~\citep[Lemma~3.1]{Gratton08022024}.
 Its proof is deferred to \cref{sec:proof_of_sum_norm_g_over_mu_geq_2sqrt_leq_log}.
 \begin{lemma}\label{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}
     In \cref{alg:regularized_qn}, we have
@@ -462,7 +461,7 @@ Its proof is deferred to \cref{sec:proof_of_sum_norm_g_over_mu_geq_2sqrt_leq_log
     \end{align*}
 \end{lemma}
 
-We now bound the sum of $\delta_k$ over $k \in K^+$ with $\norm{g_{k}}^2$.
+We now lower bound the sum of $\delta_k$ over $k \in K^+$ with $\norm{g_{k}}^2$.
 We define the following constants for later use:
 \begin{equation}
     C_1 \defeq \frac{\overline{\alpha}}{\theta_{\max}}, \qquad
@@ -505,7 +504,7 @@ We define the following constants for later use:
 
 \subsection{Global Convergence Result}
 
-Finally, we combine the results for $k \in K^0$ (\cref{lem:sum_small_delta_k_bound_K0}) and $k \in K^+$ (\cref{lem:sum_small_delta_k_bound_Kplus}) to derive a bound on the total sum of $\norm{g_k}^2$.
+Finally, we combine the results for $k \in K^0$ (\cref{lem:sum_small_delta_k_bound_K0}) and $k \in K^+$ (\cref{lem:sum_small_delta_k_bound_Kplus}) to derive an upper bound on the total sum of $\norm{g_k}^2$.
 We define the constant $F$ as follows:
 \begin{equation}
     F \defeq f(x_0) - f^* + \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}) + C_1 \sqrt{\varsigma} - C_2 \ln(\varsigma).
@@ -583,7 +582,7 @@ Now, we establish the following global convergence result for \cref{alg:regulari
     \begin{align}
         \frac{1}{k_{\max}} \sum_{k=0}^{k_{\max}-1} \norm{g_k}^2
          & = \frac{1}{k_{\max}} \qty(\sum_{{k} \in K^0} \norm{g_{k}}^2 + \sum_{k \in K^+} \norm{g_{k}}^2)                    &  & (K=K^0 \cup K^+) \notag \\
-         & \leq \frac{1}{k_{\max}} \max\qty(\frac{M}{c \overline{\alpha}} F', \, \frac{4}{C_1^2} F'^2), \label{eq:gc_result}
+         & \leq \frac{1}{k_{\max}} \max\qty(\frac{M F'}{c \overline{\alpha}}, \, \frac{4 F'^2}{C_1^2}), \label{eq:gc_result}
     \end{align}
     which completes the proof.
     \myQED
@@ -596,9 +595,7 @@ Since this is not essential for the main argument, we omit the details and refer
 We next interpret \cref{eq:gc_result} in the proof of \cref{thm:gc}.
 The contribution of the indices in $K^0$ is analogous to the classical analysis of gradient descent. Indeed, for gradient descent with fixed step size $\alpha = 1/L$, one has
 \begin{equation*}
-    \sum_{j=0}^{k} \norm{g_j}^2
-    \le 2L \qty(f(x_0)-f^*)
-    = \frac{2(f(x_0)-f^*)}{\alpha}.
+    \frac{1}{k_{\max}}\sum_{k=0}^{k_{\max}-1} \norm{g_k}^2 \le = \frac{1}{k_{\max}}\frac{2(f(x_0)-f^*)}{\alpha}.
 \end{equation*}
 Thus, the term associated with $K^0$ reflects the standard $\order{f(x_0)-f^*}$ dependence of first-order methods since $F'$ contains the initial gaps $f(x_0)-f^*$ and $\overline{f}(x_0)-\overline{f}^*$.
 In contrast, the contribution of $K^+$ resembles the behavior of AdaGrad-Norm, whose convergence bound scales quadratically with the initial optimality gap~\citep{wardAdaGradStepsizesSharp2020}.
@@ -617,8 +614,8 @@ The quantities to be discussed here are the matrices $B_k$, the step sizes $\alp
 
 \subsection{Approximate Hessian $B_k$}\label{sec:proposed_choice_Bk}
 
-We first discuss the construction of the matrices $B_k$ used in \refLine{line:d_k} of \cref{alg:regularized_qn}, using the L-BFGS method.
-The purpose of this subsection is to show that $B_k$ can satisfy \cref{ass:BBounds}, the uniform spectral bound, with a slight modification and selection of curvature pairs.
+We first discuss the construction of the matrices $B_k$ used in \refLine{line:d_k} of \cref{alg:regularized_qn}.
+The purpose of this subsection is to show that $B_k$ can satisfy \cref{ass:BBounds}, the uniform spectral bound, with a slight modification and selection of curvature pairs using the L-BFGS method.
 
 \paragraph{Construction of $B_k$: }
 
@@ -783,7 +780,7 @@ All experiments were conducted on a Microsoft Windows 11 Home system (version~10
 
 We evaluated all algorithms on unconstrained problems from the CUTEst benchmark collection~\citep{gouldCUTEstConstrainedUnconstrained2015}, implemented in Python using the PyCUTEst interface~\citep{PyCUTEst2022}.
 All problems were initialized with the default starting points provided by the library.
-Following the previous work~\citep{kanzowRegularizationLimitedMemory2023}, we excluded problems such as the initial point is already stationary or contains \texttt{NaN} and \texttt{INF} in its function values or gradient.
+Following the previous work~\citep{kanzowRegularizationLimitedMemory2023}, we excluded problems such as the initial point being already stationary or containing \texttt{NaN} and \texttt{INF} in its function values or gradient.
 To simulate different numerical environments, we tested the following four settings.
 \begin{itemize}
     \item Artificially noised 64-bit floating-point precision (220 problems, $\feps=10^{-2}$)
@@ -851,8 +848,7 @@ We next present performance profiles for each floating-point precision (64-bit, 
 We evaluated each method at three gradient norm tolerance levels, i.e., $\gtol \in \{10^{-1}, 10^{-3}, 10^{-5}\}$.
 These tolerance levels represent different optimization regimes, from moderate accuracy to high precision requirements.
 \Cref{fig:results_all_precisions} shows the comprehensive performance profiles across all three precision levels.
-Our methods (\texttt{Ours}) and (\texttt{Ours-MS}) demonstrates competitive or superior performance compared to existing methods in the standard 64-bit setting.
-As numerical precision degrades from 64-bit to 32-bit and further to 16-bit, our regularization-based approach demonstrates improved relative performance.
+Our methods (\texttt{Ours}) and (\texttt{Ours-MS}) demonstrate competitive or superior performance compared to existing methods in the standard 64-bit setting and maintain robust performance as precision decreases to 32-bit and 16-bit.
 The proposed method maintains stability even when traditional line search methods encounter difficulties with reduced precision arithmetic.
 
 \begin{figure}[t]
@@ -943,8 +939,8 @@ The simplicity of the optimization problem and the small value of $k_{\max}$ are
 Timing data were collected after three warm-up runs, followed by $100$ recorded trials.
 
 In \cref{fig:exec_time}, we report the execution time statistics, and we can observe that our proposed methods (\texttt{Ours}) and (\texttt{Ours-MS}) exhibit competitive performance compared to other methods.
-Combining with the results from \cref{sec:results}, our methods is competitive or superior in total oracle calls and per-iteration computational cost, indicating practical efficiency.
-As a side note, although the (\texttt{SciPy}) calls optimized C routines, it incurs associated dispatch overhead, producing a larger mean time. One of the reasons of the (\texttt{Reg}) and (\texttt{Reg-Sec}) methods taking longer execution time is due to the implementation aspect of the original code.
+Combining with the results from \cref{sec:results}, our methods are competitive or superior in total oracle calls and per-iteration computational cost, indicating practical efficiency.
+As a side note, although the (\texttt{SciPy}) calls optimized C routines, it incurs associated dispatch overhead, producing a larger mean time. One of the reasons why the (\texttt{Reg}) and (\texttt{Reg-Sec}) methods take longer execution time is due to the implementation aspect of the original code.
 
 In \cref{tab:time_results}, we report the total number of oracle calls (calls of $\overline{f}$ and $\nabla \overline{f}$) and final objective values $f(x_{k_{\max}})$.
 The purpose of this table is to confirm that all methods achieved similar convergence behavior within the limited number of iterations. The comparable values in the table indicate that the comparison of execution times is fair and not affected by differences in convergence behavior.
