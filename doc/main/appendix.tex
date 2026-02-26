@@ -31,7 +31,11 @@ The proof of \cref{prop:bounded_BFGS} is similar to existing results~\citep[Theo
         \norm{\frac{y s^\top}{y^\top s}} \le \frac{\norm{y}\norm{s}}{\sqrt{\frac{1}{\Lambda}\norm{y}^2}\sqrt{\lambda\norm{s}^2}} = \sqrt{\kappa}, \quad
         \norm{\frac{s s^\top}{y^\top s}} = \frac{s^\top s}{y^\top s} \le \frac{1}{\lambda}.
     \end{equation}
-    Let $B, H$ denote the positive definite Hessian approximation before the update and its inverse, and $B_+, H_+$ the updated matrices.
+    We next bound the scalar $\gamma$ used in the initial matrix $\gamma I$.
+    From \cref{eq:curvature_conditions1}, we have $\gamma \le \Lambda$.
+    By Cauchy--Schwarz inequality and \cref{eq:curvature_conditions2}, we have $\gamma \ge \norm{y_{k_0}}^2 / \norm{y_{k_0}}\norm{s_{k_0}} = \norm{y_{k_0}} / \norm{s_{k_0}} \ge \lambda$. Thus, $\gamma$ is bounded by $\lambda \le \gamma \le \Lambda$.
+
+    Let $B, H$ denote the positive definite Hessian approximation and its inverse before the update, and $B_+, H_+$ the updated matrices.
     The BFGS update rule is
     \begin{equation*}
         B_+   =B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}, \quad
@@ -48,10 +52,10 @@ The proof of \cref{prop:bounded_BFGS} is similar to existing results~\citep[Theo
     Applying \cref{eq:BFGS_B_norm_bound,eq:BFGS_H_norm_bound} recursively over $p$ updates and using the
     initial matrix $\gamma I$, we obtain
     \begin{align*}
-        \norm{\mathrm{BFGS}(\{s_{k_i},y_{k_i}\}_{i=0}^{p-1})}        & \le \gamma + p\Lambda,                                                                                     \\
-        \norm{(\mathrm{BFGS}(\{s_{k_i},y_{k_i}\}_{i=0}^{p-1}))^{-1}} & \le (1+\sqrt{\kappa})^{2p} \gamma +\frac{1}{\lambda}\sum_{i=0}^{p-1}(1+\sqrt{\kappa})^{2i}                 \\
-                                                                     & = (1+\sqrt{\kappa})^{2p} \gamma +\frac{1}{\lambda}\frac{(1+\sqrt{\kappa})^{2p}-1}{(1+\sqrt{\kappa})^{2}-1} \\
-                                                                     & \le (1+\sqrt{\kappa})^{2p}\qty(\gamma+\frac{1}{\lambda\qty(2\sqrt{\kappa}+\kappa)}).
+        \norm{\mathrm{BFGS}(\{s_{k_i},y_{k_i}\}_{i=0}^{p-1})}        & \le \gamma + p\Lambda \le (1+p) \Lambda,                                                                               \\
+        \norm{(\mathrm{BFGS}(\{s_{k_i},y_{k_i}\}_{i=0}^{p-1}))^{-1}} & \le (1+\sqrt{\kappa})^{2p} \gamma^{-1} +\frac{1}{\lambda}\sum_{i=0}^{p-1}(1+\sqrt{\kappa})^{2i}                        \\
+                                                                     & \le (1+\sqrt{\kappa})^{2p} \frac{1}{\lambda}+\frac{1}{\lambda}\frac{(1+\sqrt{\kappa})^{2p}-1}{(1+\sqrt{\kappa})^{2}-1} \\
+                                                                     & \le (1+\sqrt{\kappa})^{2p}\qty(\frac{1}{\lambda}+\frac{1}{\lambda\qty(2\sqrt{\kappa}+\kappa)}).
     \end{align*}
     Therefore, $\mathrm{BFGS}(\{s_{k_i},y_{k_i}\}_{i=0}^{p-1})$ satisfies the stated bounds in \cref{eq:bounded_BFGS_mM}.
     \myQED
@@ -59,8 +63,8 @@ The proof of \cref{prop:bounded_BFGS} is similar to existing results~\citep[Theo
 
 The conditions \cref{eq:curvature_conditions1,eq:curvature_conditions2} are standard in the analysis of quasi-Newton methods~\citep[Theorem 2.1]{byrdToolAnalysisQuasiNewton1989}.
 If $f$ is $L$-smooth (\cref{ass:LSmooth}) and convex, then by the Baillon--Haddad theorem~\citep{baillonQuelquesProprietesOperateurs1977,bauschkeBaillonHaddadTheoremRevisited2009} its gradient is $1/L$-cocoercive:
-\begin{equation}
+\begin{equation*}
     (\nabla f(x)-\nabla f(y))^\top (x-y) \ge \frac{1}{L} \norm{\nabla f(x)-\nabla f(y)}^2
-\end{equation}
+\end{equation*}
 for all $x,y \in \bbR^n$.
 Applying this inequality with $x=x_{k+1}$ and $y=x_k$ yields \cref{eq:curvature_conditions1} with $\Lambda=L$.

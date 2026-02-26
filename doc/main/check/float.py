@@ -72,7 +72,7 @@ latex_output = f"""% !!! Auto-generated table by {script_path}
     \\caption{{
         The ``min abs value'' is the smallest positive normalized number,
         the ``relative error'' is the maximum relative rounding error,
-        and $\\feps$ is the parameter in \\eqref{{eq:relative_error_model}} used in our experiments.
+        and $\\feps$ is the parameter in \\eqref{{eq:error_model}} used in our experiments.
     }}
     \\begin{{tabular}}{{l|ccc}}
         \\toprule
