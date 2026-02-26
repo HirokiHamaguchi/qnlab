@@ -17,11 +17,11 @@
     "../imgs/quasi_newton/quasi_newton_3.png": 0,
     "../imgs/quasi_newton/bfgs_vs_dfp_100.png": 1,
     "../imgs/quasi_newton/bfgs_vs_dfp_0.1.png": 1,
-    "../imgs/modified_secant/trial_EXPLAIN.png": 1,
-    "../imgs/modified_secant/trial_HESS.png": 0,
-    "../imgs/modified_secant/trial_BFGS.png": 0,
+    "../imgs/modified_secant/trial_EXPLAIN.png": 2,
+    "../imgs/modified_secant/trial_HESS.png": 1,
+    "../imgs/modified_secant/trial_BFGS.png": 1,
     "../imgs/modified_secant/cubic_interpolation.png": 0,
-    "../imgs/modified_secant/trial_2.png": 0,
-    "../imgs/modified_secant/trial_1_cubic.png": 0,
-    "../imgs/modified_secant/trial_1_quadratic.png": 0
+    "../imgs/modified_secant/trial_2.png": 1,
+    "../imgs/modified_secant/trial_1_cubic.png": 1,
+    "../imgs/modified_secant/trial_1_quadratic.png": 1
 }

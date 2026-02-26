@@ -403,7 +403,7 @@ We introduce the following constant $\Delta_{\max}$, which serves as an upper bo
     \begin{equation}\label{eq:Delta_i_for_tele_sum}
         \Delta_{k_i} \leq \overline{f}(x_{k_i}) - \overline{f}(x_{k_{i+1}}),
     \end{equation}
-    and summing up over $k \in K^0$ gives
+    and summing $\Delta_{k}$ over $k \in K^0$ gives
     \begin{align*}
         \sum_{k \in K^0} \Delta_{k}
          & \le \sum_{i=0}^{\ell-1} (\overline{f}(x_{k_i}) - \overline{f}(x_{k_{i+1}})) + \Delta_{k_{\ell}} &  & (\text{\cref{eq:Delta_i_for_tele_sum}})                                                            \\
@@ -434,7 +434,7 @@ We now bound the sum of $\delta_k = f(x_k) - f(x_{k+1})$ over $k \in K^0$ with $
     \begin{equation}\label{eq:intermediate_bound_on_overline_delta_plus_Delta}
         \overline{\delta}_k + \Delta_{k} \le \delta_k + \frac{1+\feps}{1-\feps} \Delta_k + \Delta_k = \delta_k + \frac{2}{1-\feps} \Delta_{k}.
     \end{equation}
-    Then, combining \cref{eq:sufficient_decrease,eq:intermediate_bound_on_overline_delta_plus_Delta} and summing up over $k \in K^0$ gives
+    Then, combining \cref{eq:sufficient_decrease,eq:intermediate_bound_on_overline_delta_plus_Delta} and summing over $k \in K^0$ gives
     \begin{equation*}
         \sum_{k \in K^0} \frac{c \overline{\alpha}}{M} \norm{g_{k}}^2   \leq \sum_{k \in K^0} \delta_{k} + \frac{2}{1-\feps} \sum_{k \in K^0} \Delta_{k}
         \leq \sum_{k \in K^0} \delta_{k} + \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}),
@@ -493,7 +493,7 @@ We define the following constants for later use:
     \begin{equation}\label{eq:mu_positive_diff_desired}
         \delta_k \ge \qty(\frac{\overline{\alpha}}{\mu_{k}} - \frac{M\overline{\alpha}+L/2}{\mu_{k}^2}) \norm{g_{k}}^2.
     \end{equation}
-    Summing up \cref{eq:mu_positive_diff_desired} over ${k} \in K^+$ and applying \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} yield
+    Summing \cref{eq:mu_positive_diff_desired} over $k \in K^+$ and applying \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} yield
     \begin{align*}
               & \sum_{{k} \in K^+} \delta_k \ge \sum_{{k} \in K^+} \qty(\frac{\overline{\alpha}}{\mu_{k}} - \frac{M\overline{\alpha}+L/2}{\mu_{k}^2})\norm{g_{k}}^2                                                                                                 \\
         \ge{} & \frac{\overline{\alpha}}{\theta_{\max}} \qty(\sqrt{\varsigma + \sum_{{k} \in K^+} \norm{g_{k}}^2} - \sqrt{\varsigma}) - \frac{M\overline{\alpha}+L/2}{\theta_{\min}^2} \qty(\ln\qty(\varsigma+\sum_{{k} \in K^+} \norm{g_{k}}^2) - \ln(\varsigma)),
@@ -688,7 +688,7 @@ so that $B_k+\mu_k I\approx\mathrm{BFGS}(\{s_{k_i},\overline{y}_{k_i}+\mu_k s_{k
 Although this approximation is inexact, it has been reported to yield nearly identical practical performance while remaining comparatively simple to implement~\citep{kanzowRegularizationLimitedMemory2023}.
 We adopt this approximation in our numerical experiments.
 
-Separately, there exist function-based modified secant conditions~\citep{zhangPropertiesNumericalPerformance2001,babaie-kafakiTwoNewConjugate2010,yabeLocalSuperlinearConvergence2007,hassanModifiedSecantEquation2023} that adjust the secant equation using available function values and gradients when those quantities are deemed reliable. Such adjustments aim to improve practical convergence behavior.
+Separately, there exist function-based modified secant condition~\citep{zhangPropertiesNumericalPerformance2001,babaie-kafakiTwoNewConjugate2010,yabeLocalSuperlinearConvergence2007,hassanModifiedSecantEquation2023} that adjusts the secant equation using available function values when those quantities are reliable. Such adjustments aim to improve practical convergence behavior.
 We partially adopt these function-based modifications following prior work~\citep{zhangNewQuasiNewtonEquation1999,yuanConvergenceAnalysisModified2010}. The suffix \texttt{-MS} in \cref{sec:experiments} indicates the use of this technique.
 Because these modifications are well established, we omit low-level implementation details here.
 Further specifics are available in the cited references and in our open-source implementation${}^{\text{\ref{fn:ourGitHub}}}$.
@@ -921,7 +921,7 @@ The proposed method maintains stability even when traditional line search method
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_legend.pdf}
     \end{subfigure}
-    \caption{Performance profiles across different floating-point precisions (64, 32, and 16-bit) and tolerance levels. The results demonstrate the robustness of the proposed method.}
+    \caption{Performance profiles across different floating-point precisions (64, 32, and 16-bit) and tolerance levels. The results demonstrate the robustness of the proposed methods.}
     \label{fig:results_all_precisions}
 \end{figure}
 
@@ -959,7 +959,7 @@ The purpose of this table is to confirm that all methods achieved similar conver
 \section{Conclusion}\label{sec:conclusion}
 
 In this work, we proposed a regularized quasi-Newton method for noisy nonconvex optimization and established its global convergence properties. We also demonstrated the method's effectiveness through numerical experiments on standard benchmark problems under various noise levels and precision settings.
-The results indicate that our method is robust and effective, particularly in noisy or low-precision environments where traditional line search methods may struggle.
+The results indicate that our methods are robust and effective, particularly in noisy or low-precision environments where traditional line search methods may struggle.
 
 Future work includes the investigation of local convergence properties, the extension to constrained optimization, and the applications to practical problems in machine learning and scientific computing. Additionally, exploring adaptive strategies for selecting algorithmic parameters based on problem characteristics could further enhance the method's performance.
 An explicit analysis of the effect of inexact gradient evaluations would also provide valuable insight into the method's robustness and guide further enhancements.

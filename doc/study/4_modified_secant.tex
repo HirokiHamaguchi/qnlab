@@ -27,9 +27,9 @@
     セカント条件は準ニュートン法で広く用いられていますが、勾配情報のみを活用するため、目的関数の曲率を正確に捉えられないことがあります。このことを\cref{fig:msec_overview}で説明します。
 \fi
 \ifEn
-    In \cref{fig:msec_overview}, we have two points $x_k$ and $x_{k+1}$ where function values and gradients are already known. We see that the ideal quadratic model constructed from the exact Hessian fits well around the new point $x_{k+1}$, leading to a better convergence behavior. However, the standard secant condition, which only uses gradient information, ignores function value information and may misestimate curvature significantly, resulting in a poor approximation of the true objective function.
+    In \cref{fig:msec_overview}, we have two points $x_k$ and $x_{k+1}$ where function values and gradients are already known. We see that the ideal quadratic model constructed from the exact Hessian fits well around the new point $x_{k+1}$, leading to a better convergence behavior. However, the standard secant condition uses only gradient information and ignores function values. Consequently, it may significantly misestimate curvature, leading to a poor approximation of the true objective function.
 \else
-    \Cref{fig:msec_overview} において、関数値と勾配が既知の2点 $x_k$ と $x_{k+1}$ があるとします。正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットしており、より良い収束挙動をもたらすことが分かります。しかし、標準的な勾配のみを用いて課されるセカント条件で作られるモデルでは、関数値の情報が無視され、曲率を大きく誤る可能性があり、真の目的関数の近似が悪くなります。
+    \Cref{fig:msec_overview} において、関数値と勾配が既知の2点 $x_k$ と $x_{k+1}$ があるとします。正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットしており、より良い収束挙動をもたらすことが分かります。しかし、勾配のみを用いて課される標準的なセカント条件で作られるモデルでは、関数値の情報が無視されます。よって、曲率を大きく誤る可能性があり、真の目的関数の近似が悪くなります。
 \fi
 
 \begin{figure}[t]
@@ -177,9 +177,9 @@
     \includegraphics[width=0.7\textwidth]{../imgs/modified_secant/trial_2.pdf}
     \caption{
     \ifEn
-        Function-value-matching modified secant equation. The function values $f(x_{k-1})$ and $m_k^{\mathrm{F}}(x_{k-1})$ are matched at the previous point $x_{k-1}$.
+        Function-value-matching modified secant equation. The function values $f(x_{k})$ and $m_k^{\mathrm{F}}(x_{k})$ are matched at the previous point $x_{k}$.
     \else
-        関数値一致の修正セカント方程式。前の点 $x_{k-1}$ での関数値 $f(x_{k-1})$ と $m_k^{\mathrm{F}}(x_{k-1})$ が一致している。
+        関数値一致の修正セカント方程式。前の点 $x_{k}$ での関数値 $f(x_{k})$ と $m_k^{\mathrm{F}}(x_{k})$ が一致している。
     \fi
     }
     \label{fig:yuan_msec}
@@ -203,12 +203,12 @@
     $T_{k+1} \in \mathbb{R}^{n \times n \times n}$ を、以下を満たす $x_{k+1}$ での $f$ の3階微分テンソルとします。
 \fi
 \begin{equation*}
-    s_k^\top (T_{k+1} s_k) s_k = \sum_{i,j,l=1}^n \partial_{x_i x_j x_l} f(x_{k+1}) s_k^{(i)} s_k^{(j)} s_k^{(l)}.
+    s_k^\top (T_{k+1} s_k) s_k = \sum_{i,j,l=1}^n \partial_{ijl} f(x_{k+1}) s_k^{(i)} s_k^{(j)} s_k^{(l)}.
 \end{equation*}
 \ifEn
-    Here, $\partial_{x_i x_j x_l} f$ denotes the third derivative of $f$ with respect to $x_i$, $x_j$, and $x_l$, and $s_k^{(i)}$ is the $i$-th component of the vector $s_k$. We introduced this tensor solely for analysis purposes, and it will be eliminated from the final formula.
+    Here, $\partial_{ijl} f$ denotes the third derivative of $f$ with respect to $x_i$, $x_j$, and $x_l$, and $s_k^{(i)}$ is the $i$-th component of the vector $s_k$. We introduced this tensor solely for analysis purposes, and it will be eliminated from the final formula.
 \else
-    ここで、$\partial_{x_i x_j x_l} f$ は $f$ の $x_i$、$x_j$、および $x_l$ に対する3階微分を表し、$s_k^{(i)}$ はベクトル $s_k$ の第 $i$ 成分です。このテンソルは解析目的でのみ導入しており、最終的な式からは除去されます。
+    ここで、$\partial_{ijl} f$ は $f$ の $x_i$、$x_j$、および $x_l$ に対する3階微分を表し、$s_k^{(i)}$ はベクトル $s_k$ の第 $i$ 成分です。このテンソルは解析目的でのみ導入しており、最終的な式からは除去されます。
 \fi
 
 \ifEn
@@ -250,7 +250,7 @@
     -s_k^\top y_k                                        & = -s_k^\top B_{k+1}^{\mathrm{C}} s_k + \frac{1}{2} s_k^\top (T_{k+1} s_k) s_k.
 \end{align*}
 \ifEn
-    By summing up and using $y_k = \nabla f(x_{k+1}) - \nabla f(x_k)$, we eliminate the tensor term and obtain the scalar identity
+    By adding these and using $y_k = \nabla f(x_{k+1}) - \nabla f(x_k)$, we eliminate the tensor term and obtain the scalar identity
 \else
     これらを合計し、$y_k = \nabla f(x_{k+1}) - \nabla f(x_k)$ を使用することで、テンソル項が除去できて、以下の等式を得ます。
 \fi

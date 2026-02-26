@@ -7,6 +7,9 @@ import numpy.typing as npt
 
 from qnlab.util.doc_paths import doc_imgs_dir
 
+plt.rcParams["text.usetex"] = True
+
+
 OUTPUT_DIR = doc_imgs_dir("modified_secant")
 
 
@@ -90,7 +93,7 @@ def trial(
             bestX - 0.2,
             bestY + 0.3,
             "Almost no gap",
-            fontsize=30,
+            fontsize=35,
             color="red",
             zorder=5,
         )
@@ -218,11 +221,11 @@ def trial(
         xp[0] + (-0.6 if "3" == kind else +0.1),
         fxp - 0.05,
         "$x_k$",
-        fontsize=30,
+        fontsize=35,
         color="black",
     )
     plt.scatter([x], [fx], color="black", zorder=5)
-    plt.text(x[0] - 0.1, fx - 0.15, "$x_{k+1}$", fontsize=30, color="black")
+    plt.text(x[0] - 0.1, fx - 0.15, "$x_{k+1}$", fontsize=35, color="black")
 
     plt.axis("off")
 
