@@ -981,7 +981,7 @@ Fig. 9 はニュートン法、準ニュートン法、勾配降下法の比較�
 
 (Fig. 9 ニュートン法、準ニュートン法、勾配降下法の比較。)
 
-直線探索に基づく準ニュートン法では、最適解 $x^\ast$ に収束する列 $\lbrace x_k \rbrace_k$ を次のように生成します。
+直線探索に基づく準ニュートン法では、点列 $\lbrace x_k \rbrace_k$ を次のように生成します。
 
 ```math
 \begin{equation*}
@@ -2141,9 +2141,9 @@ y_{m-1}
 
 セカント条件は準ニュートン法で広く用いられていますが、勾配情報のみを活用するため、目的関数の曲率を正確に捉えられないことがあります。このことをFig. 13で説明します。
 
-Fig. 13 において、関数値と勾配が既知の2点 $x_k$ と $x_{k+1}$ があるとします。正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットしており、より良い収束挙動をもたらすことが分かります。しかし、標準的な勾配のみを用いて課されるセカント条件で作られるモデルでは、関数値の情報が無視され、曲率を大きく誤る可能性があり、真の目的関数の近似が悪くなります。
+Fig. 13 において、関数値と勾配が既知の2点 $x_k$ と $x_{k+1}$ があるとします。正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットしており、より良い収束挙動をもたらすことが分かります。しかし、勾配のみを用いて課される標準的なセカント条件で作られるモデルでは、関数値の情報が無視されます。よって、曲率を大きく誤る可能性があり、真の目的関数の近似が悪くなります。
 
-<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_EXPLAIN.png?v=1" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_HESS.png" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_BFGS.png" />
+<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_EXPLAIN.png?v=2" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_HESS.png?v=1" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_BFGS.png?v=1" />
 
 (Fig. 13 標準的なセカント条件の欠点。 (a) $x_k$ と $x_{k+1}$ での関数値と勾配が既に分かっている。 (b) 正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットする。 (c) 標準的なセカント条件では、必ずしも十分に曲率を捉えられない。)
 
@@ -2227,9 +2227,9 @@ B_{k+1}^{\mathrm{F}'} s_k = y_k + \frac{\max(0, 2(f(x_k) - f(x_{k+1})) + (\nabla
 
 これが関数値一致の修正セカント条件です。具体例としてFig. 15 も参照してください。
 
-![../imgs/modified_secant/trial_2.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_2.png)
+![../imgs/modified_secant/trial_2.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_2.png?v=1)
 
-(Fig. 15 関数値一致の修正セカント方程式。前の点 $x_{k-1}$ での関数値 $f(x_{k-1})$ と $m_k^{\mathrm{F}}(x_{k-1})$ が一致している。)
+(Fig. 15 関数値一致の修正セカント方程式。前の点 $x_{k}$ での関数値 $f(x_{k})$ と $m_k^{\mathrm{F}}(x_{k})$ が一致している。)
 
 #### 三次項による修正セカント条件
 
@@ -2239,11 +2239,11 @@ $T_{k+1} \in \mathbb{R}^{n \times n \times n}$ を、以下を満たす $x_{k+1}
 
 ```math
 \begin{equation*}
-s_k^\top (T_{k+1} s_k) s_k = \sum_{i,j,l=1}^n \partial_{x_i x_j x_l} f(x_{k+1}) s_k^{(i)} s_k^{(j)} s_k^{(l)}.
+s_k^\top (T_{k+1} s_k) s_k = \sum_{i,j,l=1}^n \partial_{ijl} f(x_{k+1}) s_k^{(i)} s_k^{(j)} s_k^{(l)}.
 \end{equation*}
 ```
 
-ここで、$\partial_{x_i x_j x_l} f$ は $f$ の $x_i$、$x_j$、および $x_l$ に対する3階微分を表し、$s_k^{(i)}$ はベクトル $s_k$ の第 $i$ 成分です。このテンソルは解析目的でのみ導入しており、最終的な式からは除去されます。
+ここで、$\partial_{ijl} f$ は $f$ の $x_i$、$x_j$、および $x_l$ に対する3階微分を表し、$s_k^{(i)}$ はベクトル $s_k$ の第 $i$ 成分です。このテンソルは解析目的でのみ導入しており、最終的な式からは除去されます。
 
 このテンソル項を組み込むことにより、以下のモデル関数を定義できます。
 
@@ -2319,7 +2319,7 @@ B_{k+1}^{\mathrm{C}} s_k = y_k + \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nab
 
 これが三次項による修正セカント条件です。具体例としてFig. 16も参照してください。
 
-<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_1_cubic.png" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_1_quadratic.png" />
+<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_1_cubic.png?v=1" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_1_quadratic.png?v=1" />
 
 (Fig. 16 三次項による修正セカント方程式。三次項をモデルに組み込むことで、前の点で関数値と勾配の両方を一致させることが出来ます。その二次項までの展開によって、モデルを作成します。)
 
