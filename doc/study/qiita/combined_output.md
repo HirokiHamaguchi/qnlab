@@ -1043,7 +1043,7 @@ B_{k+1} s_k = y_k.
 
 ```math
 \begin{equation*}
-m_{k+1}(x) = f(x_{k+1}) + \nabla f(x_{k+1})^\top (x - x_{k+1}) + \frac{1}{2} (x - x_{k+1})^\top B_{k+1} (x - x_{k+1}).
+m_{k+1}(x) \mathrel{\vcenter{:}}= f(x_{k+1}) + \nabla f(x_{k+1})^\top (x - x_{k+1}) + \frac{1}{2} (x - x_{k+1})^\top B_{k+1} (x - x_{k+1}).
 \end{equation*}
 ```
 
@@ -1284,7 +1284,7 @@ $C_1$ は一般に対称でないため、これを対称化します。
 
 ```math
 \begin{equation*}
-C_2 = \frac{C_1 + C_1^\top}{2}.
+C_2 \mathrel{\vcenter{:}}= \frac{C_1 + C_1^\top}{2}.
 \end{equation*}
 ```
 
@@ -1293,9 +1293,9 @@ C_2 = \frac{C_1 + C_1^\top}{2}.
 ```math
 \begin{equation*}
 \begin{cases}
-C_0 = B                                                                               \\
-C_{2t+1} = C_{2t} + \frac{(y - C_{2t}s)c^\top}{c^\top s} & (\text{asymmetric update}) \\
-C_{2t+2} = \frac{C_{2t+1} + C_{2t+1}^\top}{2}            & (\text{symmetrization})
+C_0 \mathrel{\vcenter{:}}= B                                                                               \\
+C_{2t+1} \mathrel{\vcenter{:}}= C_{2t} + \frac{(y - C_{2t}s)c^\top}{c^\top s} & (\text{asymmetric update}) \\
+C_{2t+2} \mathrel{\vcenter{:}}= \frac{C_{2t+1} + C_{2t+1}^\top}{2}            & (\text{symmetrization})
 \end{cases}
 \end{equation*}
 ```
@@ -1669,9 +1669,9 @@ B_{k+1} = B_k + UCV^\top.
 
 ```math
 \begin{equation*}
-U = \begin{bmatrix}B_k s_k & y_k\end{bmatrix},\qquad
-C = \begin{pmatrix}-\frac{1}{s_k^\top B_k s_k} & 0 \\ 0 & \frac{1}{y_k^\top s_k}\end{pmatrix},\qquad
-V = \begin{bmatrix}B_k s_k & y_k\end{bmatrix}
+U \mathrel{\vcenter{:}}= \begin{bmatrix}B_k s_k & y_k\end{bmatrix},\qquad
+C \mathrel{\vcenter{:}}= \begin{pmatrix}-\frac{1}{s_k^\top B_k s_k} & 0 \\ 0 & \frac{1}{y_k^\top s_k}\end{pmatrix},\qquad
+V \mathrel{\vcenter{:}}= \begin{bmatrix}B_k s_k & y_k\end{bmatrix}
 \end{equation*}
 ```
 
@@ -1959,8 +1959,8 @@ H_0, H_1, \dots, H_m.
 
 ```math
 \begin{equation*}
-\rho_i = \frac{1}{y_i^\top s_i}, \qquad
-V_i = I - \rho_i y_i s_i^\top.
+\rho_i \mathrel{\vcenter{:}}= \frac{1}{y_i^\top s_i}, \qquad
+V_i \mathrel{\vcenter{:}}= I - \rho_i y_i s_i^\top.
 \end{equation*}
 ```
 
@@ -2092,7 +2092,7 @@ H_0 = \gamma I.
 
 ```math
 \begin{equation*}
-\gamma = \frac{s_{m-1}^\top y_{m-1}}{y_{m-1}^\top y_{m-1}}.
+\gamma \mathrel{\vcenter{:}}= \frac{s_{m-1}^\top y_{m-1}}{y_{m-1}^\top y_{m-1}}.
 \end{equation*}
 ```
 
@@ -2100,7 +2100,7 @@ H_0 = \gamma I.
 
 ```math
 \begin{equation*}
-\bar{G} = \int_0^1 \nabla^2 f(x + \tau s_{m-1}) \mathrm{d}\tau.
+\bar{G} \mathrel{\vcenter{:}}= \int_0^1 \nabla^2 f(x + \tau s_{m-1}) \mathrm{d}\tau.
 \end{equation*}
 ```
 

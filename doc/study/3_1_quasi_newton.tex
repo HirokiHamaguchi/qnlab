@@ -141,7 +141,7 @@
     より厳密には、セカント条件は次のようにも正当化できます。$x_{k+1}$ の周りの二次近似モデルを考えます。
 \fi
 \begin{equation*}
-    m_{k+1}(x) = f(x_{k+1}) + \nabla f(x_{k+1})^\top (x - x_{k+1}) + \frac{1}{2} (x - x_{k+1})^\top B_{k+1} (x - x_{k+1}).
+    m_{k+1}(x) \coloneqq f(x_{k+1}) + \nabla f(x_{k+1})^\top (x - x_{k+1}) + \frac{1}{2} (x - x_{k+1})^\top B_{k+1} (x - x_{k+1}).
 \end{equation*}
 \ifEn
     By construction, regardless of $B_{k+1}$, this model satisfies

@@ -289,7 +289,7 @@
     $C_1$ は一般に対称でないため、これを対称化します。
 \fi
 \begin{equation*}
-    C_2 = \frac{C_1 + C_1^\top}{2}.
+    C_2 \coloneqq \frac{C_1 + C_1^\top}{2}.
 \end{equation*}
 \ifEn
     However, the symmetrized matrix $C_2$ may not satisfy the secant condition $C_2 s = y$. Therefore, we iterate this process:
@@ -298,9 +298,9 @@
 \fi
 \begin{equation*}
     \begin{dcases}
-        C_0 = B                                                                               \\
-        C_{2t+1} = C_{2t} + \frac{(y - C_{2t}s)c^\top}{c^\top s} & (\text{asymmetric update}) \\
-        C_{2t+2} = \frac{C_{2t+1} + C_{2t+1}^\top}{2}            & (\text{symmetrization})
+        C_0 \coloneqq B                                                                               \\
+        C_{2t+1} \coloneqq C_{2t} + \frac{(y - C_{2t}s)c^\top}{c^\top s} & (\text{asymmetric update}) \\
+        C_{2t+2} \coloneqq \frac{C_{2t+1} + C_{2t+1}^\top}{2}            & (\text{symmetrization})
     \end{dcases}
 \end{equation*}
 \ifEn
@@ -742,9 +742,9 @@
         ここで
     \fi
     \begin{equation*}
-        U = \begin{bmatrix}B_k s_k & y_k\end{bmatrix},\qquad
-        C = \begin{pmatrix}-\frac{1}{s_k^\top B_k s_k} & 0 \\ 0 & \frac{1}{y_k^\top s_k}\end{pmatrix},\qquad
-        V = \begin{bmatrix}B_k s_k & y_k\end{bmatrix}
+        U \coloneqq \begin{bmatrix}B_k s_k & y_k\end{bmatrix},\qquad
+        C \coloneqq \begin{pmatrix}-\frac{1}{s_k^\top B_k s_k} & 0 \\ 0 & \frac{1}{y_k^\top s_k}\end{pmatrix},\qquad
+        V \coloneqq \begin{bmatrix}B_k s_k & y_k\end{bmatrix}
     \end{equation*}
     \ifEn
         since
@@ -1189,8 +1189,8 @@
     保存されたベクトルペア $\{(s_i,y_i)\}_{i=0}^{m-1}$ を用いて、次を定義します。
 \fi
 \begin{equation*}
-    \rho_i = \frac{1}{y_i^\top s_i}, \qquad
-    V_i = I - \rho_i y_i s_i^\top.
+    \rho_i \coloneqq \frac{1}{y_i^\top s_i}, \qquad
+    V_i \coloneqq I - \rho_i y_i s_i^\top.
 \end{equation*}
 \ifEn
     Then, for $i = 0,\dots, m-1$, the inverse BFGS update can be expressed as
@@ -1349,7 +1349,7 @@
     ここでスケーリング係数 $\gamma$ は、例えば次のように選ばれます。ベクトルペア $(s_{m-1}, y_{m-1})$ は最新のものであることに注意してください。
 \fi
 \begin{equation*}
-    \gamma = \frac{s_{m-1}^\top y_{m-1}}{y_{m-1}^\top y_{m-1}}.
+    \gamma \coloneqq \frac{s_{m-1}^\top y_{m-1}}{y_{m-1}^\top y_{m-1}}.
 \end{equation*}
 \ifEn
     Note that the pair $(s_{m-1}, y_{m-1})$ is the most recent one.
@@ -1358,7 +1358,7 @@
     この選択は次の議論によって正当化できます~\citep{liuLimitedMemoryBFGS1989a,shannoMatrixConditioningNonlinear1978}。目的関数 $f$ が二回連続微分可能であると仮定し、最新のステップに沿った平均ヘッセ行列を考えます。
 \fi
 \begin{equation*}
-    \bar{G} = \int_0^1 \nabla^2 f(x + \tau s_{m-1}) \mathrm{d}\tau.
+    \bar{G} \coloneqq \int_0^1 \nabla^2 f(x + \tau s_{m-1}) \mathrm{d}\tau.
 \end{equation*}
 \ifEn
     Recall that $s_{m-1}$ denotes the most recent displacement of $x$, satisfying

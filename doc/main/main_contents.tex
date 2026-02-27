@@ -314,7 +314,7 @@ We also derive the following lemma for later use.
 \subsection{Backtracking Stage}\label{sec:inner_loop}
 
 We next analyze the line search in \cref{alg:backtracking_linesearch}.
-Recall that the parameter $c$ in \cref{alg:backtracking_linesearch} satisfy $0 < c < 1$ and $0 < m$ from \cref{ass:BBounds}.
+Recall that the parameter $c$ in \cref{alg:backtracking_linesearch} satisfies $0 < c < 1$ and $0 < m$ from \cref{ass:BBounds}.
 
 \begin{lemma}\label{lem:backtracking_finite}
     Under \cref{ass:LSmooth,ass:BBounds},
@@ -340,7 +340,7 @@ Recall that the parameter $c$ in \cref{alg:backtracking_linesearch} satisfy $0 <
     \begin{equation*}
         f(x_k) - f(x_k+\alpha_k d_k) \geq -c \alpha_k g_k^\top d_k.
     \end{equation*}
-    Since $-g_k^\top d_k \geq m \norm{d_k}^2 \geq 0$ from \cref{ass:BBounds} and \cref{eq:BBounds_results_zero}, the condition of \cref{lem:error_bound_on_function_evaluations} is satisfied with $x_{k+1} = x_k + \alpha_k d_k$. Thus we obtain $\delta_k \le \overline{\delta}_k + \Delta_k$, i.e.,
+    Since $-g_k^\top d_k \geq 0$ from \cref{ass:BBounds} and \cref{eq:BBounds_results_zero}, the condition of \cref{lem:error_bound_on_function_evaluations} is satisfied with $x_{k+1} = x_k + \alpha_k d_k$. Thus we obtain $\delta_k \le \overline{\delta}_k + \Delta_k$, i.e.,
     \begin{equation*}
         -c\alpha_k g_k^\top d_k
         \le
@@ -383,7 +383,7 @@ The following states the key property of the backtracking procedure.
 In this subsection, we lower bound the sum of actual function decreases $\delta_k$ over $k \in K^0$.
 Recall that $K^0$ denotes the set of iteration indices $k$ such that $\mu_k = 0$, as in \cref{eq:def_K0_Kplus}.
 To this end, we establish that the sum of $\Delta_k$ over $k \in K^0$ is upper bounded, where $\Delta_k$ is the error-absorbing term in the relaxed Armijo condition (\cref{eq:relaxed_Armijo_condition}).
-We introduce the following constant $\Delta_{\max}$, which serves as an upper bound for $\Delta_k$ at $k \in K^0$.
+We introduce the following constant $\Delta_{\max}$, which serves as an upper bound for $\Delta_k$ of $k \in K^0$.
 \begin{equation*}
     \Delta_{\max} \defeq \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{0}), -\overline{f}^*).
 \end{equation*}
@@ -422,18 +422,18 @@ We now bound the sum of $\delta_k = f(x_k) - f(x_{k+1})$ over $k \in K^0$ with $
 \end{lemma}
 \begin{proof}
     The relaxed Armijo condition (\cref{eq:relaxed_Armijo_condition}) at iteration $k \in K^0$ yields
-    \begin{align*}
+    \begin{align}
         \overline{\delta}_{k} + \Delta_{k}
-         & = \overline{f}(x_{k}) - \overline{f}(x_{k+1}) + \Delta_{k} &  & (\text{\cref{eq:def_overline_small_delta_k}})                                   \notag \\
-         & \ge -c \alpha_{k} g_{k}^\top d_{k}                         &  & (\text{\cref{eq:relaxed_Armijo_condition}}) \notag                                     \\
-         & \ge \frac{c \overline{\alpha}}{M+\mu_{k}} \norm{g_{k}}^2   &  & (\text{\cref{prop:backtracking_summary} and \cref{eq:BBounds_results_first}})\notag    \\
-         & = \frac{c \overline{\alpha}}{M} \norm{g_{k}}^2.            &  & (\mu_{k} = 0 \text{ since } k \in K^0)
-    \end{align*}
+         & = \overline{f}(x_{k}) - \overline{f}(x_{k+1}) + \Delta_{k} &  & (\text{\cref{eq:def_overline_small_delta_k}})                                   \notag     \\
+         & \ge -c \alpha_{k} g_{k}^\top d_{k}                         &  & (\text{\cref{eq:relaxed_Armijo_condition}}) \notag                                         \\
+         & \ge \frac{c \overline{\alpha}}{M+\mu_{k}} \norm{g_{k}}^2   &  & (\text{\cref{prop:backtracking_summary} and \cref{eq:BBounds_results_first}})\notag        \\
+         & = \frac{c \overline{\alpha}}{M} \norm{g_{k}}^2.            &  & (\mu_{k} = 0 \text{ since } k \in K^0) \label{eq:lower_bound_overline_delta_plus_Delta_K0}
+    \end{align}
     Using \cref{lem:error_delta_bounded_by_Delta}, we also have
-    \begin{equation*}
-        \overline{\delta}_k + \Delta_{k} \le \delta_k + \frac{1+\feps}{1-\feps} \Delta_k + \Delta_k = \delta_k + \frac{2}{1-\feps} \Delta_{k}.
-    \end{equation*}
-    Then, combining these inequalities and summing over $k \in K^0$ gives
+    \begin{equation}
+        \overline{\delta}_k + \Delta_{k} \le \delta_k + \frac{1+\feps}{1-\feps} \Delta_k + \Delta_k = \delta_k + \frac{2}{1-\feps} \Delta_{k}. \label{eq:upper_bound_overline_delta_plus_Delta_K0}
+    \end{equation}
+    Then, combining \cref{eq:lower_bound_overline_delta_plus_Delta_K0,eq:upper_bound_overline_delta_plus_Delta_K0} and summing over $k \in K^0$ gives
     \begin{equation*}
         \sum_{k \in K^0} \frac{c \overline{\alpha}}{M} \norm{g_{k}}^2   \leq \sum_{k \in K^0} \delta_{k} + \frac{2}{1-\feps} \sum_{k \in K^0} \Delta_{k}
         \leq \sum_{k \in K^0} \delta_{k} + \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}),
@@ -504,7 +504,7 @@ We define the following constants for later use:
 \subsection{Global Convergence Result}
 
 Finally, we combine the results for $k \in K^0$ (\cref{lem:sum_small_delta_k_bound_K0}) and $k \in K^+$ (\cref{lem:sum_small_delta_k_bound_Kplus}) to derive an upper bound on the total sum of $\norm{g_k}^2$.
-We define the constant $F$ as follows:
+We define a constant $F$ as follows:
 \begin{equation}
     F \defeq f(x_0) - f^* + \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}) + C_1 \sqrt{\varsigma} - C_2 \ln(\varsigma).
     \label{eq:def_F}
