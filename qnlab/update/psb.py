@@ -49,3 +49,49 @@ class PSBUpdateRule(BaseUpdateRule):
         B = compute_B(g, lm)
         H = np.linalg.inv(B).astype(np.float64)
         return B, H
+
+
+if __name__ == "__main__":
+
+    import numpy as np
+
+    def psb_update_b(B, s, y):
+        """B型 (ヘッセ行列近似) のPSB更新"""
+        r = y - np.dot(B, s)
+        s_norm_sq = np.dot(s, s)
+        term1 = (np.outer(r, s) + np.outer(s, r)) / s_norm_sq
+        term2 = (np.dot(r, s) * np.outer(s, s)) / (s_norm_sq**2)
+        return B + term1 - term2
+
+    def psb_update_h(H, s, y, tol=1e-12):
+        n = H.shape[0]
+        Delta = (y@H@y-s@y) * s@H@s - (y@H@s)**2
+        uu = np.outer(H@y-s, H@y-s)
+        vv = np.outer(H@s, H@s)
+        uv_plus_vu = np.outer(H@y-s, H@s) + np.outer(H@s, H@y-s)
+        Hbar = H - (s@H@s * uu - y@H@s * uv_plus_vu + (y@H@y-s@y) * vv) / Delta
+        return Hbar
+
+    # 1. 初期化 (B = H = I)
+    n = 3
+    B_k = np.eye(n)
+    H_k = np.eye(n)
+
+    # 2. テストデータの生成 (s, y)
+    # 注: PSBはセカント条件 B*s = y (または H*y = s) を満たすように更新します
+    np.random.seed(42)
+    s = np.random.randn(n)
+    y = np.random.randn(n)
+
+    # 3. それぞれの更新を実行
+    B_next = psb_update_b(B_k, s, y)
+    H_next = psb_update_h(H_k, s, y)
+
+    # 4. 検証: B_next の逆行列が H_next と一致するか
+    B_next_inv = np.linalg.inv(B_next)
+
+    print("B_next * H_next (Identity になるべき):")
+    print(np.round(np.dot(B_next, H_next), 10))
+
+    is_correct = np.allclose(B_next_inv, H_next)
+    print(f"\n検証結果: {'一致しました (正しい)' if is_correct else '一致しませんでした'}")
