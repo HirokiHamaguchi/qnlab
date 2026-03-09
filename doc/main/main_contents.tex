@@ -11,7 +11,7 @@ We begin by reviewing relevant background and formalizing the problem setting.
 \label{sec:prel_rqn}
 
 The regularized quasi-Newton method is a variant of quasi-Newton methods that does not rely heavily on line search techniques. This property is important for optimization in noisy evaluation environments.
-There has been renewed interest in regularized Newton-type methods, including cubic-regularization schemes~\citep{nesterovCubicRegularizationNewton2006a,ranganathSymmetricRankOneQuasiNewton2025,wangConvergenceRatesRegularized2025}, and we focus on quadratic regularization~\citep{kanzowRegularizationLimitedMemory2023,doikovSuperUniversalRegularizedNewton2024,liTruncatedRegularizedNewton2009,zhangNewRegularizedQuasiNewton2018,uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,shengNewAdaptiveTrust2018}.
+There has been renewed interest in regularized Newton-type methods, including cubic-regularization schemes~\citep{nesterovCubicRegularizationNewton2006a,ranganathSymmetricRankOneQuasiNewton2025,wangConvergenceRatesRegularized2025}, and we focus on quadratic regularization~\citep{kanzowRegularizationLimitedMemory2023,doikovSuperUniversalRegularizedNewton2024,liTruncatedRegularizedNewton2009,zhangNewRegularizedQuasiNewton2018,uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,shengNewAdaptiveTrust2018} for simplicity of analysis and implementation.
 
 For $g_k \defeq \nabla f(x_k)$ and an approximate Hessian $B_k \in \bbR^{n \times n}$, regularized quasi-Newton methods compute the step as
 \begin{equation*}
@@ -76,14 +76,14 @@ Under this regime, the computed gradient $\nabla \overline{f}(x)$ is a sufficien
     \nabla \overline{f}(x) = \nabla f(x).
 \end{equation}
 We emphasize that this assumption is introduced solely as a modeling simplification, rather than as a claim about practical gradient accuracy.
-Notably, the proposed algorithm does not rely on Wolfe-type conditions, which typically require accurate gradient information at trial points, making it robust to gradient inaccuracies.
+Notably, the proposed algorithm does not rely on Wolfe-type conditions, which typically require accurate gradient information at trial points, and is therefore robust to gradient inaccuracies.
 Our numerical experiments in \cref{sec:experiments} include cases where gradients are contaminated by noise, and they also demonstrate that the proposed method remains effective even when \cref{eq:exact_gradient_assumption} is violated.
 
 \section{Proposed Algorithm}\label{sec:algorithm}
 
 We propose a new algorithm for the problem setting stated in \cref{sec:problem_setting}.
 We draw inspiration from the OFFO framework to design robust regularization and scaling strategies.
-Unlike purely objective-function-free methods, our algorithm exploits function values when they are numerically reliable and smoothly switches to gradient-based control otherwise.
+Unlike purely OFFO methods, our algorithm exploits function values when they are numerically reliable and smoothly switches to gradient-based control otherwise.
 This hybrid behavior enables improved stability without sacrificing efficiency in practical optimization tasks.
 The pseudo-code of our algorithm is given in \cref{alg:regularized_qn}. The minimum of the empty set is defined as $+\infty$ in \refLine{line:mu_0_condition}.
 \Cref{alg:backtracking_linesearch} is an auxiliary line search algorithm called in \cref{alg:regularized_qn}.
@@ -101,9 +101,9 @@ In the following, we explain the three main components of \cref{alg:regularized_
         }
         \uElse{
             $K^+ \gets K^+ \cup \{k\}$ \label{line:update_K_plus}\;
-            $\mu_{k} \gets \theta_k \sqrt{\varsigma + \sum_{j \in K^+} \norm{g_{j}}^2}$ with $\theta_k \in [\theta_{\min}, \theta_{\max}]$ (\cref{sec:proposed_choice_mu}). \label{line:update_theta}\;
+            $\mu_{k} \gets \theta_k \sqrt{\varsigma + \sum_{j \in K^+} \norm{g_{j}}^2}$ with $\theta_k \in [\theta_{\min}, \theta_{\max}]$ ~ (see \cref{sec:proposed_choice_mu}). \label{line:update_theta}\;
         }
-        $d_k \gets -(B_k + \mu_k I)^{-1} g_k$ with $B_k$ (\cref{sec:proposed_choice_Bk}). \label{line:d_k}\;
+        $d_k \gets -(B_k + \mu_k I)^{-1} g_k$ with $B_k$ ~ (see \cref{sec:proposed_choice_Bk}). \label{line:d_k}\;
         Find $\alpha_k$ and $\Delta_k$ satisfying \cref{eq:relaxed_Armijo_condition} by \cref{alg:backtracking_linesearch}.  \label{line:armijo}\;
         $x_{k+1} \gets x_k + \alpha_k d_k$,\,
         $g_{k+1} \gets \nabla \overline{f}(x_{k+1})$ \label{line:update}\;
@@ -119,7 +119,7 @@ In the following, we explain the three main components of \cref{alg:regularized_
     $\alpha_k \gets 1$\; \label{line:ls_init}
     $\Delta_k \gets \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_k), -\overline{f}(x_k+\alpha_k d_k))$\;
     \While{$\overline{f}(x_k) + c \alpha_k g_k^\top d_k + \Delta_k < \overline{f}(x_k+\alpha_k d_k)$}{
-        $\alpha_k \leftarrow \beta \alpha_k$ with $\beta \in [\beta_{\min},\beta_{\max}]$ (\cref{sec:proposed_choice_alpha}). \; \label{line:ls_backtracking}
+        $\alpha_k \leftarrow \beta \alpha_k$ with $\beta \in [\beta_{\min},\beta_{\max}]$ ~ (see \cref{sec:proposed_choice_alpha}). \; \label{line:ls_backtracking}
         $\Delta_k \gets \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_k), -\overline{f}(x_k+\alpha_k d_k))$\;
     }
     \Return{$\alpha_k$}\;
@@ -143,7 +143,7 @@ The second component is the computation of the step size $\alpha_k$ using a rela
     \end{dcases}
 \end{equation}
 where $\Delta_k$ is the error-absorbing term that is recomputed for each $\alpha_k$.
-This relaxation guarantees the existence of $\alpha_k \in (0,1]$ even in the presence of numerical errors in $\overline{f}$.
+This relaxation guarantees the existence of $\alpha_k \in (0,1]$ even in the presence of errors in $\overline{f}$.
 When $d_k$ is a descent direction ($g_k^\top d_k < 0$), \cref{eq:relaxed_Armijo_condition} ensures that a temporary increase of $\overline{f}$ is at most $\Delta_k$.
 Since $\Delta_k$ depends on $-\overline{f}(x_k + \alpha_k d_k)$ but not on $\overline{f}(x_k + \alpha_k d_k)$, $\Delta_k$ does not increase when $\overline{f}(x_k + \alpha_k d_k)$ becomes large.
 This prevents unbounded growth of $\Delta_k$.
@@ -152,7 +152,7 @@ This prevents unbounded growth of $\Delta_k$.
 
 The third component is the adaptive update of the regularization parameter $\mu_k$.
 A larger $\mu_k$ yields a more conservative step, while a smaller $\mu_k$ allows a more aggressive quasi-Newton step, especially when $\mu_k=0$.
-In practical settings, setting $\mu_k=0$ is preferred, since this allows us to fully exploit the quasi-Newton approximation and typically leads to practically faster convergence.
+In practical settings, $\mu_k=0$ is preferred, since this allows us to fully exploit the quasi-Newton approximation and typically leads to practically faster convergence.
 Let us partition the iteration indices $K\defeq \{0,1,2,\ldots, k_{\max}-1\}$ into two sets:
 \begin{equation}\label{eq:def_K0_Kplus}
     K^0 \defeq \{k \in K \mid \mu_k = 0\}, \quad K^+ \defeq \{k \in K \mid \mu_k > 0\}.
@@ -164,7 +164,6 @@ We set $\mu_k=0$ if and only if the following condition is satisfied:
 Note that $k=0$ satisfies \cref{eq:mu_0_condition} since $K^0$ is empty.
 This condition restricts $\mu_k=0$ to iterations for which a sufficient decrease in $\overline f$ has been observed.
 Thereby, while $\overline{f}$ can temporarily increase, this condition theoretically ensures that $\overline{f}$ does not grow unboundedly or oscillate indefinitely.
-
 Otherwise, to ensure convergence to first-order stationary points, we apply an OFFO-based update
 \begin{equation}\label{eq:offo_based_update}
     \mu_k = \theta_k \sqrt{\varsigma+\sum_{j \in K^+, \, j \leq k}\norm{g_j}^2},
@@ -501,9 +500,9 @@ We define the following constants for later use:
     \myQED
 \end{proof}
 
-\subsection{Global Convergence Result}
+\subsection{Global Convergence Rate}
 
-Finally, we combine the results for $k \in K^0$ (\cref{lem:sum_small_delta_k_bound_K0}) and $k \in K^+$ (\cref{lem:sum_small_delta_k_bound_Kplus}) to derive an upper bound on the total sum of $\norm{g_k}^2$.
+Finally, we combine the results for $k \in K^0$ stated in \cref{lem:sum_small_delta_k_bound_K0} and $k \in K^+$ stated in \cref{lem:sum_small_delta_k_bound_Kplus} to derive an upper bound on the total sum of $\norm{g_k}^2$.
 We define a constant $F$ as follows:
 \begin{equation}
     F \defeq f(x_0) - f^* + \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}) + C_1 \sqrt{\varsigma} - C_2 \ln(\varsigma).
@@ -511,7 +510,7 @@ We define a constant $F$ as follows:
 \end{equation}
 Then, we can obtain the following unified bound of the sum of $\norm{g_k}^2$.
 \begin{lemma}\label{lem:sum_norm_g_k_bound}
-    Under the assumptions, the sum of $\norm{g_{k}}^2$ over $k \in K^0, K^+$ satisfies
+    Under \cref{ass:bounded,ass:LSmooth,ass:BBounds}, the sum of $\norm{g_{k}}^2$ over $k \in K^0, K^+$ satisfies
     \begin{equation*}
         F \ge
         \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \norm{g_{k}}^2 +
@@ -538,8 +537,8 @@ Then, we can obtain the following unified bound of the sum of $\norm{g_k}^2$.
     \myQED
 \end{proof}
 
-Now, we establish the following global convergence result for \cref{alg:regularized_qn}.
-\begin{theorem}[Global Convergence]\label{thm:gc}
+Now, we establish the following convergence rate for \cref{alg:regularized_qn}.
+\begin{theorem}\label{thm:gc}
     Under \cref{ass:bounded,ass:LSmooth,ass:BBounds}, the average of squared gradient norms generated by \cref{alg:regularized_qn} satisfies
     \begin{equation*}
         \frac{1}{k_{\max}} \sum_{k=0}^{k_{\max}-1} \norm{g_k}^2 = \order{\frac{1}{k_{\max}}}.
@@ -594,12 +593,12 @@ Since this is not essential for the main argument, we omit the details and refer
 We next interpret \cref{eq:gc_result} in the proof of \cref{thm:gc}.
 The contribution of the indices in $K^0$ is analogous to the classical analysis of gradient descent. Indeed, for gradient descent with fixed step size $\alpha = 1/L$, one has
 \begin{equation*}
-    \frac{1}{k_{\max}}\sum_{k=0}^{k_{\max}-1} \norm{g_k}^2 \le = \frac{1}{k_{\max}}\frac{2(f(x_0)-f^*)}{\alpha}.
+    \frac{1}{k_{\max}}\sum_{k=0}^{k_{\max}-1} \norm{g_k}^2 \le \frac{1}{k_{\max}}\frac{2(f(x_0)-f^*)}{\alpha}.
 \end{equation*}
 Thus, the term associated with $K^0$ reflects the standard $\order{f(x_0)-f^*}$ dependence of first-order methods since $F'$ contains the initial gaps $f(x_0)-f^*$ and $\overline{f}(x_0)-\overline{f}^*$.
 In contrast, the contribution of $K^+$ resembles the behavior of AdaGrad-Norm, whose convergence bound scales quadratically with the initial optimality gap~\citep{wardAdaGradStepsizesSharp2020}.
 
-Finally, it is well-known that \cref{thm:gc} implies that the iteration complexity:
+Finally, \cref{thm:gc} implies that the iteration complexity:
 \begin{equation*}
     \min\left\{k \relmiddle| \norm{\nabla f(x_k)} \leq \gtol \right\} = \order{1/\gtol^2}.
 \end{equation*}
@@ -627,7 +626,11 @@ For an iteration $k$, we define
 where $g_k$ and $g_{k+1}$ are the gradients at $x_k$ and $x_{k+1}$, respectively.
 Starting from an initial matrix, an approximate Hessian is obtained by successively applying BFGS updates to a sequence of curvature pairs.
 Let $\{(s_{k_i},y_{k_i})\}_{i=0}^{p-1}$ be a collection of curvature pairs, where $k_i$ denotes the iteration index at which the $i$-th pair was generated.
-Starting from the initial matrix $\gamma I$ with $\gamma=\norm{y_{k_0}}^2 / y_{k_0}^\top s_{k_0}$, we define $\mathrm{BFGS}(\{s_{k_i},y_{k_i}\}_{i=0}^{p-1})$ as the matrix $B_k$ obtained by sequentially applying the BFGS update using these pairs in the given order.
+Starting from the initial matrix $B^{(0)} = \gamma I$ with $\gamma=\norm{y_{k_0}}^2 / y_{k_0}^\top s_{k_0}$, we define $\mathrm{BFGS}(\{(s_{k_i},y_{k_i})\}_{i=0}^{p-1})$ as the matrix $B^{(p)}$ obtained by sequentially applying the BFGS update as
+\begin{equation*}
+    B^{(j+1)} = B^{(j)} - \frac{B^{(j)} s_{k_j} s_{k_j}^\top B^{(j)}}{s_{k_j}^\top B^{(j)} s_{k_j}} + \frac{y_{k_j} y_{k_j}^\top}{y_{k_j}^\top s_{k_j}}
+\end{equation*}
+for $j=0,1,\ldots,p-1$, where each curvature pair $(s_{k_j},y_{k_j})$ is applied in order.
 Here, $p>0$ denotes the maximum number of stored curvature pairs and is a fixed small integer in the L-BFGS method.
 When fewer than $p$ curvature pairs are available, the BFGS update is applied using all currently available pairs.
 
@@ -687,10 +690,10 @@ so that $B_k+\mu_k I\approx\mathrm{BFGS}(\{s_{k_i},\overline{y}_{k_i}+\mu_k s_{k
 Although this approximation is inexact, it has been reported to yield nearly identical practical performance while remaining comparatively simple to implement~\citep{kanzowRegularizationLimitedMemory2023}.
 We adopt this approximation in our numerical experiments.
 
-Separately, there exist function-based modified secant condition~\citep{zhangPropertiesNumericalPerformance2001,babaie-kafakiTwoNewConjugate2010,yabeLocalSuperlinearConvergence2007,hassanModifiedSecantEquation2023} that adjusts the secant equation using available function values when those quantities are reliable. Such adjustments aim to improve practical convergence behavior.
+Separately, there exist function-based modified secant conditions~\citep{zhangPropertiesNumericalPerformance2001,babaie-kafakiTwoNewConjugate2010,yabeLocalSuperlinearConvergence2007,hassanModifiedSecantEquation2023} that adjust the secant equation using available function values when those quantities are reliable. Such adjustments aim to improve practical convergence behavior.
 We partially adopt these function-based modifications following prior work~\citep{zhangNewQuasiNewtonEquation1999,yuanConvergenceAnalysisModified2010}. The suffix \texttt{-MS} in \cref{sec:experiments} indicates the use of this technique.
 Because these modifications are well established, we omit low-level implementation details here.
-Further specifics are available in the cited references and in our open-source implementation${}^{\text{\ref{fn:ourGitHub}}}$.
+Further specifics are available in the cited references and in our open-source implementation.
 
 \subsection{Step Size \texorpdfstring{$\alpha_k$}{alpha k}}\label{sec:proposed_choice_alpha}
 
@@ -717,12 +720,12 @@ In our implementation, we choose the regularization parameter as
 \begin{equation*}
     \mu_k = \mathrm{clip}\qty(\frac{1}{10}\norm{g_k}, \frac{1}{100} G_k, G_k) \quad \text{where} \quad G_k \defeq \sqrt{\varsigma + \sum_{j \in K, \, j \leq k} \norm{g_{j}}^2},
 \end{equation*}
-which is consistent with the general form (\cref{eq:offo_based_update}) with an adaptive factor $\theta_k \in [10^{-2},1]$.
+which is consistent with the general form stated in \cref{eq:offo_based_update} with an adaptive factor $\theta_k \in [10^{-2},1]$.
 In practice, we may set $\varsigma=0$ as long as the initial gradient is nonzero since $\varsigma$ is mainly introduced for avoiding zero division, but to make it consistent with the theory, we set $\varsigma=10^{-10}$ in all experiments.
 
 When $B_k$ is a good approximation of the Hessian, the regularization parameter $\mu_k$ should be small for fast convergence.
 Since the quantity $G_k$ is strictly increasing with $k$, it is natural in practice to decrease the effective regularization when sufficient progress in the objective function is achieved.
-When the difference between the two sides of \cref{eq:mu_0_condition} is larger than $1$, we restart the accumulation by resetting $K^+$ to the empty set and $G_k$ to $\varsigma$.
+When the difference between the left- and right-hand sides of \cref{eq:mu_0_condition} is larger than $1$, we restart the accumulation by resetting $K^+$ to the empty set and $G_k$ to $\varsigma$.
 As long as the number of such restarts is finite, the overall convergence analysis in \cref{sec:analysis} remains valid.
 Since these choices are heuristic, there may be room for further improvement. Especially, further increasing $\mu_k$ stabilizes the method when the objective function values are highly noisy, and decreasing $\mu_k$ more aggressively may accelerate convergence when the objective function is accurate.
 
@@ -783,8 +786,8 @@ To simulate different numerical environments, we tested the following four setti
 \begin{itemize}
     \item Artificially noised 64-bit floating-point precision (220 problems, $\feps=10^{-2}$)
     \item 64-bit floating-point precision (220 problems, $\feps=2.22 \times 10^{-9}$)
-    \item 32-bit floating-point precision (220 problems, $\feps=1.19 \times 10^{-2}$)
-    \item 16-bit floating-point precision (152 problems, $\feps=9.77 \times 10^{-1}$)
+    \item 32-bit floating-point precision (220 problems, $\feps=1.19 \times 10^{-3}$)
+    \item 16-bit floating-point precision (152 problems, $\feps=9.77 \times 10^{-2}$)
 \end{itemize}
 In the artificial noise setting, we added uniform random noise to both the objective function values and each component of the gradient vectors independently, i.e.,
 \begin{equation*}
@@ -806,9 +809,9 @@ We also set the maximum number of iterations to $k_{\max} = 15{,}000$ and timed 
 
 We used performance profiles~\citep{dolanBenchmarkingOptimizationSoftware2002} to compare the algorithms.
 Let $P$ denote the set of test problems and $S$ the set of solvers.
-For each problem $p \in P$ and solver $s \in S$, let $n_{p,s} > 0$ denote the number of function and gradient evaluations required to reach a specified gradient norm tolerance $\gtol$.
-Note that $n_{p,s}$ is not time in this experiment but the number of evaluations.
-When a solver fails to converge within the gradient tolerance or exceeds a maximum number of evaluations, we set $n_{p,s} = +\infty$.
+For each problem $p \in P$ and solver $s \in S$, let $n_{p,s} > 0$ denote the number of oracle calls (i.e., function and gradient evaluations) required to reach a specified gradient norm tolerance $\gtol$.
+We use the number of oracle calls rather than clock time to avoid the influence of algorithmic overhead and to focus on the intrinsic optimization efficiency.
+When a solver fails to converge within the gradient tolerance or exceeds a maximum number of oracle calls, we set $n_{p,s} = +\infty$.
 Then, the performance ratio $r_{p,s}$ is defined as
 \begin{equation*}
     r_{p,s} = \frac{n_{p,s}}{\min_{s' \in S} n_{p,s'}}.
@@ -827,7 +830,7 @@ We first present the result in the artificial noise setting described in \cref{s
 In this regime, the proposed methods show superior robustness compared to other quasi-Newton methods.
 This result highlights the validity of our theoretical analysis in \cref{sec:analysis} and demonstrates the effectiveness of our approach in handling noisy objective function values.
 
-\begin{figure}[htbp]
+\begin{figure}[t]
     \centering
     \begin{subfigure}[b]{0.9\textwidth}
         \centering
@@ -926,7 +929,16 @@ The proposed methods maintain stability even when traditional line search method
 
 \subsection{Computational Time per Iteration}\label{sec:comp_time}
 
-In this subsection, we present an experiment to compare the per-iteration computational cost of each method. Here, our purpose lies in the measurement of the total execution time, not the number of oracle calls.
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../imgs/for_paper/time.pdf}
+    \caption{Mean execution times for the experiment in \cref{sec:comp_time}.
+        This plot roughly indicates the extra computational overhead of each method.
+        Error bars represent one standard deviation over $100$ runs.}
+    \label{fig:exec_time}
+\end{figure}
+
+In this subsection, we present an experiment to compare the per-iteration computational cost of each method. Here, our purpose lies in the measurement of the total execution time rather than the number of oracle calls.
 We conducted experiments on the ill-conditioned quadratic problem
 \begin{equation*}
     \underset{x \in \bbR^n}{\mathrm{minimize}} \quad \frac{1}{2} \sum_{i=1}^n i x_i^2
@@ -941,17 +953,8 @@ In \cref{fig:exec_time}, we report the execution time statistics, and we can obs
 Combining with the results from \cref{sec:results}, our methods are competitive or superior in total oracle calls and per-iteration computational cost, indicating practical efficiency.
 As a side note, although the (\texttt{SciPy}) calls optimized C routines, it incurs associated dispatch overhead, producing a larger mean time. One of the reasons why the (\texttt{Reg}) and (\texttt{Reg-Sec}) methods take longer execution time is due to the implementation aspect of the original code.
 
-In \cref{tab:time_results}, we report the total number of oracle calls (calls of $\overline{f}$ and $\nabla \overline{f}$) and final objective values $f(x_{k_{\max}})$.
+In \cref{tab:time_results}, we report the total number of oracle calls (calls of $\overline{f}$ and $\nabla \overline{f}$) and final objective values $\overline{f}(x_{k_{\max}})$.
 The purpose of this table is to confirm that all methods achieved similar convergence behavior within the limited number of iterations. The comparable values in the table indicate that the comparison of execution times is fair and not affected by differences in convergence behavior.
-
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=0.9\textwidth]{../imgs/for_paper/time.pdf}
-    \caption{Mean execution times for the experiment in \cref{sec:comp_time}.
-        This plot roughly indicates the extra computational overhead of each method.
-        Error bars represent one standard deviation over $100$ runs.}
-    \label{fig:exec_time}
-\end{figure}
 
 \input{check/time_results_table}
 

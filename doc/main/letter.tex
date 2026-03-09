@@ -1,0 +1,41 @@
+% !LW recipe=uplatex
+\documentclass[12pt]{letter}
+\usepackage[margin=1in,top=0.75in,bottom=0.75in]{geometry}
+
+\begin{document}
+
+\begin{letter}{Editors\\
+    \textit{Mathematical Programming Computation}}
+
+  \opening{Dear Editors,}
+
+  We are pleased to submit our manuscript entitled ``Practical Regularized Quasi-Newton Methods with Inexact Function Values'' for publication in \textit{Mathematical Programming Computation}.
+
+  This paper studies smooth nonconvex optimization problems in which function evaluations are affected by numerical errors.
+  The main contributions of the paper are as follows:
+  \begin{itemize}
+    \item We develop a regularized quasi-Newton framework for smooth nonconvex optimization with noisy objective function evaluations.
+    \item By combining a relaxed Armijo-type line search with a regularization parameter update inspired by Objective-Function-Free Optimization and AdaGrad-Norm, we establish a global convergence rate of $\mathcal{O}(1/\varepsilon^2)$ for obtaining a first-order stationary point.
+    \item Numerical experiments on the CUTEst benchmark set with injected noise and low-precision floating-point arithmetic (64-, 32-, and 16-bit) demonstrate that the proposed method is substantially more robust and faster than several existing methods.
+  \end{itemize}
+
+  We believe that this work will be of interest to researchers in numerical optimization, particularly those studying quasi-Newton methods and optimization algorithms under noise.
+
+  This manuscript is original, has not been published previously, and is not under consideration for publication elsewhere.
+  All authors have approved the manuscript and agree with its submission to this journal.
+
+  Thank you for considering this manuscript.
+
+  \closing{Sincerely,}
+
+  Hiroki Hamaguchi\\
+  Naoki Marumo\\
+  Akiko Takeda\\[6pt]
+
+  Graduate School of Information Science and Technology\\
+  The University of Tokyo\\
+  Tokyo, Japan\\
+  Email: \texttt{hirokihamaguchi0331@gmail.com}
+\end{letter}
+
+\end{document}

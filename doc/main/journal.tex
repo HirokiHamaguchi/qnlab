@@ -1,7 +1,12 @@
 \RequirePackage{fix-cm}
-\documentclass[dvipdfmx,smallextended]{svjour3}
-
+%
+%\documentclass{svjour3}                     % onecolumn (standard format)
+%\documentclass[smallcondensed]{svjour3}     % onecolumn (ditto)
+\documentclass[dvipdfmx,smallextended]{svjour3}       % onecolumn (second format)
+%\documentclass[twocolumn]{svjour3}          % twocolumn
+%
 \smartqed  % flush right qed marks, e.g. at end of proof
+%
 \newcommand{\myQED}{\qed}
 
 \usepackage{graphicx}
@@ -110,26 +115,6 @@
 % https://qiita.com/rityo_masu/items/efd44bc8f9229e014237
 \allowdisplaybreaks[4]
 
-% todo: remove this
-% https://tex.stackexchange.com/questions/184203/huge-white-space-in-latex-template-springer-journal
-\AtBeginDocument{%
-    \paperwidth=\dimexpr
-    1in + \oddsidemargin
-    + \textwidth
-    % + \marginparsep + \marginparwidth
-    + 1in + \oddsidemargin
-    \relax
-    \paperheight=\dimexpr
-    1in + \topmargin
-    + \headheight + \headsep
-    + \textheight
-    % + \footskip
-    + 1in + \topmargin
-    \relax
-    \usepackage[pass]{geometry}
-    \relax
-}
-
 \newcommand{\feps}{\epsilon_\mathrm{f}}
 \newcommand{\gtol}{\epsilon_{\mathrm{gtol}}}
 
@@ -201,8 +186,10 @@ Our implementation is publicly available on GitHub%
 
 \subfile{main_contents.tex}
 
-\appendix
-\input{appendix.tex}
+\begin{appendices}
+    \crefalias{section}{appendix}
+    \input{appendix.tex}
+\end{appendices}
 
 \begin{acknowledgements}
     This work was partially supported by JSPS KAKENHI (23H03351, 24K23853) and JST CREST (JPMJCR24Q2).

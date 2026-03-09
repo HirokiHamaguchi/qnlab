@@ -49,8 +49,8 @@ The proof of \cref{prop:bounded_BFGS} is similar to existing results~\citep[Theo
                    & \le\qty(1+\norm{\frac{y s^\top}{y^\top s}})^2\norm{H}+\norm{\frac{s s^\top}{y^\top s}}                                                                                                       \notag                                               \\
                    & \le \qty(1+\sqrt{\kappa})^2\norm{H}+\frac{1}{\lambda}.  \label{eq:BFGS_H_norm_bound}                                                                                                                &  & (\text{\cref{eq:curvature_norm_bounds}})
     \end{align}
-    Applying \cref{eq:BFGS_B_norm_bound,eq:BFGS_H_norm_bound} recursively over $p$ updates and using the
-    initial matrix $\gamma I$, we obtain
+    Recall that $\mathrm{BFGS}(\{(s_{k_i},y_{k_i})\}_{i=0}^{p-1})$ denotes the matrix obtained by sequentially applying the BFGS update to the initial matrix $\gamma I$ using the curvature pairs $\{(s_{k_i},y_{k_i})\}_{i=0}^{p-1}$.
+    Applying \cref{eq:BFGS_B_norm_bound,eq:BFGS_H_norm_bound} recursively over $p$ updates and using the initial matrix $\gamma I$, we obtain
     \begin{align*}
         \norm{\mathrm{BFGS}(\{s_{k_i},y_{k_i}\}_{i=0}^{p-1})}        & \le \gamma + p\Lambda \le (1+p) \Lambda,                                                                               \\
         \norm{(\mathrm{BFGS}(\{s_{k_i},y_{k_i}\}_{i=0}^{p-1}))^{-1}} & \le (1+\sqrt{\kappa})^{2p} \gamma^{-1} +\frac{1}{\lambda}\sum_{i=0}^{p-1}(1+\sqrt{\kappa})^{2i}                        \\
