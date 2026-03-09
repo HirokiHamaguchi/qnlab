@@ -160,7 +160,7 @@ def generate_latex_table(methods_list: list[str], table_data: pd.DataFrame):
     num_methods = len(methods_list)
 
     latex_table = (
-        r"""\begin{table}[ht]
+        r"""\begin{table}[t]
     \centering
     \caption{The number of oracle calls and final observed objective values for the experiment in \cref{sec:comp_time}.}
     \label{tab:time_results}

@@ -37,22 +37,6 @@ def individual_plot(
         vis(prob, callbacks, labels, prob_name, only_grad=True, only_plot=True)
 
 
-def generate_title(noise: np.float64, gtol: float) -> str | None:
-    """Generate title string for the performance profile plot."""
-    if noise == 0:
-        return None
-
-    noise_e = int(np.log10(noise))
-    assert np.isclose(noise, 10**noise_e)
-    gtol_e = int(np.log10(gtol))
-    assert np.isclose(gtol, 10**gtol_e)
-    return (
-        rf"noise=$10^{{{noise_e}}}$, "
-        + r"$\epsilon_{\mathrm{gtol}}="
-        + f"10^{{{gtol_e}}}$"
-    )
-
-
 def generate_output_path(precision: int, noise: np.float64, gtol: float) -> Path:
     """Generate output file path for the performance profile plot."""
     output_dir = Path("doc/imgs/compare")
@@ -93,7 +77,6 @@ def draw_pp(
 
     output_path = generate_output_path(precision, noise, gtol)
     fig_size = generate_fig_size(noise)
-    title = generate_title(noise, gtol)
 
     # Create figure with proper size for paper
     fig, ax = plt.subplots(figsize=fig_size)
@@ -117,10 +100,6 @@ def draw_pp(
         fontsize=18,
         fontweight="normal",
     )
-
-    # Set title if provided
-    if title:
-        ax.set_title(title, fontsize=25, fontweight="normal", pad=15)
 
     # Grid styling
     ax.grid(True, alpha=0.35, linestyle="-", linewidth=0.6, color="gray")
