@@ -706,7 +706,7 @@ Further specifics are available in the cited references and in our open-source i
 We next discuss the adjustment of the step size $\alpha_k$ in \refLine{line:ls_backtracking} of \cref{alg:backtracking_linesearch}.
 As indicated in the pseudo-code, we choose $\alpha_k$ using interpolation of the objective function.
 Mor\'e--Thuente line searches~\citep{10.1145/192115.192132} are widely used in quasi-Newton methods~\citep{2020SciPy-NMeth}, and they typically employ cubic or quadratic interpolation to select trial step sizes.
-In our implementation, we use an essentially identical procedure with a slight modification, namely, clipping the trial step size to the interval $[\beta_{\min}\alpha_k, \beta_{\max}\alpha_k]$.
+In our implementation, we use an essentially identical procedure, except that the trial step size is obtained by clipping it to the interval $[\beta_{\min}\alpha_k, \beta_{\max}\alpha_k]$.
 For all numerical experiments, we set the Armijo parameter to $c = 10^{-4}$ and choose the interpolation bounds as $\beta_{\min} = 1/16$ and $\beta_{\max} = 15/16$.
 
 Furthermore, when $\mu_k>0$ and $\alpha_k=1$, we introduce a one-time adjustment of the trial step size using gradient information.
@@ -816,7 +816,7 @@ We also set the maximum number of iterations to $k_{\max} = 15{,}000$ and timed 
 We used performance profiles~\citep{dolanBenchmarkingOptimizationSoftware2002} to compare the algorithms.
 Let $P$ denote the set of test problems and $S$ the set of solvers.
 For each problem $p \in P$ and solver $s \in S$, let $n_{p,s} > 0$ denote the number of oracle calls (i.e., function and gradient evaluations) required to reach a specified gradient norm tolerance $\gtol$.
-We use the number of oracle calls rather than clock time to avoid the influence of algorithmic overhead and to focus on the intrinsic optimization efficiency.
+In this experiment, we use the number of oracle calls rather than clock time to avoid the influence of algorithmic overhead and to focus on the intrinsic optimization efficiency.
 When a solver fails to converge within the gradient tolerance or exceeds a maximum number of oracle calls, we set $n_{p,s} = +\infty$.
 Then, the performance ratio $r_{p,s}$ is defined as
 \begin{equation*}
