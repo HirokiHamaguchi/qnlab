@@ -1,13 +1,9 @@
-\RequirePackage{fix-cm}
-%
-%\documentclass{svjour3}                     % onecolumn (standard format)
-%\documentclass[smallcondensed]{svjour3}     % onecolumn (ditto)
-\documentclass[dvipdfmx,smallextended]{svjour3}       % onecolumn (second format)
-%\documentclass[twocolumn]{svjour3}          % twocolumn
-%
-\smartqed  % flush right qed marks, e.g. at end of proof
-%
-\newcommand{\myQED}{\qed}
+\documentclass[11pt,dvipdfmx]{article}
+
+\usepackage[margin=1truein]{geometry}
+\usepackage{authblk}
+
+\newcommand{\myQED}{}
 
 \usepackage{graphicx}
 \usepackage{mathptmx}
@@ -17,6 +13,7 @@
 \usepackage[linesnumbered, ruled]{algorithm2e}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{amsthm}
 \usepackage{bm,bbm}
 \usepackage{booktabs}
 \usepackage{cancel}
@@ -97,7 +94,18 @@
 % \definealphabet{scr}{\mathscr}{A}{Z}
 % \definealphabet{frak}{\mathfrak}{A}{Z}
 
-\spn@wtheorem{assumption}{Assumption}{\bfseries}{\itshape}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{assumption}{Assumption}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
 
 % cleverefの設定
 \crefname{theorem}{Theorem}{Theorems}
@@ -118,55 +126,22 @@
 \newcommand{\feps}{\epsilon_\mathrm{f}}
 \newcommand{\gtol}{\epsilon_{\mathrm{gtol}}}
 
-\journalname{Mathematical Programming Computational}
-
 \begin{document}
 
-\title{Practical Regularized Quasi-Newton Methods with Inexact Function Values}
-% \titlerunning{Short form of title}    % if too long for running head
+\title{Practical Regularized Quasi-Newton Methods\\
+    with Inexact Function Values}
 
-\author{
-    Hiroki Hamaguchi\,\orcidlink{0009-0005-7348-1356} \and
-    Naoki Marumo\,\orcidlink{0000-0002-7372-4275} \and
-    Akiko Takeda\,\orcidlink{0000-0002-8846-4496}
-}
-% \authorrunning{Short form of author list} % if too long for running head
+\author[1]{Hiroki Hamaguchi\,\orcidlink{0009-0005-7348-1356}\footnote{E-mail: \href{mailto:hirokihamaguchi0331@gmail.com}{\nolinkurl{hirokihamaguchi0331@gmail.com}}}}
+\author[1]{Naoki Marumo\,\orcidlink{0000-0002-7372-4275}}
+\author[1,2]{Akiko Takeda\,\orcidlink{0000-0002-8846-4496}}
 
-\institute{
-    H. Hamaguchi \at
-    Graduate School of Information Science and Technology, The University of Tokyo, Tokyo, Japan \\
-    \email{hirokihamaguchi0331@gmail.com}
-    \and
-    N. Marumo \at
-    Graduate School of Information Science and Technology, The University of Tokyo, Tokyo, Japan
-    \and
-    A. Takeda \at
-    Graduate School of Information Science and Technology, The University of Tokyo, Tokyo, Japan \\
-    Center for Advanced Intelligence Project, RIKEN, Tokyo, Japan
-}
-
-\date{Received: date / Accepted: date}
-% The correct dates will be entered by the editor
+\affil[1]{Graduate School of Information Science and Technology, The University of Tokyo, Tokyo, Japan}
+\affil[2]{Center for Advanced Intelligence Project, RIKEN, Tokyo, Japan}
 
 \maketitle
 
 \begin{abstract}
     \input{abstract.tex}
-
-    \keywords{
-        Regularized Quasi-Newton Method \and
-        Numerical Stability \and
-        Numerical Error \and
-        AdaGrad-Norm \and
-        Objective-Function-Free Optimization
-    }
-    % \PACS{PACS code1 \and PACS code2 \and more}
-    \subclass{
-        90C53\and %: Methods of quasi-Newton type
-        90C06\and %: Large-scale problems
-        65K05\and %: Mathematical programming
-        49M15 % : Methods of Newton--Raphson, Galerkin and Ritz types
-    }
 \end{abstract}
 
 \section{Introduction}\label{sec:introduction}
@@ -184,12 +159,15 @@ Finally, in \cref{sec:conclusion}, we conclude the paper with a summary and futu
 Our implementation is publicly available on GitHub%
 \footnote{\label{fn:ourGitHub}\url{https://github.com/HirokiHamaguchi/qnlab}}.
 
+% arXiv-specific widths for Figure~\ref{fig:results_noise} in main_contents.tex
+\providecommand{\resultsNoiseMainWidth}{0.7}
+\providecommand{\resultsNoiseLegendWidth}{0.7}
+\providecommand{\resultsAllPrecisionsSubfigWidth}{0.25}
+
 \subfile{main_contents.tex}
 
-\begin{appendices}
-    \crefalias{section}{appendix}
-    \input{appendix.tex}
-\end{appendices}
+\section*{Acknowledgements}
+This work was partially supported by JSPS KAKENHI (23H03351, 24K23853) and JST CREST (JPMJCR24Q2).
 
 % BibTeX users please use one of
 \bibliographystyle{spbasic}      % basic style, author-year citations
@@ -197,23 +175,9 @@ Our implementation is publicly available on GitHub%
 %\bibliographystyle{spphys}       % APS-like style for physics
 \bibliography{../L-BFGS.bib}
 
-\section*{Statements and Declarations}
-
-\subsection*{Funding}
-
-This work was partially supported by JSPS KAKENHI (23H03351, 24K23853) and JST CREST (JPMJCR24Q2).
-
-\subsection*{Competing Interests}
-
-The authors have no relevant financial or non-financial interests to disclose.
-
-\subsection*{Author Contributions}
-
-All authors contributed to the study conception and design. The first draft of the manuscript was written by Hiroki Hamaguchi and all authors commented on previous versions of the manuscript. All authors read and approved the final manuscript.
-
-\subsection*{Data Availability}
-
-The code used in this study is publicly available at the following GitHub repository: \\
-\url{https://github.com/HirokiHamaguchi/qnlab}.
+\begin{appendices}
+    \crefalias{section}{appendix}
+    \input{appendix.tex}
+\end{appendices}
 
 \end{document}

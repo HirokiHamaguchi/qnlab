@@ -2,6 +2,12 @@
 
 \begin{document}
 
+% Default widths for the two subfigures in Figure~\ref{fig:results_noise}.
+% These can be overridden by a parent file (e.g., arXiv.tex).
+\providecommand{\resultsNoiseMainWidth}{0.9}
+\providecommand{\resultsNoiseLegendWidth}{0.8}
+\providecommand{\resultsAllPrecisionsSubfigWidth}{0.32}
+
 \section{Preliminaries and Problem Setting}
 \label{sec:preliminaries}
 
@@ -832,11 +838,11 @@ This result highlights the validity of our theoretical analysis in \cref{sec:ana
 
 \begin{figure}[t]
     \centering
-    \begin{subfigure}[b]{0.9\textwidth}
+    \begin{subfigure}[b]{\resultsNoiseMainWidth\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_pp_noise0.001_gtol1e-02.pdf}
     \end{subfigure}
-    \begin{subfigure}[b]{0.8\textwidth}
+    \begin{subfigure}[b]{\resultsNoiseLegendWidth\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_legend.pdf}
     \end{subfigure}
@@ -856,19 +862,19 @@ The proposed methods maintain stability even when traditional line search method
 \begin{figure}[t]
     \centering
     % 64-bit precision
-    \begin{subfigure}[b]{0.32\textwidth}
+    \begin{subfigure}[b]{\resultsAllPrecisionsSubfigWidth\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision64_gtol1e-01.pdf}
         \caption{64-bit, $\gtol=10^{-1}$}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\textwidth}
+    \begin{subfigure}[b]{\resultsAllPrecisionsSubfigWidth\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision64_gtol1e-03.pdf}
         \caption{64-bit, $\gtol=10^{-3}$}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\textwidth}
+    \begin{subfigure}[b]{\resultsAllPrecisionsSubfigWidth\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision64_gtol1e-05.pdf}
         \caption{64-bit, $\gtol=10^{-5}$}
@@ -877,19 +883,19 @@ The proposed methods maintain stability even when traditional line search method
     \vspace{0.5em}
 
     % 32-bit precision
-    \begin{subfigure}[b]{0.32\textwidth}
+    \begin{subfigure}[b]{\resultsAllPrecisionsSubfigWidth\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision32_gtol1e-01.pdf}
         \caption{32-bit, $\gtol=10^{-1}$}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\textwidth}
+    \begin{subfigure}[b]{\resultsAllPrecisionsSubfigWidth\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision32_gtol1e-03.pdf}
         \caption{32-bit, $\gtol=10^{-3}$}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\textwidth}
+    \begin{subfigure}[b]{\resultsAllPrecisionsSubfigWidth\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision32_gtol1e-05.pdf}
         \caption{32-bit, $\gtol=10^{-5}$}
@@ -898,19 +904,19 @@ The proposed methods maintain stability even when traditional line search method
     \vspace{0.5em}
 
     % 16-bit precision
-    \begin{subfigure}[b]{0.32\textwidth}
+    \begin{subfigure}[b]{\resultsAllPrecisionsSubfigWidth\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision16_gtol1e-01.pdf}
         \caption{16-bit, $\gtol=10^{-1}$}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\textwidth}
+    \begin{subfigure}[b]{\resultsAllPrecisionsSubfigWidth\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision16_gtol1e-03.pdf}
         \caption{16-bit, $\gtol=10^{-3}$}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\textwidth}
+    \begin{subfigure}[b]{\resultsAllPrecisionsSubfigWidth\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision16_gtol1e-05.pdf}
         \caption{16-bit, $\gtol=10^{-5}$}
