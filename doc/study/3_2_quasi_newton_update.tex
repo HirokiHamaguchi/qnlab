@@ -551,7 +551,7 @@
 \ifEn
     It is known that the BFGS update can be obtained as the solution to the following KL divergence minimization problem:
 \else
-    ここで、BFGS更新は次のKLダイバージェンス最小化問題の解として得られることが知られています。
+    ここで、BFGS更新は次のKLダイバージェンス最小化問題の解として得られることが知られています\citep[Section 7.2.4]{kanamori2016continuous}。
 \fi
 \begin{align*}
     \underset{\bar{B} \succ 0}{\mathrm{minimize}}
@@ -560,7 +560,7 @@
      & \quad \bar{B}s = y.
 \end{align*}
 
-\begin{proposition}[{\citep[Section 7.2.4]{kanamori2016continuous}}]
+\begin{proposition}
     \ifEn
         Let $y^\top s > 0$ and $B \succ 0$ be a symmetric positive definite matrix. The solution to the above optimization problem is given by the BFGS update formula.
     \else

@@ -1,5 +1,3 @@
-%!LW recipe=uplatex
-
 \documentclass[0_main]{subfiles}
 
 \begin{document}
@@ -130,9 +128,9 @@
     B_{k+1} s_k = y_k.
 \end{equation*}
 \ifEn
-    This relation is called the secant condition or the quasi-Newton equation.
+    This relation is called the secant condition or the quasi-Newton equation~\citep{nocedal1999numerical}.
 \else
-    この関係はセカント条件、または準ニュートン方程式と呼ばれています。
+    この関係はセカント条件、または準ニュートン方程式と呼ばれています\citep{nocedal1999numerical}。
 \fi
 
 \ifEn
@@ -169,5 +167,10 @@
 \else
     これは、セカント条件により二次モデル $m_{k+1}(x)$ が、以前の関数値 $f(x_k)$ を除き、$x_{k+1}$ と $x_k$ の両方における既知の情報を正確に反映していることを意味しています。
 \fi
+
+\ifSubfilesClassLoaded{
+    \bibliographystyle{plainnat}
+    \bibliography{../L-BFGS.bib}
+}{}
 
 \end{document}

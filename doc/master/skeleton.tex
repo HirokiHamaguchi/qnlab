@@ -1,7 +1,9 @@
-\documentclass[uplatex,english,suri,master]{suribt}
+%!LW recipe=uplatex&pbibtex
+
+\documentclass[uplatex,english,suri,master,dvipdfmx]{suribt}
 %\documentclass[oneside]{suribt}% 本文が * ページ以下のときに (掲示に注意)
 
-\usepackage[dvipdfmx]{graphicx}
+\usepackage{graphicx}
 \usepackage{mathptmx}
 
 \usepackage{ascmac}
@@ -149,7 +151,7 @@
 
 \frontmatter% ここから前文
 \begin{abstract}%%%%%%%%%%%%% 概要 %%%%%%%%
-    \input{../main/abstract.tex}
+  \input{../main/abstract.tex}
 \end{abstract}
 
 \tableofcontents%%%%%%%%%%%%% 目次 %%%%%%%%
