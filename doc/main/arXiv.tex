@@ -1,3 +1,4 @@
+% !LW recipe=pdflatex
 \documentclass[11pt]{article}
 
 \usepackage[margin=1truein]{geometry}
@@ -169,11 +170,12 @@ Our implementation is publicly available on GitHub%
 \section*{Acknowledgements}
 This work was partially supported by JSPS KAKENHI (23H03351, 24K23853) and JST CREST (JPMJCR24Q2).
 
-% BibTeX users please use one of
-% \bibliographystyle{spbasic}      % basic style, author-year citations
-\bibliographystyle{spmpsci}      % mathematics and physical sciences
-%\bibliographystyle{spphys}       % APS-like style for physics
-\bibliography{../L-BFGS.bib}
+% % BibTeX users please use one of
+% % \bibliographystyle{spbasic}      % basic style, author-year citations
+% \bibliographystyle{spmpsci}      % mathematics and physical sciences
+% %\bibliographystyle{spphys}       % APS-like style for physics
+% \bibliography{../L-BFGS.bib}
+\input{arXiv.bbl}
 
 \begin{appendices}
     \crefalias{section}{appendix}
