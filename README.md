@@ -1,12 +1,21 @@
 # QNLab
 
-https://pypi.org/project/qnlab/
-
 QNLab is a research repository containing the implementation of our paper "Practical Regularized Quasi-Newton Methods with Inexact Function Values." It also includes various quasi-Newton methods, specifically focusing on L-BFGS variants.
 
 ## Features
 
-(Under Construction)
+- **Noise-tolerant L-BFGS method:**
+  We developed a noise-tolerant and practically fast L-BFGS method.
+
+  ![Performance profile under noisy evaluations](doc/imgs/compare/_pp_noise0.001_gtol1e-02.png)
+  ![legend](doc/imgs/compare/_legend.png)
+
+- **Quasi-Newton methods in pure Python:**
+  We also provide implementations of various quasi-Newton methods in pure Python, which can be easily used and modified for research purposes.
+
+- **Documents about Quasi-Newton Methods:**
+  We have some documents about basic of quasi-Newton methods.
+  See [doc/study/0_main.pdf](doc/study/0_main.pdf).
 
 ## Setup for Users
 
