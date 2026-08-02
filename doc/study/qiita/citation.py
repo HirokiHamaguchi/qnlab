@@ -63,27 +63,14 @@ def _sanitize_bbl_text(text: str) -> str:
 
 def _iter_bbl_entries(lines: Iterable[str]) -> Iterable[Tuple[str, str]]:
     """Yield (key, raw_text) entries from a .bbl file."""
-    key = None
-    buffer: list[str] = []
-    bibitem_re = re.compile(r"^\\bibitem(?:\[[^\]]*\])?\{([^}]+)\}")
-    end_re = re.compile(r"^\\end\{thebibliography\}")
+    content = "".join(lines)
+    content = content.split("\\end{thebibliography}", maxsplit=1)[0]
+    bibitem_re = re.compile(r"\\bibitem(?:\[[^\]]*\])?\{([^}]+)\}")
+    matches = list(bibitem_re.finditer(content))
 
-    for line in lines:
-        if end_re.match(line):
-            break
-        match = bibitem_re.match(line)
-        if match:
-            if key is not None:
-                yield key, "".join(buffer)
-            key = match.group(1).strip()
-            buffer = []
-            continue
-
-        if key is not None:
-            buffer.append(line)
-
-    if key is not None:
-        yield key, "".join(buffer)
+    for index, match in enumerate(matches):
+        entry_end = matches[index + 1].start() if index + 1 < len(matches) else len(content)
+        yield match.group(1).strip(), content[match.end() : entry_end]
 
 
 def generate_cite_mapping_from_bbl(
@@ -109,6 +96,10 @@ def generate_cite_mapping_from_bbl(
         lines = f.readlines()
 
     mapping: Dict[str, str] = {}
+    if output_path.exists():
+        with open(output_path, "r", encoding="utf-8") as f:
+            mapping.update(json.load(f))
+
     for key, raw_text in _iter_bbl_entries(lines):
         mapping[key] = _sanitize_bbl_text(raw_text)
 

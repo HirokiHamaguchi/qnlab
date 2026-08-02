@@ -34,6 +34,9 @@ def post_process_content(content: str) -> str:
     content = convert_equation_environments(content)
     # Convert \href{url}{alt} to Markdown links
     content = convert_href_to_md(content)
+    # Render common LaTeX diaeresis commands as Unicode in prose.
+    content = content.replace(r'{\"o}', "ö").replace(r'{\"O}', "Ö")
+    content = content.replace(r"{\'e}", "é").replace(r"{\'E}", "É")
     # Then convert nested itemize/enumerate
     content = convert_nested_itemize_enumerate(content)
     # Remove labels and \myQED
@@ -97,5 +100,8 @@ def for_qiita_post_process(content: str) -> str:
 
     # Apply citep conversion with footnote definitions
     res2 = convert_citep(res2)
+    # BibTeX output may omit the grouping braces around accent commands.
+    res2 = res2.replace(r'\"o', "ö").replace(r'\"O', "Ö")
+    res2 = res2.replace(r"\'e", "é").replace(r"\'E", "É")
 
     return res2

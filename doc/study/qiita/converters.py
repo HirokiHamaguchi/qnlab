@@ -10,7 +10,7 @@ from typing import Dict, List
 sys.path.insert(0, str(Path(__file__).parent))
 
 from config import ENV_DISPLAY_NAMES, GITHUB_RAW_URL_BASE, USE_GITHUB_URL
-from utils import extract_braced_content
+from utils import extract_braced_content, find_matching
 
 
 def convert_cref(line: str, label_map: Dict[str, tuple]) -> str:
@@ -54,9 +54,17 @@ def convert_section_commands(line: str) -> str:
         ("subparagraph", "######"),
     ]
     for cmd, heading in section_mappings:
-        pattern = rf"\\{cmd}\{{([^}}]*)\}}"
-        replacement = rf"{heading} \1"
-        line = re.sub(pattern, replacement, line)
+        command = rf"\{cmd}{{"
+        search_from = 0
+        while (command_pos := line.find(command, search_from)) != -1:
+            brace_start = command_pos + len(command) - 1
+            brace_end = find_matching(line, brace_start)
+            if brace_end == -1:
+                break
+            title = line[brace_start + 1 : brace_end]
+            replacement = f"{heading} {title}"
+            line = line[:command_pos] + replacement + line[brace_end + 1 :]
+            search_from = command_pos + len(replacement)
     return line
 
 
@@ -118,13 +126,38 @@ def convert_nested_itemize_enumerate(content: str) -> str:
 
 def convert_href_to_md(content: str) -> str:
     r"""Convert \href{url}{alt} to Markdown [alt](url)."""
+    result: List[str] = []
+    cursor = 0
 
-    def href_replace(match: re.Match[str]) -> str:
-        url = match.group(1)
-        alt = match.group(2)
-        return f"[{alt}]({url})"
+    while True:
+        command_pos = content.find(r"\href{", cursor)
+        if command_pos == -1:
+            result.append(content[cursor:])
+            break
 
-    return re.sub(r"\\href\{([^}]+)\}\{([^}]+)\}", href_replace, content)
+        result.append(content[cursor:command_pos])
+        url_start = command_pos + len(r"\href")
+        url_end = find_matching(content, url_start)
+        alt_start = url_end + 1
+
+        if url_end == -1 or alt_start >= len(content) or content[alt_start] != "{":
+            result.append(content[command_pos : command_pos + 1])
+            cursor = command_pos + 1
+            continue
+
+        alt_end = find_matching(content, alt_start)
+        if alt_end == -1:
+            result.append(content[command_pos : command_pos + 1])
+            cursor = command_pos + 1
+            continue
+
+        url = content[url_start + 1 : url_end]
+        alt = content[alt_start + 1 : alt_end]
+        alt = alt.replace(r'{\"o}', "ö").replace(r'{\"O}', "Ö")
+        result.append(f"[{alt}]({url})")
+        cursor = alt_end + 1
+
+    return "".join(result)
 
 
 def convert_subfile_to_md(content: str) -> str:
