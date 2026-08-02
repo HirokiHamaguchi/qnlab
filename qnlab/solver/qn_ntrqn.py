@@ -1,9 +1,9 @@
 from collections import deque
-from typing import Deque, Tuple, Union
+from typing import Tuple, Union
 
 import numpy as np
 import numpy.typing as npt
-from scipy.optimize._linesearch import _cubicmin, _quadmin
+from scipy.optimize._linesearch import _cubicmin, _quadmin  # type: ignore
 
 from qnlab.parameter import NTRQNParameter
 from qnlab.problem.base import BaseProblem
@@ -159,8 +159,8 @@ def qn_ntrqn(
     g = prob.g(x)
 
     lm = QuasiNewtonMemory(g, param.m, method)
-    pf: Deque[np.float64] = deque([], maxlen=param.past)
-    pf2: Deque[np.float64] = deque([fx], maxlen=param.non_monotone)
+    pf: deque[np.float64] = deque([], maxlen=param.past)
+    pf2: deque[np.float64] = deque([fx], maxlen=param.non_monotone)
     gnorm: np.float64 = np.float64(np.linalg.norm(g))
 
     if not np.isfinite(gnorm):
@@ -217,7 +217,7 @@ def qn_ntrqn(
         lm.add_new_data(new_x, new_f, new_g, x, fx, g, callback, eps)
 
         if mu == 0.0:
-            min_fx_minus_delta = min(min_fx_minus_delta, fx - delta)
+            min_fx_minus_delta = np.minimum(min_fx_minus_delta, fx - delta)
 
         x, fx, g = new_x, new_f, new_g
         k += 1

@@ -75,3 +75,8 @@ packages = ["qnlab"]
 [tool.pydocstyle]
 convention = "google"
 add-ignore = ["D100", "D104"]
+
+[dependency-groups]
+dev = [
+    "scipy-stubs>=1.18.0.1",
+]

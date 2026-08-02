@@ -1,0 +1,25 @@
+{
+    "cSpell.words": [
+        "armijo",
+        "BFGS",
+        "cand",
+        "cchk",
+        "cubicmin",
+        "dnorm",
+        "gnorm",
+        "gtol",
+        "interpolant",
+        "interpolants",
+        "linalg",
+        "linesearch",
+        "MAXIMUMLINESEARCH",
+        "mypy",
+        "NTRQN",
+        "offo",
+        "pycache",
+        "qchk",
+        "qnlab",
+        "quadmin",
+        "venv"
+    ]
+}

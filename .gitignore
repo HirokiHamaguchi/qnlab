@@ -6,7 +6,6 @@ __pycache__
 .venv
 .DS_Store
 *.bbl
-.vscode
 secret
 
 TODO.md
