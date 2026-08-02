@@ -1215,6 +1215,12 @@
 \fi
 
 \ifEn
+    For more information, see \href{https://en.wikipedia.org/wiki/Compact_quasi-Newton_representation}{Compact quasi-Newton representation}.
+\else
+    詳細については、\href{https://en.wikipedia.org/wiki/Compact_quasi-Newton_representation}{Compact quasi-Newton representation}を参照してください。
+\fi
+
+\ifEn
     \subsubsection{Two-Loop Recursion}
 \else
     \subsubsection{二重ループ再帰}
@@ -1292,7 +1298,7 @@
         r^{(i+1)}
          & = r^{(i)} + s_i \left(\rho_i s_i^\top q^{(i+1)} - \rho_i y_i^\top r^{(i)}\right)                                  \\
          & = r^{(i)} + \rho_i s_i s_i^\top \left(V_{i+1} V_{i+2} \cdots V_{m-1}\right) q - \rho_i s_i y_i^\top r^{(i)}       \\
-         & = \left(I- \rho_i y_i s_i^\top\right) r^{(i)} + \rho_i s_i s_i^\top \left(V_{i+1} V_{i+2} \cdots V_{m-1}\right) q \\
+         & = \left(I- \rho_i s_i y_i^\top\right) r^{(i)} + \rho_i s_i s_i^\top \left(V_{i+1} V_{i+2} \cdots V_{m-1}\right) q \\
          & =
         V_i^\top r^{(i)}
         +

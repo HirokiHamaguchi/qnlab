@@ -65,7 +65,7 @@
 \ifEn
     We can overcome this limitation by utilizing the function values. The basic idea is illustrated in \cref{fig:cubic_interpolation}. Even when the gradients are the same at two points $x_k$ and $x_{k+1}$, natural interpolation of function values differs depending on the function values $f(x_k)$ and $f(x_{k+1})$. This observation motivates the modified secant condition, which incorporates function value information to improve Hessian approximation.
 \else
-    この問題は、関数値を利用することで克服できます。基本的な考え方は \cref{fig:cubic_interpolation} に示した通りです。2 点 $x_k$ と $x_{k+1}$ で勾配が同じであっても、適切な補完は関数値 $f(x_k)$ と $f(x_{k+1})$ によって異なります。この観察こそが、関数値情報を取り込んでヘッセ行列の近似を改善する修正セカント条件の動機を端的に示しています。
+    この問題は、関数値を利用することで克服できます。基本的な考え方は \cref{fig:cubic_interpolation} に示した通りです。2 点 $x_k$ と $x_{k+1}$ で勾配が同じであっても、適切な補間は関数値 $f(x_k)$ と $f(x_{k+1})$ によって異なります。この観察こそが、関数値情報を取り込んでヘッセ行列の近似を改善する修正セカント条件の動機を端的に示しています。
 \fi
 
 \begin{figure}[t]
@@ -75,7 +75,7 @@
         \ifEn
             Basic idea of the modified secant condition. Even when the gradients are the same at two points $x_k$ and $x_{k+1}$, natural interpolation of function values differs depending on the function values $f(x_k)$ and $f(x_{k+1})$.
         \else
-            修正セカント条件の基本的な考え方。$x_k$ と $x_{k+1}$ で同一の勾配を持つが異なる関数値を持つ場合、適切な補完は異なります。
+            修正セカント条件の基本的な考え方。$x_k$ と $x_{k+1}$ で同一の勾配を持つが異なる関数値を持つ場合、適切な補間は異なります。
         \fi
     }
     \label{fig:cubic_interpolation}
@@ -177,9 +177,9 @@
     \includegraphics[width=0.7\textwidth]{../imgs/modified_secant/trial_2.pdf}
     \caption{
     \ifEn
-        Function-value-matching modified secant equation. The function values $f(x_{k})$ and $m_k^{\mathrm{F}}(x_{k})$ are matched at the previous point $x_{k}$.
+        Function-value-matching modified secant equation. The function values $f(x_{k})$ and $m_{k+1}^{\mathrm{F}}(x_{k})$ are matched at the previous point $x_{k}$.
     \else
-        関数値一致の修正セカント方程式。前の点 $x_{k}$ での関数値 $f(x_{k})$ と $m_k^{\mathrm{F}}(x_{k})$ が一致している。
+        関数値一致の修正セカント方程式。前の点 $x_{k}$ での関数値 $f(x_{k})$ と $m_{k+1}^{\mathrm{F}}(x_{k})$ が一致している。
     \fi
     }
     \label{fig:yuan_msec}
@@ -193,7 +193,7 @@
 \label{subsubsec:zhang}
 
 \ifEn
-    The second modification secant condition introduces a cubic term to the model, allowing simultaneous satisfaction of both the function value and the gradient matching at the previous point~\citep{zhangNewQuasiNewtonEquation1999, zhangPropertiesNumericalPerformance2001,yabeLocalSuperlinearConvergence2007}.
+    The second modified secant condition introduces a cubic term to the model, allowing simultaneous satisfaction of both the function value and the gradient matching at the previous point~\citep{zhangNewQuasiNewtonEquation1999, zhangPropertiesNumericalPerformance2001,yabeLocalSuperlinearConvergence2007}.
 \else
     2つ目の修正セカント条件では、モデルに三次項を導入し、前の点での関数値と勾配の両方の一致を同時に満たすことを可能にします~\citep{zhangNewQuasiNewtonEquation1999, zhangPropertiesNumericalPerformance2001,yabeLocalSuperlinearConvergence2007}。
 \fi

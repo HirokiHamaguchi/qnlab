@@ -168,6 +168,53 @@
     これは、セカント条件により二次モデル $m_{k+1}(x)$ が、以前の関数値 $f(x_k)$ を除き、$x_{k+1}$ と $x_k$ の両方における既知の情報を正確に反映していることを意味しています。
 \fi
 
+\ifEn
+    \subsection{Superlinear Convergence and the Dennis--Mor{\'e} Condition}
+\else
+    \subsection{超線形収束と Dennis--Mor{\'e} 条件}
+\fi
+
+\ifEn
+    Q-convergence is short for quotient-convergence, referring to convergence rates defined through quotients of successive errors. In particular,
+
+    A sequence $\{ x_k \}$ converging to $x^*$ is said to converge Q-superlinearly if
+\else
+    Q-収束は quotient-convergence(商による収束)の略であり、連続する誤差の比によって定義される収束率を指します。特に、
+
+    $x^*$ に収束する点列 $\{ x_k \}$ が Q-超線形収束するとは、
+\fi
+\begin{equation*}
+    \lim_{k\to\infty}\frac{\left\lVert x_{k+1}-x^*\right\rVert}{\left\lVert x_k-x^*\right\rVert}=0
+\end{equation*}
+\ifEn
+    holds. Thus, the contraction factor itself approaches zero, which is stronger than Q-linear convergence with a fixed contraction factor less than one.
+
+    The Dennis--Mor{\'e} condition characterizes when a Newton-like iteration achieves this rate~\citep{dennisMoreCharacterizationSuperlinear1974,dennisjr.QuasiNewtonMethodsMotivation1977}. Consider the iteration
+\else
+    が成り立つことをいいます。したがって、一定の収縮率が1未満である Q-線形収束よりも強く、収縮率そのものが0へ近づきます。
+
+    Newton 型の反復がこの収束率を達成するための条件の一つがDennis--Mor{\'e} 条件です~\citep{dennisMoreCharacterizationSuperlinear1974,dennisjr.QuasiNewtonMethodsMotivation1977}。次の更新
+\fi
+\begin{equation*}
+    B_k s_k=-\nabla f(x_k), \qquad x_{k+1}=x_k+s_k
+\end{equation*}
+\ifEn
+    and suppose that $x_k\to x^*$, $x_k\neq x^*$, $\nabla f(x^*)=0$, and that $\nabla^2 f$ is continuous near $x^*$ with the matrix $\nabla^2 f(x^*)$ nonsingular. Then the convergence is Q-superlinear if and only if
+\else
+    を考えます。$x_k\to x^*$、$x_k\neq x^*$、$\nabla f(x^*)=0$ とし、$x^*$ の近傍で $\nabla^2 f$ が連続かつ $\nabla^2 f(x^*)$ が正則であると仮定します。このとき、Q-超線形収束することと次の条件は同値です。
+\fi
+\begin{equation}
+    \lim_{k\to\infty}
+    \frac{\left\lVert \left(B_k-\nabla^2 f(x^*)\right)s_k\right\rVert}
+         {\left\lVert s_k\right\rVert}=0.
+    \label{eq:dennis-more}
+\end{equation}
+\ifEn
+    This is the Dennis--Mor{\'e} condition. See also~\citep{jinNonasymptoticGlobalConvergence2025}.
+\else
+    これを Dennis--Mor{\'e} 条件と呼びます。詳しくは~\citep{jinNonasymptoticGlobalConvergence2025}などを参照してください。
+\fi
+
 \ifSubfilesClassLoaded{
     \bibliographystyle{plainnat}
     \bibliography{../L-BFGS.bib}
