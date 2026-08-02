@@ -7,6 +7,7 @@ BaseType = Literal[
     "Kanzow",
     "KanzowSec",
     "NTRQN",
+    "NTRQNB",
     "SciPy",
     "NTQN",
     "GradientDescent",
@@ -86,7 +87,7 @@ class Method:
         elif self.base == "Newton":
             return "Newton"
         else:
-            label = "NTRQN"
+            label = self.base
 
             if self.store == "cautious":
                 label += "_StoreC"

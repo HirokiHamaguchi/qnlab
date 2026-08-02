@@ -57,7 +57,7 @@ class Callback:
         self._reset()
         self.callback(
             prob,
-            prob.x0,
+            x0,
             prob.f(x0, count=False),
             prob.g(x0, count=False),
         )
