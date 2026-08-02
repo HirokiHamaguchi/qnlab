@@ -429,6 +429,23 @@
   file = {C:\Users\hirok\Zotero\storage\35KFNGHM\Dehghani et al. - 2018 - A new modified BFGS method for unconstrained optim.pdf}
 }
 
+@article{dennisCharacterizationSuperlinearConvergence1974,
+  title = {A {{Characterization}} of {{Superlinear Convergence}} and {{Its Application}} to {{Quasi-Newton Methods}}},
+  author = {Dennis, J. E. and Mor{\'e}, Jorge J.},
+  year = 1974,
+  journal = {Mathematics of Computation},
+  volume = {28},
+  number = {126},
+  eprint = {2005926},
+  eprinttype = {jstor},
+  pages = {549--560},
+  publisher = {American Mathematical Society},
+  issn = {0025-5718},
+  doi = {10.2307/2005926},
+  urldate = {2026-08-02},
+  abstract = {Let \$F\$ be a mapping from real \$n\$-dimensional Euclidean space into itself. Most practical algorithms for finding a zero of \$F\$ are of the form \$\$x\_\textbraceleft k+1\textbraceright{} = x\_k - B\_k\textasciicircum\textbraceleft -1\textbraceright Fx\_k,\$\$ where \$\textbackslash\textbraceleft B\_k\textbackslash\textbraceright\$ is a sequence of nonsingular matrices. The main result of this paper is a characterization theorem for the superlinear convergence to a zero of \$F\$ of sequences of the above form. This result is then used to give a unified treatment of the results on the superlinear convergence of the Davidon-Fletcher-Powell method obtained by Powell for the case in which exact line searches are used, and by Broyden, Dennis, and Mor\'e for the case without line searches. As a by-product, several results on the asymptotic behavior of the sequence \$\textbackslash\textbraceleft B\_k\textbackslash\textbraceright\$ are obtained. An interesting aspect of these results is that superlinear convergence is obtained without any consistency conditions; i.e., without requiring that the sequence \$\textbackslash\textbraceleft B\_k\textbackslash\textbraceright\$ converge to the Jacobian matrix of \$F\$ at the zero. In fact, a modification of an example due to Powell shows that most of the known quasi-Newton methods are not, in general, consistent. Finally, it is pointed out that the above-mentioned characterization theorem applies to other single and double rank quasi-Newton methods, and that the results of this paper can be used to obtain their superlinear convergence.}
+}
+
 @article{dennisjr.QuasiNewtonMethodsMotivation1977,
   title = {Quasi-{{Newton Methods}}, {{Motivation}} and {{Theory}}},
   author = {Dennis, Jr., J. E. and Mor{\'e}, Jorge J.},
@@ -669,9 +686,10 @@
   title = {{Analytical study of the Least Squares Quasi-Newton method for interaction problems}},
   author = {Haelterman, Robby},
   year = 2009,
-  abstract = {Diss. doct. ingenieurswetenschappen},
+  abstract = {Often in nature different systems interact, like fluids and structures, heat and electricity, populations of species, etc. It is our aim in this thesis to find, describe and analyze solution methods to solve the equations resulting from the mathematical models describing those interacting systems. Even if powerful solvers often already exist for problems in a single physical domain (e.g. structural or fluid problems), the development of similar tools for multi-physics problems is still ongoing. When the interaction (or coupling) between the two systems is strong, many methods still fail or are computationally very expensive. Approaches for solving these multi-physics problems can be broadly put in two categories: monolithic or partitioned. While we are not claiming that the partitioned approach is panacea for all coupled problems, we will only focus our attention in this thesis on studying methods to solve (strongly) coupled problems with a partitioned approach in which each of the physical problems is solved with a specialized code that we consider to be a black box solver and of which the Jacobian is unknown. We also assume that calling these black boxes is the most expensive part of any algorithm, so that performance is judged by the number of times these are called. In 2005 Vierendeels presented a new coupling procedure for this partitioned approach in a fluid-structure interaction context, based on sensitivity analysis of the important displacement and pressure modes which are detected during the iteration process. This approach only uses input-output couples of the solvers (one for the fluid problem and one for the structural problem). In this thesis we will focus on establishing the properties of this method and show that it can be interpreted as a block quasi-Newton method with approximate Jacobians based on a least squares formulation. We also establish and investigate other algorithms that exploit the original idea but use a single approximate Jacobian. The main focus in this thesis lies on establishing the algebraic properties of the methods under investigation and not so much on the best implementation form.},
   isbn = {978-90-8578-274-2},
-  langid = {mul}
+  langid = {mul},
+  school = {Ghent University}
 }
 
 @article{Hamel2024,
@@ -745,6 +763,21 @@
   pages = {150--194},
   publisher = {Inderscience Publishers Ltd},
   file = {C:\Users\hirok\Zotero\storage\T86UZ3NJ\1308.4008v1.pdf}
+}
+
+@article{jinNonasymptoticGlobalConvergence2025,
+  title = {Non-Asymptotic Global Convergence Rates of {{BFGS}} with Exact Line Search},
+  author = {Jin, Qiujiang and Jiang, Ruichen and Mokhtari, Aryan},
+  year = 2025,
+  month = aug,
+  journal = {Mathematical Programming},
+  issn = {1436-4646},
+  doi = {10.1007/s10107-025-02256-7},
+  urldate = {2026-08-02},
+  abstract = {In this paper, we explore the non-asymptotic global convergence rates of the Broyden-Fletcher-Goldfarb-Shanno (BFGS) method implemented with exact line search. Notably, due to Dixon's equivalence result, our findings are also applicable to other quasi-Newton methods in the convex Broyden class employing exact line search, such as the Davidon-Fletcher-Powell (DFP) method. Specifically, we focus on problems where the objective function is strongly convex with Lipschitz continuous gradient and Hessian. Our results hold for any initial point and any symmetric positive definite initial Hessian approximation matrix. The analysis unveils a detailed three-phase convergence process, characterized by distinct linear and superlinear rates, contingent on the iteration progress. Additionally, our theoretical findings demonstrate the trade-offs between linear and superlinear convergence rates for BFGS when we modify the initial Hessian approximation matrix, a phenomenon further corroborated by our numerical experiments.},
+  langid = {english},
+  keywords = {90-08,90C25,90C53,BFGS,Global convergence rate,Non-asymptotic analysis,Quasi-Newton},
+  file = {C:\Users\hirok\Zotero\storage\UES4D6AF\Jin et al. - 2025 - Non-asymptotic global convergence rates of BFGS with exact line search.pdf}
 }
 
 @misc{kamzolovCubicRegularizationKey2023,
@@ -1341,7 +1374,6 @@
   title = {Modeling {{Hessian-vector}} Products in Nonlinear Optimization: New {{Hessian-free}} Methods},
   author = {Song, L and Vicente, L N},
   year = 2021,
-  month = apr,
   journal = {IMA Journal of Numerical Analysis},
   volume = {42},
   number = {2},

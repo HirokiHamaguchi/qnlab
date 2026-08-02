@@ -1,3 +1,7 @@
 OR
 secret
-**/*.synctex.gz
+*.synctex.gz
+*.aux
+*.blg
+*.log
+*.out
