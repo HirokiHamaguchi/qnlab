@@ -69,7 +69,9 @@ def _iter_bbl_entries(lines: Iterable[str]) -> Iterable[Tuple[str, str]]:
     matches = list(bibitem_re.finditer(content))
 
     for index, match in enumerate(matches):
-        entry_end = matches[index + 1].start() if index + 1 < len(matches) else len(content)
+        entry_end = (
+            matches[index + 1].start() if index + 1 < len(matches) else len(content)
+        )
         yield match.group(1).strip(), content[match.end() : entry_end]
 
 

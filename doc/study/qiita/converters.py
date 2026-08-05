@@ -153,7 +153,7 @@ def convert_href_to_md(content: str) -> str:
 
         url = content[url_start + 1 : url_end]
         alt = content[alt_start + 1 : alt_end]
-        alt = alt.replace(r'{\"o}', "ö").replace(r'{\"O}', "Ö")
+        alt = alt.replace(r"{\"o}", "ö").replace(r"{\"O}", "Ö")
         result.append(f"[{alt}]({url})")
         cursor = alt_end + 1
 
@@ -370,7 +370,9 @@ def convert_figure_to_md(block: str, counter: int) -> str:
             if width is not None:
                 if "modified_secant/trial" in image_path:
                     width = "100"
-                img_tags.append(f'<img width="{width}%" src="{url}" alt="{alt_text}" />')
+                img_tags.append(
+                    f'<img width="{width}%" src="{url}" alt="{alt_text}" />'
+                )
             else:
                 img_tags.append(f'<img src="{url}" alt="{alt_text}" />')
         result = "".join(img_tags) + "\n"

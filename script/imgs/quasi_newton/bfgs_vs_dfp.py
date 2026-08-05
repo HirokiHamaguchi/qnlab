@@ -78,10 +78,7 @@ def plot_trajectories(lambda_, x_bfgs, x_dfp):
 
     # Create visualization with 2x1 layout
     # Fixed figsize for consistent appearance
-    fig, axes = plt.subplots(
-        1, 2, figsize=(13, 6),
-        facecolor='white'
-    )
+    fig, axes = plt.subplots(1, 2, figsize=(13, 6), facecolor="white")
 
     x_range = np.linspace(xmin, xmax, 150)
     y_range = np.linspace(ymin, ymax, 150)
@@ -89,10 +86,10 @@ def plot_trajectories(lambda_, x_bfgs, x_dfp):
     Z = 0.5 * (X**2 + Y**2)  # quadratic function f(x) = 0.5 * ||x||^2
 
     # Color for contour lines
-    contour_color = '#2C3E50'
+    contour_color = "#2C3E50"
 
     # Plot 1: Function contour with BFGS trajectory
-    cf1 = axes[0].contourf(X, Y, Z, levels=20, cmap='viridis', alpha=0.7)
+    cf1 = axes[0].contourf(X, Y, Z, levels=20, cmap="viridis", alpha=0.7)
     axes[0].contour(X, Y, Z, levels=20, colors=contour_color, linewidths=0.5, alpha=0.4)
 
     # Plot BFGS trajectory with improved styling
@@ -100,45 +97,51 @@ def plot_trajectories(lambda_, x_bfgs, x_dfp):
         x_bfgs[:, 0],
         x_bfgs[:, 1],
         "o-",
-        color='#E74C3C',
+        color="#E74C3C",
         markersize=6,
         linewidth=2.5,
         label="BFGS",
         alpha=0.85,
-        markeredgecolor='white',
-        markeredgewidth=1.0
+        markeredgecolor="white",
+        markeredgewidth=1.0,
     )
     axes[0].plot(
-        x_bfgs[0, 0], x_bfgs[0, 1],
+        x_bfgs[0, 0],
+        x_bfgs[0, 1],
         "o",
-        color='#27AE60',
+        color="#27AE60",
         markersize=12,
         label="Start",
-        markeredgecolor='white',
+        markeredgecolor="white",
         markeredgewidth=1.5,
-        zorder=5
+        zorder=5,
     )
     axes[0].plot(
-        0, 0,
+        0,
+        0,
         "*",
-        color='#F39C12',
+        color="#F39C12",
         markersize=20,
         label="Minimum",
-        markeredgecolor='white',
+        markeredgecolor="white",
         markeredgewidth=1.0,
-        zorder=4
+        zorder=4,
     )
 
-    axes[0].set_title(f"BFGS Trajectory (λ={lambda_})", fontsize=18, fontweight='bold', pad=20)
-    axes[0].set_xlabel("$x_1$", fontsize=16, fontweight='bold')
-    axes[0].set_ylabel("$x_2$", fontsize=16, fontweight='bold')
-    axes[0].legend(fontsize=13, framealpha=0.95, loc='best', edgecolor='black', fancybox=True)
-    axes[0].tick_params(axis='both', which='major', labelsize=12)
-    axes[0].grid(True, alpha=0.2, linestyle='--', linewidth=0.5)
+    axes[0].set_title(
+        f"BFGS Trajectory (λ={lambda_})", fontsize=18, fontweight="bold", pad=20
+    )
+    axes[0].set_xlabel("$x_1$", fontsize=16, fontweight="bold")
+    axes[0].set_ylabel("$x_2$", fontsize=16, fontweight="bold")
+    axes[0].legend(
+        fontsize=13, framealpha=0.95, loc="best", edgecolor="black", fancybox=True
+    )
+    axes[0].tick_params(axis="both", which="major", labelsize=12)
+    axes[0].grid(True, alpha=0.2, linestyle="--", linewidth=0.5)
     axes[0].set_aspect("equal")
 
     # Plot 2: Function contour with DFP trajectory
-    cf2 = axes[1].contourf(X, Y, Z, levels=20, cmap='viridis', alpha=0.7)
+    cf2 = axes[1].contourf(X, Y, Z, levels=20, cmap="viridis", alpha=0.7)
     axes[1].contour(X, Y, Z, levels=20, colors=contour_color, linewidths=0.5, alpha=0.4)
 
     # Plot DFP trajectory with improved styling
@@ -146,41 +149,47 @@ def plot_trajectories(lambda_, x_bfgs, x_dfp):
         x_dfp[:, 0],
         x_dfp[:, 1],
         "o-",
-        color='#3498DB',
+        color="#3498DB",
         markersize=6,
         linewidth=2.5,
         label="DFP",
         alpha=0.85,
-        markeredgecolor='white',
-        markeredgewidth=1.0
+        markeredgecolor="white",
+        markeredgewidth=1.0,
     )
     axes[1].plot(
-        x_dfp[0, 0], x_dfp[0, 1],
+        x_dfp[0, 0],
+        x_dfp[0, 1],
         "o",
-        color='#27AE60',
+        color="#27AE60",
         markersize=12,
         label="Start",
-        markeredgecolor='white',
+        markeredgecolor="white",
         markeredgewidth=1.5,
-        zorder=5
+        zorder=5,
     )
     axes[1].plot(
-        0, 0,
+        0,
+        0,
         "*",
-        color='#F39C12',
+        color="#F39C12",
         markersize=20,
         label="Minimum",
-        markeredgecolor='white',
+        markeredgecolor="white",
         markeredgewidth=1.0,
-        zorder=4
+        zorder=4,
     )
 
-    axes[1].set_title(f"DFP Trajectory (λ={lambda_})", fontsize=18, fontweight='bold', pad=20)
-    axes[1].set_xlabel("$x_1$", fontsize=16, fontweight='bold')
-    axes[1].set_ylabel("$x_2$", fontsize=16, fontweight='bold')
-    axes[1].legend(fontsize=13, framealpha=0.95, loc='best', edgecolor='black', fancybox=True)
-    axes[1].tick_params(axis='both', which='major', labelsize=12)
-    axes[1].grid(True, alpha=0.2, linestyle='--', linewidth=0.5)
+    axes[1].set_title(
+        f"DFP Trajectory (λ={lambda_})", fontsize=18, fontweight="bold", pad=20
+    )
+    axes[1].set_xlabel("$x_1$", fontsize=16, fontweight="bold")
+    axes[1].set_ylabel("$x_2$", fontsize=16, fontweight="bold")
+    axes[1].legend(
+        fontsize=13, framealpha=0.95, loc="best", edgecolor="black", fancybox=True
+    )
+    axes[1].tick_params(axis="both", which="major", labelsize=12)
+    axes[1].grid(True, alpha=0.2, linestyle="--", linewidth=0.5)
     axes[1].set_aspect("equal")
 
     plt.tight_layout()

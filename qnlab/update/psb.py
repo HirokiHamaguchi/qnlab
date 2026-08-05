@@ -52,7 +52,6 @@ class PSBUpdateRule(BaseUpdateRule):
 
 
 if __name__ == "__main__":
-
     import numpy as np
 
     def psb_update_b(B, s, y):
@@ -64,12 +63,15 @@ if __name__ == "__main__":
         return B + term1 - term2
 
     def psb_update_h(H, s, y, tol=1e-12):
-        n = H.shape[0]
-        Delta = (y@H@y-s@y) * s@H@s - (y@H@s)**2
-        uu = np.outer(H@y-s, H@y-s)
-        vv = np.outer(H@s, H@s)
-        uv_plus_vu = np.outer(H@y-s, H@s) + np.outer(H@s, H@y-s)
-        Hbar = H - (s@H@s * uu - y@H@s * uv_plus_vu + (y@H@y-s@y) * vv) / Delta
+        Delta = (y @ H @ y - s @ y) * s @ H @ s - (y @ H @ s) ** 2
+        uu = np.outer(H @ y - s, H @ y - s)
+        vv = np.outer(H @ s, H @ s)
+        uv_plus_vu = np.outer(H @ y - s, H @ s) + np.outer(H @ s, H @ y - s)
+        Hbar = (
+            H
+            - (s @ H @ s * uu - y @ H @ s * uv_plus_vu + (y @ H @ y - s @ y) * vv)
+            / Delta
+        )
         return Hbar
 
     # 1. 初期化 (B = H = I)
@@ -94,4 +96,6 @@ if __name__ == "__main__":
     print(np.round(np.dot(B_next, H_next), 10))
 
     is_correct = np.allclose(B_next_inv, H_next)
-    print(f"\n検証結果: {'一致しました (正しい)' if is_correct else '一致しませんでした'}")
+    print(
+        f"\n検証結果: {'一致しました (正しい)' if is_correct else '一致しませんでした'}"
+    )
