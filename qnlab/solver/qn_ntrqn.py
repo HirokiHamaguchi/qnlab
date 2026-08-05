@@ -60,6 +60,12 @@ def line_search_relaxed_armijo(
 
         f_try = prob.f(x_try)
 
+        if not np.isfinite(f_try):
+            if verbose:
+                print("  ⚠️  Rejected due to Inf/NaN in function value.")
+            alpha *= np.float64(0.5)
+            continue
+
         if np.all(x_try == x):
             if verbose:
                 print("  ⚠️ Rejected due to no change in x.")
@@ -180,8 +186,8 @@ def qn_ntrqn(
 
     k = 0
     mu = np.float64(0.0)
-    var_sigma = np.float64(1e-10)
-    offo: np.float64 = var_sigma
+    var_sigma = np.float64(1e-20)
+    offo = np.float64(np.sqrt(var_sigma))
     is_offo_mode = False
     min_fx_minus_delta = np.float64(np.inf)
     rejection_counter: int = 0
@@ -192,7 +198,7 @@ def qn_ntrqn(
             mu = np.float64(0.0)
             # if sufficient decrease is observed, reset offo
             if min_fx_minus_delta - fx >= 1.0:
-                offo = var_sigma
+                offo = np.float64(np.sqrt(var_sigma))
         else:
             if not is_offo_mode and verbose:
                 print(f"  ⚠️  Switching to offo mode. {k=}")
@@ -203,7 +209,7 @@ def qn_ntrqn(
 
         d = get_direction_reg(method, x, g, lm, mu)
 
-        ref_fx = max(pf2) if len(pf2) > 0 else fx
+        ref_fx = max(pf2) if len(pf2) > 0 else fx  # type: ignore[type-var]
         ls_res, new_x, new_f, new_g, delta, rejection_counter = (
             line_search_relaxed_armijo(
                 x,

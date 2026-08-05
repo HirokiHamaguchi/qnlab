@@ -9,6 +9,7 @@ from scipy.optimize import line_search
 from qnlab.parameter import NTRQNParameter
 from qnlab.problem.base import BaseProblem
 from qnlab.solver.qn_ntrqn import line_search_relaxed_armijo
+from qnlab.util.ret_values import RetCode
 
 
 class ExponentialProblem(BaseProblem):
@@ -63,6 +64,44 @@ class ConvexEvenPolynomialProblem(BaseProblem):
         else:
             grad = x0**5 + x0**3 + x0 - 1.0
         return np.array([grad], dtype=np.float64)
+
+
+class NonfiniteTrialProblem(BaseProblem):
+    def __init__(self):
+        super().__init__("nonfinite trial", 1, np.zeros(1, dtype=np.float64))
+
+    def _f(self, x: npt.NDArray[np.float64]) -> np.float64:
+        if x[0] <= -0.75:
+            return np.float64(np.nan)
+        return np.float64(0.5 * (x[0] + 1.0) ** 2)
+
+    def _g(self, x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+        return np.array([x[0] + 1.0], dtype=np.float64)
+
+
+def test_linesearch_rejects_nonfinite_function_value():
+    problem = NonfiniteTrialProblem()
+    x = problem.x0.copy()
+    fx = problem.f(x)
+    g = problem.g(x)
+    result = line_search_relaxed_armijo(
+        x,
+        fx,
+        g,
+        -g,
+        problem,
+        NTRQNParameter(1),
+        problem.get_machine_eps(),
+        fx,
+        verbose=False,
+        is_offo_mode=False,
+        rejection_counter=0,
+    )
+
+    code, new_x, new_f, *_ = result
+    assert code == RetCode.SUCCESS
+    np.testing.assert_allclose(new_x, [-0.5])
+    assert np.isfinite(new_f)
 
 
 def run_ls(

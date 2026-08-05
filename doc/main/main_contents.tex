@@ -727,7 +727,7 @@ In our implementation, we choose the regularization parameter as
     \mu_k = \mathrm{clip}\qty(\frac{1}{10}\norm{g_k}, \frac{1}{100} G_k, G_k) \quad \text{where} \quad G_k \defeq \sqrt{\varsigma + \sum_{j \in K, \, j \leq k} \norm{g_{j}}^2},
 \end{equation*}
 which is consistent with the general form stated in \cref{eq:offo_based_update} with an adaptive factor $\theta_k \in [10^{-2},1]$.
-In practice, we may set $\varsigma=0$ as long as the initial gradient is nonzero since $\varsigma$ is mainly introduced for avoiding zero division, but to make it consistent with the theory, we set $\varsigma=10^{-10}$ in all experiments.
+In practice, we may set $\varsigma=0$ as long as the initial gradient is nonzero since $\varsigma$ is mainly introduced for avoiding zero division, but to make it consistent with the theory, we set $\varsigma=10^{-20}$ in all experiments.
 
 When $B_k$ is a good approximation of the Hessian, the regularization parameter $\mu_k$ should be small for fast convergence.
 Since the quantity $G_k$ is strictly increasing with $k$, it is natural in practice to decrease the effective regularization when sufficient progress in the objective function is achieved.

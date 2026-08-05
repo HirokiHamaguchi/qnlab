@@ -1,6 +1,7 @@
 """Limited-memory NTRQN solver for box-constrained optimization."""
 
 from collections import deque
+from dataclasses import dataclass
 from typing import Protocol, Sequence, TypeAlias, Union, runtime_checkable
 
 import numpy as np
@@ -89,7 +90,211 @@ def max_feasible_step(
     return np.float64(np.maximum(0.0, alpha_max))
 
 
-def _projected_direction(
+@dataclass
+class _CompactBFGS:
+    """Compact Hessian built from the regularized pairs ``(s, y + mu*s)``."""
+
+    diagonal: np.float64
+    vectors: npt.NDArray[np.float64]
+    coefficients: npt.NDArray[np.float64]
+
+    @classmethod
+    def from_memory(
+        cls,
+        memory: QuasiNewtonMemory,
+        mu: np.float64,
+        n: int,
+    ) -> "_CompactBFGS":
+        """Build the same regularized L-BFGS matrix used by NTRQN's two loops."""
+        if len(memory) == 0:
+            diagonal = mu if mu > 0.0 else np.float64(1.0 / memory.zero_length)
+            return cls(
+                np.float64(diagonal),
+                np.empty((n, 0), dtype=np.float64),
+                np.empty(0, dtype=np.float64),
+            )
+
+        last = memory.get_last()
+        last_y = last.y + mu * last.s
+        last_ys = last.ys + mu * last.ss
+        diagonal = np.float64(np.dot(last_y, last_y) / last_ys)
+
+        vectors: list[npt.NDArray[np.float64]] = []
+        coefficients: list[np.float64] = []
+        for item in memory:
+            regularized_y = item.y + mu * item.s
+            regularized_ys = item.ys + mu * item.ss
+
+            bs = diagonal * item.s
+            for vector, coefficient in zip(vectors, coefficients):
+                bs = bs + coefficient * vector * np.dot(vector, item.s)
+            sbs = np.dot(item.s, bs)
+
+            # Stored BFGS pairs should make both denominators positive. Skip a
+            # pair if roundoff nevertheless makes its compact update unusable.
+            if (
+                not np.isfinite(regularized_ys)
+                or not np.isfinite(sbs)
+                or regularized_ys <= 0.0
+                or sbs <= 0.0
+            ):
+                continue
+            vectors.extend((bs, regularized_y))
+            coefficients.extend(
+                (np.float64(-1.0 / sbs), np.float64(1.0 / regularized_ys))
+            )
+
+        compact_vectors = (
+            np.column_stack(vectors) if vectors else np.empty((n, 0), dtype=np.float64)
+        )
+        return cls(
+            diagonal,
+            compact_vectors,
+            np.asarray(coefficients, dtype=np.float64),
+        )
+
+    def apply(self, vector: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+        """Apply the compact Hessian approximation."""
+        result = self.diagonal * vector
+        if self.vectors.shape[1] > 0:
+            result = result + self.vectors @ (
+                self.coefficients * (self.vectors.T @ vector)
+            )
+        return result
+
+    def solve_restricted(
+        self,
+        rhs: npt.NDArray[np.float64],
+        free: npt.NDArray[np.bool_],
+    ) -> npt.NDArray[np.float64]:
+        """Solve a principal free-variable system using Woodbury's identity."""
+        result = np.zeros_like(rhs)
+        if not np.any(free):
+            return result
+
+        restricted_rhs = rhs[free]
+        restricted_vectors = self.vectors[free]
+        solution = restricted_rhs / self.diagonal
+        if restricted_vectors.shape[1] > 0:
+            middle = np.diag(1.0 / self.coefficients)
+            middle += restricted_vectors.T @ restricted_vectors / self.diagonal
+            right = restricted_vectors.T @ restricted_rhs / self.diagonal
+            try:
+                correction = np.linalg.solve(middle, right)
+            except np.linalg.LinAlgError:
+                correction = np.linalg.lstsq(middle, right, rcond=None)[0]
+            solution -= restricted_vectors @ correction / self.diagonal
+        result[free] = solution
+        return result
+
+
+def _generalized_cauchy_point(
+    x: npt.NDArray[np.float64],
+    g: npt.NDArray[np.float64],
+    lb: npt.NDArray[np.float64],
+    ub: npt.NDArray[np.float64],
+    operator: _CompactBFGS,
+) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.bool_]]:
+    """Minimize the quadratic model along the projected-gradient path."""
+    step = np.zeros_like(x)
+    path_direction = -g.copy()
+    active = (lb == ub) | ((x <= lb) & (g > 0.0)) | ((x >= ub) & (g < 0.0))
+    path_direction[active] = 0.0
+
+    breakpoints: list[tuple[float, int]] = []
+    for i in np.flatnonzero(path_direction):
+        bound = ub[i] if path_direction[i] > 0.0 else lb[i]
+        breakpoint = (bound - x[i]) / path_direction[i]
+        if np.isfinite(breakpoint) and breakpoint >= 0.0:
+            breakpoints.append((float(breakpoint), int(i)))
+    breakpoints.sort()
+
+    previous = 0.0
+    cursor = 0
+    while cursor < len(breakpoints):
+        breakpoint = breakpoints[cursor][0]
+        interval = np.float64(max(0.0, breakpoint - previous))
+        model_gradient = g + operator.apply(step)
+        derivative = np.dot(model_gradient, path_direction)
+        curvature = np.dot(path_direction, operator.apply(path_direction))
+        minimizer = (
+            np.float64(-derivative / curvature)
+            if curvature > 0.0
+            else np.float64(np.inf)
+        )
+        if 0.0 <= minimizer < interval:
+            step += minimizer * path_direction
+            return np.clip(x + step, lb, ub), active
+
+        step += interval * path_direction
+        while cursor < len(breakpoints) and breakpoints[cursor][0] == breakpoint:
+            i = breakpoints[cursor][1]
+            step[i] = (ub[i] if path_direction[i] > 0.0 else lb[i]) - x[i]
+            path_direction[i] = 0.0
+            active[i] = True
+            cursor += 1
+        previous = breakpoint
+
+    if np.any(path_direction):
+        model_gradient = g + operator.apply(step)
+        curvature = np.dot(path_direction, operator.apply(path_direction))
+        if curvature > 0.0:
+            minimizer = max(0.0, -np.dot(model_gradient, path_direction) / curvature)
+            step += minimizer * path_direction
+    return np.clip(x + step, lb, ub), active
+
+
+def _subspace_minimization(
+    cauchy: npt.NDArray[np.float64],
+    active: npt.NDArray[np.bool_],
+    x: npt.NDArray[np.float64],
+    g: npt.NDArray[np.float64],
+    lb: npt.NDArray[np.float64],
+    ub: npt.NDArray[np.float64],
+    operator: _CompactBFGS,
+) -> npt.NDArray[np.float64]:
+    """Minimize over the Cauchy point's free variables, adding hit bounds."""
+    point = cauchy.copy()
+    working_active = active.copy()
+
+    # Each truncated correction fixes at least one additional variable.
+    for _ in range(x.size + 1):
+        free = ~working_active
+        if not np.any(free):
+            break
+        step = point - x
+        model_gradient = g + operator.apply(step)
+        correction = operator.solve_restricted(-model_gradient, free)
+        if not np.all(np.isfinite(correction)) or not np.any(correction[free]):
+            break
+
+        alpha = min(1.0, float(max_feasible_step(point, correction, lb, ub)))
+        if alpha <= 0.0:
+            break
+        point += alpha * correction
+        point = np.clip(point, lb, ub)
+        if alpha >= 1.0 - 10.0 * np.finfo(np.float64).eps:
+            break
+
+        newly_active = free & (
+            (
+                (correction < 0.0)
+                & np.isfinite(lb)
+                & np.isclose(point, lb, rtol=1e-12, atol=1e-14)
+            )
+            | (
+                (correction > 0.0)
+                & np.isfinite(ub)
+                & np.isclose(point, ub, rtol=1e-12, atol=1e-14)
+            )
+        )
+        if not np.any(newly_active):
+            break
+        working_active |= newly_active
+    return point
+
+
+def _box_quasi_newton_direction(
     method: Method,
     x: npt.NDArray[np.float64],
     g: npt.NDArray[np.float64],
@@ -98,9 +303,19 @@ def _projected_direction(
     lb: npt.NDArray[np.float64],
     ub: npt.NDArray[np.float64],
 ) -> npt.NDArray[np.float64]:
-    """Project the NTRQN step, safeguarding it by projected-gradient descent."""
-    ntrqn_direction = get_direction_reg(method, x, g, memory, mu)
-    direction = np.clip(ntrqn_direction, lb - x, ub - x)
+    """Approximately minimize the regularized L-BFGS model over the box."""
+    unconstrained = get_direction_reg(method, x, g, memory, mu)
+    if (
+        np.all(np.isfinite(unconstrained))
+        and np.all(lb - x <= unconstrained)
+        and np.all(unconstrained <= ub - x)
+    ):
+        return unconstrained
+
+    operator = _CompactBFGS.from_memory(memory, mu, x.size)
+    cauchy, active = _generalized_cauchy_point(x, g, lb, ub, operator)
+    candidate = _subspace_minimization(cauchy, active, x, g, lb, ub, operator)
+    direction = candidate - x
     if not np.all(np.isfinite(direction)) or np.dot(g, direction) >= 0.0:
         direction = -projected_gradient(x, g, lb, ub)
     return direction
@@ -141,14 +356,14 @@ def qn_ntrqnb(
     if np.linalg.norm(pg, ord=np.inf) <= param.gtol:
         return RetCode.ALREADY_MINIMIZED, fx, x
 
-    memory = QuasiNewtonMemory(g, param.m, method)
+    memory = QuasiNewtonMemory(pg, param.m, method)
     past_fx: deque[np.float64] = deque([], maxlen=param.past)
     reference_values: deque[np.float64] = deque([fx], maxlen=param.non_monotone)
 
     k = 0
     mu = np.float64(0.0)
-    var_sigma = np.float64(1e-10)
-    offo: np.float64 = var_sigma
+    var_sigma = np.float64(1e-20)
+    offo = np.float64(np.sqrt(var_sigma))
     is_offo_mode = False
     min_fx_minus_delta = np.float64(np.inf)
     rejection_counter = 0
@@ -163,7 +378,7 @@ def qn_ntrqnb(
             is_offo_mode = False
             mu = np.float64(0.0)
             if min_fx_minus_delta - fx >= 1.0:
-                offo = var_sigma
+                offo = np.float64(np.sqrt(var_sigma))
         else:
             if not is_offo_mode and verbose:
                 print(f"  ⚠️  Switching to offo mode. {k=}")
@@ -172,9 +387,13 @@ def qn_ntrqnb(
             mu = pg_norm * param.mu_scale
             mu = np.clip(mu, param.mu_min_fraction * offo, offo)
 
-        direction = _projected_direction(method, x, g, memory, mu, lb, ub)
+        direction = _box_quasi_newton_direction(method, x, g, memory, mu, lb, ub)
 
-        ref_fx = max(reference_values) if len(reference_values) > 0 else fx
+        ref_fx = (
+            max(reference_values)  # type: ignore[type-var]
+            if len(reference_values) > 0
+            else fx
+        )
         ls_res, new_x, new_f, new_g, delta, rejection_counter = (
             line_search_relaxed_armijo(
                 x,
