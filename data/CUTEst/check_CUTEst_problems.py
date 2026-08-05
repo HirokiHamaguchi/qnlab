@@ -8,8 +8,7 @@ import pycutest
 
 from qnlab.problem.cutest import CUTEstQNProblem
 
-
-ConstraintType = Literal["unconstrained", "bound"]
+type ConstraintType = Literal["unconstrained", "bound"]
 
 
 def _json_path(constraints: ConstraintType, stem: str) -> str:
@@ -230,7 +229,9 @@ def check_initial_gradient(
 
 
 if __name__ == "__main__":
-    print("\n=== Making n_table ===")
-    make_n_table(force=True)
-    print("\n=== Checking gradients ===")
-    check_initial_gradient(force=True)
+    constraints_list: tuple[ConstraintType, ...] = ("unconstrained", "bound")
+    for constraints in constraints_list:
+        print("\n=== Making n_table ===")
+        make_n_table(force=True, constraints=constraints)
+        print("\n=== Checking gradients ===")
+        check_initial_gradient(force=True, constraints=constraints)
