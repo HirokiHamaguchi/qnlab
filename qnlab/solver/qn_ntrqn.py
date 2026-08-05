@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Tuple, Union
+from typing import Callable, Tuple, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -27,6 +27,13 @@ def line_search_relaxed_armijo(
     verbose: bool,
     is_offo_mode: bool,
     rejection_counter: int,
+    gradient_mapping: Union[
+        Callable[
+            [npt.NDArray[np.float64], npt.NDArray[np.float64]],
+            npt.NDArray[np.float64],
+        ],
+        None,
+    ] = None,
 ) -> Tuple[
     RetCode,
     npt.NDArray[np.float64],
@@ -116,7 +123,10 @@ def line_search_relaxed_armijo(
                 )
             continue
 
-        g_try_norm = np.float64(np.linalg.norm(g_try))
+        stationarity = (
+            g_try if gradient_mapping is None else gradient_mapping(x_try, g_try)
+        )
+        g_try_norm = np.float64(np.linalg.norm(stationarity))
         if is_offo_mode and alpha == 1.0 and g_try_norm > param.gtol:
             dg_try = np.dot(d, g_try)
             dnorm = np.float64(np.linalg.norm(d))

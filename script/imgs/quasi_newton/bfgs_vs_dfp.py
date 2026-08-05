@@ -89,7 +89,7 @@ def plot_trajectories(lambda_, x_bfgs, x_dfp):
     contour_color = "#2C3E50"
 
     # Plot 1: Function contour with BFGS trajectory
-    cf1 = axes[0].contourf(X, Y, Z, levels=20, cmap="viridis", alpha=0.7)
+    axes[0].contourf(X, Y, Z, levels=20, cmap="viridis", alpha=0.7)
     axes[0].contour(X, Y, Z, levels=20, colors=contour_color, linewidths=0.5, alpha=0.4)
 
     # Plot BFGS trajectory with improved styling
@@ -141,7 +141,7 @@ def plot_trajectories(lambda_, x_bfgs, x_dfp):
     axes[0].set_aspect("equal")
 
     # Plot 2: Function contour with DFP trajectory
-    cf2 = axes[1].contourf(X, Y, Z, levels=20, cmap="viridis", alpha=0.7)
+    axes[1].contourf(X, Y, Z, levels=20, cmap="viridis", alpha=0.7)
     axes[1].contour(X, Y, Z, levels=20, colors=contour_color, linewidths=0.5, alpha=0.4)
 
     # Plot DFP trajectory with improved styling

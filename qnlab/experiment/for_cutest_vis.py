@@ -1,11 +1,11 @@
 from pathlib import Path
-from typing import List, Tuple, TypeAlias
+from typing import List, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from qnlab.experiment.for_cutest_run import load_npz
+from qnlab.experiment.for_cutest_run import load_npz, task_type
 from qnlab.experiment.profile import performance_profile
 from qnlab.experiment.vis import vis
 from qnlab.problem.cutest import CUTEstQNProblem
@@ -13,14 +13,13 @@ from qnlab.problem.cutest_noised import CUTEstNoisedProblem
 from qnlab.util.callback import Callback
 from qnlab.util.method import Method
 
-task_type: TypeAlias = Tuple[str, Method, dict, int, np.float64]
-
 
 def individual_plot(
     problems: list[str],
     methods: list[Tuple[Method, dict]],
     precision: int,
     noise: np.float64,
+    boxed: bool = False,
 ):
     labels = [method.label for method, _ in methods]
     for prob_name in problems:
@@ -32,17 +31,24 @@ def individual_plot(
             prob = CUTEstQNProblem(prob_name, precision=precision)
         callbacks: List[Callback] = []
         for method, option in methods:
-            task: task_type = (prob_name, method, option, precision, noise)
+            task: task_type = (
+                (prob_name, method, option, precision, noise, True)
+                if boxed
+                else (prob_name, method, option, precision, noise)
+            )
             callbacks.append(load_npz(task))
         vis(prob, callbacks, labels, prob_name, only_grad=True, only_plot=True)
 
 
-def generate_output_path(precision: int, noise: np.float64, gtol: float) -> Path:
+def generate_output_path(
+    precision: int, noise: np.float64, gtol: float, boxed: bool = False
+) -> Path:
     """Generate output file path for the performance profile plot."""
     output_dir = Path("doc/imgs/compare")
     precision_noise = f"precision{precision}" if noise == 0 else f"noise{noise}"
     gtol_filename = f"{gtol:.0e}".replace("+", "")
-    return output_dir / f"_pp_{precision_noise}_gtol{gtol_filename}.pdf"
+    prefix = "_pp_boxed" if boxed else "_pp"
+    return output_dir / f"{prefix}_{precision_noise}_gtol{gtol_filename}.pdf"
 
 
 def generate_fig_size(noise: np.float64) -> tuple[float, float]:
@@ -58,6 +64,7 @@ def draw_pp(
     precision: int,
     noise: np.float64,
     gtol: np.float64,
+    boxed: bool = False,
 ) -> None:
     # Set style for publication quality
     sns.set_style("whitegrid")
@@ -75,7 +82,7 @@ def draw_pp(
     colors = [color_palette.get(name, "black") for name in alg_names]
     line_styles_list = [line_styles.get(name, "o-") for name in alg_names]
 
-    output_path = generate_output_path(precision, noise, gtol)
+    output_path = generate_output_path(precision, noise, gtol, boxed)
     fig_size = generate_fig_size(noise)
 
     # Create figure with proper size for paper

@@ -1,4 +1,4 @@
-from typing import Dict, Sequence, Union
+from typing import Dict, Union
 
 import numpy as np
 
@@ -15,7 +15,7 @@ from qnlab.solver.qn_kanzow import qn_kanzow
 from qnlab.solver.qn_line import qn_line
 from qnlab.solver.qn_ntqn import qn_ntqn
 from qnlab.solver.qn_ntrqn import qn_ntrqn
-from qnlab.solver.qn_ntrqnb import qn_ntrqnb
+from qnlab.solver.qn_ntrqnb import BoundsInput, qn_ntrqnb
 from qnlab.solver.qn_owl import qn_owl
 from qnlab.solver.qn_scipy import qn_scipy
 from qnlab.util.callback import Callback
@@ -28,10 +28,10 @@ def qn(
     options: Dict[str, Union[np.float64, int]] = {},
     callback: Union[Callback, None] = None,
     verbose: bool = False,
-    bounds: Union[Sequence[tuple[float, float]], object, None] = None,
+    bounds: BoundsInput | None = None,
 ):
     if method.base == "SciPy":
-        return qn_scipy(prob, method, options, callback, verbose)
+        return qn_scipy(prob, method, options, callback, verbose, bounds)
 
     if method.base == "GradientDescent":
         return qn_gradient_descent(prob, method, options, callback)

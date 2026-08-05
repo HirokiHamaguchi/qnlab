@@ -87,11 +87,10 @@ class Method:
         elif self.base == "Newton":
             return "Newton"
         else:
-            label = self.base
+            label: str = self.base
 
             if self.store == "cautious":
                 label += "_StoreC"
-
             if self.secant == "modified":
                 label += "_SecantM"
             elif self.secant == "damped":
@@ -180,3 +179,42 @@ def get_methods(
     assert set(LINE_STYLES.keys()) == set(method.label for method, _ in methods)
 
     return methods, COLORS, LINE_STYLES
+
+
+def get_box_methods(
+    m: int = 10, MI: int = 15000
+) -> Tuple[List[Tuple[Method, dict]], dict, dict]:
+    """Get the standard methods for box-constrained CUTEst benchmarks."""
+    methods = [
+        (
+            Method("NTRQNB", "cautious", "damped", "bfgs", label="NTRQNB"),
+            {"m": m, "max_iterations": MI},
+        ),
+        (
+            Method(
+                "NTRQNB",
+                "cautious",
+                "damped_modified",
+                "bfgs",
+                label="NTRQNB-MS",
+            ),
+            {"m": m, "max_iterations": MI},
+        ),
+        (
+            Method(base="SciPy", scipy_method="L-BFGS-B", label="SciPy"),
+            {"maxcor": m, "maxiter": MI, "ftol": 0},
+        ),
+    ]
+
+    tab10 = plt.colormaps.get_cmap("tab10")
+    colors = {
+        "NTRQNB": tab10(0),
+        "NTRQNB-MS": tab10(1),
+        "SciPy": tab10(2),
+    }
+    line_styles = {
+        "NTRQNB": "o-",
+        "NTRQNB-MS": "o--",
+        "SciPy": "v:",
+    }
+    return methods, colors, line_styles

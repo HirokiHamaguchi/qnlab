@@ -1,6 +1,7 @@
 import json
 import multiprocessing
 import os
+from typing import Literal
 
 import numpy as np
 import pycutest
@@ -8,23 +9,37 @@ import pycutest
 from qnlab.problem.cutest import CUTEstQNProblem
 
 
-def problemsToRun(precision: int | None) -> list[str]:
+ConstraintType = Literal["unconstrained", "bound"]
+
+
+def _json_path(constraints: ConstraintType, stem: str) -> str:
+    suffix = "" if constraints == "unconstrained" else "_boxed"
+    return os.path.join(os.path.dirname(__file__), f"{stem}{suffix}.json")
+
+
+def problemsToRun(
+    precision: int | None, constraints: ConstraintType = "unconstrained"
+) -> list[str]:
     """Get the list of problems to run, excluding those with setup errors."""
     if precision is None:
         ret = sorted(
             pycutest.find_problems(
-                constraints="unconstrained",
+                constraints=constraints,
                 regular=True,
             )
         )
-        # Exclude problems that cannot be loaded due to missing setup()
-        for name in ["DMN15333LS", "MNISTS0LS", "MNISTS5LS"]:
+        excluded = (
+            ["DMN15333LS", "MNISTS0LS", "MNISTS5LS"]
+            if constraints == "unconstrained"
+            else ["CHEBYQADNE"]  # No objective function is defined.
+        )
+        for name in excluded:
             if name in ret:
                 ret.remove(name)
         return ret
     else:
         assert precision in [16, 32, 64]
-        json_path = os.path.join(os.path.dirname(__file__), "valid_problems.json")
+        json_path = _json_path(constraints, "valid_problems")
         assert os.path.exists(json_path)
         with open(json_path) as f:
             data = json.load(f)
@@ -40,12 +55,11 @@ def get_n(problem_name: str) -> int:
     return prob.n
 
 
-def make_n_table(force: bool = False):
-    """Generate and save n_table.json with problem dimensions."""
-    dirname = os.path.dirname(__file__)
-    json_path = os.path.join(dirname, "n_table.json")
+def make_n_table(force: bool = False, constraints: ConstraintType = "unconstrained"):
+    """Generate and save the dimension table for a problem class."""
+    json_path = _json_path(constraints, "n_table")
 
-    problems = problemsToRun(None)
+    problems = problemsToRun(None, constraints)
 
     # Load existing data if available
     if os.path.exists(json_path):
@@ -102,11 +116,12 @@ def check_problem_at_precision(
         return False
 
 
-def check_initial_gradient(force: bool = False):
+def check_initial_gradient(
+    force: bool = False, constraints: ConstraintType = "unconstrained"
+):
     """Check gradient computation stability across precisions."""
-    dirname = os.path.dirname(__file__)
-    json_path = os.path.join(dirname, "valid_problems.json")
-    problems = problemsToRun(None)
+    json_path = _json_path(constraints, "valid_problems")
+    problems = problemsToRun(None, constraints)
 
     print(f"Checking {len(problems)} problems across precisions 16, 32, 64...")
     print("=" * 80)
@@ -140,7 +155,9 @@ def check_initial_gradient(force: bool = False):
                 "SCURLY20",
                 "SCURLY30",
                 "SSCOSINE",
-            ],
+            ]
+            if constraints == "unconstrained"
+            else [],
         }
 
     # Convert to sets for efficient lookup

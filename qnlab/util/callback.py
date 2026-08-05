@@ -51,6 +51,7 @@ class Callback:
         self,
         prob: BaseProblem,
         x0: npt.NDArray[np.float64],
+        gnorm_vector: Optional[npt.NDArray[np.float64]] = None,
     ) -> None:
         """Called at the start of the optimization."""
         prob.reset()
@@ -60,6 +61,7 @@ class Callback:
             x0,
             prob.f(x0, count=False),
             prob.g(x0, count=False),
+            gnorm_vector=gnorm_vector,
         )
 
     def callback(
@@ -68,11 +70,13 @@ class Callback:
         x: npt.NDArray[np.float64],
         fx: np.float64,
         g: npt.NDArray[np.float64],
+        gnorm_vector: Optional[npt.NDArray[np.float64]] = None,
     ) -> None:
         if self.save_xs:
             self.xs.append(np.copy(x))
 
-        gnorm = np.float64(np.linalg.norm(g, ord=self.gnorm_order))
+        vector = g if gnorm_vector is None else gnorm_vector
+        gnorm = np.float64(np.linalg.norm(vector, ord=self.gnorm_order))
         self.fxs.append(fx)
         self.gnorms.append(gnorm)
 

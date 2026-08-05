@@ -1,8 +1,9 @@
 import numpy as np
-from scipy.optimize import Bounds
 
 from qnlab.parameter import NTRQNParameter
 from qnlab.problem.base import BaseProblem
+from qnlab.solver.qn import qn
+from qnlab.solver.qn_ntrqn import qn_ntrqn
 from qnlab.solver.qn_ntrqnb import max_feasible_step, projected_gradient, qn_ntrqnb
 from qnlab.util.callback import Callback
 from qnlab.util.method import Method
@@ -32,7 +33,7 @@ def test_projected_gradient_and_feasible_step():
 
 def test_ntrqnb_finds_boundary_solution():
     problem = QuadraticProblem([10.0, 0.5])
-    bounds = Bounds([-1.0, -1.0], [1.0, 1.0])
+    bounds = [(-1.0, 1.0), (-1.0, 1.0)]
     method = Method("NTRQNB", "cautious", "damped", "bfgs")
     parameter = NTRQNParameter(2, {"gtol": np.float64(1e-9), "max_iterations": 100})
     callback = Callback(save_xs=True)
@@ -43,6 +44,7 @@ def test_ntrqnb_finds_boundary_solution():
     np.testing.assert_allclose(x, [1.0, -1.0], atol=1e-8)
     assert fx == np.float64(1.0)
     assert all(np.all((-1.0 <= iterate) & (iterate <= 1.0)) for iterate in callback.xs)
+    assert callback.gnorms[-1] <= parameter.gtol
 
 
 def test_ntrqnb_detects_initial_constrained_stationarity():
@@ -55,3 +57,42 @@ def test_ntrqnb_detects_initial_constrained_stationarity():
         method,
     )
     assert code == RetCode.ALREADY_MINIMIZED
+
+
+def test_ntrqnb_matches_ntrqn_when_bounds_are_inactive():
+    parameter = NTRQNParameter(2, {"gtol": np.float64(1e-9)})
+    method = Method("NTRQN", "cautious", "damped", "bfgs")
+
+    unconstrained = QuadraticProblem([10.0, 0.5])
+    unconstrained_callback = Callback(save_xs=True)
+    unconstrained_result = qn_ntrqn(
+        unconstrained, parameter, method, unconstrained_callback
+    )
+
+    boxed = QuadraticProblem([10.0, 0.5])
+    boxed_callback = Callback(save_xs=True)
+    boxed_result = qn_ntrqnb(
+        boxed,
+        [(-100.0, 100.0), (-100.0, 100.0)],
+        parameter,
+        method,
+        boxed_callback,
+    )
+
+    assert boxed_result[0] == unconstrained_result[0]
+    np.testing.assert_allclose(boxed_result[1], unconstrained_result[1])
+    np.testing.assert_allclose(boxed_result[2], unconstrained_result[2])
+    np.testing.assert_allclose(boxed_callback.xs, unconstrained_callback.xs)
+
+
+def test_scipy_boxed_callback_uses_projected_gradient():
+    problem = QuadraticProblem([10.0, 0.5])
+    bounds = [(-1.0, 1.0), (-1.0, 1.0)]
+    method = Method(base="SciPy", scipy_method="L-BFGS-B")
+    callback = Callback(save_xs=True)
+
+    code, _, x = qn(problem, method, callback=callback, bounds=bounds)
+
+    assert code == RetCode.SUCCESS
+    np.testing.assert_allclose(x, [1.0, -1.0])
+    assert callback.gnorms[-1] == 0.0

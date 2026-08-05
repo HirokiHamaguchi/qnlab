@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.typing as npt
+from scipy.optimize import Bounds
 
 from qnlab.problem.base import BaseProblem
 
@@ -18,6 +19,9 @@ class CUTEstQNProblem(BaseProblem):
 
         self.precision = precision
         self.prob = pycutest.import_problem(problem_name)
+        self.bounds = Bounds(
+            self.prob.bl.astype(np.float64), self.prob.bu.astype(np.float64)
+        )
         super().__init__(problem_name, self.prob.n, self.prob.x0.astype(np.float64))
 
     def _f(self, x: npt.NDArray[np.float64]) -> np.float64:

@@ -1,7 +1,7 @@
 import os
 import warnings
 from pathlib import Path
-from typing import List, Tuple, TypeAlias
+from typing import List, Tuple, TypeAlias, Union
 from zipfile import BadZipFile
 
 import numpy as np
@@ -12,13 +12,26 @@ from qnlab.solver.qn import qn
 from qnlab.util.callback import Callback, CallbackTimeoutError
 from qnlab.util.method import Method
 
-task_type: TypeAlias = Tuple[str, Method, dict, int, np.float64]
+legacy_task_type: TypeAlias = Tuple[str, Method, dict, int, np.float64]
+boxed_task_type: TypeAlias = Tuple[str, Method, dict, int, np.float64, bool]
+task_type: TypeAlias = Union[legacy_task_type, boxed_task_type]
+
+
+def _unpack_task(
+    task: task_type,
+) -> tuple[str, Method, dict, int, np.float64, bool]:
+    if len(task) == 5:
+        prob_name, method, option, precision, noise = task
+        return prob_name, method, option, precision, noise, False
+    return task
 
 
 def get_file_path(task: task_type) -> str:
-    prob_name, method, _option, precision, noise = task
+    prob_name, method, _option, precision, noise, boxed = _unpack_task(task)
     prob_type = "noisy" if noise > 0 else str(precision)
     folder = Path(os.path.dirname(__file__)).parent.parent / "data" / "temp"
+    if boxed:
+        folder /= "boxed"
     return str(folder / prob_type / prob_name / f"{method.label}.npz")
 
 
@@ -57,7 +70,7 @@ def save_npz(task: task_type, callback: Callback) -> None:
 
 
 def solveProblemWithTimeout(task: task_type, TL: int, allow_save: bool):
-    prob_name, method, option, precision, noise = task
+    prob_name, method, option, precision, noise, boxed = _unpack_task(task)
     file_path = get_file_path(task)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     if noise > 0.0:
@@ -69,7 +82,13 @@ def solveProblemWithTimeout(task: task_type, TL: int, allow_save: bool):
     callback = Callback(time_limit=TL)
     try:
         print(f"▶ Running: {file_path}")
-        qn(prob, method, option, callback)
+        qn(
+            prob,
+            method,
+            option,
+            callback,
+            bounds=prob.bounds if boxed else None,
+        )
         print(f"✓ {prob_name} with {method.label}")
         save_npz(task, callback)
     except CallbackTimeoutError as e:
@@ -90,12 +109,17 @@ def run(
     noise: np.float64,
     ERROR_CAUSING_TASKS: list[Tuple[int, str, str]],
     TL: int,
+    boxed: bool = False,
 ):
     # Prepare all tasks
     tasks: List[task_type] = []
     for problem in problems:
         for method, option in methods:
-            task = (problem, method, option, precision, noise)
+            task: task_type = (
+                (problem, method, option, precision, noise, True)
+                if boxed
+                else (problem, method, option, precision, noise)
+            )
             if len(load_npz(task, False).calls) > 0:
                 continue
             tasks.append(task)
@@ -122,6 +146,7 @@ def load_results(
     precision: int,
     noise: np.float64,
     gtol: np.float64,
+    boxed: bool = False,
 ) -> Tuple[list[str], np.ndarray, np.ndarray, np.ndarray, list[str]]:
     """
     Load and aggregate results from saved files.
@@ -142,7 +167,11 @@ def load_results(
 
     for j, prob_name in enumerate(problems):
         for i, (method, option) in enumerate(methods):
-            task: task_type = (prob_name, method, option, precision, noise)
+            task: task_type = (
+                (prob_name, method, option, precision, noise, True)
+                if boxed
+                else (prob_name, method, option, precision, noise)
+            )
             callback = load_npz(task, False)
             if len(callback.calls) == 0:
                 res = (np.inf, np.inf, np.inf)
