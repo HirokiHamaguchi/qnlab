@@ -8,7 +8,7 @@
 
 数理最適化とは、このような最善の選択、およびそれを遂行する数学的手法や学問領域を指し、本稿では連続最適化、特にその代表的な手法であるニュートン法と準ニュートン法を中心として、基礎的な概念をまとめます。
 
-<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/sixhump.png?v=1" />
+<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/sixhump.png?v=1" alt="Six-hump camel function optimization landscape" />
 
 ## 目次
 
@@ -16,7 +16,7 @@
 
 - [連続最適化の基本概念](#連続最適化の基本概念)
   - [凸性と強凸性](#凸性と強凸性)
-  - [ヘッセ行列の正定値性](#ヘッセ行列の正定値性)
+  - [正定値性](#正定値性)
   - [平滑性](#平滑性)
     - [ヘッセ行列の固有値のバウンド](#ヘッセ行列の固有値のバウンド)
     - [Baillon–Haddadの定理](#baillonhaddadの定理)
@@ -37,6 +37,7 @@
     - [二つの定式化の関係](#二つの定式化の関係)
 - [準ニュートン法](#準ニュートン法)
   - [セカント条件](#セカント条件)
+  - [超線形収束と Dennis–Moré 条件](#超線形収束と-dennismoré-条件)
   - [代表的な準ニュートン更新則](#代表的な準ニュートン更新則)
     - [Broyden更新](#broyden更新)
       - [導出 (Broyden)](#導出-broyden)
@@ -157,11 +158,11 @@ $\mu=0$ の場合も、同様の議論により凸性について示すことが
 
 強凸性は、凸性に加えて目的関数が一様に正の曲率を持つことを意味します。Fig. 1 に示した通り、凸関数と強凸関数には曲率に違いがみられます。$\mu=0$ を強凸の定義に含めるか否かは、文献によって多少の揺れがありますが、一般的な慣習に倣い本稿では含めません。例えば[^nesterovIntroductoryLecturesConvex2014][^kanamori2016continuous]などを参照してください。
 
-<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/convexity_comparison_convex.png?v=1" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/convexity_comparison_strongly_convex.png?v=1" />
+<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/convexity_comparison_convex.png?v=1" alt="convexity comparison convex" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/convexity_comparison_strongly_convex.png?v=1" alt="convexity comparison strongly convex" />
 
 (Fig. 1 凸関数と強凸関数の例。 破線は $x=0$ における二次近似を示しています。 上2つの関数は凸ですが強凸ではなく、下2つの関数は強凸性の定義を満たす $\mu>0$ が存在し強凸となります。)
 
-### ヘッセ行列の正定値性
+### 正定値性
 
 続いて、$f$ が $C^2$ 級であるとして、凸性および強凸性がヘッセ行列 $\nabla^2 f(x)$ の正定値性とどのように関係するかを示します。
 
@@ -176,7 +177,7 @@ $\mu=0$ の場合も、同様の議論により凸性について示すことが
 \end{align*}
 ```
 
-正定値でも負定値でもない行列は不定値 (indefinite) と呼ばれます。行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表します。特に $B$ が零行列のときは $A \succeq 0$ と書くことがあります。同様に、$\preceq$ は半負定値に対して定義されます。$\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ と同値です。これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味します。更に、対称行列ならば演算子ノルム $\left\lVert A \right\rVert$ は固有値の絶対値の最大値であるため、$\left\lVert A \right\rVert$ も少なくとも $\mu$ 以上であることを意味します。
+二次形式が正の値と負の値の両方を取る対称行列、すなわち半正定値でも半負定値でもない対称行列は、不定値 (indefinite) と呼ばれます。対称行列 $A,B \in \mathbb{R}^{n \times n}$ に対して、$A \succeq B$ は $A-B$ が半正定値であることを表します。この関係は [Löwner 順序 (Löwner order)](https://en.wikipedia.org/wiki/Loewner_order) と呼ばれます。そして $A \succ B$ は、$A-B$ が正定値であることを意味します。同様に、$\preceq$ や $\prec$ も定義されます。特に $B$ が零行列のときは $A \succeq 0$ と書くことがあります。$\mu \geq 0$ に対し、$A \succeq \mu I$ はすべての $v \in \mathbb{R}^n$ について $v^\top A v \ge \mu \left\lVert v \right\rVert^2$ と同値です。これは $A$ の任意の固有値が少なくとも $\mu$ 以上であることを意味します。更に、対称行列ならば演算子ノルム $\left\lVert A \right\rVert$ は固有値の絶対値の最大値であるため、$\left\lVert A \right\rVert$ も少なくとも $\mu$ 以上であることを意味します。
 
 ここで、強凸性は関数が一様に正の曲率を持つことを意味していました。これはヘッセ行列も一様に正の曲率を持つこと、つまり一様に正定値であることと対応しています。実際、凸性や強凸性は次のように、ヘッセ行列の定値性と同値になることが知られています。
 
@@ -312,9 +313,9 @@ f(y) - f(x) & = \phi(1) - \phi(0) = \int_0^1 \phi'(t) \mathrm{d}t               
 
 </details>
 
-もし、更に $f$ が凸であれば、次の下界も成立します。
+もし、更に $f$ が凸であれば、次の下界も成立します[^FanZhongXiuMingLianSokZuiShiHuaarugorizumu2023] [Proposition 2.3.5]。
 
-**Proposition 4** ([^FanZhongXiuMingLianSokZuiShiHuaarugorizumu2023] [Proposition 2.3.5])
+**Proposition 4**
 
 関数 $f \colon \mathbb{R}^n \to \mathbb{R}$ が凸であり、かつ $L$-平滑であるとする。このとき、任意の $x,y \in \mathbb{R}^n$ について次が成り立つ。
 
@@ -574,7 +575,7 @@ x_{k+1} \gets x_k - \alpha_k \nabla^2 f(x_k)^{-1} g_k.
 
 この亜種は[減衰ニュートン法(damped Newton's method)](https://ja.wikipedia.org/wiki/%E6%9C%80%E9%81%A9%E5%8C%96%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E3%83%8B%E3%83%A5%E3%83%BC%E3%83%88%E3%83%B3%E6%B3%95#%E9%AB%98%E6%AC%A1%E5%85%83)あるいは緩和ニュートン法(relaxed Newton's method)と呼ばれます(個人的にはdampedの方がよく聞きます)。
 
-<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_opt_step0.png" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_opt_step1.png" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_opt_step2.png" />
+<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_opt_step0.png" alt="newton opt step0" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_opt_step1.png" alt="newton opt step1" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_opt_step2.png" alt="newton opt step2" />
 
 (Fig. 4 ニュートン法の反復の様子。この例では、全てのステップで $\alpha_k=1$、つまり $x_{k+1} = x_k - \nabla^2 f(x_k)^{-1} g_k$ が成り立つ。)
 
@@ -897,7 +898,7 @@ f''''(x) & = \frac{e^x(1 - 4e^x + e^{2x})}{(1+e^x)^4}.
 
 それにもかかわらず、初期点 $x_0$ が $\mu$ に対して十分大きい場合、Fig. 7 に示すようにニュートン法は振動します。
 
-<img width="50%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_failure_strongly_convex_function_0.1_-4.png?v=1" /><img width="50%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_failure_strongly_convex_function_0.01_-4.png?v=1" />
+<img width="50%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_failure_strongly_convex_function_0.1_-4.png?v=1" alt="newton failure strongly convex function 0.1  4" /><img width="50%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/newton_failure_strongly_convex_function_0.01_-4.png?v=1" alt="newton failure strongly convex function 0.01  4" />
 
 (Fig. 7 (左) $x_0=-4, \ \mu=0.1$ ではニュートン法が収束する。(右) $x_0=-4, \ \mu=0.01$ ではニュートン法が振動する。)
 
@@ -994,7 +995,7 @@ x_{k+1} = x_k - \alpha_k B_k^{-1} \nabla f(x_k)
 
 準ニュートン法の核心は、各反復で $B_k$ をどのように更新して真のヘッセ行列に近づけるかにあります。Fig. 10 は準ニュートン法の概念図です。まず現在の点 $x_k$ の周りで、$B_k$ を用いて目的関数 $f$ の二次近似モデルを構成します。次にこの二次モデルを最小化して次の点 $x_{k+1}$ を得ます。$x_{k+1}$ を得た後、$x_k$ と $x_{k+1}$ における勾配情報を用いて近似行列 $B_k$ を $B_{k+1}$ に更新します。この手続きを収束するまで繰り返すことが準ニュートン法です。
 
-<img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/quasi_newton_1.png" /><img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/quasi_newton_2.png" /><img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/quasi_newton_3.png" />
+<img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/quasi_newton_1.png" alt="quasi newton 1" /><img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/quasi_newton_2.png" alt="quasi newton 2" /><img width="33%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/quasi_newton_3.png" alt="quasi newton 3" />
 
 (Fig. 10 準ニュートン法の概念図。 (1) 目的関数 $f$ (青い曲面) と現在点 $x_k$ (赤点) が与えられます。 (2) 現在の近似ヘッセ行列によって得られる二次モデル $m_k(x)$ (橙色の曲面) を最小化し、その最小点 $x_{k+1}$ (黄色のバツ印) に移動します。 (3) 二次モデルを更新し (緑色の曲面)、この操作を繰り返します。)
 
@@ -1037,7 +1038,7 @@ B_{k+1} s_k = y_k.
 \end{equation*}
 ```
 
-この関係はセカント条件、または準ニュートン方程式と呼ばれています。
+この関係はセカント条件、または準ニュートン方程式と呼ばれています[^nocedal1999numerical]。
 
 より厳密には、セカント条件は次のようにも正当化できます。$x_{k+1}$ の周りの二次近似モデルを考えます。
 
@@ -1070,11 +1071,45 @@ m_{k+1}(x_{k+1}) = f(x_{k+1}), \\
 
 これは、セカント条件により二次モデル $m_{k+1}(x)$ が、以前の関数値 $f(x_k)$ を除き、$x_{k+1}$ と $x_k$ の両方における既知の情報を正確に反映していることを意味しています。
 
+### 超線形収束と Dennis–Moré 条件
+
+Q-収束は quotient-convergence(商による収束)の略であり、連続する誤差の比によって定義される収束率を指します。特に、
+
+$x^\ast$ に収束する点列 $\lbrace x_k \rbrace$ が Q-超線形収束するとは、
+
+```math
+\begin{equation*}
+\lim_{k\to\infty}\frac{\left\lVert x_{k+1}-x^\ast\right\rVert}{\left\lVert x_k-x^\ast\right\rVert}=0
+\end{equation*}
+```
+
+が成り立つことをいいます。したがって、一定の収縮率が1未満である Q-線形収束よりも強く、収縮率そのものが0へ近づきます。
+
+Newton 型の反復がこの収束率を達成するための条件の一つがDennis–Moré 条件です[^dennisCharacterizationSuperlinearConvergence1974][^dennisjrQuasiNewtonMethodsMotivation1977]。次の更新
+
+```math
+\begin{equation*}
+B_k s_k=-\nabla f(x_k), \qquad x_{k+1}=x_k+s_k
+\end{equation*}
+```
+
+を考えます。$x_k\to x^\ast$、$x_k\neq x^\ast$、$\nabla f(x^\ast)=0$ とし、$x^\ast$ の近傍で $\nabla^2 f$ が連続かつ $\nabla^2 f(x^\ast)$ が正則であると仮定します。このとき、Q-超線形収束することと次の条件は同値です。
+
+```math
+\begin{equation}
+\lim_{k\to\infty}
+\frac{\left\lVert \left(B_k-\nabla^2 f(x^\ast)\right)s_k\right\rVert}
+{\left\lVert s_k\right\rVert}=0.
+\end{equation}
+```
+
+これを Dennis–Moré 条件と呼びます。詳しくは[^jinNonasymptoticGlobalConvergence2025]などを参照してください。
+
 <!-- From 3_2_quasi_newton_update.tex -->
 
 ### 代表的な準ニュートン更新則
 
-$B_k$, $s_k$, $y_k$ が与えられたとき、セカント条件を満たす $B_{k+1}$ を与える更新則は多数存在します。ここでは代表的なものをその導出とともに示します[^dennisjr.QuasiNewtonMethodsMotivation1977a]。本小節に限り、簡潔さのため $B_k$, $B_{k+1}$, $s_k$, $y_k$ をそれぞれ $B$, $\bar{B}$, $s$, $y$ と略記します。
+$B_k$, $s_k$, $y_k$ が与えられたとき、セカント条件を満たす $B_{k+1}$ を与える更新則は多数存在します。ここでは代表的なものをその導出とともに示します[^dennisjrQuasiNewtonMethodsMotivation1977]。本小節に限り、簡潔さのため $B_k$, $B_{k+1}$, $s_k$, $y_k$ をそれぞれ $B$, $\bar{B}$, $s$, $y$ と略記します。
 
 #### Broyden更新
 
@@ -1088,7 +1123,7 @@ $B_k$, $s_k$, $y_k$ が与えられたとき、セカント条件を満たす $B
 
 ##### 導出 (Broyden)
 
-単純な構造的仮定からこの公式を導出します[^dennisjr.QuasiNewtonMethodsMotivation1977a] [Section 4]。
+単純な構造的仮定からこの公式を導出します[^dennisjrQuasiNewtonMethodsMotivation1977] [Section 4]。
 
 **Proposition 8**
 
@@ -1139,7 +1174,7 @@ $\bar{B}$ がセカント条件
 
 Broyden更新は、フロベニウスノルムにおける最小変化更新としても特徴づけられます。
 
-**Proposition 9** ([^dennisjr.QuasiNewtonMethodsMotivation1977a] [Theorem 4.1])
+**Proposition 9** ([^dennisjrQuasiNewtonMethodsMotivation1977] [Theorem 4.1])
 
 $B\in\mathbb{R}^{n\times n}$, $y\in\mathbb{R}^n$, $s\in\mathbb{R}^n\setminus\lbrace 0 \rbrace$ が与えられているとき、行列 $\bar{B}_{\mathrm{Broyden}}$ は以下の最適化問題の一意解である。
 
@@ -1302,7 +1337,7 @@ C_{2t+2} \mathrel{\vcenter{:}}= \frac{C_{2t+1} + C_{2t+1}^\top}{2}            & 
 
 重要な結果として、行列の列 $\lbrace C_t \rbrace_t$ はセカント条件を満たす対称行列に収束します。次の命題ではそれを示します。
 
-**Proposition 10** ([^dennisjr.QuasiNewtonMethodsMotivation1977a] [Lemma 7.2])
+**Proposition 10** ([^dennisjrQuasiNewtonMethodsMotivation1977] [Lemma 7.2])
 
 $c^\top s \neq 0$ と仮定します。このとき、行列の列 $\lbrace C_t \rbrace_t$ は収束し、その極限は次で与えられる。
 
@@ -1505,7 +1540,7 @@ KLダイバージェンスとは、行列間の近さを測る一種の非対称
 \end{align*}
 ```
 
-ここで、BFGS更新は次のKLダイバージェンス最小化問題の解として得られることが知られています。
+ここで、BFGS更新は次のKLダイバージェンス最小化問題の解として得られることが知られています[^kanamori2016continuous] [Section 7.2.4]。
 
 ```math
 \begin{align*}
@@ -1516,7 +1551,7 @@ KLダイバージェンスとは、行列間の近さを測る一種の非対称
 \end{align*}
 ```
 
-**Proposition 11** ([^kanamori2016continuous] [Section 7.2.4])
+**Proposition 11**
 
 $y^\top s > 0$ とし、また $B \succ 0$ を正定値対称行列とする。このとき、上記の最適化問題の解はBFGS更新で与えられる。
 
@@ -1941,7 +1976,7 @@ Fig. 11 と Fig. 12 は特定の $\lambda_1$ に対する反復軌跡を示し�
 
 以下では、準ニュートン法を大規模最適化問題へ拡張する際に重要となる、記憶制限準ニュートン法について説明します。通常の準ニュートン法では、近似ヘッセ行列 $B_k$ またはその逆行列 $H_k$ を密行列として陽に保存・更新するため、$n$ 変数に対して $\mathcal{O}(n^2)$ のメモリを要します。一方で、記憶制限準ニュートン法では、最新の $m$ 組のベクトルペア $\lbrace(s_i,y_i)\rbrace$ という限られた情報のみを保持して、その情報だけから近似ヘッセ行列に関する計算を行います。この工夫により空間計算量は $\mathcal{O}(nm)$ に減少し、$m$ が小さな定数(通常は $m\le 10$) のとき大幅な改善となります。
 
-特に、BFGS更新の記憶制限版であるL-BFGS法[^liuLimitedMemoryBFGS1989a]は、その代表的な手法です。このBFGS更新の場合に注目し、限られた情報だけを用いて準ニュートン方向 $d_k = -H_k g_k$ を空間計算量・時間計算量の両面で効率的に計算する方法を示します。
+特に、BFGS更新の記憶制限版であるL-BFGS法[^liuLimitedMemoryBFGS1989]は、その代表的な手法です。このBFGS更新の場合に注目し、限られた情報だけを用いて準ニュートン方向 $d_k = -H_k g_k$ を空間計算量・時間計算量の両面で効率的に計算する方法を示します。
 
 本小節では次の有限長の行列の列を扱います。
 
@@ -1981,6 +2016,8 @@ H_m = V_{m-1}^\top \cdots V_0^\top H_0 V_0 \cdots V_{m-1} + \left(\sum_{j=0}^{m-
 ```
 
 $H_0$ は選ばれた初期逆ヘッセ近似であり、通常はスケールされた単位行列です。
+
+詳細については、[Compact quasi-Newton representation](https://en.wikipedia.org/wiki/Compact_quasi-Newton_representation)を参照してください。
 
 #### 二重ループ再帰
 
@@ -2045,7 +2082,7 @@ $\alpha_i$, $\beta_i$, $q^{(i+1)}$ の定義を代入すると、$i < m-1$ の�
 r^{(i+1)}
 & = r^{(i)} + s_i \left(\rho_i s_i^\top q^{(i+1)} - \rho_i y_i^\top r^{(i)}\right)                                  \\
 & = r^{(i)} + \rho_i s_i s_i^\top \left(V_{i+1} V_{i+2} \cdots V_{m-1}\right) q - \rho_i s_i y_i^\top r^{(i)}       \\
-& = \left(I- \rho_i y_i s_i^\top\right) r^{(i)} + \rho_i s_i s_i^\top \left(V_{i+1} V_{i+2} \cdots V_{m-1}\right) q \\
+& = \left(I- \rho_i s_i y_i^\top\right) r^{(i)} + \rho_i s_i s_i^\top \left(V_{i+1} V_{i+2} \cdots V_{m-1}\right) q \\
 & =
 V_i^\top r^{(i)}
 +
@@ -2096,7 +2133,7 @@ H_0 = \gamma I.
 \end{equation*}
 ```
 
-この選択は次の議論によって正当化できます[^liuLimitedMemoryBFGS1989a][^shannoMatrixConditioningNonlinear1978]。目的関数 $f$ が二回連続微分可能であると仮定し、最新のステップに沿った平均ヘッセ行列を考えます。
+この選択は次の議論によって正当化できます[^liuLimitedMemoryBFGS1989][^shannoMatrixConditioningNonlinear1978]。目的関数 $f$ が二回連続微分可能であると仮定し、最新のステップに沿った平均ヘッセ行列を考えます。
 
 ```math
 \begin{equation*}
@@ -2143,15 +2180,15 @@ y_{m-1}
 
 Fig. 13 において、関数値と勾配が既知の2点 $x_k$ と $x_{k+1}$ があるとします。正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットしており、より良い収束挙動をもたらすことが分かります。しかし、勾配のみを用いて課される標準的なセカント条件で作られるモデルでは、関数値の情報が無視されます。よって、曲率を大きく誤る可能性があり、真の目的関数の近似が悪くなります。
 
-<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_EXPLAIN.png?v=2" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_HESS.png?v=1" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_BFGS.png?v=1" />
+<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_EXPLAIN.png?v=2" alt="trial EXPLAIN" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_HESS.png?v=1" alt="trial HESS" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_BFGS.png?v=1" alt="trial BFGS" />
 
 (Fig. 13 標準的なセカント条件の欠点。 (a) $x_k$ と $x_{k+1}$ での関数値と勾配が既に分かっている。 (b) 正確なヘッセ行列から構築された理想的な二次モデルは、新しい点 $x_{k+1}$ の周りでよくフィットする。 (c) 標準的なセカント条件では、必ずしも十分に曲率を捉えられない。)
 
-この問題は、関数値を利用することで克服できます。基本的な考え方は Fig. 14 に示した通りです。2 点 $x_k$ と $x_{k+1}$ で勾配が同じであっても、適切な補完は関数値 $f(x_k)$ と $f(x_{k+1})$ によって異なります。この観察こそが、関数値情報を取り込んでヘッセ行列の近似を改善する修正セカント条件の動機を端的に示しています。
+この問題は、関数値を利用することで克服できます。基本的な考え方は Fig. 14 に示した通りです。2 点 $x_k$ と $x_{k+1}$ で勾配が同じであっても、適切な補間は関数値 $f(x_k)$ と $f(x_{k+1})$ によって異なります。この観察こそが、関数値情報を取り込んでヘッセ行列の近似を改善する修正セカント条件の動機を端的に示しています。
 
 ![../imgs/modified_secant/cubic_interpolation.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/cubic_interpolation.png)
 
-(Fig. 14 修正セカント条件の基本的な考え方。$x_k$ と $x_{k+1}$ で同一の勾配を持つが異なる関数値を持つ場合、適切な補完は異なります。)
+(Fig. 14 修正セカント条件の基本的な考え方。$x_k$ と $x_{k+1}$ で同一の勾配を持つが異なる関数値を持つ場合、適切な補間は異なります。)
 
 以下では、2つの既知の修正セカント条件を提示します。
 
@@ -2229,7 +2266,7 @@ B_{k+1}^{\mathrm{F}'} s_k = y_k + \frac{\max(0, 2(f(x_k) - f(x_{k+1})) + (\nabla
 
 ![../imgs/modified_secant/trial_2.png](https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_2.png?v=1)
 
-(Fig. 15 関数値一致の修正セカント方程式。前の点 $x_{k}$ での関数値 $f(x_{k})$ と $m_k^{\mathrm{F}}(x_{k})$ が一致している。)
+(Fig. 15 関数値一致の修正セカント方程式。前の点 $x_{k}$ での関数値 $f(x_{k})$ と $m_{k+1}^{\mathrm{F}}(x_{k})$ が一致している。)
 
 #### 三次項による修正セカント条件
 
@@ -2319,7 +2356,7 @@ B_{k+1}^{\mathrm{C}} s_k = y_k + \frac{6(f(x_k) - f(x_{k+1})) + 3 s_k^\top (\nab
 
 これが三次項による修正セカント条件です。具体例としてFig. 16も参照してください。
 
-<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_1_cubic.png?v=1" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_1_quadratic.png?v=1" />
+<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_1_cubic.png?v=1" alt="trial 1 cubic" /><img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/modified_secant/trial_1_quadratic.png?v=1" alt="trial 1 quadratic" />
 
 (Fig. 16 三次項による修正セカント方程式。三次項をモデルに組み込むことで、前の点で関数値と勾配の両方を一致させることが出来ます。その二次項までの展開によって、モデルを作成します。)
 
@@ -2349,26 +2386,28 @@ s_i = x_{k+1} - x_i, \quad y_i = \nabla f(x_{k+1}) - \nabla f(x_i). \quad (i = k
 
 以上です。お読みいただきありがとうございました。
 
-[^Doikov2021SecondOrderTensor]: Nikita Doikov. New Second-Order and Tensor Methods in Convex Optimization. PhD thesis, Universit\'e catholique de Louvain, 2021.
+[^Doikov2021SecondOrderTensor]: Nikita Doikov. New Second-Order and Tensor Methods in Convex Optimization. PhD thesis, Université catholique de Louvain, 2021.
 [^FanZhongXiuMingLianSokZuiShiHuaarugorizumu2023]: 飯塚 秀明. 連続最適化アルゴリズム. オーム社, 2023. ISBN 978-4-274-23006-6.
 [^babaie-kafakiModifiedBFGSAlgorithm2011]: Saman Babaie-Kafaki. A modified BFGS algorithm based on a hybrid secant equation. Science China Mathematics, 54 (9): 2019--2036, 2011. ISSN 1869-1862. https://doi.org/10.1007/s11425-011-4232-7.
 [^barzilaiTwoPointStepSize1988]: Jonathan Barzilai and Jonathan M. Borwein. Two-Point Step Size Gradient Methods. IMA Journal of Numerical Analysis, 8 (1): 141--148, 1988. ISSN 0272-4979. https://doi.org/10.1093/imanum/8.1.141.
-[^bauschkeBaillonHaddadTheoremRevisited2009]: Heinz H. Bauschke and Patrick L. Combettes. The Baillon-Haddad Theorem Revisited, 2009.
+[^bauschkeBaillonHaddadTheoremRevisited2009]: Heinz H. Bauschke and Patrick L. Combettes. The Baillon--Haddad Theorem Revisited, 2009.
 [^berahasLimitedmemoryBFGSDisplacement2022]: Albert S. Berahas, Frank E. Curtis, and Baoyu Zhou. Limited-memory BFGS with displacement aggregation. Mathematical Programming, 194 (1): 121--157, 2022. ISSN 1436-4646. https://doi.org/10.1007/s10107-021-01621-6.
-[^dennisjr.QuasiNewtonMethodsMotivation1977a]: J. E. Dennis, Jr. and Jorge J. Mor\'e. Quasi-Newton Methods, Motivation and Theory. SIAM Review, 19 (1): 46--89, 1977. ISSN 0036-1445. https://doi.org/10.1137/1019005.
+[^dennisCharacterizationSuperlinearConvergence1974]: J. E. Dennis and Jorge J. Moré. A Characterization of Superlinear Convergence and Its Application to Quasi-Newton Methods. Mathematics of Computation, 28 (126): 549--560, 1974. ISSN 0025-5718. https://doi.org/10.2307/2005926.
+[^dennisjrQuasiNewtonMethodsMotivation1977]: J. E. Dennis, Jr. and Jorge J. Moré. Quasi-Newton Methods, Motivation and Theory. SIAM Review, 19 (1): 46--89, 1977. ISSN 0036-1445. https://doi.org/10.1137/1019005.
 [^doi:10.1137/1.9781611971200]: J. E. Dennis and Robert B. Schnabel. Numerical Methods for Unconstrained Optimization and Nonlinear Equations. Society for Industrial and Applied Mathematics, 1996. https://doi.org/10.1137/1.9781611971200.
-[^haeltermanAnalyticalStudyLeast2009]: Robby Haelterman. Analytical study of the Least Squares Quasi-Newton method for interaction problems. PhD thesis, 2009.
+[^haeltermanAnalyticalStudyLeast2009]: Robby Haelterman. Analytical study of the Least Squares Quasi-Newton method for interaction problems. PhD thesis, Ghent University, 2009. URL http://lib.ugent.be/catalog/rug01:001333190.
+[^jinNonasymptoticGlobalConvergence2025]: Qiujiang Jin, Ruichen Jiang, and Aryan Mokhtari. Non-asymptotic global convergence rates of BFGS with exact line search. Mathematical Programming, August 2025. ISSN 1436-4646. https://doi.org/10.1007/s10107-025-02256-7.
 [^kanamori2016continuous]: 金森 敬文, 鈴木 大慈, 竹内 一郎, and 佐藤 一誠. 機械学習のための連続最適化. 機械学習プロフェッショナルシリーズ. 講談社サイエンティフィク, 2016. ISBN 978-4-06-152920-5.
-[^kanamoriBregmanExtensionQuasiNewton2010]: Takafumi Kanamori and Atsumi Ohara. A Bregman Extension of quasi-Newton updates II: Convergence and Robustness Properties, 2010\natexlaba.
-[^kanamoriBregmanExtensionQuasiNewton2010a]: Takafumi Kanamori and Atsumi Ohara. A Bregman Extension of quasi-Newton updates I: An Information Geometrical framework, 2010\natexlabb.
+[^kanamoriBregmanExtensionQuasiNewton2010]: Takafumi Kanamori and Atsumi Ohara. A Bregman Extension of quasi-Newton updates I: An Information Geometrical framework, 2010\natexlaba.
+[^kanamoriBregmanExtensionQuasiNewton2010a]: Takafumi Kanamori and Atsumi Ohara. A Bregman Extension of quasi-Newton updates II: Convergence and Robustness Properties, 2010\natexlabb.
 [^leeAdvancingMultiSecantQuasiNewton2025]: Mokhwa Lee and Yifan Sun. Advancing Multi-Secant Quasi-Newton Methods for General Convex Functions, 2025.
-[^liuLimitedMemoryBFGS1989a]: Dong C. Liu and Jorge Nocedal. On the limited memory BFGS method for large scale optimization. Mathematical Programming, 45 (1): 503--528, 1989. ISSN 1436-4646. https://doi.org/10.1007/BF01589116.
+[^liuLimitedMemoryBFGS1989]: Dong C. Liu and Jorge Nocedal. On the limited memory BFGS method for large scale optimization. Mathematical Programming, 45 (1): 503--528, 1989. ISSN 1436-4646. https://doi.org/10.1007/BF01589116.
 [^m.j.d.powellNewAlgorithmUnconstrained1970]: M.J.D. Powell. A New Algorithm for Unconstrained Optimization. In Nonlinear Programming, pages 31--65. Academic Press, 1970. https://doi.org/10.1016/B978-0-12-597050-1.50006-3.
 [^nesterovIntroductoryLecturesConvex2014]: Yurii Nesterov. Introductory Lectures on Convex Optimization: A Basic Course. Springer Publishing Company, Incorporated, 1 edition, 2014. ISBN 978-1-4613-4691-3.
 [^nocedal1999numerical]: Jorge Nocedal and Stephen J Wright. Numerical Optimization. Springer, 1999. ISBN 978-0-387-30303-1. https://doi.org/10.1007/978-0-387-40065-5.
-[^powellHowBadAre1986]: M. J. D. Powell. How bad are the BFGS and DFP methods when the objective function is quadratic? Mathematical Programming, 34 (1): 34--47, January 1986. ISSN 1436-4646. https://doi.org/10.1007/BF01582161.
+[^powellHowBadAre1986]: M. J. D. Powell. How bad are the BFGS and DFP methods when the objective function is quadratic? Mathematical Programming, 34 (1): 34--47, 1986. ISSN 1436-4646. https://doi.org/10.1007/BF01582161.
 [^rockafellarVariationalAnalysis1998]: R. Tyrrell Rockafellar and Roger J. B. Wets. Variational Analysis, volume 317 of Grundlehren Der Mathematischen Wissenschaften. Springer, 1998. ISBN 978-3-540-62772-2 978-3-642-02431-3. https://doi.org/10.1007/978-3-642-02431-3.
-[^shannoMatrixConditioningNonlinear1978]: D. F. Shanno and Kang-Hoh Phua. Matrix conditioning and nonlinear optimization. Mathematical Programming, 14 (1): 149--160, December 1978. ISSN 1436-4646. https://doi.org/10.1007/BF01588962.
+[^shannoMatrixConditioningNonlinear1978]: D. F. Shanno and Kang-Hoh Phua. Matrix conditioning and nonlinear optimization. Mathematical Programming, 14 (1): 149--160, 1978. ISSN 1436-4646. https://doi.org/10.1007/BF01588962.
 [^weiNewQuasiNewtonMethods2006]: Zengxin Wei, Guoyin Li, and Liqun Qi. New quasi-Newton methods for unconstrained optimization problems. Applied Mathematics and Computation, 175 (2): 1156--1188, 2006. ISSN 0096-3003. https://doi.org/10.1016/j.amc.2005.08.027.
 [^yabeLocalSuperlinearConvergence2007]: Hiroshi Yabe, Hideho Ogasawara, and Masayuki Yoshino. Local and superlinear convergence of quasi-Newton methods based on modified secant conditions. Journal of Computational and Applied Mathematics, 205 (1): 617--632, 2007. ISSN 03770427. https://doi.org/10.1016/j.cam.2006.05.018.
 [^yuanModifiedBFGSAlgorithm1991]: Ya-Xiang Yuan. A Modified BFGS Algorithm for Unconstrained Optimization. IMA Journal of Numerical Analysis, 11 (3): 325--332, 1991. ISSN 0272-4979. https://doi.org/10.1093/imanum/11.3.325.

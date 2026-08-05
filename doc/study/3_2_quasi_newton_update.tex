@@ -9,9 +9,9 @@
 \fi
 
 \ifEn
-    Given $B_k$, $s_k$, and $y_k$, there exist many update rules that produce $B_{k+1}$ satisfying the secant condition. We introduce several representative ones together with their derivations~\citep{dennisjr.QuasiNewtonMethodsMotivation1977}. In this subsection only, for brevity, we abbreviate $B_k$, $B_{k+1}$, $s_k$, and $y_k$ as $B$, $\bar{B}$, $s$, and $y$, respectively.
+    Given $B_k$, $s_k$, and $y_k$, there exist many update rules that produce $B_{k+1}$ satisfying the secant condition. We introduce several representative ones together with their derivations~\citep{dennisjrQuasiNewtonMethodsMotivation1977}. In this subsection only, for brevity, we abbreviate $B_k$, $B_{k+1}$, $s_k$, and $y_k$ as $B$, $\bar{B}$, $s$, and $y$, respectively.
 \else
-    $B_k$, $s_k$, $y_k$ が与えられたとき、セカント条件を満たす $B_{k+1}$ を与える更新則は多数存在します。ここでは代表的なものをその導出とともに示します~\citep{dennisjr.QuasiNewtonMethodsMotivation1977}。本小節に限り、簡潔さのため $B_k$, $B_{k+1}$, $s_k$, $y_k$ をそれぞれ $B$, $\bar{B}$, $s$, $y$ と略記します。
+    $B_k$, $s_k$, $y_k$ が与えられたとき、セカント条件を満たす $B_{k+1}$ を与える更新則は多数存在します。ここでは代表的なものをその導出とともに示します~\citep{dennisjrQuasiNewtonMethodsMotivation1977}。本小節に限り、簡潔さのため $B_k$, $B_{k+1}$, $s_k$, $y_k$ をそれぞれ $B$, $\bar{B}$, $s$, $y$ と略記します。
 \fi
 
 \ifEn
@@ -36,9 +36,9 @@
 \fi
 
 \ifEn
-    We derive this formula from simple structural assumptions~\citep[Section 4]{dennisjr.QuasiNewtonMethodsMotivation1977}.
+    We derive this formula from simple structural assumptions~\citep[Section 4]{dennisjrQuasiNewtonMethodsMotivation1977}.
 \else
-    単純な構造的仮定からこの公式を導出します~\citep[Section 4]{dennisjr.QuasiNewtonMethodsMotivation1977}。
+    単純な構造的仮定からこの公式を導出します~\citep[Section 4]{dennisjrQuasiNewtonMethodsMotivation1977}。
 \fi
 \begin{proposition}
     \ifEn
@@ -101,7 +101,7 @@
     Broyden更新は、フロベニウスノルムにおける最小変化更新としても特徴づけられます。
 \fi
 
-\begin{proposition}[{\citep[Theorem 4.1]{dennisjr.QuasiNewtonMethodsMotivation1977}}]
+\begin{proposition}[{\citep[Theorem 4.1]{dennisjrQuasiNewtonMethodsMotivation1977}}]
     \ifEn
         Let $B\in\mathbb{R}^{n\times n}$, $y\in\mathbb{R}^n$, and $s\in\mathbb{R}^n\setminus\{ 0 \}$ be given. Then $\bar{B}_{\mathrm{Broyden}}$ is the unique solution of the following optimization problem:
     \else
@@ -309,7 +309,7 @@
     重要な結果として、行列の列 $\{ C_t \}_t$ はセカント条件を満たす対称行列に収束します。次の命題ではそれを示します。
 \fi
 
-\begin{proposition}[{\citep[Lemma 7.2]{dennisjr.QuasiNewtonMethodsMotivation1977}}]\label{prop:psb-convergence}
+\begin{proposition}[{\citep[Lemma 7.2]{dennisjrQuasiNewtonMethodsMotivation1977}}]\label{prop:psb-convergence}
     \ifEn
         Suppose that $c^\top s \neq 0$. Then, the sequence $\{ C_t \}_t$ converges, and the limit is given by
     \else
