@@ -328,6 +328,14 @@ def add_version_query(image_path: str, url: str) -> str:
     return url
 
 
+def make_image_alt_text(image_path: str, caption_text: str | None = None) -> str:
+    """Build concise alt text for generated Markdown images."""
+    if caption_text:
+        return caption_text
+    stem = Path(image_path).stem
+    return stem.replace("_", " ").replace("-", " ")
+
+
 def convert_figure_to_md(block: str, counter: int) -> str:
     r"""Convert LaTeX figure block to Markdown.
 
@@ -338,6 +346,12 @@ def convert_figure_to_md(block: str, counter: int) -> str:
     if not image_entries:
         return ""
 
+    caption_texts = extract_braced_content(block, "caption")
+    caption_text = None
+    if caption_texts:
+        assert len(caption_texts) == 1
+        caption_text = caption_texts[0].replace("\n", " ").strip()
+
     if len(image_entries) == 1:
         image_path = image_entries[0]["path"].replace(".pdf", ".png")
         if USE_GITHUB_URL:
@@ -346,7 +360,8 @@ def convert_figure_to_md(block: str, counter: int) -> str:
             url = add_version_query(image_path, url)
         else:
             url = image_path
-        result = f"![{image_path}]({url})\n"
+        alt_text = make_image_alt_text(image_path, caption_text)
+        result = f"![{alt_text}]({url})\n"
     else:
         img_tags = []
         for entry in image_entries:
@@ -358,18 +373,16 @@ def convert_figure_to_md(block: str, counter: int) -> str:
             else:
                 url = image_path
             width = entry.get("width_percent")
+            alt_text = make_image_alt_text(image_path)
             if width is not None:
                 if "modified_secant/trial" in image_path:
                     width = "100"
-                img_tags.append(f'<img width="{width}%" src="{url}" />')
+                img_tags.append(f'<img width="{width}%" src="{url}" alt="{alt_text}" />')
             else:
-                img_tags.append(f'<img src="{url}" />')
+                img_tags.append(f'<img src="{url}" alt="{alt_text}" />')
         result = "".join(img_tags) + "\n"
 
-    caption_texts = extract_braced_content(block, "caption")
-    if caption_texts:
-        assert len(caption_texts) == 1
-        caption_text = caption_texts[0].replace("\n", " ").strip()
+    if caption_text:
         result += f"\n({ENV_DISPLAY_NAMES['figure']} {counter} {caption_text})\n"
 
     return result

@@ -623,7 +623,7 @@ The purpose of this subsection is to show that $B_k$ can satisfy \cref{ass:BBoun
 
 \paragraph{Construction of $B_k$: }
 
-We briefly note the L-BFGS method and the curvature pair notation~\citep{nocedal1999numerical,liuLimitedMemoryBFGS1989a,berahasLimitedmemoryBFGSDisplacement2022}.
+We briefly note the L-BFGS method and the curvature pair notation~\citep{nocedal1999numerical,liuLimitedMemoryBFGS1989,berahasLimitedmemoryBFGSDisplacement2022}.
 For an iteration $k$, we define
 \begin{equation*}
     s_k \defeq x_{k+1}-x_k,\qquad
@@ -685,7 +685,7 @@ We begin by describing how to compute the search direction
     d_k=-(B_k+\mu_k I)^{-1}g_k
 \end{equation*}
 with $B_k$ in \cref{eq:proposed_choice_of_Bk}.
-When $\mu_k=0$, the direction can be computed efficiently by the standard L-BFGS two-loop recursion~\citep{liuLimitedMemoryBFGS1989a,nocedal1999numerical}.
+When $\mu_k=0$, the direction can be computed efficiently by the standard L-BFGS two-loop recursion~\citep{liuLimitedMemoryBFGS1989,nocedal1999numerical}.
 For the case $\mu_k>0$, regularized limited-memory schemes may in principle be employed~\citep{kanzowRegularizationLimitedMemory2023}.
 Alternatively, one may adopt the simple and robust approximation mentioned in the same reference.
 Specifically, we approximate $B_k$ in \cref{eq:proposed_choice_of_Bk} by

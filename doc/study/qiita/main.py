@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
 LaTeX to Markdown converter for study documents.
-Processes all .tex files in the current directory and combines them into one Markdown file.
+Processes the numbered .tex files in doc/study and combines them into one Markdown file.
 """
 
 import sys
 from pathlib import Path
 
-# Ensure imports work from doc/study directory
+# Ensure sibling converter modules can be imported when this file is run directly.
 sys.path.insert(0, str(Path(__file__).parent))
 
 from pdf_handler import convert_pdf_to_png
@@ -16,8 +16,8 @@ from processor import get_global_state, process_latex_file
 
 
 def main() -> None:
-    """Main function to process all .tex files in current directory."""
-    # Parse command line arguments for language setting
+    """Process the numbered LaTeX files in the parent doc/study directory."""
+    # Select the output language.
     is_japanese_mode = True
 
     global_state = get_global_state()
@@ -82,7 +82,7 @@ def main() -> None:
         top_sentences.extend([f"\n<!-- From {main_file} -->\n", main_content])
 
     top_sentences.append(
-        '\n<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/sixhump.png?v=1" />\n'
+        '\n<img width="100%" src="https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/doc/imgs/quasi_newton/sixhump.png?v=1" alt="Six-hump camel function optimization landscape" />\n'
     )
 
     # Add table of contents with language-specific text
@@ -126,6 +126,7 @@ def main() -> None:
     output_content = "\n".join(all_markdown_lines)
     output_content = post_process_content(output_content)
     output_content = for_qiita_post_process(output_content)
+    output_content = output_content.rstrip() + "\n"
     output_file.write_text(output_content, encoding="utf-8")
     print(f"\nConversion complete! Output written to {output_file}")
     print(f"Processed {len(tex_files)} files.")

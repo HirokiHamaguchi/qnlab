@@ -9,9 +9,9 @@
 \fi
 
 \ifEn
-    Given $B_k$, $s_k$, and $y_k$, there exist many update rules that produce $B_{k+1}$ satisfying the secant condition. We introduce several representative ones together with their derivations~\citep{dennisjr.QuasiNewtonMethodsMotivation1977a}. In this subsection only, for brevity, we abbreviate $B_k$, $B_{k+1}$, $s_k$, and $y_k$ as $B$, $\bar{B}$, $s$, and $y$, respectively.
+    Given $B_k$, $s_k$, and $y_k$, there exist many update rules that produce $B_{k+1}$ satisfying the secant condition. We introduce several representative ones together with their derivations~\citep{dennisjr.QuasiNewtonMethodsMotivation1977}. In this subsection only, for brevity, we abbreviate $B_k$, $B_{k+1}$, $s_k$, and $y_k$ as $B$, $\bar{B}$, $s$, and $y$, respectively.
 \else
-    $B_k$, $s_k$, $y_k$ が与えられたとき、セカント条件を満たす $B_{k+1}$ を与える更新則は多数存在します。ここでは代表的なものをその導出とともに示します~\citep{dennisjr.QuasiNewtonMethodsMotivation1977a}。本小節に限り、簡潔さのため $B_k$, $B_{k+1}$, $s_k$, $y_k$ をそれぞれ $B$, $\bar{B}$, $s$, $y$ と略記します。
+    $B_k$, $s_k$, $y_k$ が与えられたとき、セカント条件を満たす $B_{k+1}$ を与える更新則は多数存在します。ここでは代表的なものをその導出とともに示します~\citep{dennisjr.QuasiNewtonMethodsMotivation1977}。本小節に限り、簡潔さのため $B_k$, $B_{k+1}$, $s_k$, $y_k$ をそれぞれ $B$, $\bar{B}$, $s$, $y$ と略記します。
 \fi
 
 \ifEn
@@ -36,9 +36,9 @@
 \fi
 
 \ifEn
-    We derive this formula from simple structural assumptions~\citep[Section 4]{dennisjr.QuasiNewtonMethodsMotivation1977a}.
+    We derive this formula from simple structural assumptions~\citep[Section 4]{dennisjr.QuasiNewtonMethodsMotivation1977}.
 \else
-    単純な構造的仮定からこの公式を導出します~\citep[Section 4]{dennisjr.QuasiNewtonMethodsMotivation1977a}。
+    単純な構造的仮定からこの公式を導出します~\citep[Section 4]{dennisjr.QuasiNewtonMethodsMotivation1977}。
 \fi
 \begin{proposition}
     \ifEn
@@ -101,7 +101,7 @@
     Broyden更新は、フロベニウスノルムにおける最小変化更新としても特徴づけられます。
 \fi
 
-\begin{proposition}[{\citep[Theorem 4.1]{dennisjr.QuasiNewtonMethodsMotivation1977a}}]
+\begin{proposition}[{\citep[Theorem 4.1]{dennisjr.QuasiNewtonMethodsMotivation1977}}]
     \ifEn
         Let $B\in\mathbb{R}^{n\times n}$, $y\in\mathbb{R}^n$, and $s\in\mathbb{R}^n\setminus\{ 0 \}$ be given. Then $\bar{B}_{\mathrm{Broyden}}$ is the unique solution of the following optimization problem:
     \else
@@ -309,7 +309,7 @@
     重要な結果として、行列の列 $\{ C_t \}_t$ はセカント条件を満たす対称行列に収束します。次の命題ではそれを示します。
 \fi
 
-\begin{proposition}[{\citep[Lemma 7.2]{dennisjr.QuasiNewtonMethodsMotivation1977a}}]\label{prop:psb-convergence}
+\begin{proposition}[{\citep[Lemma 7.2]{dennisjr.QuasiNewtonMethodsMotivation1977}}]\label{prop:psb-convergence}
     \ifEn
         Suppose that $c^\top s \neq 0$. Then, the sequence $\{ C_t \}_t$ converges, and the limit is given by
     \else
@@ -1156,11 +1156,11 @@
 \ifEn
     Next, we discuss the limited memory quasi-Newton methods, which are crucial for extending quasi-Newton methods to large-scale optimization problems. In standard quasi-Newton methods, the approximate Hessian $B_k$ or its inverse $H_k$ is stored and updated explicitly as a dense matrix, requiring $\mathcal{O}(n^2)$ memory for $n$ variables. In contrast, limited memory quasi-Newton methods maintain only a limited amount of information, i.e., the most recent $m$ curvature pairs $\{(s_i,y_i)\}$ and perform computations related to the approximate Hessian using just this information. This reduces the space complexity to $\mathcal{O}(nm)$, which is a dramatic improvement when $m$ is a small constant (typically $m\le 10$).
 
-    The L-BFGS method~\citep{liuLimitedMemoryBFGS1989a}, which is a limited memory version of the BFGS update, is particularly representative. We focus on this BFGS update case and show how the quasi-Newton direction $d_k = -H_k g_k$ can be computed efficiently in terms of both space and time complexity using only the limited information.
+    The L-BFGS method~\citep{liuLimitedMemoryBFGS1989}, which is a limited memory version of the BFGS update, is particularly representative. We focus on this BFGS update case and show how the quasi-Newton direction $d_k = -H_k g_k$ can be computed efficiently in terms of both space and time complexity using only the limited information.
 \else
     以下では、準ニュートン法を大規模最適化問題へ拡張する際に重要となる、記憶制限準ニュートン法について説明します。通常の準ニュートン法では、近似ヘッセ行列 $B_k$ またはその逆行列 $H_k$ を密行列として陽に保存・更新するため、$n$ 変数に対して $\mathcal{O}(n^2)$ のメモリを要します。一方で、記憶制限準ニュートン法では、最新の $m$ 組のベクトルペア $\{(s_i,y_i)\}$ という限られた情報のみを保持して、その情報だけから近似ヘッセ行列に関する計算を行います。この工夫により空間計算量は $\mathcal{O}(nm)$ に減少し、$m$ が小さな定数(通常は $m\le 10$) のとき大幅な改善となります。
 
-    特に、BFGS更新の記憶制限版であるL-BFGS法~\citep{liuLimitedMemoryBFGS1989a}は、その代表的な手法です。このBFGS更新の場合に注目し、限られた情報だけを用いて準ニュートン方向 $d_k = -H_k g_k$ を空間計算量・時間計算量の両面で効率的に計算する方法を示します。
+    特に、BFGS更新の記憶制限版であるL-BFGS法~\citep{liuLimitedMemoryBFGS1989}は、その代表的な手法です。このBFGS更新の場合に注目し、限られた情報だけを用いて準ニュートン方向 $d_k = -H_k g_k$ を空間計算量・時間計算量の両面で効率的に計算する方法を示します。
 \fi
 
 \ifEn
@@ -1359,9 +1359,9 @@
 \end{equation*}
 \ifEn
     Note that the pair $(s_{m-1}, y_{m-1})$ is the most recent one.
-    This choice is motivated by the following discussion~\citep{liuLimitedMemoryBFGS1989a,shannoMatrixConditioningNonlinear1978}. Assume that the objective function $f$ is twice continuously differentiable and consider the mean Hessian along the most recent step:
+    This choice is motivated by the following discussion~\citep{liuLimitedMemoryBFGS1989,shannoMatrixConditioningNonlinear1978}. Assume that the objective function $f$ is twice continuously differentiable and consider the mean Hessian along the most recent step:
 \else
-    この選択は次の議論によって正当化できます~\citep{liuLimitedMemoryBFGS1989a,shannoMatrixConditioningNonlinear1978}。目的関数 $f$ が二回連続微分可能であると仮定し、最新のステップに沿った平均ヘッセ行列を考えます。
+    この選択は次の議論によって正当化できます~\citep{liuLimitedMemoryBFGS1989,shannoMatrixConditioningNonlinear1978}。目的関数 $f$ が二回連続微分可能であると仮定し、最新のステップに沿った平均ヘッセ行列を考えます。
 \fi
 \begin{equation*}
     \bar{G} \coloneqq \int_0^1 \nabla^2 f(x + \tau s_{m-1}) \mathrm{d}\tau.
