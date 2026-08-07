@@ -439,3 +439,4 @@ def vis(
 
     _save_or_show_figure(pdf_path)
     plt.rcdefaults()
+    plt.close()
