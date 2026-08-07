@@ -1,8 +1,8 @@
 import numpy as np
 import numpy.typing as npt
 
-from qnlab.update.update import check_direction, get_direction
-from qnlab.util.memory_interface import QuasiNewtonMemory
+from qnlab.update.update import check_direction, get_direction, get_direction_reg
+from qnlab.util.memory_interface import LBFGSWorkspace, QuasiNewtonMemory
 from qnlab.util.method import Method
 
 
@@ -36,7 +36,7 @@ def generate_lm(
         if len(lm) and (
             np.abs(lm.get_last().ys) < 1e-3 or np.abs(lm.get_last().yy) < 1e-3
         ):
-            lm._deque.pop()
+            lm.pop_last()
             continue
 
         if len(lm) >= maxlen:
@@ -51,6 +51,73 @@ def test_dir_BFGS_and_check():
         d_lbfgs = get_direction(method, xk, gk, lm)
         check_direction(method, n, gk, d_lbfgs, lm)
     print("BFGS passed")
+
+
+def test_lbfgs_workspace_keeps_contiguous_pairs_and_gram_matrices():
+    workspace = LBFGSWorkspace(n=5, capacity=3)
+    rng = np.random.default_rng(12)
+    pairs = [(rng.normal(size=5), rng.normal(size=5)) for _ in range(4)]
+    for step, gradient in pairs:
+        workspace.append(step, gradient)
+
+    expected_steps = np.column_stack([pair[0] for pair in pairs[-3:]])
+    expected_gradients = np.column_stack([pair[1] for pair in pairs[-3:]])
+    np.testing.assert_allclose(workspace.steps, expected_steps)
+    np.testing.assert_allclose(workspace.gradients, expected_gradients)
+    np.testing.assert_allclose(
+        workspace.step_products, expected_steps.T @ expected_steps
+    )
+    np.testing.assert_allclose(
+        workspace.step_gradient, expected_steps.T @ expected_gradients
+    )
+    np.testing.assert_allclose(
+        workspace.gradient_products, expected_gradients.T @ expected_gradients
+    )
+
+
+def test_workspace_two_loop_matches_pairwise_reference():
+    rng = np.random.default_rng(21)
+    n = 8
+    matrix = rng.normal(size=(n, n))
+    matrix = matrix.T @ matrix + np.eye(n)
+    method = Method("NTRQN", "raw", "raw", "bfgs")
+    point = np.zeros(n)
+    memory = QuasiNewtonMemory(matrix @ point, maxlen=4, method=method)
+    for _ in range(6):
+        new_point = point + rng.normal(size=n)
+        memory.add_new_data(
+            new_point,
+            np.float64(0.0),
+            matrix @ new_point,
+            point,
+            np.float64(0.0),
+            matrix @ point,
+            None,
+            np.float64(0.0),
+        )
+        point = new_point
+
+    gradient = rng.normal(size=n)
+    for mu in (np.float64(0.0), np.float64(0.7)):
+        direction = -gradient.copy()
+        alphas = np.empty(len(memory))
+        items = list(memory)
+        for index in range(len(items) - 1, -1, -1):
+            item = items[index]
+            denominator = item.ys + mu * item.ss
+            alphas[index] = np.dot(item.s, direction) / denominator
+            direction -= alphas[index] * (item.y + mu * item.s)
+        last = items[-1]
+        direction *= (last.ys + mu * last.ss) / (
+            last.yy + 2.0 * mu * last.ys + mu * mu * last.ss
+        )
+        for index, item in enumerate(items):
+            beta = np.dot(item.y + mu * item.s, direction) / (item.ys + mu * item.ss)
+            direction += (alphas[index] - beta) * item.s
+
+        np.testing.assert_allclose(
+            get_direction_reg(method, point, gradient, memory, mu), direction
+        )
 
 
 def test_dir_DFP_and_check():

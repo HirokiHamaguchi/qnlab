@@ -11,7 +11,6 @@ import numpy.typing as npt
 from qnlab.parameter import NTRQNParameter
 from qnlab.problem.base import BaseProblem
 from qnlab.solver.qn_ntrqn import line_search_relaxed_armijo
-from qnlab.update.update import get_direction_reg
 from qnlab.util.callback import Callback
 from qnlab.util.check_termination import check_termination
 from qnlab.util.memory_interface import QuasiNewtonMemory
@@ -99,6 +98,7 @@ class _CompactBFGS:
     vectors: npt.NDArray[np.float64]
     coefficients: npt.NDArray[np.float64]
     inverse_coefficients: npt.NDArray[np.float64] | None = None
+    vector_gram: npt.NDArray[np.float64] | None = None
 
     def __post_init__(self) -> None:
         if self.coefficients.ndim == 1:
@@ -120,17 +120,17 @@ class _CompactBFGS:
                 np.empty((0, 0), dtype=np.float64),
             )
 
-        regularized_pairs: list[
-            tuple[npt.NDArray[np.float64], npt.NDArray[np.float64], np.float64]
-        ] = []
-        for item in memory:
-            regularized_y = item.y + mu * item.s
-            regularized_ys = np.float64(item.ys + mu * item.ss)
-            if not np.isfinite(regularized_ys) or regularized_ys <= 0.0:
-                continue
-            regularized_pairs.append((item.s, regularized_y, regularized_ys))
-
-        if not regularized_pairs:
+        workspace = memory.workspace
+        steps = workspace.steps
+        gradients = workspace.gradients
+        step_products = workspace.step_products
+        step_gradient = workspace.step_gradient
+        gradient_products = workspace.gradient_products
+        regularized_pair_products = np.diag(step_gradient) + mu * np.diag(step_products)
+        valid = np.isfinite(regularized_pair_products) & (
+            regularized_pair_products > 0.0
+        )
+        if not np.any(valid):
             diagonal = mu if mu > 0.0 else np.float64(1.0 / memory.zero_length)
             return cls(
                 np.float64(diagonal),
@@ -138,9 +138,22 @@ class _CompactBFGS:
                 np.empty((0, 0), dtype=np.float64),
             )
 
-        last_y = regularized_pairs[-1][1]
-        last_ys = regularized_pairs[-1][2]
-        diagonal = np.float64(np.dot(last_y, last_y) / last_ys)
+        if not np.all(valid):
+            indices = np.flatnonzero(valid)
+            steps = steps[:, indices]
+            gradients = gradients[:, indices]
+            step_products = step_products[np.ix_(indices, indices)]
+            step_gradient = step_gradient[np.ix_(indices, indices)]
+            gradient_products = gradient_products[np.ix_(indices, indices)]
+
+        regularized_step_gradient = step_gradient + mu * step_products
+        regularized_gradient_products = (
+            gradient_products
+            + mu * (step_gradient + step_gradient.T)
+            + mu * mu * step_products
+        )
+        last_ys = regularized_step_gradient[-1, -1]
+        diagonal = np.float64(regularized_gradient_products[-1, -1] / last_ys)
         if not np.isfinite(diagonal) or diagonal <= 0.0:
             diagonal = mu if mu > 0.0 else np.float64(1.0 / memory.zero_length)
             return cls(
@@ -149,18 +162,21 @@ class _CompactBFGS:
                 np.empty((0, 0), dtype=np.float64),
             )
 
-        steps = np.asarray([pair[0] for pair in regularized_pairs]).T
-        gradients = np.asarray([pair[1] for pair in regularized_pairs]).T
-        step_gradient = steps.T @ gradients
-        lower = np.tril(step_gradient, k=-1)
-        pair_products = np.diag(np.diag(step_gradient))
-        middle = np.block(
-            [
-                [diagonal * (steps.T @ steps), lower],
-                [lower.T, -pair_products],
-            ]
-        )
-        vectors = np.concatenate((diagonal * steps, gradients), axis=1)
+        lower = np.tril(regularized_step_gradient, k=-1)
+        pair_products = np.diag(regularized_step_gradient)
+        col = pair_products.size
+        middle = np.empty((2 * col, 2 * col), dtype=np.float64)
+        middle[:col, :col] = diagonal * step_products
+        middle[:col, col:] = lower
+        middle[col:, :col] = lower.T
+        middle[col:, col:] = -np.diag(pair_products)
+
+        vectors = np.concatenate((diagonal * steps, gradients + mu * steps), axis=1)
+        vector_gram = np.empty_like(middle)
+        vector_gram[:col, :col] = diagonal * diagonal * step_products
+        vector_gram[:col, col:] = diagonal * regularized_step_gradient
+        vector_gram[col:, :col] = vector_gram[:col, col:].T
+        vector_gram[col:, col:] = regularized_gradient_products
         try:
             coefficients = np.linalg.solve(middle, -np.eye(middle.shape[0]))
         except np.linalg.LinAlgError:
@@ -179,6 +195,7 @@ class _CompactBFGS:
             vectors,
             coefficients,
             -middle,
+            vector_gram,
         )
 
     def apply(self, vector: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
@@ -228,7 +245,15 @@ class _CompactBFGS:
             else:
                 inverse_coefficients = stored_inverse
             middle = inverse_coefficients.copy()
-            middle += restricted_vectors.T @ restricted_vectors / self.diagonal
+            active = ~free
+            if self.vector_gram is not None and np.count_nonzero(
+                active
+            ) < np.count_nonzero(free):
+                active_vectors = self.vectors[active]
+                restricted_gram = self.vector_gram - active_vectors.T @ active_vectors
+            else:
+                restricted_gram = restricted_vectors.T @ restricted_vectors
+            middle += restricted_gram / self.diagonal
             middle = 0.5 * (middle + middle.T)
             right = restricted_vectors.T @ restricted_rhs / self.diagonal
             try:
@@ -242,12 +267,24 @@ class _CompactBFGS:
         return result
 
 
+@dataclass
+class _BoxWorkspace:
+    """Reusable arrays whose size depends only on the problem dimension."""
+
+    breakpoint_values: npt.NDArray[np.float64]
+
+    @classmethod
+    def create(cls, n: int) -> "_BoxWorkspace":
+        return cls(np.empty(n, dtype=np.float64))
+
+
 def _generalized_cauchy_point(
     x: npt.NDArray[np.float64],
     g: npt.NDArray[np.float64],
     lb: npt.NDArray[np.float64],
     ub: npt.NDArray[np.float64],
     operator: _CompactBFGS,
+    workspace: _BoxWorkspace | None = None,
 ) -> tuple[
     npt.NDArray[np.float64],
     npt.NDArray[np.bool_],
@@ -266,7 +303,12 @@ def _generalized_cauchy_point(
     if not np.any(path_direction):
         return x.copy(), active, np.zeros(operator.vectors.shape[1])
 
-    breakpoint_values = np.full(x.size, np.inf, dtype=np.float64)
+    breakpoint_values = (
+        np.full(x.size, np.inf, dtype=np.float64)
+        if workspace is None
+        else workspace.breakpoint_values
+    )
+    breakpoint_values.fill(np.inf)
     toward_lower = (path_direction < 0.0) & np.isfinite(lb)
     toward_upper = (path_direction > 0.0) & np.isfinite(ub)
     breakpoint_values[toward_lower] = (
@@ -278,8 +320,14 @@ def _generalized_cauchy_point(
     bounded = np.flatnonzero(
         np.isfinite(breakpoint_values) & (breakpoint_values >= 0.0)
     )
-    breakpoints = [(float(breakpoint_values[i]), int(i)) for i in bounded]
-    heapq.heapify(breakpoints)
+    if bounded.size > 0:
+        first_index = int(bounded[np.argmin(breakpoint_values[bounded])])
+        first_breakpoint = float(breakpoint_values[first_index])
+    else:
+        first_index = -1
+        first_breakpoint = np.inf
+    first_pending = True
+    breakpoints: list[tuple[float, int]] | None = None
 
     compact_direction = operator.vectors.T @ path_direction
     compact_step = np.zeros(operator.vectors.shape[1], dtype=np.float64)
@@ -292,7 +340,20 @@ def _generalized_cauchy_point(
     elapsed = np.float64(0.0)
 
     while True:
-        breakpoint, index = heapq.heappop(breakpoints) if breakpoints else (np.inf, -1)
+        if first_pending:
+            breakpoint, index = first_breakpoint, first_index
+            first_pending = False
+        else:
+            if breakpoints is None:
+                breakpoints = [
+                    (float(breakpoint_values[i]), int(i))
+                    for i in bounded
+                    if i != first_index
+                ]
+                heapq.heapify(breakpoints)
+            breakpoint, index = (
+                heapq.heappop(breakpoints) if breakpoints else (np.inf, -1)
+            )
         interval = np.float64(max(0.0, breakpoint - elapsed))
         minimizer = np.float64(-derivative / curvature)
         if minimizer < interval:
@@ -363,25 +424,19 @@ def _subspace_minimization(
 
 
 def _box_quasi_newton_direction(
-    method: Method,
     x: npt.NDArray[np.float64],
     g: npt.NDArray[np.float64],
     memory: QuasiNewtonMemory,
     mu: np.float64,
     lb: npt.NDArray[np.float64],
     ub: npt.NDArray[np.float64],
+    workspace: _BoxWorkspace | None = None,
 ) -> npt.NDArray[np.float64]:
     """Approximately minimize the regularized L-BFGS model over the box."""
-    unconstrained = get_direction_reg(method, x, g, memory, mu)
-    if (
-        np.all(np.isfinite(unconstrained))
-        and np.all(lb - x <= unconstrained)
-        and np.all(unconstrained <= ub - x)
-    ):
-        return unconstrained
-
     operator = _CompactBFGS.from_memory(memory, mu, x.size)
-    cauchy, active, compact_step = _generalized_cauchy_point(x, g, lb, ub, operator)
+    cauchy, active, compact_step = _generalized_cauchy_point(
+        x, g, lb, ub, operator, workspace
+    )
     candidate = _subspace_minimization(
         cauchy, active, x, g, lb, ub, operator, compact_step
     )
@@ -429,6 +484,7 @@ def qn_ntrqnb(
         return RetCode.ALREADY_MINIMIZED, fx, x
 
     memory = QuasiNewtonMemory(pg, param.m, method)
+    box_workspace = _BoxWorkspace.create(prob.n)
     past_fx: deque[np.float64] = deque([], maxlen=param.past)
     reference_values: deque[np.float64] = deque([fx], maxlen=param.non_monotone)
 
@@ -459,7 +515,7 @@ def qn_ntrqnb(
             mu = pg_norm * param.mu_scale
             mu = np.clip(mu, param.mu_min_fraction * offo, offo)
 
-        direction = _box_quasi_newton_direction(method, x, g, memory, mu, lb, ub)
+        direction = _box_quasi_newton_direction(x, g, memory, mu, lb, ub, box_workspace)
 
         ref_fx = (
             max(reference_values)  # type: ignore[type-var]

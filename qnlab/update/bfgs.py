@@ -46,35 +46,49 @@ class BFGSUpdateRule(BaseUpdateRule):
         # pp. 773--782, 1980.
         if len(lm) == 0:
             return -g
+        return BFGSUpdateRule._compute_dir_reg(g, lm, np.float64(0.0))
+
+    @staticmethod
+    def _compute_dir_reg(g, lm, mu) -> npt.NDArray[np.float64]:
+        workspace = lm.workspace
+        steps = workspace.steps
+        gradients = workspace.gradients
+        step_norms = workspace.step_norms
+        pair_products = workspace.pair_products
+        gradient_norms = workspace.gradient_norms
+        alphas = workspace.alphas
+        count = workspace.size
+
         d = -g.copy()
-        for item in reversed(lm):
-            item.alpha = np.dot(item.s, d) / item.ys
-            d -= item.alpha * item.y
-        d *= lm.get_last().ys / lm.get_last().yy
-        for item in lm:
-            beta = np.dot(item.y, d) / item.ys
-            d += (item.alpha - beta) * item.s
+        denominators = pair_products + mu * step_norms
+        for index in range(count - 1, -1, -1):
+            alpha = np.dot(steps[:, index], d) / denominators[index]
+            alphas[index] = alpha
+            d -= alpha * gradients[:, index]
+            if mu != 0.0:
+                d -= alpha * mu * steps[:, index]
+
+        last = count - 1
+        numerator = denominators[last]
+        denominator = (
+            gradient_norms[last]
+            + 2.0 * mu * pair_products[last]
+            + mu * mu * step_norms[last]
+        )
+        d *= numerator / denominator
+
+        for index in range(count):
+            beta = (
+                np.dot(gradients[:, index], d) + mu * np.dot(steps[:, index], d)
+            ) / denominators[index]
+            d += (alphas[index] - beta) * steps[:, index]
         return d
 
     @staticmethod
     def compute_dir_reg(x, g, lm, mu) -> npt.NDArray[np.float64]:
         """Uses new_y = y + mu * s in the update."""
         assert len(lm) > 0
-        d = -g.copy()
-        for item in reversed(lm):
-            item.alpha = np.dot(item.s, d) / (item.ys + mu * item.ss)
-            d -= item.alpha * item.y
-            d -= item.alpha * mu * item.s
-        firstItem = lm.get_last()
-        d *= (firstItem.ys + mu * firstItem.ss) / (
-            firstItem.yy + 2.0 * mu * firstItem.ys + mu * mu * firstItem.ss
-        )
-        for item in lm:
-            yd = np.dot(item.y, d)
-            sd = np.dot(item.s, d)
-            beta = (yd + mu * sd) / (item.ys + mu * item.ss)
-            d += (item.alpha - beta) * item.s
-        return d
+        return BFGSUpdateRule._compute_dir_reg(g, lm, mu)
 
     @staticmethod
     def check(n, g, d, lm) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:

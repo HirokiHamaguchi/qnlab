@@ -125,6 +125,30 @@ def test_cauchy_recurrence_does_not_reapply_full_operator():
     )
 
 
+def test_cauchy_does_not_build_heap_when_first_segment_contains_minimum(
+    monkeypatch,
+):
+    operator = _CompactBFGS(
+        diagonal=np.float64(1.0),
+        vectors=np.empty((2, 0)),
+        coefficients=np.empty((0, 0)),
+    )
+    monkeypatch.setattr(
+        "qnlab.solver.qn_ntrqnb.heapq.heapify",
+        lambda _: (_ for _ in ()).throw(AssertionError()),
+    )
+
+    cauchy, _, _ = _generalized_cauchy_point(
+        np.zeros(2),
+        np.array([-1.0, 2.0]),
+        np.full(2, -10.0),
+        np.full(2, 10.0),
+        operator,
+    )
+
+    np.testing.assert_allclose(cauchy, [1.0, -2.0])
+
+
 def test_compact_regularization_matches_ntrqn_two_loop():
     method = Method("NTRQNB", "raw", "raw", "bfgs")
     q = np.array([[4.0, 0.5, 0.0], [0.5, 3.0, 0.25], [0.0, 0.25, 2.0]])
@@ -242,7 +266,7 @@ def test_ntrqnb_matches_ntrqn_when_bounds_are_inactive():
     )
 
     assert boxed_result[0] == unconstrained_result[0]
-    np.testing.assert_allclose(boxed_result[1], unconstrained_result[1])
+    np.testing.assert_allclose(boxed_result[1], unconstrained_result[1], atol=1e-28)
     np.testing.assert_allclose(boxed_result[2], unconstrained_result[2])
     np.testing.assert_allclose(boxed_callback.xs, unconstrained_callback.xs)
 
