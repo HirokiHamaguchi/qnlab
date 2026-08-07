@@ -2,6 +2,7 @@
 
 from collections import deque
 from dataclasses import dataclass
+import heapq
 from typing import Protocol, Sequence, TypeAlias, Union, runtime_checkable
 
 import numpy as np
@@ -97,6 +98,11 @@ class _CompactBFGS:
     diagonal: np.float64
     vectors: npt.NDArray[np.float64]
     coefficients: npt.NDArray[np.float64]
+    inverse_coefficients: npt.NDArray[np.float64] | None = None
+
+    def __post_init__(self) -> None:
+        if self.coefficients.ndim == 1:
+            self.coefficients = np.diag(self.coefficients)
 
     @classmethod
     def from_memory(
@@ -111,46 +117,68 @@ class _CompactBFGS:
             return cls(
                 np.float64(diagonal),
                 np.empty((n, 0), dtype=np.float64),
-                np.empty(0, dtype=np.float64),
+                np.empty((0, 0), dtype=np.float64),
             )
 
-        last = memory.get_last()
-        last_y = last.y + mu * last.s
-        last_ys = last.ys + mu * last.ss
-        diagonal = np.float64(np.dot(last_y, last_y) / last_ys)
-
-        vectors: list[npt.NDArray[np.float64]] = []
-        coefficients: list[np.float64] = []
+        regularized_pairs: list[
+            tuple[npt.NDArray[np.float64], npt.NDArray[np.float64], np.float64]
+        ] = []
         for item in memory:
             regularized_y = item.y + mu * item.s
-            regularized_ys = item.ys + mu * item.ss
-
-            bs = diagonal * item.s
-            for vector, coefficient in zip(vectors, coefficients):
-                bs = bs + coefficient * vector * np.dot(vector, item.s)
-            sbs = np.dot(item.s, bs)
-
-            # Stored BFGS pairs should make both denominators positive. Skip a
-            # pair if roundoff nevertheless makes its compact update unusable.
-            if (
-                not np.isfinite(regularized_ys)
-                or not np.isfinite(sbs)
-                or regularized_ys <= 0.0
-                or sbs <= 0.0
-            ):
+            regularized_ys = np.float64(item.ys + mu * item.ss)
+            if not np.isfinite(regularized_ys) or regularized_ys <= 0.0:
                 continue
-            vectors.extend((bs, regularized_y))
-            coefficients.extend(
-                (np.float64(-1.0 / sbs), np.float64(1.0 / regularized_ys))
+            regularized_pairs.append((item.s, regularized_y, regularized_ys))
+
+        if not regularized_pairs:
+            diagonal = mu if mu > 0.0 else np.float64(1.0 / memory.zero_length)
+            return cls(
+                np.float64(diagonal),
+                np.empty((n, 0), dtype=np.float64),
+                np.empty((0, 0), dtype=np.float64),
             )
 
-        compact_vectors = (
-            np.column_stack(vectors) if vectors else np.empty((n, 0), dtype=np.float64)
+        last_y = regularized_pairs[-1][1]
+        last_ys = regularized_pairs[-1][2]
+        diagonal = np.float64(np.dot(last_y, last_y) / last_ys)
+        if not np.isfinite(diagonal) or diagonal <= 0.0:
+            diagonal = mu if mu > 0.0 else np.float64(1.0 / memory.zero_length)
+            return cls(
+                np.float64(diagonal),
+                np.empty((n, 0), dtype=np.float64),
+                np.empty((0, 0), dtype=np.float64),
+            )
+
+        steps = np.asarray([pair[0] for pair in regularized_pairs]).T
+        gradients = np.asarray([pair[1] for pair in regularized_pairs]).T
+        step_gradient = steps.T @ gradients
+        lower = np.tril(step_gradient, k=-1)
+        pair_products = np.diag(np.diag(step_gradient))
+        middle = np.block(
+            [
+                [diagonal * (steps.T @ steps), lower],
+                [lower.T, -pair_products],
+            ]
         )
+        vectors = np.concatenate((diagonal * steps, gradients), axis=1)
+        try:
+            coefficients = np.linalg.solve(middle, -np.eye(middle.shape[0]))
+        except np.linalg.LinAlgError:
+            coefficients = np.linalg.lstsq(
+                middle, -np.eye(middle.shape[0]), rcond=None
+            )[0]
+        coefficients = 0.5 * (coefficients + coefficients.T)
+        if not np.all(np.isfinite(coefficients)):
+            return cls(
+                diagonal,
+                np.empty((n, 0), dtype=np.float64),
+                np.empty((0, 0), dtype=np.float64),
+            )
         return cls(
             diagonal,
-            compact_vectors,
-            np.asarray(coefficients, dtype=np.float64),
+            vectors,
+            coefficients,
+            -middle,
         )
 
     def apply(self, vector: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
@@ -158,9 +186,17 @@ class _CompactBFGS:
         result = self.diagonal * vector
         if self.vectors.shape[1] > 0:
             result = result + self.vectors @ (
-                self.coefficients * (self.vectors.T @ vector)
+                self.coefficients @ (self.vectors.T @ vector)
             )
         return result
+
+    def quadratic_form(self, vector: npt.NDArray[np.float64]) -> np.float64:
+        """Return ``vector.T @ B @ vector`` without forming ``B``."""
+        compact = self.vectors.T @ vector
+        return np.float64(
+            self.diagonal * np.dot(vector, vector)
+            + np.dot(compact, self.coefficients @ compact)
+        )
 
     def solve_restricted(
         self,
@@ -176,13 +212,31 @@ class _CompactBFGS:
         restricted_vectors = self.vectors[free]
         solution = restricted_rhs / self.diagonal
         if restricted_vectors.shape[1] > 0:
-            middle = np.diag(1.0 / self.coefficients)
+            stored_inverse = self.inverse_coefficients
+            if stored_inverse is None:
+                try:
+                    inverse_coefficients: npt.NDArray[np.float64] = np.asarray(
+                        np.linalg.solve(
+                            self.coefficients, np.eye(self.coefficients.shape[0])
+                        ),
+                        dtype=np.float64,
+                    )
+                except np.linalg.LinAlgError:
+                    inverse_coefficients = np.asarray(
+                        np.linalg.pinv(self.coefficients), dtype=np.float64
+                    )
+            else:
+                inverse_coefficients = stored_inverse
+            middle = inverse_coefficients.copy()
             middle += restricted_vectors.T @ restricted_vectors / self.diagonal
+            middle = 0.5 * (middle + middle.T)
             right = restricted_vectors.T @ restricted_rhs / self.diagonal
             try:
                 correction = np.linalg.solve(middle, right)
             except np.linalg.LinAlgError:
                 correction = np.linalg.lstsq(middle, right, rcond=None)[0]
+            if not np.all(np.isfinite(correction)):
+                return result
             solution -= restricted_vectors @ correction / self.diagonal
         result[free] = solution
         return result
@@ -194,54 +248,87 @@ def _generalized_cauchy_point(
     lb: npt.NDArray[np.float64],
     ub: npt.NDArray[np.float64],
     operator: _CompactBFGS,
-) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.bool_]]:
-    """Minimize the quadratic model along the projected-gradient path."""
-    step = np.zeros_like(x)
+) -> tuple[
+    npt.NDArray[np.float64],
+    npt.NDArray[np.bool_],
+    npt.NDArray[np.float64],
+]:
+    """Find the first model minimizer along the projected-gradient path.
+
+    Derivative and curvature data are updated at each breakpoint using the
+    compact BFGS representation.  After the initial matrix-vector product,
+    each crossed breakpoint therefore costs ``O(m**2)`` rather than
+    ``O(n*m)``.
+    """
     path_direction = -g.copy()
     active = (lb == ub) | ((x <= lb) & (g > 0.0)) | ((x >= ub) & (g < 0.0))
     path_direction[active] = 0.0
+    if not np.any(path_direction):
+        return x.copy(), active, np.zeros(operator.vectors.shape[1])
 
-    breakpoints: list[tuple[float, int]] = []
-    for i in np.flatnonzero(path_direction):
-        bound = ub[i] if path_direction[i] > 0.0 else lb[i]
-        breakpoint = (bound - x[i]) / path_direction[i]
-        if np.isfinite(breakpoint) and breakpoint >= 0.0:
-            breakpoints.append((float(breakpoint), int(i)))
-    breakpoints.sort()
+    breakpoint_values = np.full(x.size, np.inf, dtype=np.float64)
+    toward_lower = (path_direction < 0.0) & np.isfinite(lb)
+    toward_upper = (path_direction > 0.0) & np.isfinite(ub)
+    breakpoint_values[toward_lower] = (
+        lb[toward_lower] - x[toward_lower]
+    ) / path_direction[toward_lower]
+    breakpoint_values[toward_upper] = (
+        ub[toward_upper] - x[toward_upper]
+    ) / path_direction[toward_upper]
+    bounded = np.flatnonzero(
+        np.isfinite(breakpoint_values) & (breakpoint_values >= 0.0)
+    )
+    breakpoints = [(float(breakpoint_values[i]), int(i)) for i in bounded]
+    heapq.heapify(breakpoints)
 
-    previous = 0.0
-    cursor = 0
-    while cursor < len(breakpoints):
-        breakpoint = breakpoints[cursor][0]
-        interval = np.float64(max(0.0, breakpoint - previous))
-        model_gradient = g + operator.apply(step)
-        derivative = np.dot(model_gradient, path_direction)
-        curvature = np.dot(path_direction, operator.apply(path_direction))
-        minimizer = (
-            np.float64(-derivative / curvature)
-            if curvature > 0.0
-            else np.float64(np.inf)
+    compact_direction = operator.vectors.T @ path_direction
+    compact_step = np.zeros(operator.vectors.shape[1], dtype=np.float64)
+    derivative = np.float64(np.dot(g, path_direction))
+    curvature = operator.quadratic_form(path_direction)
+    if not np.isfinite(curvature) or curvature <= 0.0:
+        return x.copy(), active, compact_step
+    original_curvature = curvature
+    curvature_floor = np.finfo(np.float64).eps * original_curvature
+    elapsed = np.float64(0.0)
+
+    while True:
+        breakpoint, index = heapq.heappop(breakpoints) if breakpoints else (np.inf, -1)
+        interval = np.float64(max(0.0, breakpoint - elapsed))
+        minimizer = np.float64(-derivative / curvature)
+        if minimizer < interval:
+            minimizer = np.maximum(0.0, minimizer)
+            elapsed += minimizer
+            compact_step += minimizer * compact_direction
+            return np.clip(x - elapsed * g, lb, ub), active, compact_step
+
+        compact_step += interval * compact_direction
+        derivative += interval * curvature
+        elapsed = np.float64(breakpoint)
+
+        old_component = path_direction[index]
+        bound_step = (
+            ub[index] - x[index] if old_component > 0.0 else lb[index] - x[index]
         )
-        if 0.0 <= minimizer < interval:
-            step += minimizer * path_direction
-            return np.clip(x + step, lb, ub), active
+        row = operator.vectors[index]
+        model_gradient_component = (
+            g[index]
+            + operator.diagonal * bound_step
+            + np.dot(row, operator.coefficients @ compact_step)
+        )
+        derivative -= old_component * model_gradient_component
 
-        step += interval * path_direction
-        while cursor < len(breakpoints) and breakpoints[cursor][0] == breakpoint:
-            i = breakpoints[cursor][1]
-            step[i] = (ub[i] if path_direction[i] > 0.0 else lb[i]) - x[i]
-            path_direction[i] = 0.0
-            active[i] = True
-            cursor += 1
-        previous = breakpoint
-
-    if np.any(path_direction):
-        model_gradient = g + operator.apply(step)
-        curvature = np.dot(path_direction, operator.apply(path_direction))
-        if curvature > 0.0:
-            minimizer = max(0.0, -np.dot(model_gradient, path_direction) / curvature)
-            step += minimizer * path_direction
-    return np.clip(x + step, lb, ub), active
+        matrix_direction_component = operator.diagonal * old_component + np.dot(
+            row, operator.coefficients @ compact_direction
+        )
+        matrix_diagonal = operator.diagonal + np.dot(row, operator.coefficients @ row)
+        curvature += (
+            -2.0 * old_component * matrix_direction_component
+            + old_component * old_component * matrix_diagonal
+        )
+        curvature = np.float64(max(curvature_floor, curvature))
+        compact_direction -= old_component * row
+        path_direction[index] = 0.0
+        active[index] = True
 
 
 def _subspace_minimization(
@@ -252,46 +339,27 @@ def _subspace_minimization(
     lb: npt.NDArray[np.float64],
     ub: npt.NDArray[np.float64],
     operator: _CompactBFGS,
+    compact_step: npt.NDArray[np.float64] | None = None,
 ) -> npt.NDArray[np.float64]:
-    """Minimize over the Cauchy point's free variables, adding hit bounds."""
-    point = cauchy.copy()
-    working_active = active.copy()
+    """Take one safeguarded Newton correction in the Cauchy free subspace."""
+    free = ~active
+    if not np.any(free):
+        return cauchy
 
-    # Each truncated correction fixes at least one additional variable.
-    for _ in range(x.size + 1):
-        free = ~working_active
-        if not np.any(free):
-            break
-        step = point - x
-        model_gradient = g + operator.apply(step)
-        correction = operator.solve_restricted(-model_gradient, free)
-        if not np.all(np.isfinite(correction)) or not np.any(correction[free]):
-            break
+    step = cauchy - x
+    if compact_step is None:
+        compact_step = operator.vectors.T @ step
+    model_gradient = g + operator.diagonal * step
+    if operator.vectors.shape[1] > 0:
+        model_gradient += operator.vectors @ (operator.coefficients @ compact_step)
+    correction = operator.solve_restricted(-model_gradient, free)
+    if not np.all(np.isfinite(correction)) or np.dot(model_gradient, correction) >= 0.0:
+        return cauchy
 
-        alpha = min(1.0, float(max_feasible_step(point, correction, lb, ub)))
-        if alpha <= 0.0:
-            break
-        point += alpha * correction
-        point = np.clip(point, lb, ub)
-        if alpha >= 1.0 - 10.0 * np.finfo(np.float64).eps:
-            break
-
-        newly_active = free & (
-            (
-                (correction < 0.0)
-                & np.isfinite(lb)
-                & np.isclose(point, lb, rtol=1e-12, atol=1e-14)
-            )
-            | (
-                (correction > 0.0)
-                & np.isfinite(ub)
-                & np.isclose(point, ub, rtol=1e-12, atol=1e-14)
-            )
-        )
-        if not np.any(newly_active):
-            break
-        working_active |= newly_active
-    return point
+    alpha = min(1.0, float(max_feasible_step(cauchy, correction, lb, ub)))
+    if alpha <= 0.0:
+        return cauchy
+    return np.clip(cauchy + alpha * correction, lb, ub)
 
 
 def _box_quasi_newton_direction(
@@ -313,8 +381,10 @@ def _box_quasi_newton_direction(
         return unconstrained
 
     operator = _CompactBFGS.from_memory(memory, mu, x.size)
-    cauchy, active = _generalized_cauchy_point(x, g, lb, ub, operator)
-    candidate = _subspace_minimization(cauchy, active, x, g, lb, ub, operator)
+    cauchy, active, compact_step = _generalized_cauchy_point(x, g, lb, ub, operator)
+    candidate = _subspace_minimization(
+        cauchy, active, x, g, lb, ub, operator, compact_step
+    )
     direction = candidate - x
     if not np.all(np.isfinite(direction)) or np.dot(g, direction) >= 0.0:
         direction = -projected_gradient(x, g, lb, ub)
@@ -330,6 +400,8 @@ def qn_ntrqnb(
     verbose: bool = False,
 ) -> tuple[RetCode, np.float64, npt.NDArray[np.float64]]:
     """Run projected NTRQN subject to box constraints."""
+    if method.update != "bfgs":
+        raise ValueError("NTRQNB supports only the BFGS update")
     prob.reset()
     eps = prob.get_machine_eps()
 

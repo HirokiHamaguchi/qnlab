@@ -82,10 +82,47 @@ def test_box_direction_solves_coupled_quadratic_model():
     lb = np.full(2, -np.inf)
     ub = np.array([0.2, np.inf])
 
-    cauchy, active = _generalized_cauchy_point(x, g, lb, ub, operator)
-    candidate = _subspace_minimization(cauchy, active, x, g, lb, ub, operator)
+    cauchy, active, compact_step = _generalized_cauchy_point(x, g, lb, ub, operator)
+    candidate = _subspace_minimization(
+        cauchy, active, x, g, lb, ub, operator, compact_step
+    )
 
     np.testing.assert_allclose(candidate, [0.2, -0.28], atol=1e-14)
+
+
+def test_cauchy_point_stops_at_a_kink_local_minimum():
+    matrix = np.array([[0.18054497, -0.18211891], [-0.18211891, 2.74167213]])
+    diagonal = np.float64(0.05)
+    eigenvalues, eigenvectors = np.linalg.eigh(matrix - diagonal * np.eye(2))
+    operator = _CompactBFGS(diagonal, eigenvectors, eigenvalues)
+    x = np.zeros(2)
+    g = np.array([-1.48374522, -1.34843921])
+    upper_first = np.float64(0.7891577708267851)
+    lb = np.full(2, -np.inf)
+    ub = np.array([upper_first, np.inf])
+
+    cauchy, active, _ = _generalized_cauchy_point(x, g, lb, ub, operator)
+    breakpoint = upper_first / -g[0]
+
+    np.testing.assert_allclose(cauchy, np.clip(x - breakpoint * g, lb, ub))
+    np.testing.assert_array_equal(active, [True, False])
+
+
+def test_cauchy_recurrence_does_not_reapply_full_operator():
+    operator = _CompactBFGS(
+        diagonal=np.float64(1.0),
+        vectors=np.array([[1.0], [1.0]]),
+        coefficients=np.array([9.0]),
+    )
+    operator.apply = lambda _: (_ for _ in ()).throw(AssertionError())  # type: ignore[method-assign]
+
+    _generalized_cauchy_point(
+        np.zeros(2),
+        np.array([-1.0, 1.0]),
+        np.full(2, -np.inf),
+        np.array([0.2, np.inf]),
+        operator,
+    )
 
 
 def test_compact_regularization_matches_ntrqn_two_loop():
@@ -120,10 +157,39 @@ def test_compact_regularization_matches_ntrqn_two_loop():
     mu = np.float64(0.7)
     g = np.array([-0.4, 0.3, 1.2])
     operator = _CompactBFGS.from_memory(memory, mu, 3)
-    matrix = np.column_stack([operator.apply(np.eye(3)[i]) for i in range(3)])
     expected = get_direction_reg(method, np.zeros(3), g, memory, mu)
 
-    np.testing.assert_allclose(np.linalg.solve(matrix, -g), expected, rtol=1e-12)
+    assert operator.inverse_coefficients is not None
+    np.testing.assert_allclose(
+        operator.solve_restricted(-g, np.ones(3, dtype=bool)),
+        expected,
+        rtol=1e-12,
+    )
+
+
+def test_compact_restricted_solve_matches_dense_principal_system():
+    method = Method("NTRQNB", "raw", "raw", "bfgs")
+    q = np.array([[4.0, 0.5, 0.0], [0.5, 3.0, 0.25], [0.0, 0.25, 2.0]])
+    points = [np.zeros(3), np.array([0.2, -0.1, 0.3])]
+    memory = QuasiNewtonMemory(q @ points[0], 10, method)
+    memory.add_new_data(
+        points[1],
+        np.float64(0.0),
+        q @ points[1],
+        points[0],
+        np.float64(0.0),
+        q @ points[0],
+        None,
+        np.float64(0.0),
+    )
+    operator = _CompactBFGS.from_memory(memory, np.float64(0.3), 3)
+    free = np.array([True, False, True])
+    rhs = np.array([1.0, 8.0, -2.0])
+    dense = np.column_stack([operator.apply(np.eye(3)[:, i]) for i in range(3)])
+    expected = np.zeros(3)
+    expected[free] = np.linalg.solve(dense[np.ix_(free, free)], rhs[free])
+
+    np.testing.assert_allclose(operator.solve_restricted(rhs, free), expected)
 
 
 def test_active_gradient_does_not_shrink_initial_free_step():
