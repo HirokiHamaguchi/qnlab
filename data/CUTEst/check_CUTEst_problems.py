@@ -21,28 +21,13 @@ def problemsToRun(
 ) -> list[str]:
     """Get the list of problems to run, excluding those with setup errors."""
     if precision is None:
-        ret = sorted(
-            pycutest.find_problems(
-                constraints=constraints,
-                regular=True,
-            )
-        )
-        excluded = (
-            ["DMN15333LS", "MNISTS0LS", "MNISTS5LS"]
-            if constraints == "unconstrained"
-            else ["CHEBYQADNE"]  # No objective function is defined.
-        )
-        for name in excluded:
-            if name in ret:
-                ret.remove(name)
-        return ret
-    else:
-        assert precision in [16, 32, 64]
-        json_path = _json_path(constraints, "valid_problems")
-        assert os.path.exists(json_path)
-        with open(json_path) as f:
-            data = json.load(f)
-        return data.get("valid_problems", {}).get(f"precision_{precision}", [])
+        precision = 64
+    assert precision in [16, 32, 64]
+    json_path = _json_path(constraints, "valid_problems")
+    assert os.path.exists(json_path)
+    with open(json_path) as f:
+        data = json.load(f)
+    return data.get("valid_problems", {}).get(f"precision_{precision}", [])
 
 
 def get_n(problem_name: str) -> int:
