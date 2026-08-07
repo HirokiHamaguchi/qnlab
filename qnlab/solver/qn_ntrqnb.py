@@ -1,8 +1,16 @@
-"""Limited-memory NTRQN solver for box-constrained optimization."""
+"""Limited-memory NTRQN solver for box-constrained optimization.
 
+For the L-BFGS-B implementation, see
+https://github.com/scipy/scipy/blob/main/scipy/optimize/src/lbfgsb.c
+
+Our implementation is slower than SciPy's because it is written in Python,
+and computing the GCP requires more involved logic than the original version.
+Even so, our method sometimes uses fewer oracle calls than SciPy's.
+"""
+
+import heapq
 from collections import deque
 from dataclasses import dataclass
-import heapq
 from typing import Protocol, Sequence, TypeAlias, Union, runtime_checkable
 
 import numpy as np
@@ -37,7 +45,7 @@ BoundsInput: TypeAlias = Sequence[BoundPair] | BoundsLike
 def prepare_bounds(
     bounds: BoundsInput, n: int
 ) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
-    """Convert scipy-style bounds to finite-or-infinite float arrays."""
+    """Convert SciPy-style bounds to float arrays with finite or infinite bounds."""
     if isinstance(bounds, BoundsLike):
         lb = np.broadcast_to(np.asarray(bounds.lb, dtype=np.float64), (n,)).copy()
         ub = np.broadcast_to(np.asarray(bounds.ub, dtype=np.float64), (n,)).copy()
