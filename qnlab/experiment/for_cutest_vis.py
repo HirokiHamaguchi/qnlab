@@ -11,7 +11,18 @@ from qnlab.experiment.vis import vis
 from qnlab.problem.cutest import CUTEstQNProblem
 from qnlab.problem.cutest_noised import CUTEstNoisedProblem
 from qnlab.util.callback import Callback
-from qnlab.util.method import Method
+from qnlab.util.method import Method, get_box_methods, get_methods
+
+INDIVIDUAL_PLOT_OUTPUT_DIR = Path("doc/imgs/compare/individual")
+
+
+def _individual_plot_output_path(
+    prob_name: str, precision: int, noise: np.float64, boxed: bool
+) -> Path:
+    """Return the extension-free output path expected by ``vis``."""
+    constraint = "boxed" if boxed else "unboxed"
+    precision_noise = f"precision{precision}" if noise == 0 else f"noise{noise}"
+    return INDIVIDUAL_PLOT_OUTPUT_DIR / constraint / precision_noise / prob_name
 
 
 def individual_plot(
@@ -22,6 +33,7 @@ def individual_plot(
     boxed: bool = False,
 ):
     labels = [method.label for method, _ in methods]
+    _, color_palette, line_styles = get_box_methods() if boxed else get_methods()
     for prob_name in problems:
         if noise > 0.0:
             prob: CUTEstQNProblem = CUTEstNoisedProblem(
@@ -37,7 +49,20 @@ def individual_plot(
                 else (prob_name, method, option, precision, noise)
             )
             callbacks.append(load_npz(task))
-        vis(prob, callbacks, labels, prob_name, only_grad=True, only_plot=True)
+        output_path = _individual_plot_output_path(prob_name, precision, noise, boxed)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        vis(
+            prob,
+            callbacks,
+            labels,
+            prob_name,
+            only_grad=False,
+            only_plot=True,
+            pdf_path=str(output_path),
+            color_palette=color_palette,
+            line_styles=line_styles,
+        )
+        print(f"Saved figure to {output_path}.pdf")
 
 
 def generate_output_path(

@@ -32,6 +32,52 @@ StoreType = Literal["raw", "cautious"]
 SecantType = Literal["raw", "modified", "damped", "damped_modified"]
 UpdateType = Literal["bfgs", "dfp", "sr1", "psb"]
 
+TAB20 = plt.colormaps.get_cmap("tab20")
+
+COLORS = {
+    "NTRQN": TAB20(0),
+    "NTRQN-MS": TAB20(1),
+    "Line": TAB20(2),
+    "Line-MS": TAB20(3),
+    "Reg": TAB20(4),
+    "Reg-Sec": TAB20(5),
+    "SciPy": TAB20(6),
+    "NTQN": TAB20(8),
+}
+COLORS.update(
+    {
+        "NTRQNB": COLORS["NTRQN"],
+        "NTRQNB-MS": COLORS["NTRQN-MS"],
+    }
+)
+
+LINE_STYLES = {
+    "NTRQN": "o-",
+    "NTRQN-MS": "o--",
+    "Line": "^--",
+    "Line-MS": "^-.",
+    "Reg": "D--",
+    "Reg-Sec": "D-.",
+    "SciPy": "v:",
+    "NTQN": "s-.",
+}
+LINE_STYLES.update(
+    {
+        "NTRQNB": LINE_STYLES["NTRQN"],
+        "NTRQNB-MS": LINE_STYLES["NTRQN-MS"],
+    }
+)
+
+
+def _get_plot_settings(
+    methods: List[Tuple["Method", dict]],
+) -> tuple[dict, dict[str, str]]:
+    """Return shared plotting settings for the selected methods."""
+    labels = [method.label for method, _ in methods]
+    colors = {label: COLORS[label] for label in labels}
+    line_styles = {label: LINE_STYLES[label] for label in labels}
+    return colors, line_styles
+
 
 class Method:
     def __init__(
@@ -151,34 +197,8 @@ def get_methods(
         ),
     ]
 
-    TAB20 = plt.colormaps.get_cmap("tab20")
-
-    COLORS = {
-        "NTRQN": TAB20(0),
-        "NTRQN-MS": TAB20(1),
-        "Line": TAB20(2),
-        "Line-MS": TAB20(3),
-        "Reg": TAB20(4),
-        "Reg-Sec": TAB20(5),
-        "SciPy": TAB20(6),
-        "NTQN": TAB20(8),
-    }
-
-    LINE_STYLES = {
-        "NTRQN": "o-",
-        "NTRQN-MS": "o--",
-        "Line": "^--",
-        "Line-MS": "^-.",
-        "Reg": "D--",
-        "Reg-Sec": "D-.",
-        "SciPy": "v:",
-        "NTQN": "s-.",
-    }
-
-    assert set(COLORS.keys()) == set(method.label for method, _ in methods)
-    assert set(LINE_STYLES.keys()) == set(method.label for method, _ in methods)
-
-    return methods, COLORS, LINE_STYLES
+    colors, line_styles = _get_plot_settings(methods)
+    return methods, colors, line_styles
 
 
 def get_box_methods(
@@ -206,15 +226,5 @@ def get_box_methods(
         ),
     ]
 
-    tab10 = plt.colormaps.get_cmap("tab10")
-    colors = {
-        "NTRQNB": tab10(0),
-        "NTRQNB-MS": tab10(1),
-        "SciPy": tab10(2),
-    }
-    line_styles = {
-        "NTRQNB": "o-",
-        "NTRQNB-MS": "o--",
-        "SciPy": "v:",
-    }
+    colors, line_styles = _get_plot_settings(methods)
     return methods, colors, line_styles

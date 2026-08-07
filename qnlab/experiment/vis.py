@@ -1,3 +1,4 @@
+import warnings
 from typing import List, Literal
 
 import matplotlib.pyplot as plt
@@ -9,8 +10,28 @@ from qnlab.util.callback import Callback
 
 # Constants
 DEFAULT_LEVELS = 20
+DEFAULT_MARKER_COUNT = 12
 LINE_STYLES = ["-", "--", "-.", ":"]
 GRADIENT_THRESHOLD = 1e-5
+
+
+def _has_trajectory_data(prob: BaseProblem, callbacks: List[Callback]) -> bool:
+    """Return whether every callback contains plottable optimization iterates."""
+    return bool(callbacks) and all(
+        len(callback.xs) > 0
+        and all(np.asarray(x).shape == (prob.n,) for x in callback.xs)
+        for callback in callbacks
+    )
+
+
+def _warn_missing_trajectory_data() -> None:
+    warnings.warn(
+        "Skipping the contour plot because optimization iterates (xs) are not "
+        "available. Stored CUTEst results contain only calls, function values, "
+        "and gradient norms.",
+        RuntimeWarning,
+        stacklevel=3,
+    )
 
 
 def _configure_matplotlib(use_tex: bool = False) -> None:
@@ -148,15 +169,43 @@ def _get_line_style(i: int, is_lbfgs: bool) -> str:
     return "-" if is_lbfgs else LINE_STYLES[i % len(LINE_STYLES)]
 
 
-def _get_plot_properties(label: str, i: int) -> dict:
+def _get_marker_indices(
+    x_values, target_count: int = DEFAULT_MARKER_COUNT
+) -> list[int]:
+    """Choose marker indices that are approximately uniform along the x-axis."""
+    if target_count < 2:
+        raise ValueError("target_count must be at least 2")
+
+    x = np.asarray(x_values)
+    if len(x) <= target_count:
+        return list(range(len(x)))
+
+    if np.all(np.diff(x) >= 0) and x[-1] > x[0]:
+        targets = np.linspace(x[0], x[-1], target_count)
+        indices = np.searchsorted(x, targets)
+    else:
+        indices = np.linspace(0, len(x) - 1, target_count, dtype=int)
+
+    indices = np.clip(indices, 0, len(x) - 1)
+    indices[0] = 0
+    indices[-1] = len(x) - 1
+    return np.unique(indices).tolist()
+
+
+def _get_plot_properties(
+    label: str,
+    i: int,
+    color_palette: dict | None = None,
+    line_styles: dict[str, str] | None = None,
+) -> dict:
     """Get plotting properties for a method."""
-    is_lbfgs = "S_L-BFGS-B" in label
     return {
-        "linewidth": 4,
-        "alpha": 1.0 if is_lbfgs else 0.8,
-        "color": "black" if is_lbfgs else None,
-        "linestyle": _get_line_style(i, is_lbfgs),
-        "zorder": 5 - i / 10,
+        "linewidth": 2.2,
+        "alpha": 1.0,
+        "color": (color_palette or {}).get(label, "black"),
+        "fmt": (line_styles or {}).get(label, "o-"),
+        "markersize": 6,
+        "zorder": 5 - i / 10 if "SciPy" not in label else 10,
     }
 
 
@@ -168,12 +217,17 @@ def _plot_function_values(
     shift_val: float,
     x_axis: str,
     ax,
+    color_palette: dict | None = None,
+    line_styles: dict[str, str] | None = None,
 ) -> None:
     """Plot function values on the given axis."""
     xlabel = "oracle calls"  # default
 
     for i, callback in enumerate(callbacks):
-        props = _get_plot_properties(labels[i], i)
+        props = _get_plot_properties(
+            labels[i], i, color_palette=color_palette, line_styles=line_styles
+        )
+        fmt = props.pop("fmt", None)
         shifted_fxs = [fx + shift_val for fx in callback.fxs]
 
         if x_axis == "iterations":
@@ -182,7 +236,11 @@ def _plot_function_values(
         else:
             x_values = callback.calls
 
-        ax.plot(x_values, shifted_fxs, label=labels[i], **props)
+        if fmt is None:
+            ax.plot(x_values, shifted_fxs, label=labels[i], **props)
+        else:
+            props["markevery"] = _get_marker_indices(x_values)
+            ax.plot(x_values, shifted_fxs, fmt, label=labels[i], **props)
 
     ax.set_yscale("log")
     ax.set_xlabel(xlabel)
@@ -203,6 +261,8 @@ def _plot_gradient_norms(
     name: str,
     x_axis: str,
     ax,
+    color_palette: dict | None = None,
+    line_styles: dict[str, str] | None = None,
 ) -> None:
     """Plot gradient norms on the given axis."""
     xlabel = "oracle calls"  # default
@@ -210,8 +270,12 @@ def _plot_gradient_norms(
     for i, callback in enumerate(callbacks):
         # Special handling for L-BFGS-B variants
         is_lbfgs = "L-BFGS-B" in labels[i] and "(m=" not in labels[i]
-        props = _get_plot_properties(labels[i], i)
-        props["linestyle"] = _get_line_style(i, is_lbfgs)
+        props = _get_plot_properties(
+            labels[i], i, color_palette=color_palette, line_styles=line_styles
+        )
+        fmt = props.pop("fmt", None)
+        if fmt is None:
+            props["linestyle"] = _get_line_style(i, is_lbfgs)
 
         if x_axis == "iterations":
             x_values = list(range(len(callback.gnorms)))
@@ -219,7 +283,11 @@ def _plot_gradient_norms(
         else:
             x_values = callback.calls
 
-        ax.plot(x_values, callback.gnorms, label=labels[i], **props)
+        if fmt is None:
+            ax.plot(x_values, callback.gnorms, label=labels[i], **props)
+        else:
+            props["markevery"] = _get_marker_indices(x_values)
+            ax.plot(x_values, callback.gnorms, fmt, label=labels[i], **props)
 
     ax.set_yscale("log")
     ax.set_xlabel(xlabel)
@@ -286,6 +354,8 @@ def vis(
     one_figure: bool = False,
     use_tex: bool = False,
     x_axis: Literal["calls", "iterations"] = "calls",
+    color_palette: dict | None = None,
+    line_styles: dict[str, str] | None = None,
 ) -> None:
     assert x_axis in ["calls", "iterations"]
 
@@ -294,26 +364,78 @@ def vis(
 
     if one_figure:
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
-        _create_contour_plot(prob, callbacks, labels, "", DEFAULT_LEVELS, ax1)
-        _plot_gradient_norms(prob, callbacks, labels, "", x_axis, ax2)
+        if _has_trajectory_data(prob, callbacks):
+            _create_contour_plot(prob, callbacks, labels, "", DEFAULT_LEVELS, ax1)
+        else:
+            _warn_missing_trajectory_data()
+            ax1.set_axis_off()
+            ax1.text(
+                0.5,
+                0.5,
+                "Trajectory data not available",
+                ha="center",
+                va="center",
+                transform=ax1.transAxes,
+            )
+        _plot_gradient_norms(
+            prob,
+            callbacks,
+            labels,
+            "",
+            x_axis,
+            ax2,
+            color_palette,
+            line_styles,
+        )
         fig.suptitle(name, y=0.95)
     else:
         if not only_plot:
-            fig = plt.figure(figsize=(8, 8))
-            ax = fig.add_subplot(111)
-            _create_contour_plot(prob, callbacks, labels, name, levels, ax)
-            _save_or_show_figure(pdf_path, "_contour")
+            if _has_trajectory_data(prob, callbacks):
+                fig = plt.figure(figsize=(8, 8))
+                ax = fig.add_subplot(111)
+                _create_contour_plot(prob, callbacks, labels, name, levels, ax)
+                _save_or_show_figure(pdf_path, "_contour")
+            else:
+                _warn_missing_trajectory_data()
 
         shift_val = _calculate_shift_value(callbacks)
 
         if only_grad:
             fig = plt.figure(figsize=(8, 6))
             ax = fig.add_subplot(111)
-            _plot_gradient_norms(prob, callbacks, labels, name, x_axis, ax)
+            _plot_gradient_norms(
+                prob,
+                callbacks,
+                labels,
+                name,
+                x_axis,
+                ax,
+                color_palette,
+                line_styles,
+            )
         else:
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
-            _plot_function_values(prob, callbacks, labels, name, shift_val, x_axis, ax1)
-            _plot_gradient_norms(prob, callbacks, labels, name, x_axis, ax2)
+            _plot_function_values(
+                prob,
+                callbacks,
+                labels,
+                name,
+                shift_val,
+                x_axis,
+                ax1,
+                color_palette,
+                line_styles,
+            )
+            _plot_gradient_norms(
+                prob,
+                callbacks,
+                labels,
+                name,
+                x_axis,
+                ax2,
+                color_palette,
+                line_styles,
+            )
 
     _save_or_show_figure(pdf_path)
     plt.rcdefaults()

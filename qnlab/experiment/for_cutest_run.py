@@ -54,7 +54,10 @@ def load_npz(task: task_type, verbose: bool = True) -> Callback:
     except (EOFError, BadZipFile) as e:
         print(file_path)
         raise e
-    callback.xs = [np.zeros(0) for _ in range(len(callback.calls))]
+    # Iterates are intentionally not stored in this compact result format.
+    # Keep xs empty so visualization code can distinguish unavailable trajectory
+    # data from actual zero-valued iterates.
+    callback.xs = []
     return callback
 
 
