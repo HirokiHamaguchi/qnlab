@@ -16,6 +16,7 @@ def _callback(xs: list[np.ndarray]) -> Callback:
     callback.fxs = np.array([2.0, 1.0], dtype=np.float64).tolist()
     callback.gnorms = np.array([1.0, 0.1], dtype=np.float64).tolist()
     callback.calls = [1, 2]
+    callback.times = [0.1, 0.2]
     return callback
 
 
@@ -88,4 +89,14 @@ def test_vis_accepts_performance_profile_styles(monkeypatch) -> None:
         only_plot=True,
         color_palette={"method": "red"},
         line_styles={"method": "s--"},
+    )
+
+
+def test_vis_accepts_time_axis(monkeypatch) -> None:
+    prob = Mock(n=2)
+    callback = _callback([])
+    monkeypatch.setattr(vis_module, "_save_or_show_figure", Mock())
+
+    vis_module.vis(
+        prob, [callback], ["method"], "problem", only_plot=True, x_axis="time"
     )

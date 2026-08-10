@@ -1,9 +1,9 @@
 import warnings
-from typing import List, Literal
+from typing import List, Literal, Sequence
 
 import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
+import seaborn as sns  # type: ignore[import-untyped]
 
 from qnlab.problem.base import BaseProblem
 from qnlab.util.callback import Callback
@@ -92,13 +92,13 @@ def _plot_2d_contour(
 ) -> None:
     """Plot 2D contour with trajectories."""
     # Collect all points for bounds calculation
-    all_points = []
+    all_points: list[list[float]] = []
     for callback in callbacks:
         x = np.array([prob.x0] + callback.xs)
         all_points.extend(x[:, :2].tolist())
 
-    all_points = np.array(all_points)
-    bounds = _get_plot_bounds(all_points)
+    all_points_array = np.array(all_points)
+    bounds = _get_plot_bounds(all_points_array)
 
     # Plot trajectories
     for i, callback in enumerate(callbacks):
@@ -125,7 +125,7 @@ def _plot_1d_function(
     prob: BaseProblem, callbacks: List[Callback], labels: List[str], ax
 ) -> None:
     """Plot 1D function with trajectories."""
-    all_xs = []
+    all_xs: list[float] = []
 
     # Plot trajectories
     for i, callback in enumerate(callbacks):
@@ -134,7 +134,7 @@ def _plot_1d_function(
         is_lbfgs = "L-BFGS-B" in labels[i]
         color = "black" if is_lbfgs else None
         ax.plot(xs, zs, "o-", label=labels[i], alpha=0.5, color=color)
-        all_xs.extend(xs)
+        all_xs.extend(float(np.asarray(x_k).item()) for x_k in xs)
 
     # Plot function
     min_x, max_x = min(all_xs), max(all_xs)
@@ -230,9 +230,13 @@ def _plot_function_values(
         fmt = props.pop("fmt", None)
         shifted_fxs = [fx + shift_val for fx in callback.fxs]
 
+        x_values: Sequence[int | float]
         if x_axis == "iterations":
             x_values = list(range(len(callback.fxs)))
             xlabel = "iterations"
+        elif x_axis == "time":
+            x_values = callback.times
+            xlabel = "time (s)"
         else:
             x_values = callback.calls
 
@@ -277,9 +281,13 @@ def _plot_gradient_norms(
         if fmt is None:
             props["linestyle"] = _get_line_style(i, is_lbfgs)
 
+        x_values: Sequence[int | float]
         if x_axis == "iterations":
             x_values = list(range(len(callback.gnorms)))
             xlabel = "iterations"
+        elif x_axis == "time":
+            x_values = callback.times
+            xlabel = "time (s)"
         else:
             x_values = callback.calls
 
@@ -302,7 +310,7 @@ def _plot_gradient_norms(
 
 def _calculate_shift_value(callbacks: List[Callback]) -> float:
     """Calculate shift value for function values to ensure positivity."""
-    min_fx = min(min(callback.fxs) for callback in callbacks)
+    min_fx = min(min(float(fx) for fx in callback.fxs) for callback in callbacks)
     shift_val = max(0, -min_fx)
     return shift_val + 1e-5 if shift_val > 0 else 0
 
@@ -314,6 +322,14 @@ def _truncate_callbacks(
     for callback in callbacks:
         if x_axis == "iterations":
             idx = min(max_length, len(callback.calls))
+        elif x_axis == "time":
+            idx = 0
+            for i, elapsed in enumerate(callback.times):
+                if elapsed > max_length:
+                    idx = i
+                    break
+            else:
+                idx = len(callback.times)
         else:
             idx = 0
             for i, call in enumerate(callback.calls):
@@ -327,6 +343,7 @@ def _truncate_callbacks(
         callback.fxs = callback.fxs[:idx]
         callback.gnorms = callback.gnorms[:idx]
         callback.calls = callback.calls[:idx]
+        callback.times = callback.times[:idx]
 
 
 def _save_or_show_figure(pdf_path: str, suffix: str = "") -> None:
@@ -353,11 +370,11 @@ def vis(
     max_length: int = int(1e8),
     one_figure: bool = False,
     use_tex: bool = False,
-    x_axis: Literal["calls", "iterations"] = "calls",
+    x_axis: Literal["calls", "iterations", "time"] = "calls",
     color_palette: dict | None = None,
     line_styles: dict[str, str] | None = None,
 ) -> None:
-    assert x_axis in ["calls", "iterations"]
+    assert x_axis in ["calls", "iterations", "time"]
 
     _configure_matplotlib(use_tex)
     _truncate_callbacks(callbacks, max_length, x_axis)

@@ -1,9 +1,9 @@
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Literal, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
+import seaborn as sns  # type: ignore[import-untyped]
 
 from qnlab.experiment.for_cutest_run import load_npz, task_type
 from qnlab.experiment.profile import performance_profile
@@ -17,11 +17,23 @@ INDIVIDUAL_PLOT_OUTPUT_DIR = Path("doc/imgs/compare/individual")
 
 
 def _individual_plot_output_path(
-    prob_name: str, precision: int, noise: np.float64, boxed: bool
+    prob_name: str,
+    precision: int,
+    noise: np.float64,
+    boxed: bool,
+    metric: str = "calls",
 ) -> Path:
     """Return the extension-free output path expected by ``vis``."""
     constraint = "boxed" if boxed else "unboxed"
     precision_noise = f"precision{precision}" if noise == 0 else f"noise{noise}"
+    if metric == "time":
+        return (
+            INDIVIDUAL_PLOT_OUTPUT_DIR
+            / constraint
+            / "time"
+            / precision_noise
+            / prob_name
+        )
     return INDIVIDUAL_PLOT_OUTPUT_DIR / constraint / precision_noise / prob_name
 
 
@@ -31,6 +43,8 @@ def individual_plot(
     precision: int,
     noise: np.float64,
     boxed: bool = False,
+    x_axis: Literal["calls", "iterations", "time"] = "calls",
+    result_subdir: str | None = None,
 ):
     labels = [method.label for method, _ in methods]
     _, color_palette, line_styles = get_box_methods() if boxed else get_methods()
@@ -48,8 +62,14 @@ def individual_plot(
                 if boxed
                 else (prob_name, method, option, precision, noise)
             )
-            callbacks.append(load_npz(task))
-        output_path = _individual_plot_output_path(prob_name, precision, noise, boxed)
+            callbacks.append(load_npz(task, result_subdir=result_subdir))
+        output_path = _individual_plot_output_path(
+            prob_name,
+            precision,
+            noise,
+            boxed,
+            metric="time" if x_axis == "time" else "calls",
+        )
         output_path.parent.mkdir(parents=True, exist_ok=True)
         vis(
             prob,
@@ -59,6 +79,7 @@ def individual_plot(
             only_grad=False,
             only_plot=True,
             pdf_path=str(output_path),
+            x_axis=x_axis,
             color_palette=color_palette,
             line_styles=line_styles,
         )
@@ -66,13 +87,19 @@ def individual_plot(
 
 
 def generate_output_path(
-    precision: int, noise: np.float64, gtol: float, boxed: bool = False
+    precision: int,
+    noise: np.float64,
+    gtol: float,
+    boxed: bool = False,
+    metric: str = "calls",
 ) -> Path:
     """Generate output file path for the performance profile plot."""
     output_dir = Path("doc/imgs/compare")
     precision_noise = f"precision{precision}" if noise == 0 else f"noise{noise}"
     gtol_filename = f"{gtol:.0e}".replace("+", "")
     prefix = "_pp_boxed" if boxed else "_pp"
+    if metric == "time":
+        prefix += "_time"
     return output_dir / f"{prefix}_{precision_noise}_gtol{gtol_filename}.pdf"
 
 
@@ -90,6 +117,7 @@ def draw_pp(
     noise: np.float64,
     gtol: np.float64,
     boxed: bool = False,
+    metric: str = "calls",
 ) -> None:
     # Set style for publication quality
     sns.set_style("whitegrid")
@@ -107,7 +135,7 @@ def draw_pp(
     colors = [color_palette.get(name, "black") for name in alg_names]
     line_styles_list = [line_styles.get(name, "o-") for name in alg_names]
 
-    output_path = generate_output_path(precision, noise, gtol, boxed)
+    output_path = generate_output_path(precision, noise, gtol, boxed, metric)
     fig_size = generate_fig_size(noise)
 
     # Create figure with proper size for paper

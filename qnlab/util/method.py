@@ -188,7 +188,7 @@ def get_methods(
             {"m": m, "max_iterations": MI},
         ),
         (
-            Method(base="SciPy", scipy_method="L-BFGS-B", label="SciPy"),
+            Method("SciPy", scipy_method="L-BFGS-B", label="SciPy"),
             {"maxcor": m, "maxiter": MI, "ftol": 0},
         ),
         (
