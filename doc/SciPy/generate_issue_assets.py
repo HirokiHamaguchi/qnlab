@@ -12,6 +12,9 @@ import fitz
 REPO_ROOT = Path(__file__).resolve().parents[2]
 OUTPUT_DIR = REPO_ROOT / "doc" / "SciPy"
 INDIVIDUAL_DIR = REPO_ROOT / "doc" / "imgs" / "compare" / "individual"
+LEGEND_PATH = REPO_ROOT / "doc" / "imgs" / "compare" / "_legend.pdf"
+UNBOXED_ORACLE_DIR = INDIVIDUAL_DIR / "unboxed" / "precision64"
+UNBOXED_TIME_DIR = INDIVIDUAL_DIR / "unboxed" / "time" / "precision64"
 
 
 def render_first_page(source: Path, destination: Path, dpi: int = 240) -> None:
@@ -27,45 +30,65 @@ def latex_escape(value: str) -> str:
     return value.replace("\\", r"\textbackslash{}").replace("_", r"\_")
 
 
-def plot_block(path: Path) -> str:
-    relative_path = Path(os.path.relpath(path, OUTPUT_DIR)).as_posix()
-    name = latex_escape(path.stem)
+def relative_tex_path(path: Path) -> str:
+    """Return a POSIX path to an asset, relative to the generated TeX file."""
+    return Path(os.path.relpath(path, OUTPUT_DIR)).as_posix()
+
+
+def paired_plot_block(name: str, oracle_path: Path, time_path: Path) -> str:
+    """Place the oracle-call and wall-clock plots for one problem together."""
+    oracle_relative_path = relative_tex_path(oracle_path)
+    time_relative_path = relative_tex_path(time_path)
+    escaped_name = latex_escape(name)
     return rf"""
-\begin{{minipage}}[t]{{0.485\textwidth}}
+\begin{{minipage}}[t]{{\textwidth}}
   \centering
-  \includegraphics[width=\linewidth,height=0.39\textheight,keepaspectratio]{{{relative_path}}}
-  \par\smallskip
-  \texttt{{{name}}}
+  \texttt{{\bfseries {escaped_name}}}\par\smallskip
+  \begin{{minipage}}[t]{{0.47\textwidth}}
+    \centering\scriptsize Oracle calls\par
+    \includegraphics[width=\linewidth,height=0.20\textheight,keepaspectratio]{{{oracle_relative_path}}}
+  \end{{minipage}}\hfill
+  \begin{{minipage}}[t]{{0.47\textwidth}}
+    \centering\scriptsize Wall-clock time\par
+    \includegraphics[width=\linewidth,height=0.20\textheight,keepaspectratio]{{{time_relative_path}}}
+  \end{{minipage}}
 \end{{minipage}}
 """.strip()
 
 
-def section(title: str, directory: Path) -> str:
-    plots = sorted(directory.glob("*.pdf"), key=lambda path: path.stem.casefold())
-    if not plots:
-        raise FileNotFoundError(f"No PDF plots found in {directory}")
+def paired_plots(oracle_directory: Path, time_directory: Path) -> str:
+    """Group plots by problem, with both metrics on each row."""
+    oracle_plots = {path.stem: path for path in oracle_directory.glob("*.pdf")}
+    time_plots = {path.stem: path for path in time_directory.glob("*.pdf")}
+    if not oracle_plots:
+        raise FileNotFoundError(f"No PDF plots found in {oracle_directory}")
+    if oracle_plots.keys() != time_plots.keys():
+        oracle_only = sorted(oracle_plots.keys() - time_plots.keys())
+        time_only = sorted(time_plots.keys() - oracle_plots.keys())
+        raise ValueError(
+            "Oracle-call and wall-clock plots do not cover the same problems: "
+            f"oracle only={oracle_only}, time only={time_only}"
+        )
 
-    chunks = [rf"\section{{{title}}}", rf"\noindent {len(plots)} problems.\par\medskip"]
-    for index, plot in enumerate(plots, start=1):
-        chunks.append(plot_block(plot))
-        if index % 2:
-            chunks.append(r"\hfill")
-        elif index % 4:
-            chunks.append(r"\par\medskip")
-        if index % 4 == 0 and index != len(plots):
-            chunks.append(r"\clearpage")
-    chunks.append(r"\clearpage")
+    names = sorted(oracle_plots, key=str.casefold)
+    chunks = [rf"\noindent {len(names)} problems.\par\smallskip"]
+    for index, name in enumerate(names, start=1):
+        chunks.append(paired_plot_block(name, oracle_plots[name], time_plots[name]))
+        if index != len(names):
+            chunks.append(r"\par\smallskip")
     return "\n".join(chunks)
 
 
 def generate_individual_results_tex(destination: Path) -> None:
     """Create a contact-sheet TeX document containing every individual plot."""
-    preamble = r"""\documentclass[10pt,a4paper,landscape]{article}
-\usepackage[margin=10mm,headheight=14pt]{geometry}
+    legend_path = relative_tex_path(LEGEND_PATH)
+    preamble = r"""\documentclass[10pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
 \usepackage{graphicx}
 \usepackage[hidelinks]{hyperref}
 \usepackage{fancyhdr}
 \setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
 \pagestyle{fancy}
 \fancyhf{}
 \lhead{CUTEst individual results}
@@ -77,32 +100,18 @@ def generate_individual_results_tex(destination: Path) -> None:
 \maketitle
 \begin{abstract}
 This appendix collects all per-problem plots used to audit the aggregate
-performance profiles in the accompanying SciPy issue draft.  The first two
-sections contain the same 220 unconstrained, 64-bit CUTEst problems plotted
-against oracle calls and wall-clock time.  The final section contains 124
-box-constrained, 64-bit problems plotted against oracle calls.  These plots
-show heterogeneous solver behavior and are evidence against interpreting an
-aggregate profile as a claim that one solver wins on every problem.
+performance profiles in the accompanying SciPy issue draft.  Oracle-call and
+wall-clock plots for each of the 220 unconstrained, 64-bit CUTEst problems are
+shown side by side.  These plots show heterogeneous solver behavior and are
+evidence against interpreting an aggregate profile as a claim that one solver
+wins on every problem.
 \end{abstract}
-\tableofcontents
-\clearpage
-"""
-    body = "\n".join(
-        [
-            section(
-                "Unconstrained, 64-bit: oracle calls",
-                INDIVIDUAL_DIR / "unboxed" / "precision64",
-            ),
-            section(
-                "Unconstrained, 64-bit: wall-clock time",
-                INDIVIDUAL_DIR / "unboxed" / "time" / "precision64",
-            ),
-            section(
-                "Box-constrained, 64-bit: oracle calls",
-                INDIVIDUAL_DIR / "boxed" / "precision64",
-            ),
-        ]
-    )
+\begin{center}
+  \textbf{Solver legend}\par\smallskip
+  \includegraphics[width=0.94\textwidth,height=0.16\textheight,keepaspectratio]{LEGEND_PATH_PLACEHOLDER}
+\end{center}
+""".replace("LEGEND_PATH_PLACEHOLDER", legend_path)
+    body = paired_plots(UNBOXED_ORACLE_DIR, UNBOXED_TIME_DIR)
     destination.write_text(preamble + body + "\n\\end{document}\n", encoding="utf-8")
 
 
