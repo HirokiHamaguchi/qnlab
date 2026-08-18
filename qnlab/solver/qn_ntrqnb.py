@@ -498,8 +498,7 @@ def qn_ntrqnb(
 
     k = 0
     mu = np.float64(0.0)
-    var_sigma = np.float64(1e-20)
-    offo = np.float64(np.sqrt(var_sigma))
+    offo_squared = np.float64(param.offo_squared_offset)
     is_offo_mode = False
     min_fx_minus_delta = np.float64(np.inf)
     rejection_counter = 0
@@ -510,18 +509,21 @@ def qn_ntrqnb(
         return projected_gradient(point, gradient, lb, ub)
 
     while True:
-        if min_fx_minus_delta >= fx:
+        if not param.force_offo and min_fx_minus_delta >= fx:
             is_offo_mode = False
             mu = np.float64(0.0)
-            if min_fx_minus_delta - fx >= 1.0:
-                offo = np.float64(np.sqrt(var_sigma))
+            if min_fx_minus_delta - fx >= param.restart_threshold:
+                offo_squared = np.float64(param.offo_squared_offset)
+                if callback is not None:
+                    callback.others["OFFO accumulator restart"] += 1
         else:
             if not is_offo_mode and verbose:
                 print(f"  ⚠️  Switching to offo mode. {k=}")
             is_offo_mode = True
-            offo = np.sqrt(offo**2 + pg_norm**2)
+            offo_squared += pg_norm**2
+            offo_scale = np.sqrt(offo_squared)
             mu = pg_norm * param.mu_scale
-            mu = np.clip(mu, param.mu_min_fraction * offo, offo)
+            mu = np.clip(mu, param.mu_min_fraction * offo_scale, offo_scale)
 
         direction = _box_quasi_newton_direction(x, g, memory, mu, lb, ub, box_workspace)
 

@@ -2,6 +2,11 @@ import numpy as np
 import numpy.typing as npt
 
 from qnlab.update.update import check_direction, get_direction, get_direction_reg
+from qnlab.util.iteration_data import (
+    CAUTIOUS_CURVATURE_LOWER,
+    CAUTIOUS_CURVATURE_UPPER,
+    IterationData,
+)
 from qnlab.util.memory_interface import LBFGSWorkspace, QuasiNewtonMemory
 from qnlab.util.method import Method
 
@@ -73,6 +78,38 @@ def test_lbfgs_workspace_keeps_contiguous_pairs_and_gram_matrices():
     np.testing.assert_allclose(
         workspace.gradient_products, expected_gradients.T @ expected_gradients
     )
+
+
+def test_cautious_rule_enforces_both_uniform_curvature_bounds():
+    method = Method("NTRQN", "cautious", "raw", "bfgs")
+    accepted = IterationData()
+    is_valid, _ = accepted.set(
+        np.array([1.0]),
+        np.float64(0.0),
+        np.array([1.0]),
+        np.array([0.0]),
+        np.float64(0.0),
+        np.array([0.0]),
+        method,
+        np.float64(0.0),
+    )
+    assert is_valid
+    assert accepted.ys >= CAUTIOUS_CURVATURE_LOWER * accepted.ss
+    assert accepted.ys >= accepted.yy / CAUTIOUS_CURVATURE_UPPER
+
+    rejected = IterationData()
+    is_valid, message = rejected.set(
+        np.array([1000.0]),
+        np.float64(0.0),
+        np.array([1e-6]),
+        np.array([0.0]),
+        np.float64(0.0),
+        np.array([0.0]),
+        method,
+        np.float64(0.0),
+    )
+    assert not is_valid
+    assert message == "skip by cautious update"
 
 
 def test_workspace_two_loop_matches_pairwise_reference():

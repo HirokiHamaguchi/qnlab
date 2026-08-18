@@ -55,6 +55,11 @@
 \definecolor{cC}{HTML}{77AC30}
 \definecolor{cD}{HTML}{D95319}
 
+\newenvironment{MPCchange}{%
+    \ifdefined\MPCRevision\color{red}\fi
+}{}
+\newcommand{\MPCchanged}[1]{{\ifdefined\MPCRevision\color{red}\fi#1}}
+
 \newcommand{\red}[1]{\textcolor{red}{#1}}
 \newcommand{\blue}[1]{\textcolor{blue}{#1}}
 \newcommand{\cyan}[1]{\textcolor{cyan}{#1}}

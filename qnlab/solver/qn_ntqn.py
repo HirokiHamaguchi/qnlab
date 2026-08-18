@@ -39,7 +39,7 @@ def qn_ntqn(
         gx = prob.g(x, count=False)
         if callback:
             callback.callback(prob, x, fx, gx)
-        if np.linalg.norm(gx, ord=np.inf) < param.gtol:
+        if param.stop_at_gtol and np.linalg.norm(gx, ord=np.inf) < param.gtol:
             final_xk[:] = x
             final_fk = fx
             raise StopOptimization()
@@ -65,7 +65,7 @@ def qn_ntqn(
                 "max_geval": param.max_evaluations,
                 "tol": param.gtol,
                 "qn_hist_size": param.m,  # Use m from parameter
-                "terminate": 1,  # optimize until no more progress
+                "terminate": param.terminate,
                 "display": 1 if verbose else 0,
             },
         )

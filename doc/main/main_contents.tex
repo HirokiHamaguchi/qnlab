@@ -17,7 +17,7 @@ We begin by reviewing relevant background and formalizing the problem setting.
 \label{sec:prel_rqn}
 
 The regularized quasi-Newton method is a variant of quasi-Newton methods that does not rely heavily on line search techniques. This property is important for optimization in noisy evaluation environments.
-There has been renewed interest in regularized Newton-type methods, including cubic-regularization schemes~\citep{nesterovCubicRegularizationNewton2006a,ranganathSymmetricRankOneQuasiNewton2025,wangConvergenceRatesRegularized2025}, and we focus on quadratic regularization~\citep{kanzowRegularizationLimitedMemory2023,doikovSuperUniversalRegularizedNewton2024,liTruncatedRegularizedNewton2009,zhangNewRegularizedQuasiNewton2018,uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,shengNewAdaptiveTrust2018} for simplicity of analysis and implementation.
+There has been renewed interest in regularized Newton-type methods, including cubic-regularization schemes~\citep{nesterovCubicRegularizationNewton2006,ranganathSymmetricRankOneQuasiNewton2025,wangConvergenceRatesRegularized2025}, and we focus on quadratic regularization~\citep{kanzowRegularizationLimitedMemory2023,doikovSuperUniversalRegularizedNewton2024,liTruncatedRegularizedNewton2009,zhangNewRegularizedQuasiNewton2018,uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,shengNewAdaptiveTrust2018} for simplicity of analysis and implementation.
 
 For $g_k \defeq \nabla f(x_k)$ and an approximate Hessian $B_k \in \bbR^{n \times n}$, regularized quasi-Newton methods compute the step as
 \begin{equation*}
@@ -70,20 +70,19 @@ The error is predominantly relative when $\abs{f(x)}$ is large and effectively a
 In the numerical experiments, $\feps$ is taken as a large multiple of the machine epsilon to account for accumulated round-off effects.
 Closely related models are also employed in practical stopping criteria~\citep{2020SciPy-NMeth}.
 
-We next specify the assumptions of gradient evaluations.
-In practice, termination is typically based on a gradient tolerance $\gtol$, and the condition $\norm{\nabla \overline{f}(x)} \le \gtol$ is used as a stopping criterion.
-Hence, prior to termination, it holds that $\norm{\nabla \overline{f}(x)} > \gtol$.
-If the gradient noise $\norm{\nabla f(x) - \nabla \overline{f}(x)}$ were comparable to or larger than $\gtol$, the stopping criterion could not be satisfied reliably, even when $\nabla f(x) = 0$. To ensure meaningful termination, the gradient noise must be sufficiently small relative to $\gtol$. Specifically, during the optimization process, we assume
-\begin{equation*}
-    \norm{\nabla f(x) - \nabla \overline{f}(x)} \ll \gtol < \norm{\nabla \overline{f}(x)}.
-\end{equation*}
-Under this regime, the computed gradient $\nabla \overline{f}(x)$ is a sufficiently accurate approximation of the true gradient $\nabla f(x)$ prior to termination. Accordingly, for the purpose of simplifying the theoretical analysis, we adopt the exact-gradient assumption
-\begin{equation}\label{eq:exact_gradient_assumption}
-    \nabla \overline{f}(x) = \nabla f(x).
-\end{equation}
-We emphasize that this assumption is introduced solely as a modeling simplification, rather than as a claim about practical gradient accuracy.
-Notably, the proposed algorithm does not rely on Wolfe-type conditions, which typically require accurate gradient information at trial points, and is therefore robust to gradient inaccuracies.
-Our numerical experiments in \cref{sec:experiments} include cases where gradients are contaminated by noise, and they also demonstrate that the proposed method remains effective even when \cref{eq:exact_gradient_assumption} is violated.
+\begin{MPCchange}
+We distinguish the setting covered by the analysis from the additional stress tests in \cref{sec:experiments}.
+The convergence theory makes the following exact-gradient assumption.
+\begin{assumption}[Exact gradient]\label{ass:exact_gradient}
+    For every evaluated point \(x\),
+    \begin{equation}\label{eq:exact_gradient_assumption}
+        g(x)=\nabla \overline f(x)=\nabla f(x).
+    \end{equation}
+\end{assumption}
+This assumption is not implied by the function-value error model in \cref{eq:error_model} and is therefore stated independently.
+With a bounded nonvanishing gradient error, exact first-order stationarity is generally impossible to certify below the noise floor; a result in that setting would instead have to bound convergence to a neighborhood.
+Accordingly, function-value-only noise is the theory-aligned artificial experiment, while joint function-and-gradient noise is reported as a deliberately adverse robustness test beyond the theorem.
+\end{MPCchange}
 
 \section{Proposed Algorithm}\label{sec:algorithm}
 
@@ -96,18 +95,19 @@ The pseudo-code of our algorithm is given in \cref{alg:regularized_qn}. The mini
 In the following, we explain the three main components of \cref{alg:regularized_qn}.
 
 \DontPrintSemicolon
+\begin{MPCchange}
 \begin{algorithm}[ht]
     \normalsize
     \KwIn{$x_0$, $0 < k_{\max}$, $0 \le \feps < 1$, $0 < \theta_{\min} \leq \theta_{\max}$ and $0 < \varsigma < 1$}
     $k \gets 0$, $g_0 \gets \nabla \overline{f}(x_0)$, $K^0 \gets \emptyset$, $K^+ \gets \emptyset$ \label{line:init}\;
     \For{$k=0,1,2,\ldots, k_{\max}-1$}{
-        \uIf{$\min_{j \in K^0} (\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k)$\label{line:mu_0_condition}}{
+        \uIf{$\min_{j \in K^0,\,j<k} (\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k)$\label{line:mu_0_condition}}{
             $K^0 \gets K^0 \cup \{k\}$ \label{line:update_K_0}\;
             $\mu_k \gets 0$ \label{line:update_mu_0}\;
         }
         \uElse{
             $K^+ \gets K^+ \cup \{k\}$ \label{line:update_K_plus}\;
-            $\mu_{k} \gets \theta_k \sqrt{\varsigma + \sum_{j \in K^+} \norm{g_{j}}^2}$ with $\theta_k \in [\theta_{\min}, \theta_{\max}]$ ~ (see \cref{sec:proposed_choice_mu}). \label{line:update_theta}\;
+            $\mu_{k} \gets \theta_k \sqrt{\varsigma + \sum_{j \in K^+,\,j\leq k} \norm{g_{j}}^2}$ with $\theta_k \in [\theta_{\min}, \theta_{\max}]$ ~ (see \cref{sec:proposed_choice_mu}). \label{line:update_theta}\;
         }
         $d_k \gets -(B_k + \mu_k I)^{-1} g_k$ with $B_k$ ~ (see \cref{sec:proposed_choice_Bk}). \label{line:d_k}\;
         Find $\alpha_k$ and $\Delta_k$ satisfying \cref{eq:relaxed_Armijo_condition} by \cref{alg:backtracking_linesearch}.  \label{line:armijo}\;
@@ -117,6 +117,7 @@ In the following, we explain the three main components of \cref{alg:regularized_
     \caption{Noise Tolerant Regularized Quasi-Newton Method}
     \label{alg:regularized_qn}
 \end{algorithm}
+\end{MPCchange}
 
 \DontPrintSemicolon
 \begin{algorithm}[ht]
@@ -187,7 +188,9 @@ In this section, we establish the global convergence properties of
 
 \subsection{Assumptions}\label{sec:assumptions}
 
-Throughout this section, we make the following three assumptions.
+\begin{MPCchange}
+In addition to the exact-gradient assumption stated in \cref{ass:exact_gradient}, we make the following three structural assumptions.
+\end{MPCchange}
 The first assumption ensures that the objective function is bounded below.
 \begin{assumption}\label{ass:bounded}
     The function $f$ is bounded below, meaning that for all $x \in \mathbb{R}^n$,
@@ -451,7 +454,9 @@ We now bound the sum of $\delta_k = f(x_k) - f(x_{k+1})$ over $k \in K^0$ with $
 \subsection{Bound for the case \texorpdfstring{$\mu_k > 0$}{mu k > 0}}
 
 Next, we show that the sum of $\delta_{k}$ over $k \in K^+$ is lower bounded.
-Recall that $K^+$ be a set of iteration indices $k$ such that $\mu_k > 0$ as defined in \cref{eq:def_K0_Kplus}, and that $\mu_k$ is defined as $\theta_k \sqrt{\varsigma + \sum_{j \in K^+,\ j < k} \norm{g_{j}}^2}$ with $\theta_k \in [\theta_{\min}, \theta_{\max}]$ in \refLine{line:update_theta} of \cref{alg:regularized_qn}.
+\begin{MPCchange}
+Recall that $K^+$ is the set of iteration indices $k$ such that $\mu_k > 0$ as defined in \cref{eq:def_K0_Kplus}, and that $\mu_k$ is defined as $\theta_k \sqrt{\varsigma + \sum_{j \in K^+,\ j \leq k} \norm{g_{j}}^2}$ with $\theta_k \in [\theta_{\min}, \theta_{\max}]$ in \refLine{line:update_theta} of \cref{alg:regularized_qn}.
+\end{MPCchange}
 
 Before proceeding to the main proof, we present \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}, providing standard inequalities in the AdaGrad-Norm algorithm analysis~\citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020},~\citep[Lemma~3.1]{Gratton08022024}.
 Its proof is deferred to \cref{sec:proof_of_sum_norm_g_over_mu_geq_2sqrt_leq_log}.
@@ -545,7 +550,9 @@ Then, we can obtain the following unified bound of the sum of $\norm{g_k}^2$.
 
 Now, we establish the following convergence rate for \cref{alg:regularized_qn}.
 \begin{theorem}\label{thm:gc}
-    Under \cref{ass:bounded,ass:LSmooth,ass:BBounds}, the average of squared gradient norms generated by \cref{alg:regularized_qn} satisfies
+    \begin{MPCchange}
+        Under \cref{ass:exact_gradient,ass:bounded,ass:LSmooth,ass:BBounds}, the average of squared gradient norms generated by \cref{alg:regularized_qn} satisfies
+    \end{MPCchange}
     \begin{equation*}
         \frac{1}{k_{\max}} \sum_{k=0}^{k_{\max}-1} \norm{g_k}^2 = \order{\frac{1}{k_{\max}}}.
     \end{equation*}
@@ -609,6 +616,15 @@ Finally, \cref{thm:gc} implies that the iteration complexity:
     \min\left\{k \relmiddle| \norm{\nabla f(x_k)} \leq \gtol \right\} = \order{1/\gtol^2}.
 \end{equation*}
 This is a standard convergence guarantee for first-order optimization algorithms applied to $L$-smooth nonconvex functions.
+\begin{MPCchange}
+More explicitly, \cref{eq:gc_result} gives the sufficient bound
+\begin{equation*}
+    k_{\max}\geq \frac{1}{\gtol^2}
+    \max\left\{\frac{MF'}{c\overline\alpha},\frac{4(F')^2}{C_1^2}\right\}.
+\end{equation*}
+Here \(\overline\alpha\) depends only on \(c,L,m,M\) and the backtracking bounds, \(C_1=\overline\alpha/\theta_{\max}\), \(C_2=(M\overline\alpha+L/2)/\theta_{\min}^2\), and \(F'\) is displayed in the proof and contains \(\feps\), \(\varsigma\), the initial true and observed optimality gaps, and \(\Delta_{\max}\).
+Thus the order symbol suppresses no dependence on the iteration counter, but it does suppress these problem and algorithm parameters; the guarantee deteriorates as the permitted function error approaches \(1\) through the factor \((1-\feps)^{-1}\).
+\end{MPCchange}
 
 \section{Practical Choices of Algorithmic Variables}\label{sec:proposed_choice}
 
@@ -660,22 +676,30 @@ Now, we provide a sufficient condition for \cref{ass:BBounds} by the following p
 \end{proposition}
 Proposition~\ref{prop:bounded_BFGS} shows that, whenever \cref{eq:curvature_conditions1,eq:curvature_conditions2} hold for the stored pairs, the resulting $\mathrm{BFGS}$ matrix satisfies \cref{ass:BBounds} as expressed in \cref{eq:bounded_BFGS_mM}.
 
-Based on \cref{prop:bounded_BFGS}, we basically adopt the following rule for forming $B_k$:
+\begin{MPCchange}
+Based on \cref{prop:bounded_BFGS}, we form \(B_k\) from at most \(p=10\) stored modified curvature pairs.
+After damping, a pair \((s,\overline y)\) is retained only if
+\begin{equation}\label{eq:implemented_cautious_test}
+    \overline y^\top s \geq \max\left\{10^{-8}\norm{s}^2,\frac{\norm{\overline y}^2}{10^8},10^{-16}\right\}.
+\end{equation}
+Thus every stored pair satisfies \cref{eq:curvature_conditions1,eq:curvature_conditions2} with the iteration-independent constants \(\lambda=10^{-8}\) and \(\Lambda=10^8\).
+The finite memory bound and \cref{prop:bounded_BFGS} then provide uniform constants \(m\) and \(M\), independent of \(k\), for the matrices actually used by the implementation.
+The absolute floor in \cref{eq:implemented_cautious_test} rejects numerically degenerate pairs but is not needed for this implication.
+
+We use
 \begin{equation}\label{eq:proposed_choice_of_Bk}
     B_k=\mathrm{BFGS}(\{(s_{k_i}, \overline{y}_{k_i})\}),
 \end{equation}
 where
 \begin{equation*}
-    \overline{y}_{k_i} \defeq \theta^{\mathrm{damp}}_i y_{k_i} + (1-\theta^{\mathrm{damp}}_i) B_{k-1}s_{k_i} \\
+    \overline y_{k_i}
+    =\theta_i^{\mathrm{damp}}y_{k_i}
+    +(1-\theta_i^{\mathrm{damp}})B_{k-1}s_{k_i},
+    \qquad \theta_i^{\mathrm{damp}}\in[0,1].
 \end{equation*}
-with $\theta^{\mathrm{damp}}_i \in [0,1]$.
-This parameter is determined using a damped BFGS update~\citep{powellAlgorithmsNonlinearConstraints1978,lotfiStochasticDampedLBFGS2020} and the indices $\{k_i\}_{i=0}^{p-1}$ are selected so that the modified pairs $(s_{k_i},\overline y_{k_i})$ satisfy \cref{eq:curvature_conditions1,eq:curvature_conditions2} for some constants $\lambda, \Lambda$.
-The damped BFGS is a classical technique to ensure $\overline y_{k_i}^\top s_{k_i}>0$, and we adopted its simple limited-memory variant~\citep{lotfiStochasticDampedLBFGS2020}.
-
-Since we do not employ Wolfe conditions in the line search, this damping technique plays a central role in ensuring the positive definiteness of $B_k$.
-The selection of curvature pairs shares the same spirit as the cautious update~\citep{liGlobalConvergenceBFGS2001,mannelStructuredLBFGSMethod2024,mannelGlobalizationLBFGSBarzilai2025}, which only uses pairs satisfying certain curvature conditions.
-By \cref{prop:bounded_BFGS}, $B_k$ satisfies the uniform spectral bound in \cref{ass:BBounds}.
-This confirms that the practical construction of $B_k$ is consistent with the theoretical requirements.
+We determine \(\theta_i^{\mathrm{damp}}\) using the standard damped BFGS construction and its limited-memory variant~\citep{powellAlgorithmsNonlinearConstraints1978,lotfiStochasticDampedLBFGS2020} before applying \cref{eq:implemented_cautious_test}.
+This explicit two-sided test, rather than convexity or cocoercivity of \(\nabla f\), establishes consistency between the nonconvex theory and implementation.
+\end{MPCchange}
 
 \paragraph{Remarks for Practical Implementation: }
 
@@ -722,18 +746,18 @@ Since this adjustment is at most once per iteration, the theoretical results in 
 \subsection{Regularization Parameter \texorpdfstring{$\mu_k$}{mu k}}\label{sec:proposed_choice_mu}
 
 We finally discuss the adjustment of the regularization parameter $\mu_k$ in \refLine{line:update_theta} of \cref{alg:regularized_qn}.
-In our implementation, we choose the regularization parameter as
+\begin{MPCchange}
+In our implementation, the OFFO accumulator contains exactly those gradient norms generated during regularized iterations:
 \begin{equation*}
-    \mu_k = \mathrm{clip}\qty(\frac{1}{10}\norm{g_k}, \frac{1}{100} G_k, G_k) \quad \text{where} \quad G_k \defeq \sqrt{\varsigma + \sum_{j \in K, \, j \leq k} \norm{g_{j}}^2},
+    G_k^2=\varsigma+\sum_{j\in K^+,\,j\leq k}\norm{g_j}^2,
+    \qquad
+    \mu_k=\mathrm{clip}\left(\frac{1}{10}\norm{g_k},\frac{1}{100}G_k,G_k\right).
 \end{equation*}
-which is consistent with the general form stated in \cref{eq:offo_based_update} with an adaptive factor $\theta_k \in [10^{-2},1]$.
-In practice, we may set $\varsigma=0$ as long as the initial gradient is nonzero since $\varsigma$ is mainly introduced for avoiding zero division, but to make it consistent with the theory, we set $\varsigma=10^{-20}$ in all experiments.
-
-When $B_k$ is a good approximation of the Hessian, the regularization parameter $\mu_k$ should be small for fast convergence.
-Since the quantity $G_k$ is strictly increasing with $k$, it is natural in practice to decrease the effective regularization when sufficient progress in the objective function is achieved.
-When the difference between the left- and right-hand sides of \cref{eq:mu_0_condition} is larger than $1$, we restart the accumulation by resetting $K^+$ to the empty set and $G_k$ to $\varsigma$.
-As long as the number of such restarts is finite, the overall convergence analysis in \cref{sec:analysis} remains valid.
-Since these choices are heuristic, there may be room for further improvement. Especially, further increasing $\mu_k$ stabilizes the method when the objective function values are highly noisy, and decreasing $\mu_k$ more aggressively may accelerate convergence when the objective function is accurate.
+Hence \(\mu_k=\theta_kG_k\) with \(\theta_k\in[10^{-2},1]\), exactly as required by \cref{eq:offo_based_update}.
+We set \(\varsigma=10^{-20}\), so that its square root, the initial scale \(G_{-1}\), equals \(10^{-10}\).
+The primary implementation does not restart this accumulator; the earlier heuristic restart is disabled by default and is considered only as an ablation.
+This removes the unproved finite-restart qualification from the convergence claim.
+\end{MPCchange}
 
 \section{Numerical Experiments}\label{sec:experiments}
 
@@ -773,7 +797,10 @@ We compared the following methods in our experiments.
     \item (\texttt{NTQN}): Noise-tolerant quasi-Newton method~\citep{xie2020analysis,shiNoiseTolerantQuasiNewtonAlgorithm2022}
           \begin{itemize}
               \item A method designed to accommodate inexact gradient information, as mentioned in \cref{sec:problem_setting}.
-              \item We mainly used the default parameter settings, and slightly modified the stopping criteria to terminate at the desired gradient norm tolerance.
+              \begin{MPCchange}
+              \item We report both the original wrapper setting and the authors' recommended termination mode (\texttt{terminate=3}).
+              \item For the latter, the external solver controls termination; the common gradient-tolerance criterion is used only when constructing performance profiles and is not injected into the solver.
+              \end{MPCchange}
           \end{itemize}
 \end{itemize}
 
@@ -788,22 +815,18 @@ All experiments were conducted on a Microsoft Windows 11 Home system (version~10
 We evaluated all algorithms on unconstrained problems from the CUTEst benchmark collection~\citep{gouldCUTEstConstrainedUnconstrained2015}, implemented in Python using the PyCUTEst interface~\citep{PyCUTEst2022}.
 All problems were initialized with the default starting points provided by the library.
 Following the previous work~\citep{kanzowRegularizationLimitedMemory2023}, we excluded problems such as the initial point being already stationary or containing \texttt{NaN} and \texttt{INF} in its function values or gradient.
-To simulate different numerical environments, we tested the following four settings:
-\begin{itemize}
-    \item Artificially noised 64-bit floating-point precision (220 problems, $\feps=10^{-2}$)
-    \item 64-bit floating-point precision (220 problems, $\feps=2.22 \times 10^{-9}$)
-    \item 32-bit floating-point precision (220 problems, $\feps=1.19 \times 10^{-3}$)
-    \item 16-bit floating-point precision (152 problems, $\feps=9.77 \times 10^{-2}$)
-\end{itemize}
-In the artificial noise setting, we added uniform random noise to both the objective function values and each component of the gradient vectors independently, i.e.,
-\begin{equation*}
-    \overline{f}(x) = f(x) + \mathrm{unif}(-10^{-3}, 10^{-3}), \quad
-    \nabla \overline{f}(x) = \nabla f(x) + \mathrm{unif}(-10^{-3}, 10^{-3}) \mathbbm{1},
-\end{equation*}
-where $\mathrm{unif}(a,b)$ denotes a uniform random variable in the interval $[a,b]$ and $\mathbbm{1}$ is the vector of all ones.
-This setting is the same as the one in~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
-In the reduced precision settings, to simulate lower numerical precision, we first cast the input vector $x$ to the target lower precision, then computed $\overline{f}(x)$ and $\nabla \overline{f}(x)$ using the lower-precision input.
-Although the internal computations of CUTEst remain in 64-bit precision, the casting of the input vector effectively simulated the impact of reduced precision on function and gradient evaluations.
+\begin{MPCchange}
+The 64- and 32-bit collections contain 220 problems with dimensions from \(2\) to \(123{,}200\), and the 16-bit collection contains 152 problems over the same dimension range.
+The supplied error rates are \(2.22\times10^{-9}\), \(1.19\times10^{-3}\), and \(9.77\times10^{-2}\) for the 64-, 32-, and 16-bit experiments, respectively.
+In addition to these precision experiments, we distinguish two additive-noise experiments on the 64-bit collection:
+\begin{enumerate}
+    \item a theory-aligned setting with \(\overline f(x)=f(x)+\xi_f\), \(\xi_f\sim\operatorname{unif}(-10^{-3},10^{-3})\), and exact gradients; and
+    \item an adverse stress test with the same function perturbation and independent componentwise gradient perturbations \(\xi_g^{(i)}\sim\operatorname{unif}(-10^{-3},10^{-3})\).
+\end{enumerate}
+We supply \(\feps=10^{-2}\) in both settings and additionally test \(10^{-4}\) and \(10^{-1}\) to assess under- and overestimation of this error parameter.
+Each noisy experiment records the random seed, and all solvers receive the same seed for a given problem and scenario.
+The joint-noise setting deliberately violates \cref{eq:exact_gradient_assumption}; it is included to test performance under an unfavorable perturbation, not to validate the exact-gradient theorem.
+\end{MPCchange}
 
 Each setting uses a different error rate $\feps$ in the error model (\cref{eq:error_model}), as summarized in \cref{tab:machine_epsilon}.
 The table relates the machine epsilon (maximum relative rounding error) for each floating-point precision to the $\feps$ value used in our experiments. The relatively large $\feps$ values are chosen to account for the cumulative errors that may arise during optimization.
@@ -831,10 +854,12 @@ Following standard implementations~\citep{2020SciPy-NMeth}, we used the infinity
 
 \subsubsection{Results with Artificial Noise}\label{sssec:noise_results}
 
-We first present the result in the artificial noise setting described in \cref{sssec:problems}.
-\Cref{fig:results_noise} presents the performance profile.
-In this regime, the proposed methods show superior robustness compared to other quasi-Newton methods.
-This result highlights the validity of our theoretical analysis in \cref{sec:analysis} and demonstrates the effectiveness of our approach in handling noisy objective function values.
+\begin{MPCchange}
+We first separate the theory-aligned function-noise experiment from the joint-noise stress test described in \cref{sssec:problems}.
+The former tests the assumptions of \cref{sec:analysis}; the latter asks whether the implementation remains useful when both available quantities are perturbed.
+Therefore, success in the joint-noise experiment is empirical evidence of robustness beyond the theorem and is not presented as validation of the exact-gradient complexity result.
+The experiment notebook also compares the hybrid method with an always-OFFO variant and the earlier accumulator-restart heuristic, and varies the supplied \(\feps\) over two orders of magnitude around its nominal value.
+\end{MPCchange}
 
 \begin{figure}[t]
     \centering
@@ -846,7 +871,9 @@ This result highlights the validity of our theoretical analysis in \cref{sec:ana
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_legend.pdf}
     \end{subfigure}
-    \caption{Performance profile for artificial noise setting (level of $10^{-3}$) and $\gtol=10^{-2}$.}
+    \begin{MPCchange}
+        \caption{Performance profile for the deliberately adverse joint function-and-gradient noise setting (componentwise level \(10^{-3}\)) and \(\gtol=10^{-2}\). This experiment lies outside the exact-gradient theory.}
+    \end{MPCchange}
     \label{fig:results_noise}
 \end{figure}
 
@@ -856,8 +883,10 @@ We next present performance profiles for each floating-point precision (64-, 32-
 We evaluated each method at three gradient norm tolerance levels, i.e., $\gtol \in \{10^{-1}, 10^{-3}, 10^{-5}\}$.
 These tolerance levels represent different optimization regimes, from moderate accuracy to high precision requirements.
 \Cref{fig:results_all_precisions} shows the comprehensive performance profiles across all three precision levels.
-Our methods (\texttt{Ours}) and (\texttt{Ours-MS}) demonstrate competitive or superior performance compared to existing methods in the standard 64-bit setting and maintain robust performance as precision decreases to 32-bit and 16-bit.
-The proposed methods maintain stability even when traditional line search methods encounter difficulties with reduced precision arithmetic.
+\begin{MPCchange}
+The profiles show that \texttt{Ours} and \texttt{Ours-MS} solve a large fraction of the retained problems across the three precision levels.
+Their relative ranking depends on the tolerance and precision, so we avoid claiming uniform superiority and report both the fraction solved and the performance ratios in \cref{fig:results_all_precisions}.
+\end{MPCchange}
 
 \begin{figure}[t]
     \centering
@@ -966,11 +995,13 @@ The purpose of this table is to confirm that all methods achieved similar conver
 
 \section{Conclusion}\label{sec:conclusion}
 
-In this work, we proposed a regularized quasi-Newton method for noisy nonconvex optimization and established its global convergence properties. We also demonstrated the method's effectiveness through numerical experiments on standard benchmark problems under various noise levels and precision settings.
-The results indicate that our methods are robust and effective, particularly in noisy or low-precision environments where traditional line search methods may struggle.
-
-Future work includes the investigation of local convergence properties, the extension to constrained optimization, and the applications to practical problems in machine learning and scientific computing. Additionally, exploring adaptive strategies for selecting algorithmic parameters based on problem characteristics could further enhance the method's performance.
-An explicit analysis of the effect of inexact gradient evaluations would also provide valuable insight into the method's robustness and guide further enhancements.
+\begin{MPCchange}
+We proposed a hybrid regularized quasi-Newton method for smooth nonconvex optimization with bounded errors in objective-function values.
+Under exact gradients and explicit uniform spectral bounds on the quasi-Newton matrices, the method has the standard \(\order{1/\varepsilon^2}\) first-order iteration complexity.
+The implementation enforces the required two-sided curvature conditions directly and uses the same non-restarted OFFO accumulator as the analysis.
+The experiments distinguish function-value noise covered by the theorem from a joint-noise stress test outside its scope and assess sensitivity to the supplied error bound.
+An analysis with inexact gradients, which can at best guarantee convergence to a noise-dependent neighborhood without additional assumptions, remains future work.
+\end{MPCchange}
 
 \ifSubfilesClassLoaded{
     \bibliographystyle{spbasic}

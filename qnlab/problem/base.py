@@ -101,7 +101,7 @@ class BaseProblem(ABC):
         """
         return np.float64(np.finfo(np.float64).eps * 1e7)
 
-    def get_noise(self) -> np.float64:
+    def get_noise(self) -> np.float64 | npt.NDArray[np.float64]:
         """Returns the noise level to gradient for this problem.
 
         Default value is 0.0 (no noise).

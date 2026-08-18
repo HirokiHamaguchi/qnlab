@@ -1,9 +1,8 @@
-Many practical optimization problems involve objective function values that are corrupted by unavoidable numerical errors.
-In smooth nonconvex optimization, quasi-Newton methods combined with line search are widely used due to their efficiency and scalability.
-These methods implicitly assume accurate function evaluations and thus may fail to converge in noisy settings.
-Developing fast and robust quasi-Newton methods for such scenarios is therefore crucial.
-
-To address this issue, we propose a noise-tolerant regularized quasi-Newton method equipped with a relaxed Armijo-type line search, designed to remain stable under inaccurate function evaluations.
-By combining a regularization parameter update rule inspired by Objective-Function-Free Optimization and the AdaGrad-Norm method, we establish a global convergence rate of $\order{1/\varepsilon^2}$ for reaching a first-order stationary point under the assumed error model.
-We performed extensive experiments on the CUTEst benchmark collection with artificially noisy objective function evaluations, as well as with low-precision floating-point arithmetic (64-, 32-, and 16-bit).
-The results demonstrate that the proposed method is substantially more robust than several existing methods, while maintaining competitive practical convergence speed and computational cost.
+\begin{MPCchange}
+Many practical optimization problems involve objective function values that are corrupted by bounded, nonvanishing numerical errors.
+We propose a noise-tolerant regularized quasi-Newton method that exploits a relaxed Armijo line search when observed function values provide reliable progress and switches to an objective-function-free regularization mechanism otherwise.
+Under exact gradients, smooth nonconvexity, bounded relative-or-absolute function errors, and uniformly bounded quasi-Newton matrices, we prove an \(\order{1/\varepsilon^2}\) iteration complexity for reaching first-order stationarity.
+The exact-gradient qualification is essential to the stated theorem; experiments with perturbed gradients are reported separately as deliberately adverse robustness tests beyond its scope.
+Experiments on CUTEst include function-value-only noise, joint function-and-gradient noise, and 64-, 32-, and 16-bit arithmetic.
+They evaluate both robustness and the sensitivity to the supplied function-error bound.
+\end{MPCchange}

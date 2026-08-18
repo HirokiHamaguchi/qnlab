@@ -22,15 +22,20 @@ Differences in function values or directional derivatives can be dominated by nu
 From a computational perspective, improving the robustness of quasi-Newton methods in noisy environments is therefore crucial.
 In particular, it is desirable to design algorithms that (i) retain computational efficiency when function evaluations are accurate, (ii) remain stable when function values are unreliable, and (iii) guarantee convergence to first-order stationary points under mild assumptions.
 
+\begin{MPCchange}
 In this work, we propose a noise-tolerant regularized quasi-Newton method that addresses these challenges.
-Our approach combines Armijo-type line search with quadratic regularization~\citep{uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023}
-and Objective-Function-Free Optimization (OFFO) inspired strategy~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
-When a sufficient decrease in function value is observed, the method behaves similarly to standard quasi-Newton methods with line search, preserving its practical efficiency.
-When numerical noise dominates, we introduce regularization on the approximate Hessian to ensure numerical stability, which yields convergence properties similar to those of OFFO methods, particularly AdaGrad-Norm~\citep{wardAdaGradStepsizesSharp2020}.
-The resulting algorithm is particularly well-suited for low-precision or noisy environments.
+Our approach combines an Armijo-type line search with quadratic regularization~\citep{uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023} and an Objective-Function-Free Optimization (OFFO) inspired strategy~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
+Unlike the regularized L-BFGS method in~\citep{kanzowRegularizationLimitedMemory2023}, which establishes global convergence without an evaluation-complexity bound, our analysis gives the standard \(\order{1/\varepsilon^2}\) complexity under bounded function-value errors.
+Unlike OFFO algorithms, which deliberately never evaluate the objective function, our hybrid method retains a relaxed line search whenever observed function values certify progress and invokes OFFO-type scaling only otherwise.
+The noise-tolerant quasi-Newton analysis in~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022} yields a stationarity neighborhood whose function-error contribution is proportional to \(\sqrt{M\epsilon_f}\), whereas its gradient-error contribution is proportional to \(\epsilon_g\).
+Consequently, up to problem-dependent constants, making the former no larger than the latter requires the comparatively restrictive regime \(\epsilon_f=\order{\epsilon_g^2/M}\).
+Our focus is complementary: function values may carry substantial nonvanishing error, as is common in low-precision computation, while gradients are exact in the complexity theorem.
 
-From a theoretical standpoint, we establish that the proposed method achieves the standard global convergence rate of $\order{1/\varepsilon^2}$ for smooth nonconvex optimization problems, even when objective function values are corrupted by noise.
-Extensive numerical experiments on the CUTEst benchmark collection, across various floating-point precisions and artificial noise settings, demonstrate that the proposed method is significantly more stable than standard methods with line search in the presence of significant numerical noise, while maintaining practical convergence speed.
+When a sufficient decrease in observed function value is available, the method uses an unregularized quasi-Newton step; otherwise, it uses regularization governed by a phasewise AdaGrad-Norm accumulator.
+We prove that the resulting method reaches an \(\varepsilon\)-first-order stationary point in \(\order{1/\varepsilon^2}\) iterations for smooth nonconvex objectives under exact gradients and bounded relative-or-absolute function errors.
+We state the exact-gradient scope explicitly and separate theory-aligned function-noise experiments from joint function-and-gradient perturbations, the latter serving as deliberately adverse stress tests rather than evidence for the theorem.
+The CUTEst study also reports problem dimensions, the baseline stopping rules, sensitivity to the supplied function-error estimate, and ablations of the hybrid mechanism.
+\end{MPCchange}
 
 \ifSubfilesClassLoaded{
     \bibliographystyle{spbasic}

@@ -186,26 +186,27 @@ def qn_ntrqn(
 
     k = 0
     mu = np.float64(0.0)
-    var_sigma = np.float64(1e-20)
-    offo = np.float64(np.sqrt(var_sigma))
+    offo_squared = np.float64(param.offo_squared_offset)
     is_offo_mode = False
     min_fx_minus_delta = np.float64(np.inf)
     rejection_counter: int = 0
 
     while True:
-        if min_fx_minus_delta >= fx:
+        if not param.force_offo and min_fx_minus_delta >= fx:
             is_offo_mode = False
             mu = np.float64(0.0)
-            # if sufficient decrease is observed, reset offo
-            if min_fx_minus_delta - fx >= 1.0:
-                offo = np.float64(np.sqrt(var_sigma))
+            if min_fx_minus_delta - fx >= param.restart_threshold:
+                offo_squared = np.float64(param.offo_squared_offset)
+                if callback is not None:
+                    callback.others["OFFO accumulator restart"] += 1
         else:
             if not is_offo_mode and verbose:
                 print(f"  ⚠️  Switching to offo mode. {k=}")
             is_offo_mode = True
-            offo = np.sqrt(offo**2 + gnorm**2)
+            offo_squared += gnorm**2
+            offo_scale = np.sqrt(offo_squared)
             mu = gnorm * param.mu_scale
-            mu = np.clip(mu, param.mu_min_fraction * offo, offo)
+            mu = np.clip(mu, param.mu_min_fraction * offo_scale, offo_scale)
 
         d = get_direction_reg(method, x, g, lm, mu)
 

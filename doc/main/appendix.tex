@@ -13,7 +13,7 @@ The proof of \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} is similar to exist
     Similarly, $x/\sqrt{y} \ge x/(\sqrt{y}+\sqrt{y-x}) = \sqrt{y}-\sqrt{y-x}$ holds. Thus, we have
     \begin{align*}
         \frac{\norm{g_{k_i}}^2}{\mu_{k_i}}
-         & \ge \frac{1}{\theta_{\max}} \frac{\norm{g_{k_i}}^2}{\sqrt{\varsigma + \sum_{\ell=0}^{i} \norm{g_{k_\ell}^2}}}                                                      &  & (\text{definition})                  \\
+         & \ge \MPCchanged{\frac{1}{\theta_{\max}} \frac{\norm{g_{k_i}}^2}{\sqrt{\varsigma + \sum_{\ell=0}^{i} \norm{g_{k_\ell}}^2}}}                                                      &  & (\text{definition})                  \\
          & \ge \frac{1}{\theta_{\max}} \qty(\sqrt{\varsigma+\sum_{\ell=0}^{i\vphantom{i-1}} \norm{g_{k_\ell}}^2} - \sqrt{\varsigma+\sum_{\ell=0}^{i-1} \norm{g_{k_\ell}}^2}). &  & (x/\sqrt{y} \ge \sqrt{y}-\sqrt{y-x})
     \end{align*}
     Summing these inequalities over $0 \le i < \abs{K^+}$ yields the claim.
@@ -61,10 +61,8 @@ The proof of \cref{prop:bounded_BFGS} is similar to existing results~\citep[Theo
     \myQED
 \end{proof}
 
-The conditions \cref{eq:curvature_conditions1,eq:curvature_conditions2} are standard in the analysis of quasi-Newton methods~\citep[Theorem 2.1]{byrdToolAnalysisQuasiNewton1989}.
-If $f$ is $L$-smooth (\cref{ass:LSmooth}) and convex, then by the Baillon--Haddad theorem~\citep{baillonQuelquesProprietesOperateurs1977,bauschkeBaillonHaddadTheoremRevisited2009} its gradient is $1/L$-cocoercive:
-\begin{equation*}
-    (\nabla f(x)-\nabla f(y))^\top (x-y) \ge \frac{1}{L} \norm{\nabla f(x)-\nabla f(y)}^2
-\end{equation*}
-for all $x,y \in \bbR^n$.
-Applying this inequality with $x=x_{k+1}$ and $y=x_k$ yields \cref{eq:curvature_conditions1} with $\Lambda=L$.
+\begin{MPCchange}
+The two curvature inequalities are standard sufficient conditions for bounded limited-memory BFGS matrices~\citep[Theorem 2.1]{byrdToolAnalysisQuasiNewton1989}.
+In the implementation they are enforced directly by \cref{eq:implemented_cautious_test}; no convexity or cocoercivity assumption is used.
+This point is important because the convergence theorem permits nonconvex objectives.
+\end{MPCchange}

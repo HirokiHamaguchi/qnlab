@@ -22,6 +22,9 @@ class NTRQNParameter(BaseParameter):
         self.mu_scale: np.float64 = np.float64(0.1)
         self.mu_min_fraction: np.float64 = np.float64(0.01)
         self.non_monotone: int = 1
+        self.offo_squared_offset: np.float64 = np.float64(1e-20)
+        self.restart_threshold: np.float64 = np.float64(np.inf)
+        self.force_offo: int = 0
 
         if options:
             self._apply_options(options)
@@ -52,5 +55,11 @@ class NTRQNParameter(BaseParameter):
         if self.mu_min_fraction <= 0:
             return RetCode.ERR_INVALIDPARAMETERS
         if self.non_monotone <= 0:
+            return RetCode.ERR_INVALIDPARAMETERS
+        if self.offo_squared_offset <= 0.0:
+            return RetCode.ERR_INVALIDPARAMETERS
+        if self.restart_threshold <= 0.0:
+            return RetCode.ERR_INVALIDPARAMETERS
+        if self.force_offo not in (0, 1):
             return RetCode.ERR_INVALIDPARAMETERS
         return RetCode.SUCCESS

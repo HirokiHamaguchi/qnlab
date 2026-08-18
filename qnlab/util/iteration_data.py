@@ -5,6 +5,10 @@ import numpy.typing as npt
 
 from qnlab.util.method import Method
 
+CAUTIOUS_CURVATURE_LOWER = np.float64(1e-8)
+CAUTIOUS_CURVATURE_UPPER = np.float64(1e8)
+CAUTIOUS_ABSOLUTE_FLOOR = np.float64(1e-16)
+
 
 class IterationData:
     """Data structure to store per-iteration vectors and scalars."""
@@ -90,8 +94,12 @@ class IterationData:
 
         # Check if we should store this vector based on the store rule
         if method.store == "cautious":
-            THRESHOLD = 1e-8
-            if self.ys < max(THRESHOLD * min(self.ss, self.yy), THRESHOLD**2):
+            curvature_floor = max(
+                CAUTIOUS_CURVATURE_LOWER * self.ss,
+                self.yy / CAUTIOUS_CURVATURE_UPPER,
+                CAUTIOUS_ABSOLUTE_FLOOR,
+            )
+            if self.ys < curvature_floor:
                 return False, "skip by cautious update"
 
         return True, ""
