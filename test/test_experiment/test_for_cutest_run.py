@@ -6,8 +6,8 @@ from qnlab.experiment import for_cutest_run
 from qnlab.util.callback import Callback
 
 
-def _task(method: Mock) -> tuple[str, Mock, dict, int, np.float64]:
-    return ("ARWHEAD", method, {"m": 5}, 64, np.float64(0))
+def _task(method: Mock) -> for_cutest_run.CUTEstTask:
+    return for_cutest_run.CUTEstTask("ARWHEAD", method, {"m": 5}, 64)
 
 
 def test_save_and_load_npz_preserves_times(monkeypatch, tmp_path) -> None:

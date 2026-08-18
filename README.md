@@ -74,13 +74,13 @@ uv run pytest
 ### Reproduce the paper experiments
 
 [`notebooks/cutest.ipynb`](notebooks/cutest.ipynb) is the canonical entry point
-for reproducing the CUTEst experiments reported in the paper. It contains both
-the original benchmark workflow and the additional experiments for the MPC
-response.
+for reproducing all CUTEst experiments reported in the paper. A single
+configuration-driven workflow covers the 64-, 32-, and 16-bit experiments and
+the explicit function- and gradient-noise scenarios used in the MPC response.
 Run the notebook from the repository environment after configuring PyCUTEst.
 
-The full CUTEst benchmark is long-running. For the additional experiments,
-first leave `RUN_EXPERIMENTS = False` and select a small set with
+The full CUTEst benchmark is long-running. First leave
+`RUN_EXPERIMENTS = False` and select a small set with
 `PROBLEMS_TO_RUN`, `SCENARIOS_TO_RUN`, and `METHODS_TO_RUN`. After checking the
 displayed task list, set `RUN_EXPERIMENTS = True` to run the selected tasks.
 Results are saved under `data/temp/`; an existing result for the same condition

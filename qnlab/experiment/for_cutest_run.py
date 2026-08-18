@@ -1,7 +1,8 @@
-import os
+import json
 import warnings
+from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Tuple, TypeAlias, Union
+from typing import Tuple
 from zipfile import BadZipFile
 
 import numpy as np
@@ -12,41 +13,61 @@ from qnlab.solver.qn import qn
 from qnlab.util.callback import Callback, CallbackTimeoutError
 from qnlab.util.method import Method
 
-legacy_task_type: TypeAlias = Tuple[str, Method, dict, int, np.float64]
-boxed_task_type: TypeAlias = Tuple[str, Method, dict, int, np.float64, bool]
-task_type: TypeAlias = Union[legacy_task_type, boxed_task_type]
+RESULT_ROOT = Path(__file__).resolve().parents[2] / "data" / "temp"
 
 
-def _unpack_task(
-    task: task_type,
-) -> tuple[str, Method, dict, int, np.float64, bool]:
-    if len(task) == 5:
-        prob_name, method, option, precision, noise = task
-        return prob_name, method, option, precision, noise, False
-    return task
+@dataclass
+class CUTEstTask:
+    problem_name: str
+    method: Method
+    options: dict
+    precision: int
+    function_noise: np.float64 = np.float64(0)
+    gradient_noise: np.float64 = np.float64(0)
+    assumed_function_error: np.float64 | None = None
+    seed: int = 0
+    boxed: bool = False
+    scenario: str | None = None
+
+    def metadata(self) -> dict:
+        return {
+            "problem": self.problem_name,
+            "method": self.method.label,
+            "options": self.options,
+            "precision": self.precision,
+            "function_noise": self.function_noise,
+            "gradient_noise": self.gradient_noise,
+            "assumed_function_error": self.assumed_function_error,
+            "seed": self.seed,
+            "boxed": self.boxed,
+            "scenario": self.scenario,
+        }
 
 
-def get_file_path(task: task_type, result_subdir: str | None = None) -> str:
-    prob_name, method, _option, precision, noise, boxed = _unpack_task(task)
-    prob_type = "noisy" if noise > 0 else str(precision)
-    folder = Path(os.path.dirname(__file__)).parent.parent / "data" / "temp"
+def get_file_path(task: CUTEstTask, result_subdir: str | None = None) -> str:
+    folder = RESULT_ROOT
     if result_subdir is not None:
         folder /= result_subdir
-    if boxed:
-        folder /= "boxed"
-    return str(folder / prob_type / prob_name / f"{method.label}.npz")
+    if task.scenario is not None:
+        folder /= task.scenario
+        folder /= f"seed_{task.seed}"
+    else:
+        if task.boxed:
+            folder /= "boxed"
+        noise = max(task.function_noise, task.gradient_noise)
+        folder /= "noisy" if noise > 0 else str(task.precision)
+    return str(folder / task.problem_name / f"{task.method.label}.npz")
 
 
 def load_npz(
-    task: task_type, verbose: bool = True, result_subdir: str | None = None
+    task: CUTEstTask, verbose: bool = True, result_subdir: str | None = None
 ) -> Callback:
     """Load stored callback data for a task."""
     file_path = get_file_path(task, result_subdir)
-    if not os.path.exists(file_path):
+    if not Path(file_path).exists():
         if verbose:
             warnings.warn(f"File not found: {file_path}, returning empty Callback.")
-        callback = Callback()
-        return callback
+        return Callback()
     try:
         with np.load(file_path) as data:
             callback = Callback()
@@ -61,62 +82,149 @@ def load_npz(
         print(file_path)
         raise e
     # Iterates are intentionally not stored in this compact result format.
-    # Keep xs empty so visualization code can distinguish unavailable trajectory
-    # data from actual zero-valued iterates.
     callback.xs = []
     return callback
 
 
+def _json_default(value: object) -> object:
+    if isinstance(value, np.generic):
+        return value.item()
+    raise TypeError(f"Object of type {type(value).__name__} is not JSON serializable")
+
+
 def save_npz(
-    task: task_type, callback: Callback, result_subdir: str | None = None
+    task: CUTEstTask,
+    callback: Callback,
+    result_subdir: str | None = None,
+    extra_metadata: dict | None = None,
 ) -> None:
-    """Persist callback data for a task."""
-    file_path = get_file_path(task, result_subdir)
+    """Persist callback data and task metadata."""
+    file_path = Path(get_file_path(task, result_subdir))
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    metadata = task.metadata() | {"diagnostics": dict(callback.others)}
+    if extra_metadata is not None:
+        metadata.update(extra_metadata)
     np.savez_compressed(
         file_path,
         calls=callback.calls,
         fxs=callback.fxs,
         gnorms=callback.gnorms,
         times=callback.times,
+        metadata=json.dumps(metadata, default=_json_default),
     )
 
 
-def solveProblemWithTimeout(
-    task: task_type,
-    TL: int,
+def _create_problem(task: CUTEstTask) -> CUTEstQNProblem:
+    has_noise_model = (
+        task.function_noise > 0
+        or task.gradient_noise > 0
+        or task.assumed_function_error is not None
+    )
+    if has_noise_model:
+        return CUTEstNoisedProblem(
+            task.problem_name,
+            precision=task.precision,
+            function_noise=task.function_noise,
+            gradient_noise=task.gradient_noise,
+            assumed_function_error=task.assumed_function_error,
+            seed=task.seed,
+        )
+    return CUTEstQNProblem(task.problem_name, precision=task.precision)
+
+
+def solve_problem_with_timeout(
+    task: CUTEstTask,
+    time_limit: int,
     allow_save: bool,
     result_subdir: str | None = None,
-):
-    prob_name, method, option, precision, noise, boxed = _unpack_task(task)
+) -> None:
     file_path = get_file_path(task, result_subdir)
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    if noise > 0.0:
-        prob: CUTEstQNProblem = CUTEstNoisedProblem(
-            prob_name, precision=precision, noise=noise
-        )
-    else:
-        prob = CUTEstQNProblem(prob_name, precision=precision)
-    callback = Callback(time_limit=TL)
+    problem = _create_problem(task)
+    callback = Callback(time_limit=time_limit)
     try:
         print(f"▶ Running: {file_path}")
         qn(
-            prob,
-            method,
-            option,
+            problem,
+            task.method,
+            task.options,
             callback,
-            bounds=prob.bounds if boxed else None,
+            bounds=problem.bounds if task.boxed else None,
         )
-        print(f"✓ {prob_name} with {method.label}")
-        save_npz(task, callback, result_subdir)
-    except CallbackTimeoutError as e:
-        print(f"⏱ {prob_name} with {method.label}: {str(e)}")
+        print(f"✓ {task.problem_name} with {task.method.label}")
+        save_npz(
+            task,
+            callback,
+            result_subdir,
+            {"dimension": int(problem.n), "status": "completed", "error": ""},
+        )
+    except CallbackTimeoutError as error:
+        print(f"⏱ {task.problem_name} with {task.method.label}: {error}")
         if allow_save:
-            save_npz(task, callback, result_subdir)
+            save_npz(
+                task,
+                callback,
+                result_subdir,
+                {
+                    "dimension": int(problem.n),
+                    "status": "timeout",
+                    "error": str(error),
+                },
+            )
         else:
             print("⚠ Not saving results for time limit less than 600 seconds.")
-    except Exception as e:
-        print(f"✗ {prob_name} with {method.label}: {str(e)}")
-        save_npz(task, callback, result_subdir)
+    except Exception as error:
+        print(f"✗ {task.problem_name} with {task.method.label}: {error}")
+        save_npz(
+            task,
+            callback,
+            result_subdir,
+            {
+                "dimension": int(problem.n),
+                "status": "error",
+                "error": repr(error),
+            },
+        )
+
+
+def run_tasks(
+    tasks: list[CUTEstTask],
+    error_causing_tasks: list[Tuple[int, str, str]],
+    time_limit: int,
+    result_subdir: str | None = None,
+    overwrite: bool = False,
+) -> None:
+    pending = [
+        task
+        for task in tasks
+        if overwrite or len(load_npz(task, False, result_subdir).calls) == 0
+    ]
+    print(f"Total tasks to run: {len(pending)}")
+
+    errors = []
+    for index, task in enumerate(pending):
+        file_path = get_file_path(task, result_subdir)
+        try:
+            known_error = (
+                task.precision,
+                task.problem_name,
+                task.method.label,
+            ) in error_causing_tasks
+            if known_error:
+                print("⚠ Reducing time limit for known error-causing task.")
+                solve_problem_with_timeout(
+                    task, 60, allow_save=True, result_subdir=result_subdir
+                )
+            else:
+                solve_problem_with_timeout(
+                    task,
+                    time_limit,
+                    allow_save=time_limit >= 600,
+                    result_subdir=result_subdir,
+                )
+            print(f"[{index + 1}/{len(pending)}] ✓ Success")
+        except Exception as error:
+            print(f"[{index + 1}/{len(pending)}] ⚠ Error: {error}")
+            errors.append((file_path, f"Error: {error}"))
 
 
 def run(
@@ -128,38 +236,22 @@ def run(
     TL: int,
     boxed: bool = False,
     result_subdir: str | None = None,
-):
-    # Prepare all tasks
-    tasks: List[task_type] = []
-    for problem in problems:
-        for method, option in methods:
-            task: task_type = (
-                (problem, method, option, precision, noise, True)
-                if boxed
-                else (problem, method, option, precision, noise)
-            )
-            if len(load_npz(task, False, result_subdir).calls) > 0:
-                continue
-            tasks.append(task)
-    print(f"Total tasks to run: {len(tasks)}")
-
-    errors = []  # collect errors for reporting after all tasks
-    for i, task in enumerate(tasks):
-        file_path = get_file_path(task, result_subdir)
-        try:
-            if (precision, task[0], task[1].label) in ERROR_CAUSING_TASKS:
-                print("⚠ Reducing time limit for known error-causing task.")
-                solveProblemWithTimeout(
-                    task, 60, allow_save=True, result_subdir=result_subdir
-                )
-            else:
-                solveProblemWithTimeout(
-                    task, TL, allow_save=TL >= 600, result_subdir=result_subdir
-                )
-            print(f"[{i + 1}/{len(tasks)}] ✓ Success")
-        except Exception as e:
-            print(f"[{i + 1}/{len(tasks)}] ⚠ Error: {e}")
-            errors.append((file_path, f"Error: {e}"))
+) -> None:
+    """Run the original equal-noise workflow used by auxiliary notebooks."""
+    tasks = [
+        CUTEstTask(
+            problem,
+            method,
+            options,
+            precision,
+            function_noise=noise,
+            gradient_noise=noise,
+            boxed=boxed,
+        )
+        for problem in problems
+        for method, options in methods
+    ]
+    run_tasks(tasks, ERROR_CAUSING_TASKS, TL, result_subdir=result_subdir)
 
 
 def load_results(
@@ -172,52 +264,48 @@ def load_results(
     metric: str = "calls",
     result_subdir: str | None = None,
 ) -> Tuple[list[str], np.ndarray, np.ndarray, np.ndarray, list[str]]:
-    """
-    Load and aggregate results from saved files.
-
-    Returns:
-        alg_names: List of algorithm names
-        callsM: (n_algorithms, n_problems) array of function calls or elapsed times
-        fxsM: (n_algorithms, n_problems) array of function values
-        gnormsM: (n_algorithms, n_problems) array of gradient norms
-        problems: Filtered list of problem names (after removing zero rows)
-    """
+    """Load and aggregate stored results."""
     assert metric in ["calls", "time"]
-    alg_names = list(method.label for method, _ in methods)
-    nAlgorithms = len(alg_names)
-    nProbs = len(problems)
-    callsM = np.zeros((nAlgorithms, nProbs), dtype=float)
-    fxsM = np.zeros((nAlgorithms, nProbs), dtype=float)
-    gnormsM = np.zeros((nAlgorithms, nProbs), dtype=float)
+    alg_names = [method.label for method, _ in methods]
+    callsM = np.zeros((len(alg_names), len(problems)), dtype=float)
+    fxsM = np.zeros((len(alg_names), len(problems)), dtype=float)
+    gnormsM = np.zeros((len(alg_names), len(problems)), dtype=float)
 
-    for j, prob_name in enumerate(problems):
-        for i, (method, option) in enumerate(methods):
-            task: task_type = (
-                (prob_name, method, option, precision, noise, True)
-                if boxed
-                else (prob_name, method, option, precision, noise)
+    for j, problem_name in enumerate(problems):
+        for i, (method, options) in enumerate(methods):
+            task = CUTEstTask(
+                problem_name,
+                method,
+                options,
+                precision,
+                function_noise=noise,
+                gradient_noise=noise,
+                boxed=boxed,
             )
             callback = load_npz(task, False, result_subdir)
             if len(callback.calls) == 0:
-                res = (np.inf, np.inf, np.inf)
+                result = (np.inf, np.inf, np.inf)
             else:
-                isOk = callback.gnorms <= gtol
-                if not np.any(isOk):
-                    res = (np.inf, np.inf, np.inf)
+                converged = callback.gnorms <= gtol
+                if not np.any(converged):
+                    result = (np.inf, np.inf, np.inf)
                 else:
-                    idx = np.where(isOk)[0][0]
-                    assert callback.calls[idx] >= 0
+                    index = np.where(converged)[0][0]
+                    assert callback.calls[index] >= 0
                     if metric == "time":
-                        if len(callback.times) == 0:
-                            work = np.inf
-                        else:
-                            work = max(np.finfo(float).tiny, callback.times[idx])
+                        work = (
+                            np.inf
+                            if len(callback.times) == 0
+                            else max(np.finfo(float).tiny, callback.times[index])
+                        )
                     else:
-                        # We take max with 1
-                        # Otherwise, performance profile will cause error
-                        work = max(1, callback.calls[idx])
-                    res = (work, callback.fxs[idx], callback.gnorms[idx])
+                        work = max(1, callback.calls[index])
+                    result = (
+                        work,
+                        callback.fxs[index],
+                        callback.gnorms[index],
+                    )
 
-            callsM[i, j], fxsM[i, j], gnormsM[i, j] = res
+            callsM[i, j], fxsM[i, j], gnormsM[i, j] = result
 
     return alg_names, callsM, fxsM, gnormsM, problems

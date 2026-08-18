@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns  # type: ignore[import-untyped]
 
-from qnlab.experiment.for_cutest_run import load_npz, task_type
+from qnlab.experiment.for_cutest_run import CUTEstTask, load_npz
 from qnlab.experiment.profile import performance_profile
 from qnlab.experiment.vis import vis
 from qnlab.problem.cutest import CUTEstQNProblem
@@ -51,16 +51,23 @@ def individual_plot(
     for prob_name in problems:
         if noise > 0.0:
             prob: CUTEstQNProblem = CUTEstNoisedProblem(
-                prob_name, precision=precision, noise=noise
+                prob_name,
+                precision=precision,
+                function_noise=noise,
+                gradient_noise=noise,
             )
         else:
             prob = CUTEstQNProblem(prob_name, precision=precision)
         callbacks: List[Callback] = []
         for method, option in methods:
-            task: task_type = (
-                (prob_name, method, option, precision, noise, True)
-                if boxed
-                else (prob_name, method, option, precision, noise)
+            task = CUTEstTask(
+                prob_name,
+                method,
+                option,
+                precision,
+                function_noise=noise,
+                gradient_noise=noise,
+                boxed=boxed,
             )
             callbacks.append(load_npz(task, result_subdir=result_subdir))
         output_path = _individual_plot_output_path(
@@ -118,6 +125,7 @@ def draw_pp(
     gtol: np.float64,
     boxed: bool = False,
     metric: str = "calls",
+    output_path: Path | None = None,
 ) -> None:
     # Set style for publication quality
     sns.set_style("whitegrid")
@@ -135,7 +143,8 @@ def draw_pp(
     colors = [color_palette.get(name, "black") for name in alg_names]
     line_styles_list = [line_styles.get(name, "o-") for name in alg_names]
 
-    output_path = generate_output_path(precision, noise, gtol, boxed, metric)
+    if output_path is None:
+        output_path = generate_output_path(precision, noise, gtol, boxed, metric)
     fig_size = generate_fig_size(noise)
 
     # Create figure with proper size for paper

@@ -9,19 +9,14 @@ class CUTEstNoisedProblem(CUTEstQNProblem):
         self,
         problem_name: str,
         precision: int = 64,
-        noise: np.float64 = np.float64(0.0),
-        function_noise: np.float64 | None = None,
-        gradient_noise: np.float64 | None = None,
+        function_noise: np.float64 = np.float64(0.0),
+        gradient_noise: np.float64 = np.float64(0.0),
         assumed_function_error: np.float64 | None = None,
         seed: int = 0,
     ) -> None:
         super().__init__(problem_name, precision)
-        self.function_noise = np.float64(
-            noise if function_noise is None else function_noise
-        )
-        self.gradient_noise = np.float64(
-            noise if gradient_noise is None else gradient_noise
-        )
+        self.function_noise = np.float64(function_noise)
+        self.gradient_noise = np.float64(gradient_noise)
         if self.function_noise < 0.0 or self.gradient_noise < 0.0:
             raise ValueError("Noise levels must be non-negative.")
         if (
@@ -34,7 +29,6 @@ class CUTEstNoisedProblem(CUTEstQNProblem):
             if assumed_function_error is None
             else np.float64(assumed_function_error)
         )
-        self.noise = max(self.function_noise, self.gradient_noise)
         self.rng = np.random.default_rng(seed=seed)
 
     def _f(self, x: npt.NDArray[np.float64]) -> np.float64:
