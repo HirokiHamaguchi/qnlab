@@ -69,6 +69,8 @@ def test_lbfgs_workspace_keeps_contiguous_pairs_and_gram_matrices():
     expected_gradients = np.column_stack([pair[1] for pair in pairs[-3:]])
     np.testing.assert_allclose(workspace.steps, expected_steps)
     np.testing.assert_allclose(workspace.gradients, expected_gradients)
+    assert workspace._steps.flags.f_contiguous
+    assert workspace._gradients.flags.f_contiguous
     np.testing.assert_allclose(
         workspace.step_products, expected_steps.T @ expected_steps
     )

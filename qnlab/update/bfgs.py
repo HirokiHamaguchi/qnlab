@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.typing as npt
+from scipy.linalg.blas import daxpy
 
 from qnlab.update.base import BaseUpdateRule
 from qnlab.util.memory_interface import QuasiNewtonMemory
@@ -51,25 +52,27 @@ class BFGSUpdateRule(BaseUpdateRule):
     @staticmethod
     def _compute_dir_reg(g, lm, mu) -> npt.NDArray[np.float64]:
         workspace = lm.workspace
-        steps = workspace.steps
-        gradients = workspace.gradients
-        step_norms = workspace.step_norms
-        pair_products = workspace.pair_products
-        gradient_norms = workspace.gradient_norms
+        steps = workspace._steps
+        gradients = workspace._gradients
+        step_norms = workspace._step_norms
+        pair_products = workspace._pair_products
+        gradient_norms = workspace._gradient_norms
         alphas = workspace.alphas
-        count = workspace.size
 
         d = -g.copy()
-        denominators = pair_products + mu * step_norms
-        for index in range(count - 1, -1, -1):
-            alpha = np.dot(steps[:, index], d) / denominators[index]
+        # Follow the ring buffer's logical order without rearranging its columns.
+        indices = workspace.indices
+        for index in indices[::-1]:
+            denominator = pair_products[index] + mu * step_norms[index]
+            alpha = np.dot(steps[:, index], d) / denominator
             alphas[index] = alpha
-            d -= alpha * gradients[:, index]
+            # daxpy computes d <- d - alpha*y in place, avoiding an n-vector temporary.
+            d = daxpy(gradients[:, index], d, a=-alpha)
             if mu != 0.0:
-                d -= alpha * mu * steps[:, index]
+                d = daxpy(steps[:, index], d, a=-alpha * mu)
 
-        last = count - 1
-        numerator = denominators[last]
+        last = workspace.last_index
+        numerator = pair_products[last] + mu * step_norms[last]
         denominator = (
             gradient_norms[last]
             + 2.0 * mu * pair_products[last]
@@ -77,11 +80,14 @@ class BFGSUpdateRule(BaseUpdateRule):
         )
         d *= numerator / denominator
 
-        for index in range(count):
-            beta = (
-                np.dot(gradients[:, index], d) + mu * np.dot(steps[:, index], d)
-            ) / denominators[index]
-            d += (alphas[index] - beta) * steps[:, index]
+        for index in indices:
+            denominator = pair_products[index] + mu * step_norms[index]
+            numerator = np.dot(gradients[:, index], d)
+            if mu != 0.0:
+                numerator += mu * np.dot(steps[:, index], d)
+            beta = numerator / denominator
+            # daxpy computes d <- d + (alpha - beta)*s without an allocation.
+            d = daxpy(steps[:, index], d, a=alphas[index] - beta)
         return d
 
     @staticmethod

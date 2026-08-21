@@ -36,7 +36,7 @@ def qn_line(
     lm = QuasiNewtonMemory(g, param.m, method)
     pf: Deque[np.float64] = deque([], maxlen=param.past)
 
-    d = -np.copy(g)
+    d = -g
 
     step = np.float64(1.0) / np.linalg.norm(d)
     k = 0
@@ -46,7 +46,8 @@ def qn_line(
         return result, fx, x
 
     while True:
-        xp, fxp, gp = np.copy(x), fx, np.copy(g)
+        # The line search rebinds g rather than modifying it, so gp needs no copy.
+        xp, fxp, gp = np.copy(x), fx, g
 
         ls, fx, step, x, g = param.linesearch(
             prob.n, x, fx, g, d, step, xp, gp, w, prob, param
@@ -56,7 +57,7 @@ def qn_line(
         if ls.is_error():
             if callback:
                 callback.callback(prob, x, fx, g)
-            x, g = np.copy(xp), np.copy(gp)
+            x, g = xp, gp
             return ls, fx, x
 
         if callback:
