@@ -36,7 +36,7 @@ uv sync
 
 - Git with submodule support
 - PyCUTEst installed and configured (for running tests involving CUTEst problems)
-  - https://github.com/abelsiqueira/linux-cutest
+  - https://github.com/ralna/CUTEst
   - https://github.com/jfowkes/pycutest
 
 ### Pull git submodules
@@ -79,12 +79,16 @@ configuration-driven workflow covers the 64-, 32-, and 16-bit experiments and
 the explicit function- and gradient-noise scenarios used in the MPC response.
 Run the notebook from the repository environment after configuring PyCUTEst.
 
-The full CUTEst benchmark is long-running. First leave
-`RUN_EXPERIMENTS = False` and select a small set with
-`PROBLEMS_TO_RUN`, `SCENARIOS_TO_RUN`, and `METHODS_TO_RUN`. After checking the
-displayed task list, set `RUN_EXPERIMENTS = True` to run the selected tasks.
-Results are saved under `data/temp/`; an existing result for the same condition
-is overwritten.
+The deterministic precision scenarios use seed `0`. Each noisy scenario uses the
+five paired seeds `0`, `1`, `2`, `3`, and `4`; every solver receives the same seed
+for a given problem and scenario.
+
+The full CUTEst benchmark is long-running. In the notebook's configuration cell,
+first select a small set with `PROBLEMS_TO_RUN`, `SCENARIOS_TO_RUN`, and
+`METHODS_TO_RUN`, and leave `RUN_EXPERIMENTS = False`. After checking the displayed
+task list, set `RUN_EXPERIMENTS = True` and run the execution cell manually.
+Results are saved under `data/temp/`; existing results are skipped unless
+`OVERWRITE_EXISTING = True` is selected deliberately.
 
 ### Install git hooks
 

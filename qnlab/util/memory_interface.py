@@ -140,7 +140,7 @@ class QuasiNewtonMemory:
         self._method = method
         self.workspace = LBFGSWorkspace(g.size, maxlen)
         gnorm = np.linalg.norm(g)
-        self.zero_length = 1 / gnorm if gnorm > 0 else 1.0
+        self.zero_hessian_scale = np.float64(gnorm if gnorm > 0 else 1.0)
 
     def __iter__(self) -> Iterator[IterationData]:
         return iter(self._deque)
@@ -186,7 +186,4 @@ class QuasiNewtonMemory:
         return item
 
     def zero_memory_direction(self, g: np.ndarray, mu: np.float64) -> np.ndarray:
-        if mu > 0.0:
-            return -g / mu
-        else:
-            return -g * self.zero_length
+        return -g / (self.zero_hessian_scale + mu)

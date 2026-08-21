@@ -58,7 +58,7 @@ We consider optimization problems in which exact objective function values are u
 When both objective values and gradients are heavily corrupted by noise, reliable optimization cannot be guaranteed.
 Thus, meaningful optimization requires that at least one source of information be sufficiently accurate.
 This work focuses on problems arising from finite-precision computations or inexact evaluations, where objective function evaluations are subject to non-negligible errors while gradient information can be computed with relatively high accuracy.
-Settings in which objective values are accurate but gradients are noisy, such as derivative-free optimization or stochastic approximation methods~\citep{berahasTheoreticalEmpiricalComparison2021,xie2020analysis,shiNoiseTolerantQuasiNewtonAlgorithm2022}, are beyond the scope of this work.
+Settings in which objective values are accurate but gradients are noisy, such as derivative-free optimization or stochastic approximation methods~\citep{berahasTheoreticalEmpiricalComparison2021,xieAnalysisBFGSMethod2020,shiNoiseTolerantQuasiNewtonAlgorithm2022}, are beyond the scope of this work.
 
 In the following, we formalize the assumptions on function value and gradient evaluations.
 We assume that only an error-contaminated function value $\overline{f}(x)$ is accessible, satisfying the hybrid absolute-relative error model~\citep{highamAccuracyStabilityNumerical2002,10.5555/3168451.3168462}:
@@ -74,11 +74,12 @@ Closely related models are also employed in practical stopping criteria~\citep{2
 We distinguish the setting covered by the analysis from the additional stress tests in \cref{sec:experiments}.
 The convergence theory makes the following exact-gradient assumption.
 \begin{assumption}[Exact gradient]\label{ass:exact_gradient}
-    For every evaluated point \(x\),
+    The algorithm has access to a gradient oracle $g$ such that, for every evaluated point $x$,
     \begin{equation}\label{eq:exact_gradient_assumption}
-        g(x)=\nabla \overline f(x)=\nabla f(x).
+        g(x)=\nabla f(x).
     \end{equation}
 \end{assumption}
+The gradient oracle is independent of the inexact function-value oracle $\overline f$; in particular, $\overline f$ need not be differentiable.
 This assumption is not implied by the function-value error model in \cref{eq:error_model} and is therefore stated independently.
 With a bounded nonvanishing gradient error, exact first-order stationarity is generally impossible to certify below the noise floor; a result in that setting would instead have to bound convergence to a neighborhood.
 Accordingly, function-value-only noise is the theory-aligned artificial experiment, while joint function-and-gradient noise is reported as a deliberately adverse robustness test beyond the theorem.
@@ -99,7 +100,7 @@ In the following, we explain the three main components of \cref{alg:regularized_
 \begin{algorithm}[ht]
     \normalsize
     \KwIn{$x_0$, $0 < k_{\max}$, $0 \le \feps < 1$, $0 < \theta_{\min} \leq \theta_{\max}$ and $0 < \varsigma < 1$}
-    $k \gets 0$, $g_0 \gets \nabla \overline{f}(x_0)$, $K^0 \gets \emptyset$, $K^+ \gets \emptyset$ \label{line:init}\;
+    $k \gets 0$, $g_0 \gets g(x_0)$, $K^0 \gets \emptyset$, $K^+ \gets \emptyset$ \label{line:init}\;
     \For{$k=0,1,2,\ldots, k_{\max}-1$}{
         \uIf{$\min_{j \in K^0,\,j<k} (\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k)$\label{line:mu_0_condition}}{
             $K^0 \gets K^0 \cup \{k\}$ \label{line:update_K_0}\;
@@ -112,7 +113,7 @@ In the following, we explain the three main components of \cref{alg:regularized_
         $d_k \gets -(B_k + \mu_k I)^{-1} g_k$ with $B_k$ ~ (see \cref{sec:proposed_choice_Bk}). \label{line:d_k}\;
         Find $\alpha_k$ and $\Delta_k$ satisfying \cref{eq:relaxed_Armijo_condition} by \cref{alg:backtracking_linesearch}.  \label{line:armijo}\;
         $x_{k+1} \gets x_k + \alpha_k d_k$,\,
-        $g_{k+1} \gets \nabla \overline{f}(x_{k+1})$ \label{line:update}\;
+        $g_{k+1} \gets g(x_{k+1})$ \label{line:update}\;
     }
     \caption{Noise Tolerant Regularized Quasi-Newton Method}
     \label{alg:regularized_qn}
@@ -137,7 +138,7 @@ In the following, we explain the three main components of \cref{alg:regularized_
 \paragraph{Computation of the Regularized Quasi-Newton Direction (\refLine{line:d_k}): }\label{sec:algorithm_components_d}
 
 The first component is the computation of the regularized quasi-Newton direction $d_k$ stated in \cref{sec:prel_rqn}.
-Given $g_k=\nabla \overline{f}(x_k) = \nabla f(x_k)$, an approximate Hessian $B_k$, and a regularization parameter $\mu_k$, we compute the search direction $d_k = -(B_k+\mu_k I)^{-1} g_k$.
+Given $g_k=g(x_k)=\nabla f(x_k)$, an approximate Hessian $B_k$, and a regularization parameter $\mu_k$, we compute the search direction $d_k = -(B_k+\mu_k I)^{-1} g_k$.
 A practical choice of $B_k$ is discussed in \cref{sec:proposed_choice_Bk}.
 
 \paragraph{Relaxed Armijo Condition with an Error-Absorbing Term (\refLine{line:armijo}): }\label{sec:algorithm_components_alpha}
@@ -685,19 +686,33 @@ After damping, a pair \((s,\overline y)\) is retained only if
 Thus every stored pair satisfies \cref{eq:curvature_conditions1,eq:curvature_conditions2} with the iteration-independent constants \(\lambda=10^{-8}\) and \(\Lambda=10^8\).
 The finite memory bound and \cref{prop:bounded_BFGS} then provide uniform constants \(m\) and \(M\), independent of \(k\), for the matrices actually used by the implementation.
 The absolute floor in \cref{eq:implemented_cautious_test} rejects numerically degenerate pairs but is not needed for this implication.
+If no curvature pair is stored, including when all candidate pairs have been rejected, the implementation uses $B_k = \gamma_0 I$.
+Define $\gamma_0$ by
+\begin{equation*}
+    \gamma_0 = \begin{cases}
+        \norm{g_0}, & \norm{g_0} > 0,\\
+        1, & \norm{g_0} = 0.
+    \end{cases}
+\end{equation*}
+Thus the zero-memory case is also positive definite and has iteration-independent spectral bounds.
 
 We use
 \begin{equation}\label{eq:proposed_choice_of_Bk}
     B_k=\mathrm{BFGS}(\{(s_{k_i}, \overline{y}_{k_i})\}),
 \end{equation}
-where
+For a candidate pair with $y_{k_i}^{\top}s_{k_i} < 0$, the implementation applies a scalar Powell-type damping before the cautious test.
+Specifically, it sets $b_i = \norm{y_{k_i}}^2 / \abs{y_{k_i}^{\top}s_{k_i}}$ and
 \begin{equation*}
     \overline y_{k_i}
-    =\theta_i^{\mathrm{damp}}y_{k_i}
-    +(1-\theta_i^{\mathrm{damp}})B_{k-1}s_{k_i},
-    \qquad \theta_i^{\mathrm{damp}}\in[0,1].
+    = \theta_i^{\mathrm{damp}} y_{k_i}
+    + (1 - \theta_i^{\mathrm{damp}}) b_i s_{k_i},
+    \qquad
+    \theta_i^{\mathrm{damp}}
+    = \frac{0.8 b_i \norm{s_{k_i}}^2}{b_i \norm{s_{k_i}}^2 - y_{k_i}^{\top} s_{k_i}} \in [0, 1).
 \end{equation*}
-We determine \(\theta_i^{\mathrm{damp}}\) using the standard damped BFGS construction and its limited-memory variant~\citep{powellAlgorithmsNonlinearConstraints1978,lotfiStochasticDampedLBFGS2020} before applying \cref{eq:implemented_cautious_test}.
+If $y_{k_i}^{\top}s_{k_i} \geq 0$, it sets $\overline y_{k_i} = y_{k_i}$.
+Candidates for which this scalar damping is numerically unsafe are discarded before applying \cref{eq:implemented_cautious_test}.
+This is the damping rule used in the released code; the subsequent two-sided cautious test, rather than damping itself, guarantees the curvature bounds.
 This explicit two-sided test, rather than convexity or cocoercivity of \(\nabla f\), establishes consistency between the nonconvex theory and implementation.
 \end{MPCchange}
 
@@ -794,7 +809,7 @@ We compared the following methods in our experiments.
               \item We used the default parameters, with the exception that \texttt{ftol} was set to $0$ to avoid premature termination.
           \end{itemize}
 
-    \item (\texttt{NTQN}): Noise-tolerant quasi-Newton method~\citep{xie2020analysis,shiNoiseTolerantQuasiNewtonAlgorithm2022}
+    \item (\texttt{NTQN}): Noise-tolerant quasi-Newton method~\citep{xieAnalysisBFGSMethod2020,shiNoiseTolerantQuasiNewtonAlgorithm2022}
           \begin{itemize}
               \item A method designed to accommodate inexact gradient information, as mentioned in \cref{sec:problem_setting}.
               \begin{MPCchange}
@@ -824,7 +839,7 @@ In addition to these precision experiments, we distinguish two additive-noise ex
     \item an adverse stress test with the same function perturbation and independent componentwise gradient perturbations \(\xi_g^{(i)}\sim\operatorname{unif}(-10^{-3},10^{-3})\).
 \end{enumerate}
 We supply \(\feps=10^{-2}\) in both settings and additionally test \(10^{-4}\) and \(10^{-1}\) to assess under- and overestimation of this error parameter.
-Each noisy experiment records the random seed, and all solvers receive the same seed for a given problem and scenario.
+Each noisy experiment uses the five seeds $0, 1, 2, 3, 4$, records the seed, and supplies the same seed to all solvers for a given problem and scenario.
 The joint-noise setting deliberately violates \cref{eq:exact_gradient_assumption}; it is included to test performance under an unfavorable perturbation, not to validate the exact-gradient theorem.
 \end{MPCchange}
 
@@ -988,7 +1003,7 @@ In \cref{fig:exec_time}, we report the execution time statistics, and we can obs
 Combining with the results from \cref{sec:results}, our methods are competitive or superior in total oracle calls and per-iteration computational cost, indicating practical efficiency.
 As a side note, although the (\texttt{SciPy}) calls optimized C routines, it incurs associated dispatch overhead, producing a larger mean time. One of the reasons why the (\texttt{Reg}) and (\texttt{Reg-Sec}) methods take longer execution time is due to the implementation aspect of the original code.
 
-In \cref{tab:time_results}, we report the total number of oracle calls (calls of $\overline{f}$ and $\nabla \overline{f}$) and final objective values $\overline{f}(x_{k_{\max}})$.
+In \cref{tab:time_results}, we report the total number of oracle calls (calls of $\overline{f}$ and $g$) and final objective values $\overline{f}(x_{k_{\max}})$.
 The purpose of this table is to confirm that all methods achieved similar convergence behavior within the limited number of iterations. The comparable values in the table indicate that the comparison of execution times is fair and not affected by differences in convergence behavior.
 
 \input{check/time_results_table}

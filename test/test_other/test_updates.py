@@ -112,6 +112,42 @@ def test_cautious_rule_enforces_both_uniform_curvature_bounds():
     assert message == "skip by cautious update"
 
 
+def test_zero_memory_direction_uses_positive_fixed_hessian_scale():
+    gradient = np.array([3.0, 4.0])
+    memory = QuasiNewtonMemory(
+        gradient,
+        maxlen=3,
+        method=Method("NTRQN", "cautious", "damped", "bfgs"),
+    )
+
+    np.testing.assert_allclose(
+        memory.zero_memory_direction(gradient, np.float64(0.0)),
+        -gradient / 5.0,
+    )
+    np.testing.assert_allclose(
+        memory.zero_memory_direction(gradient, np.float64(2.0)),
+        -gradient / 7.0,
+    )
+
+
+def test_scalar_damping_matches_documented_rule():
+    data = IterationData()
+    is_valid, message = data.set(
+        np.array([1.0]),
+        np.float64(0.0),
+        np.array([-1.0]),
+        np.array([0.0]),
+        np.float64(0.0),
+        np.array([0.0]),
+        Method("NTRQN", "raw", "damped", "bfgs"),
+        np.float64(0.0),
+    )
+
+    assert is_valid, message
+    np.testing.assert_allclose(data.y, np.array([0.2]))
+    np.testing.assert_allclose(data.ys, np.float64(0.2))
+
+
 def test_workspace_two_loop_matches_pairwise_reference():
     rng = np.random.default_rng(21)
     n = 8

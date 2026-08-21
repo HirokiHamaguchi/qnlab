@@ -200,7 +200,16 @@ Our implementation is publicly available on GitHub%
 % \bibliographystyle{spbasic}      % basic style, author-year citations
 \bibliographystyle{spmpsci}      % mathematics and physical sciences
 %\bibliographystyle{spphys}       % APS-like style for physics
-\bibliography{../L-BFGS.bib}
+\ifdefined\MPCRevision
+    \begingroup
+    \color{red}
+    \hypersetup{urlcolor=red}
+    \bibliography{../L-BFGS.bib}
+    \endgroup
+    \hypersetup{urlcolor=blue}
+\else
+    \bibliography{../L-BFGS.bib}
+\fi
 
 \section*{Statements and Declarations}
 

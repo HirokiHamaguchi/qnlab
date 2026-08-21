@@ -69,24 +69,21 @@ class IterationData:
             if not np.isfinite(self.yy):
                 return False, "infinite or invalid modified gradient difference"
 
-        # Apply damped BFGS update if needed
+        # Apply the scalar Powell-type damping documented in the manuscript.
         if method.secant in ("damped", "damped_modified"):
-            # new_y = theta y + (1 - theta) Bs
-            # new_y s = theta ys + (1 - theta) sBs = sBs + theta (ys - sBs) > 0
-            # theta = 0.8 sBs / (sBs - ys)
             self.ys = np.dot(self.y, self.s)
             if self.ys < 0.0:
                 if not np.isfinite(self.ys) or not np.isfinite(self.yy):
                     return False, "infinite or invalid damped update"
-                B_scalar = abs(self.yy / self.ys)
-                if B_scalar > 1e3:
+                b_scalar = abs(self.yy / self.ys)
+                if b_scalar > 1e3:
                     return False, "too large damped update"
-                theta_denom = self.ss * B_scalar - self.ys
+                theta_denom = self.ss * b_scalar - self.ys
                 if theta_denom == 0.0:
                     return False, "infinite or invalid damped update"
-                theta = (0.8 * self.ss * B_scalar) / theta_denom
+                theta = (0.8 * self.ss * b_scalar) / theta_denom
                 assert theta < 1.0
-                self.y = theta * self.y + (1 - theta) * B_scalar * self.s
+                self.y = theta * self.y + (1 - theta) * b_scalar * self.s
                 self.ys = np.dot(self.y, self.s)
                 self.yy = np.dot(self.y, self.y)
         else:

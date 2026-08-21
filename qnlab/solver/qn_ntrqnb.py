@@ -121,7 +121,7 @@ class _CompactBFGS:
     ) -> "_CompactBFGS":
         """Build the same regularized L-BFGS matrix used by NTRQN's two loops."""
         if len(memory) == 0:
-            diagonal = mu if mu > 0.0 else np.float64(1.0 / memory.zero_length)
+            diagonal = memory.zero_hessian_scale + mu
             return cls(
                 np.float64(diagonal),
                 np.empty((n, 0), dtype=np.float64),
@@ -139,7 +139,7 @@ class _CompactBFGS:
             regularized_pair_products > 0.0
         )
         if not np.any(valid):
-            diagonal = mu if mu > 0.0 else np.float64(1.0 / memory.zero_length)
+            diagonal = memory.zero_hessian_scale + mu
             return cls(
                 np.float64(diagonal),
                 np.empty((n, 0), dtype=np.float64),
@@ -163,7 +163,7 @@ class _CompactBFGS:
         last_ys = regularized_step_gradient[-1, -1]
         diagonal = np.float64(regularized_gradient_products[-1, -1] / last_ys)
         if not np.isfinite(diagonal) or diagonal <= 0.0:
-            diagonal = mu if mu > 0.0 else np.float64(1.0 / memory.zero_length)
+            diagonal = memory.zero_hessian_scale + mu
             return cls(
                 np.float64(diagonal),
                 np.empty((n, 0), dtype=np.float64),
