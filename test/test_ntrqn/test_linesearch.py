@@ -8,7 +8,9 @@ from scipy.optimize import line_search
 
 from qnlab.parameter import NTRQNParameter
 from qnlab.problem.base import BaseProblem
-from qnlab.solver.qn_ntrqn import line_search_relaxed_armijo
+from qnlab.solver.qn_ntrqn import line_search_relaxed_armijo, qn_ntrqn
+from qnlab.util.callback import Callback
+from qnlab.util.method import Method
 from qnlab.util.ret_values import RetCode
 
 
@@ -102,6 +104,21 @@ def test_linesearch_rejects_nonfinite_function_value():
     assert code == RetCode.SUCCESS
     np.testing.assert_allclose(new_x, [-0.5])
     assert np.isfinite(new_f)
+
+
+def test_default_solver_does_not_restart_at_initial_infinite_reference():
+    problem = ConvexEvenPolynomialProblem(degree=2)
+    callback = Callback()
+    parameter = NTRQNParameter(1, {"max_iterations": 1})
+
+    qn_ntrqn(
+        problem,
+        parameter,
+        Method("NTRQN", "cautious", "damped", "bfgs"),
+        callback,
+    )
+
+    assert callback.others["OFFO accumulator restart"] == 0
 
 
 def run_ls(

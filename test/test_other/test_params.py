@@ -41,6 +41,7 @@ def test_ntrqn_uses_shared_eps():
     param = NTRQNParameter(4, {})
     assert param.eps > 0
     assert np.isinf(param.restart_threshold)
+    assert param.max_restarts == 0
     assert param.offo_squared_offset == np.float64(1e-20)
 
 
@@ -55,6 +56,8 @@ def test_ntrqn_rejects_invalid_algorithm_options():
         NTRQNParameter(2, {"offo_squared_offset": np.float64(0.0)})
     with pytest.raises(ValueError):
         NTRQNParameter(2, {"force_offo": 2})
+    with pytest.raises(ValueError):
+        NTRQNParameter(2, {"max_restarts": -1})
 
 
 if __name__ == "__main__":
