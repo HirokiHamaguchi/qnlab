@@ -713,7 +713,7 @@ Thus the zero-memory case is also positive definite and has iteration-independen
 
 We use
 \begin{equation}\label{eq:proposed_choice_of_Bk}
-    B_k=\mathrm{BFGS}(\{(s_{k_i}, \overline{y}_{k_i})\}),
+    B_k=\mathrm{BFGS}(\{(s_{k_i}, \overline{y}_{k_i})\}).
 \end{equation}
 For a candidate pair with $y_{k_i}^{\top}s_{k_i} < 0$, the implementation applies a scalar Powell-type damping before the cautious test.
 Specifically, it sets $b_i = \norm{y_{k_i}}^2 / \abs{y_{k_i}^{\top}s_{k_i}}$ and
