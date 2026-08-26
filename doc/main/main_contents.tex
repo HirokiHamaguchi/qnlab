@@ -17,7 +17,9 @@ We begin by reviewing relevant background and formalizing the problem setting.
 \label{sec:prel_rqn}
 
 The regularized quasi-Newton method is a variant of quasi-Newton methods that does not rely heavily on line search techniques. This property is important for optimization in noisy evaluation environments.
+\begin{MPCchange}
 There has been renewed interest in regularized Newton-type methods, including cubic-regularization schemes~\citep{nesterovCubicRegularizationNewton2006,ranganathSymmetricRankOneQuasiNewton2025,wangConvergenceRatesRegularized2025}, and we focus on quadratic regularization~\citep{kanzowRegularizationLimitedMemory2023,doikovSuperUniversalRegularizedNewton2024,liTruncatedRegularizedNewton2009,zhangNewRegularizedQuasiNewton2018,uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,shengNewAdaptiveTrust2018} for simplicity of analysis and implementation.
+\end{MPCchange}
 
 For $g_k \defeq \nabla f(x_k)$ and an approximate Hessian $B_k \in \bbR^{n \times n}$, regularized quasi-Newton methods compute the step as
 \begin{equation*}
@@ -58,7 +60,9 @@ We consider optimization problems in which exact objective function values are u
 When both objective values and gradients are heavily corrupted by noise, reliable optimization cannot be guaranteed.
 Thus, meaningful optimization requires that at least one source of information be sufficiently accurate.
 This work focuses on problems arising from finite-precision computations or inexact evaluations, where objective function evaluations are subject to non-negligible errors while gradient information can be computed with relatively high accuracy.
+\begin{MPCchange}
 Settings in which objective values are accurate but gradients are noisy, such as derivative-free optimization or stochastic approximation methods~\citep{berahasTheoreticalEmpiricalComparison2021,xieAnalysisBFGSMethod2020,shiNoiseTolerantQuasiNewtonAlgorithm2022}, are beyond the scope of this work.
+\end{MPCchange}
 
 In the following, we formalize the assumptions on function value and gradient evaluations.
 We assume that only an error-contaminated function value $\overline{f}(x)$ is accessible, satisfying the hybrid absolute-relative error model~\citep{highamAccuracyStabilityNumerical2002,10.5555/3168451.3168462}:
@@ -67,10 +71,11 @@ We assume that only an error-contaminated function value $\overline{f}(x)$ is ac
 \end{equation}
 where $0 \le \feps < 1$ is an error rate.
 The error is predominantly relative when $\abs{f(x)}$ is large and effectively absolute when $\abs{f(x)}$ is small, capturing the typical behavior of rounding errors in IEEE~754 floating-point arithmetic~\citep{highamAccuracyStabilityNumerical2002}.
-In the numerical experiments, $\feps$ is taken as a large multiple of the machine epsilon to account for accumulated round-off effects.
-Closely related models are also employed in practical stopping criteria~\citep{2020SciPy-NMeth}.
-
 \begin{MPCchange}
+The choice of $\feps$ is motivated by the practical heuristic used in numerical stopping rules rather than by treating one rounding operation as the total error.
+For example, SciPy's L-BFGS-B uses $\mathtt{ftol}=\mathtt{factr}\,\epsilon_{\mathrm{mach}}$ with the moderate-accuracy default $\mathtt{factr}=10^7$~\citep{2020SciPy-NMeth}.
+We similarly use a precision-dependent multiple of machine epsilon as an aggregate error allowance and assess sensitivity to this supplied value in \cref{sec:experiments}.
+
 We distinguish the setting covered by the analysis from the additional stress tests in \cref{sec:experiments}.
 The convergence theory makes the following exact-gradient assumption.
 \begin{assumption}[Exact gradient]\label{ass:exact_gradient}
@@ -90,7 +95,11 @@ Accordingly, function-value-only noise is the theory-aligned artificial experime
 We propose a new algorithm for the problem setting stated in \cref{sec:problem_setting}.
 We draw inspiration from the OFFO framework to design robust regularization and scaling strategies.
 Unlike purely OFFO methods, our algorithm exploits function values when they are numerically reliable and smoothly switches to gradient-based control otherwise.
-This hybrid behavior enables improved stability without sacrificing efficiency in practical optimization tasks.
+\begin{MPCchange}
+A regularized quasi-Newton direction alone does not specify how to update the regularization scale once comparisons of noisy function values become uninformative, whereas the cumulative gradient scale provides such an update without further objective comparisons.
+Using that scale at every iteration would instead discard useful function information and may be unnecessarily conservative, which motivates the $K^0/K^+$ switch.
+This hybrid behavior is intended to balance stability under unreliable function values with the efficiency of unregularized quasi-Newton steps when function information is useful.
+\end{MPCchange}
 The pseudo-code of our algorithm is given in \cref{alg:regularized_qn}. The minimum of the empty set is defined as $+\infty$ in \refLine{line:mu_0_condition}.
 \Cref{alg:backtracking_linesearch} is an auxiliary line search algorithm called in \cref{alg:regularized_qn}.
 In the following, we explain the three main components of \cref{alg:regularized_qn}.
@@ -138,7 +147,9 @@ In the following, we explain the three main components of \cref{alg:regularized_
 \paragraph{Computation of the Regularized Quasi-Newton Direction (\refLine{line:d_k}): }\label{sec:algorithm_components_d}
 
 The first component is the computation of the regularized quasi-Newton direction $d_k$ stated in \cref{sec:prel_rqn}.
+\begin{MPCchange}
 Given $g_k=g(x_k)=\nabla f(x_k)$, an approximate Hessian $B_k$, and a regularization parameter $\mu_k$, we compute the search direction $d_k = -(B_k+\mu_k I)^{-1} g_k$.
+\end{MPCchange}
 A practical choice of $B_k$ is discussed in \cref{sec:proposed_choice_Bk}.
 
 \paragraph{Relaxed Armijo Condition with an Error-Absorbing Term (\refLine{line:armijo}): }\label{sec:algorithm_components_alpha}
@@ -640,7 +651,9 @@ The purpose of this subsection is to show that $B_k$ can satisfy \cref{ass:BBoun
 
 \paragraph{Construction of $B_k$: }
 
+\begin{MPCchange}
 We briefly note the L-BFGS method and the curvature pair notation~\citep{nocedal1999numerical,liuLimitedMemoryBFGS1989,berahasLimitedmemoryBFGSDisplacement2022}.
+\end{MPCchange}
 For an iteration $k$, we define
 \begin{equation*}
     s_k \defeq x_{k+1}-x_k,\qquad
@@ -678,6 +691,8 @@ Now, we provide a sufficient condition for \cref{ass:BBounds} by the following p
 Proposition~\ref{prop:bounded_BFGS} shows that, whenever \cref{eq:curvature_conditions1,eq:curvature_conditions2} hold for the stored pairs, the resulting $\mathrm{BFGS}$ matrix satisfies \cref{ass:BBounds} as expressed in \cref{eq:bounded_BFGS_mM}.
 
 \begin{MPCchange}
+The original manuscript already intended the pair selection as a cautious update: only modified pairs satisfying both conditions in \cref{eq:curvature_conditions1,eq:curvature_conditions2} were to be stored, in the same spirit as curvature-based cautious updates~\citep{liGlobalConvergenceBFGS2001,mannelStructuredLBFGSMethod2024,mannelGlobalizationLBFGSBarzilai2025a}.
+The revision makes this intended direct enforcement implementable by specifying fixed constants and the exact acceptance test used in the code.
 Based on \cref{prop:bounded_BFGS}, we form \(B_k\) from at most \(p=10\) stored modified curvature pairs.
 After damping, a pair \((s,\overline y)\) is retained only if
 \begin{equation}\label{eq:implemented_cautious_test}
@@ -724,7 +739,9 @@ We begin by describing how to compute the search direction
     d_k=-(B_k+\mu_k I)^{-1}g_k
 \end{equation*}
 with $B_k$ in \cref{eq:proposed_choice_of_Bk}.
+\begin{MPCchange}
 When $\mu_k=0$, the direction can be computed efficiently by the standard L-BFGS two-loop recursion~\citep{liuLimitedMemoryBFGS1989,nocedal1999numerical}.
+\end{MPCchange}
 For the case $\mu_k>0$, regularized limited-memory schemes may in principle be employed~\citep{kanzowRegularizationLimitedMemory2023}.
 Alternatively, one may adopt the simple and robust approximation mentioned in the same reference.
 Specifically, we approximate $B_k$ in \cref{eq:proposed_choice_of_Bk} by
@@ -770,8 +787,17 @@ In our implementation, the OFFO accumulator contains exactly those gradient norm
 \end{equation*}
 Hence \(\mu_k=\theta_kG_k\) with \(\theta_k\in[10^{-2},1]\), exactly as required by \cref{eq:offo_based_update}.
 We set \(\varsigma=10^{-20}\), so that its square root, the initial scale \(G_{-1}\), equals \(10^{-10}\).
-The primary implementation does not restart this accumulator; the earlier heuristic restart is disabled by default and is considered only as an ablation.
-This removes the unproved finite-restart qualification from the convergence claim.
+The primary implementation sets the permitted number of restarts to zero and therefore coincides exactly with the analyzed accumulator.
+The restart was originally intended only as a practical heuristic used a small finite number of times after unusually large certified progress, rather than as an essential part of the proposed algorithm.
+More precisely, for a fixed threshold $\tau>0$, the optional variant resets only the accumulator in \cref{eq:offo_based_update} whenever
+\begin{equation}\label{eq:restart_condition}
+    \min_{j \in K^0,\,j<k} \qty(\overline{f}(x_j)-\Delta_j)-\overline{f}(x_k) \geq \tau.
+\end{equation}
+The sets $K^0$ and $K^+$ and the reference values in \cref{eq:restart_condition} are not reset.
+As proved in \cref{prop:finite_accumulator_restarts}, the positive fixed threshold itself gives a finite problem-dependent upper bound on the number of restarts.
+Applying the accumulator argument separately between consecutive restarts then preserves the convergence rate of \cref{thm:gc}, as stated in \cref{thm:gc_with_accumulator_restarts}.
+For the restart ablation, we additionally impose the safeguard $R=10$, independent of the iteration limit, and record the actual number of restarts in every run.
+The experiments will report the restart-count distribution and whether the cap is ever reached, which directly tests whether repeated restart is confined to pathological cases.
 \end{MPCchange}
 
 \section{Numerical Experiments}\label{sec:experiments}
@@ -809,12 +835,16 @@ We compared the following methods in our experiments.
               \item We used the default parameters, with the exception that \texttt{ftol} was set to $0$ to avoid premature termination.
           \end{itemize}
 
+    \begin{MPCchange}
     \item (\texttt{NTQN}): Noise-tolerant quasi-Newton method~\citep{xieAnalysisBFGSMethod2020,shiNoiseTolerantQuasiNewtonAlgorithm2022}
+    \end{MPCchange}
           \begin{itemize}
               \item A method designed to accommodate inexact gradient information, as mentioned in \cref{sec:problem_setting}.
               \begin{MPCchange}
               \item We report both the original wrapper setting and the authors' recommended termination mode (\texttt{terminate=3}).
               \item For the latter, the external solver controls termination; the common gradient-tolerance criterion is used only when constructing performance profiles and is not injected into the solver.
+              \item The recommended mode may appear worse under a common-tolerance performance profile because it can terminate appropriately at its estimated noise neighborhood before reaching the profile's scoring tolerance; this reflects a difference in stopping objectives rather than necessarily worse iterates.
+              \item We therefore report both solver-declared termination and attainment of the common scoring tolerance and interpret any early truncation separately from oracle efficiency.
               \end{MPCchange}
           \end{itemize}
 \end{itemize}
@@ -833,14 +863,20 @@ Following the previous work~\citep{kanzowRegularizationLimitedMemory2023}, we ex
 \begin{MPCchange}
 The 64- and 32-bit collections contain 220 problems with dimensions from \(2\) to \(123{,}200\), and the 16-bit collection contains 152 problems over the same dimension range.
 The supplied error rates are \(2.22\times10^{-9}\), \(1.19\times10^{-3}\), and \(9.77\times10^{-2}\) for the 64-, 32-, and 16-bit experiments, respectively.
+The 64-bit value equals SciPy's default heuristic $10^7\epsilon_{\mathrm{mach}}$; at lower precisions we reduce the multiplier to $10^4$ and $10^2$, respectively, because retaining $10^7$ would violate the required range $\feps<1$ and yield an uninformative error allowance.
+These multipliers are practical safety margins rather than estimates supplied by the theory, which motivates the misspecification study below.
 In addition to these precision experiments, we distinguish two additive-noise experiments on the 64-bit collection:
 \begin{enumerate}
     \item a theory-aligned setting with \(\overline f(x)=f(x)+\xi_f\), \(\xi_f\sim\operatorname{unif}(-10^{-3},10^{-3})\), and exact gradients; and
     \item an adverse stress test with the same function perturbation and independent componentwise gradient perturbations \(\xi_g^{(i)}\sim\operatorname{unif}(-10^{-3},10^{-3})\).
 \end{enumerate}
 We supply \(\feps=10^{-2}\) in both settings and additionally test \(10^{-4}\) and \(10^{-1}\) to assess under- and overestimation of this error parameter.
+Underestimating $\feps$ makes $\Delta_k$ too small to absorb the actual function error, makes the $K^0$ test easier to satisfy, and can therefore cause the method to trust unreliable comparisons and take more unregularized steps outside the theorem's error model.
+Overestimating $\feps$ enlarges $\Delta_k$, relaxes the Armijo acceptance test, and simultaneously makes entry into $K^0$ more stringent through $\overline f(x_j)-\Delta_j$, so the expected effect is a safer but potentially more conservative use of $K^+$.
+The sensitivity experiment tests these two qualitatively different failure modes rather than treating misspecification as a purely numerical parameter sweep.
 Each noisy experiment uses the five seeds $0, 1, 2, 3, 4$, records the seed, and supplies the same seed to all solvers for a given problem and scenario.
 The joint-noise setting deliberately violates \cref{eq:exact_gradient_assumption}; it is included to test performance under an unfavorable perturbation, not to validate the exact-gradient theorem.
+This setting is particularly adverse for our method because its theory and regularization logic rely on accurate gradient information, whereas NTQN was designed specifically to accommodate bounded gradient errors.
 \end{MPCchange}
 
 Each setting uses a different error rate $\feps$ in the error model (\cref{eq:error_model}), as summarized in \cref{tab:machine_epsilon}.
@@ -872,8 +908,9 @@ Following standard implementations~\citep{2020SciPy-NMeth}, we used the infinity
 \begin{MPCchange}
 We first separate the theory-aligned function-noise experiment from the joint-noise stress test described in \cref{sssec:problems}.
 The former tests the assumptions of \cref{sec:analysis}; the latter asks whether the implementation remains useful when both available quantities are perturbed.
-Therefore, success in the joint-noise experiment is empirical evidence of robustness beyond the theorem and is not presented as validation of the exact-gradient complexity result.
+Therefore, success in the joint-noise experiment is evidence that the method can remain effective even in a setting that is theoretically unfavorable to it, but it is not presented as validation of the exact-gradient complexity result.
 The experiment notebook also compares the hybrid method with an always-OFFO variant and the earlier accumulator-restart heuristic, and varies the supplied \(\feps\) over two orders of magnitude around its nominal value.
+For the restart ablation, we aggregate the number of restarts over problems and seeds, report its distribution and maximum, and state whether the fixed cap $R=10$ is reached.
 \end{MPCchange}
 
 \begin{figure}[t]
@@ -999,11 +1036,19 @@ We used memory size $m=10$ and maximum iterations $k_{\max}=100$, and we did not
 The simplicity of the optimization problem and the small value of $k_{\max}$ are well suited to the purpose of this experiment, as they ensure that the total runtime is dominated by algorithmic overhead rather than function or gradient computation.
 Timing data were collected after three warm-up runs, followed by $100$ recorded trials.
 
-In \cref{fig:exec_time}, we report the execution time statistics, and we can observe that our proposed methods (\texttt{Ours}) and (\texttt{Ours-MS}) exhibit competitive performance compared to other methods.
-Combining with the results from \cref{sec:results}, our methods are competitive or superior in total oracle calls and per-iteration computational cost, indicating practical efficiency.
-As a side note, although the (\texttt{SciPy}) calls optimized C routines, it incurs associated dispatch overhead, producing a larger mean time. One of the reasons why the (\texttt{Reg}) and (\texttt{Reg-Sec}) methods take longer execution time is due to the implementation aspect of the original code.
+\begin{MPCchange}
+In \cref{fig:exec_time}, we report the execution time statistics, which show that the per-iteration times of \texttt{Ours} and \texttt{Ours-MS} are of the same order as those of the other Python implementations in this isolated test.
+This timing experiment measures algorithmic overhead under deliberately inexpensive objective and gradient evaluations and does not by itself establish end-to-end robustness or superiority in oracle cost.
+Wall-clock comparisons require particular care because they combine mathematical differences between algorithms with implementation and machine effects.
+Although \texttt{SciPy} uses a compiled native implementation, our implementation has also been engineered to use Basic Linear Algebra Subprograms (BLAS), column-contiguous L-BFGS storage, and a ring buffer that avoids shifting the stored curvature pairs.
+In a separate diagnostic benchmark, the relative timing changed sharply between $n=10{,}000$ and $n=11{,}000$ with the default BLAS thread pool, whereas this crossover disappeared when BLAS was restricted to a single thread.
+This behavior indicates that BLAS thread-dispatch and memory-management details can dominate the runtime ranking even when the mathematical algorithms are unchanged.
+The supplied research implementations of \texttt{Reg}, \texttt{Reg-Sec}, and \texttt{NTQN} have not been engineered using the same implementation choices, so additional wall-clock comparisons would likely favor our code partly for reasons unrelated to the algorithms themselves.
+We therefore avoid interpreting such an advantage as a mathematical one and place greater weight on oracle-call and success-profile comparisons.
+Moreover, absolute runtimes and sometimes their ranking depend on the processor, BLAS library and threading configuration, operating system, and software environment, which limits their reproducibility across machines.
 
 In \cref{tab:time_results}, we report the total number of oracle calls (calls of $\overline{f}$ and $g$) and final objective values $\overline{f}(x_{k_{\max}})$.
+\end{MPCchange}
 The purpose of this table is to confirm that all methods achieved similar convergence behavior within the limited number of iterations. The comparable values in the table indicate that the comparison of execution times is fair and not affected by differences in convergence behavior.
 
 \input{check/time_results_table}

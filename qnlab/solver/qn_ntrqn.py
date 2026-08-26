@@ -190,13 +190,19 @@ def qn_ntrqn(
     is_offo_mode = False
     min_fx_minus_delta = np.float64(np.inf)
     rejection_counter: int = 0
+    restart_count = 0
 
     while True:
         if not param.force_offo and min_fx_minus_delta >= fx:
             is_offo_mode = False
             mu = np.float64(0.0)
-            if min_fx_minus_delta - fx >= param.restart_threshold:
+            if (
+                restart_count < param.max_restarts
+                and np.isfinite(min_fx_minus_delta)
+                and min_fx_minus_delta - fx >= param.restart_threshold
+            ):
                 offo_squared = np.float64(param.offo_squared_offset)
+                restart_count += 1
                 if callback is not None:
                     callback.others["OFFO accumulator restart"] += 1
         else:

@@ -24,14 +24,36 @@ In particular, it is desirable to design algorithms that (i) retain computationa
 
 \begin{MPCchange}
 In this work, we propose a noise-tolerant regularized quasi-Newton method that addresses these challenges.
-Our approach combines an Armijo-type line search with quadratic regularization~\citep{uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023} and an Objective-Function-Free Optimization (OFFO) inspired strategy~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
-Unlike the regularized L-BFGS method in~\citep{kanzowRegularizationLimitedMemory2023}, which establishes global convergence without an evaluation-complexity bound, our analysis gives the standard \(\order{1/\varepsilon^2}\) complexity under bounded function-value errors.
+Our approach combines a relaxed Armijo line search, quadratic regularization \citep{uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023}, and an OFFO-inspired strategy~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
+Theorem~1 of Kanzow and Steck~\citep{kanzowRegularizationLimitedMemory2023} assumes a bounded sequence of quasi-Newton matrices and an objective function bounded from below and proves $\liminf_{k\to\infty}\norm{\nabla f(x_k)}=0$, so every fixed gradient tolerance is attained after finitely many iterations.
+Their result establishes global convergence without an iteration-complexity bound, whereas our analysis gives the standard \(\order{1/\varepsilon^2}\) complexity under bounded function-value errors.
+We do not claim that this standard order is itself an improvement; the contribution is instead the guarantee for the hybrid mechanism described below.
 Unlike OFFO algorithms, which deliberately never evaluate the objective function, our hybrid method retains a relaxed line search whenever observed function values certify progress and invokes OFFO-type scaling only otherwise.
 The noise-tolerant quasi-Newton analysis in~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022} yields a stationarity neighborhood whose function-error contribution is proportional to \(\sqrt{M\epsilon_f}\), whereas its gradient-error contribution is proportional to \(\epsilon_g\).
+Its relaxed Armijo condition is closely related to ours; when \(\abs{f}\) is small, our hybrid model gives an error-absorbing scale of approximately \(2\epsilon_f/(1-\epsilon_f)\), while our adaptive recomputation and the \(K^0/K^+\) switch determine when function information is used.
 Consequently, up to problem-dependent constants, making the former no larger than the latter requires the comparatively restrictive regime \(\epsilon_f=\order{\epsilon_g^2/M}\).
 Our focus is complementary: function values may carry substantial nonvanishing error, as is common in low-precision computation, while gradients are exact in the complexity theorem.
 
-When a sufficient decrease in observed function value is available, the method uses an unregularized quasi-Newton step; otherwise, it uses regularization governed by a phasewise AdaGrad-Norm accumulator.
+\begin{table}[t]
+    \caption{Comparison with representative methods for optimization with regularization or inexact information.}
+    \label{tab:related_work_comparison}
+    \centering
+    \small
+    \begin{tabular}{@{}p{0.20\linewidth}p{0.18\linewidth}p{0.18\linewidth}p{0.32\linewidth}@{}}
+        \toprule
+        Work & Function information & Gradient information & Setting and guarantee \\
+        \midrule
+        Bellavia et al.~\citep{bellaviaImpactNoiseEvaluation2021} & Intrinsically noisy & Intrinsically noisy & Deterministic trust region; evaluation complexity and attainable noise-dependent accuracy \\
+        Sun--Nocedal~\citep{sunTrustRegionMethod2023} & Bounded noise & Bounded noise & Smooth nonconvex; repeated visits to a stationarity neighborhood \\
+        Kanzow--Steck~\citep{kanzowRegularizationLimitedMemory2023} & Exact & Exact & Regularized L-BFGS for nonconvex problems; global convergence \\
+        Shi et al.~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022} & Bounded errors & Bounded errors & Modified BFGS; neighborhood result with a strongly convex component \\
+        First-order OFFO~\citep{Gratton08022024} & Not evaluated & Gradient based & Smooth nonconvex; first-order complexity without objective values \\
+        This work & Bounded relative-or-absolute errors, used selectively & Exact in the theorem & Smooth nonconvex; $\order{1/\varepsilon^2}$ stationarity complexity \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+When a sufficient decrease in observed function value is available, the method uses an unregularized quasi-Newton step; otherwise, it uses regularization governed by an AdaGrad-Norm-type accumulator over the regularized iterations.
 We prove that the resulting method reaches an \(\varepsilon\)-first-order stationary point in \(\order{1/\varepsilon^2}\) iterations for smooth nonconvex objectives under exact gradients and bounded relative-or-absolute function errors.
 We state the exact-gradient scope explicitly and separate theory-aligned function-noise experiments from joint function-and-gradient perturbations, the latter serving as deliberately adverse stress tests rather than evidence for the theorem.
 The CUTEst study also reports problem dimensions, the baseline stopping rules, sensitivity to the supplied function-error estimate, and ablations of the hybrid mechanism.
