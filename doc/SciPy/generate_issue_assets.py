@@ -7,8 +7,6 @@ import os
 import subprocess
 from pathlib import Path
 
-import fitz
-
 REPO_ROOT = Path(__file__).resolve().parents[2]
 OUTPUT_DIR = REPO_ROOT / "doc" / "SciPy"
 INDIVIDUAL_DIR = REPO_ROOT / "doc" / "imgs" / "compare" / "individual"
