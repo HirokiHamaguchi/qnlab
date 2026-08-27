@@ -58,7 +58,7 @@
 \newenvironment{MPCchange}{%
     \ifdefined\MPCRevision\color{red}\fi
 }{}
-\newcommand{\MPCchanged}[1]{{\ifdefined\MPCRevision\color{red}\fi#1}}
+\newcommand{\MPCchanged}[1]{\begin{MPCchange}#1\end{MPCchange}}
 
 \newcommand{\red}[1]{\textcolor{red}{#1}}
 \newcommand{\blue}[1]{\textcolor{blue}{#1}}
@@ -223,11 +223,14 @@ The authors have no relevant financial or non-financial interests to disclose.
 
 \subsection*{Author Contributions}
 
-All authors contributed to the study conception and design. The first draft of the manuscript was written by Hiroki Hamaguchi and all authors commented on previous versions of the manuscript. All authors read and approved the final manuscript.
+All authors contributed to the study conception and design.
+The first draft of the manuscript was written by Hiroki Hamaguchi\MPCchanged{,} and all authors commented on previous versions of the manuscript.
+All authors read and approved the final manuscript.
 
 \subsection*{Data Availability}
 
-All data analyzed during this study are publicly available. URLs are included in this article.
+All data analyzed during this study are publicly available.
+URLs are included in this article.
 
 \subsection*{Code Availability}
 
