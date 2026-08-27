@@ -17,14 +17,6 @@ UNBOXED_ORACLE_DIR = INDIVIDUAL_DIR / "unboxed" / "precision64"
 UNBOXED_TIME_DIR = INDIVIDUAL_DIR / "unboxed" / "time" / "precision64"
 
 
-def render_first_page(source: Path, destination: Path, dpi: int = 240) -> None:
-    """Render the first page of a PDF as a PNG for Markdown display."""
-    with fitz.open(source) as document:
-        page = document[0]
-        pixmap = page.get_pixmap(dpi=dpi, alpha=False)
-        pixmap.save(destination)
-
-
 def latex_escape(value: str) -> str:
     """Escape the subset of TeX special characters used in problem names."""
     return value.replace("\\", r"\textbackslash{}").replace("_", r"\_")
@@ -142,10 +134,6 @@ def main() -> None:
     args = parser.parse_args()
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    render_first_page(
-        REPO_ROOT / "doc" / "imgs" / "for_paper" / "time.pdf",
-        OUTPUT_DIR / "time_per_iteration.png",
-    )
 
     tex_path = OUTPUT_DIR / "cutest_individual_results.tex"
     generate_individual_results_tex(tex_path)
