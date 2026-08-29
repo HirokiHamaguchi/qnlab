@@ -11,7 +11,7 @@ class CUTEstQNProblem(BaseProblem):
         problem_name: str,
         precision: int = 64,
     ) -> None:
-        import pycutest
+        import pycutest  # type: ignore[import-untyped]  # pycutest has no stubs
 
         # Validate precision parameter
         if precision not in [64, 32, 16]:

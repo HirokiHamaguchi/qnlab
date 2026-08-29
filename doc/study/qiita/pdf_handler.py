@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-import pymupdf  # type: ignore[import-untyped]
+import pymupdf
 
 
 def convert_pdf_to_png(current_dir: Path) -> None:
@@ -29,7 +29,7 @@ def convert_pdf_to_png(current_dir: Path) -> None:
             with pymupdf.open(str(pdf_file)) as doc:
                 page = doc[0]
                 pix = page.get_pixmap(matrix=pymupdf.Matrix(2, 2))
-                pix.save(str(png_file))
+                pix.save(str(png_file))  # type: ignore[attr-defined]  # Missing in stub
             print(f"Converted {pdf_file.name} to {png_file.name}")
         except (IndexError, OSError, RuntimeError, ValueError) as e:
             print(f"Error converting {pdf_file.name}: {e}")

@@ -1,3 +1,5 @@
+import numpy as np
+
 from qnlab.experiment.vis import vis
 from qnlab.problem.rosenbrock import RosenbrockProblem
 from qnlab.solver.qn import qn
@@ -13,21 +15,21 @@ def run_methods(prob: RosenbrockProblem):
     callback_newton = Callback(save_xs=True)
     callback_lbfgsb = Callback(save_xs=True)
 
-    methods = [
+    methods: list[tuple[Method, Callback, dict[str, np.float64 | int]]] = [
         (
             Method(base="GradientDescent", label="Gradient Descent"),
             callback_gd,
-            {"max_iter": 1000, "tol": 1e-6},
+            {"max_iter": 1000, "tol": np.float64(1e-6)},
         ),
         (
             Method(base="Newton", label="Newton's Method"),
             callback_newton,
-            {"max_iter": 1000, "tol": 1e-6},
+            {"max_iter": 1000, "tol": np.float64(1e-6)},
         ),
         (
             Method(base="SciPy", scipy_method="L-BFGS-B", label="Quasi Newton"),
             callback_lbfgsb,
-            {"maxiter": 1000, "gtol": 1e-6, "ftol": 0},
+            {"maxiter": 1000, "gtol": np.float64(1e-6), "ftol": 0},
         ),
     ]
 

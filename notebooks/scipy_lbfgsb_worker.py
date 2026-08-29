@@ -14,7 +14,10 @@ from typing import Protocol
 import numpy as np
 import scipy
 from scipy.optimize import minimize
-from threadpoolctl import threadpool_info, threadpool_limits
+from threadpoolctl import (  # type: ignore[import-untyped]  # No stubs available
+    threadpool_info,
+    threadpool_limits,
+)
 
 
 class OptimizationProblem(Protocol):
@@ -155,14 +158,16 @@ def main() -> None:
     try:
         from scipy.version import git_revision
     except ImportError:
-        git_revision = "unknown"
+        scipy_git_revision = "unknown"
+    else:
+        scipy_git_revision = git_revision
     json.dump(
         {
             "environment": {
                 "python": sys.version.replace("\n", " "),
                 "numpy": np.__version__,
                 "scipy": scipy.__version__,
-                "scipy_git_revision": git_revision,
+                "scipy_git_revision": scipy_git_revision,
                 "platform": platform.platform(),
                 "threadpools": pools,
             },

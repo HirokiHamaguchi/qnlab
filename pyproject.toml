@@ -18,7 +18,7 @@ dependencies = [
   "joblib>=1.5.1",
   "matplotlib>=3.10.3",
   "Mosek>=11.0.22",
-  "mypy>=1.15.0",
+  "mypy>=2.3.1",
   "mypy_extensions>=1.1.0",
   "networkx>=3.5",
   "nlopt>=2.9.1",
@@ -79,5 +79,8 @@ add-ignore = ["D100", "D104"]
 
 [dependency-groups]
 dev = [
+    "pandas-stubs>=2.3,<2.4",
+    "pymupdf-stubs>=1.28.2",
     "scipy-stubs>=1.18.0.1",
+    "types-seaborn>=0.13.2.20260728",
 ]

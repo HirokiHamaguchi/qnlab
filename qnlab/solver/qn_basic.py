@@ -29,10 +29,11 @@ def _perform_line_search(
     x_new = x + alpha * d
     if fx_new is None:
         fx_new = prob.f(x_new)
-    if g_new is None:
-        g_new = prob.g(x_new)
+    gradient_new = (
+        prob.g(x_new) if g_new is None else np.asarray(g_new, dtype=np.float64)
+    )
 
-    return x_new, np.float64(fx_new), g_new
+    return x_new, np.float64(fx_new), gradient_new
 
 
 def _run_first_order(

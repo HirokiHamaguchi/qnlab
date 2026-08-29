@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from typing import Any, cast
 
 import numpy as np
 import numpy.typing as npt
@@ -26,6 +27,18 @@ def qn_scipy(
     if option is None:
         option = {}
     prob.reset()
+    assert method.scipy_method != "None"
+
+    def objective(x: npt.NDArray[np.float64]) -> np.float64:
+        return prob.f(x)
+
+    def gradient(x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+        return prob.g(x)
+
+    def hessian_product(
+        x: npt.NDArray[np.float64], p: npt.NDArray[np.float64]
+    ) -> npt.NDArray[np.float64]:
+        return prob.hvp(x, p)
 
     gradient_mapping: (
         Callable[
@@ -33,8 +46,10 @@ def qn_scipy(
         ]
         | None
     ) = None
+    scipy_bounds = None
     if bounds is not None:
         lb, ub = prepare_bounds(bounds, prob.n)
+        scipy_bounds = scipy.optimize.Bounds(lb, ub)
 
         def map_gradient(
             x: npt.NDArray[np.float64], g: npt.NDArray[np.float64]
@@ -43,18 +58,22 @@ def qn_scipy(
 
         gradient_mapping = map_gradient
 
-    def record_callback(xk):
+    scipy_options = cast(Any, option)
+
+    def record_callback(xk: npt.NDArray[np.float64]) -> None:
         assert callback is not None
         fx = prob.f(xk, count=False)
         g = prob.g(xk, count=False)
         stationarity = None if gradient_mapping is None else gradient_mapping(xk, g)
         callback.callback(prob, xk, fx, g, gnorm_vector=stationarity)
 
-    def callback_scipy_func(xk):
+    def callback_scipy_func(xk: npt.NDArray[np.float64]) -> None:
         record_callback(xk)
 
-    def callback_trust_constr(xk, _):
-        record_callback(xk)
+    def callback_scipy_result(
+        intermediate_result: scipy.optimize.OptimizeResult,
+    ) -> None:
+        record_callback(np.asarray(intermediate_result.x, dtype=np.float64))
 
     if callback:
         initial_stationarity = None
@@ -63,47 +82,46 @@ def qn_scipy(
             initial_stationarity = gradient_mapping(prob.x0, initial_g)
         callback.start(prob, prob.x0, gnorm_vector=initial_stationarity)
 
-    bounds_kwarg = {} if bounds is None else {"bounds": bounds}
-
     if method.scipy_method in ["Powell", "Nelder-Mead", "COBYLA"]:
         res = scipy.optimize.minimize(
-            prob.f,
+            objective,
             prob.x0,
             method=method.scipy_method,
             callback=callback_scipy_func if callback else None,
-            options=option,
-            **bounds_kwarg,
+            options=scipy_options,
+            bounds=scipy_bounds,
         )
-    elif method.scipy_method in [
-        "Newton-CG",
-        "trust-constr",
-        "trust-ncg",
-        "trust-krylov",
-    ]:
-        cb = (
-            callback_trust_constr
-            if "trust-constr" in method.scipy_method
-            else callback_scipy_func
-        )
+    elif method.scipy_method == "trust-constr":
         res = scipy.optimize.minimize(
-            prob.f,
+            objective,
             prob.x0,
-            jac=prob.g,
+            jac=gradient,
             method=method.scipy_method,
-            callback=cb if callback else None,
-            options=option,
-            hessp=lambda x, p: prob.hvp(x, p),  # trust-constr can be used with None
-            **bounds_kwarg,
+            callback=callback_scipy_result if callback else None,
+            options=scipy_options,
+            hessp=hessian_product,  # trust-constr can be used with None
+            bounds=scipy_bounds,
+        )
+    elif method.scipy_method in ["Newton-CG", "trust-ncg", "trust-krylov"]:
+        res = scipy.optimize.minimize(
+            objective,
+            prob.x0,
+            jac=gradient,
+            method=method.scipy_method,
+            callback=callback_scipy_func if callback else None,
+            options=scipy_options,
+            hessp=hessian_product,
+            bounds=scipy_bounds,
         )
     else:
         res = scipy.optimize.minimize(
-            prob.f,
+            objective,
             prob.x0,
-            jac=prob.g,
+            jac=gradient,
             method=method.scipy_method,
             callback=callback_scipy_func if callback else None,
-            options=option,
-            **bounds_kwarg,
+            options=scipy_options,
+            bounds=scipy_bounds,
         )
 
     if verbose:

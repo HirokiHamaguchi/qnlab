@@ -153,7 +153,9 @@ def run_ls(
         fx = prob.f(x, count=False)
         g = prob.g(x, count=False)
         d = -g / np.linalg.norm(g)
-        _res = line_search(prob.f, prob.g, xk=x, pk=d, gfk=g, old_fval=fx, c1=c1, c2=c2)
+        _scipy_result = line_search(
+            prob.f, prob.g, xk=x, pk=d, gfk=g, old_fval=fx, c1=c1, c2=c2
+        )
     else:
         raise ValueError(f"Unknown method name: {method_name}")
 

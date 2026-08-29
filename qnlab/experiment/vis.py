@@ -4,8 +4,7 @@ from typing import Literal
 
 import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns  # type: ignore[import-untyped]
-
+import seaborn as sns
 from qnlab.problem.base import BaseProblem
 from qnlab.util.callback import Callback
 

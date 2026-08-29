@@ -26,7 +26,7 @@ from qnlab.util.memory_interface import QuasiNewtonMemory
 from qnlab.util.method import Method
 from qnlab.util.ret_values import RetCode
 
-type BoundPair = tuple[float | None, float | None]
+BoundPair = tuple[float | None, float | None]
 
 
 @runtime_checkable
@@ -40,7 +40,7 @@ class BoundsLike(Protocol):
     def ub(self) -> object: ...
 
 
-type BoundsInput = Sequence[BoundPair] | BoundsLike
+BoundsInput = Sequence[BoundPair] | BoundsLike
 
 
 def prepare_bounds(

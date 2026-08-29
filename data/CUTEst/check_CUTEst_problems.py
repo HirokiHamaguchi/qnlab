@@ -4,11 +4,10 @@ import os
 from typing import Literal
 
 import numpy as np
-import pycutest
-
+import pycutest  # type: ignore[import-untyped]  # pycutest does not provide stubs
 from qnlab.problem.cutest import CUTEstQNProblem
 
-type ConstraintType = Literal["unconstrained", "bound"]
+ConstraintType = Literal["unconstrained", "bound"]
 
 
 def _json_path(constraints: ConstraintType, stem: str) -> str:

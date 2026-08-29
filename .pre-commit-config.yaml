@@ -11,7 +11,7 @@ repos:
         exclude: ^(submodules/|qnlab/solver/external_files/ntqn\.py$)
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: 'v1.15.0'
+    rev: 'v2.3.1'
     hooks:
        - id: mypy
          exclude: ^submodules/
