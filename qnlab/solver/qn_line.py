@@ -1,5 +1,4 @@
 from collections import deque
-from typing import Deque, Tuple, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -18,8 +17,8 @@ def qn_line(
     prob: BaseProblem,
     param: LineParameter,
     method: Method,
-    callback: Union[Callback, None] = None,
-) -> Tuple[RetCode, np.float64, npt.NDArray[np.float64]]:
+    callback: Callback | None = None,
+) -> tuple[RetCode, np.float64, npt.NDArray[np.float64]]:
     """Runs the L-BFGS algorithm for unconstrained optimization."""
     assert method.base == "Line"
     prob.reset()
@@ -34,7 +33,7 @@ def qn_line(
 
     w = np.zeros(prob.n, dtype=np.float64)
     lm = QuasiNewtonMemory(g, param.m, method)
-    pf: Deque[np.float64] = deque([], maxlen=param.past)
+    pf: deque[np.float64] = deque([], maxlen=param.past)
 
     d = -g
 

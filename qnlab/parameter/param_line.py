@@ -1,4 +1,5 @@
-from typing import Any, Callable, Dict, Optional, Tuple, Union
+from collections.abc import Callable
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -12,7 +13,7 @@ class LineParameter(BaseParameter):
     """Parameters for line-search-based quasi-Newton solvers."""
 
     def __init__(
-        self, n: int, options: Optional[Dict[str, Union[np.float64, int]]] = None
+        self, n: int, options: dict[str, np.float64 | int] | None = None
     ) -> None:
         super().__init__(n, options=None)
 
@@ -36,7 +37,7 @@ class LineParameter(BaseParameter):
                 BaseProblem,
                 Any,
             ],
-            Tuple[
+            tuple[
                 RetCode,
                 np.float64,
                 np.float64,
@@ -87,9 +88,8 @@ class LineParameter(BaseParameter):
         if self.linesearch_kind in (
             LINESEARCH_BACKTRACKING_WOLFE,
             LINESEARCH_BACKTRACKING_STRONG_WOLFE,
-        ):
-            if self.wolfe <= self.armijo or 1.0 <= self.wolfe:
-                return RetCode.ERR_INVALID_WOLFE
+        ) and (self.wolfe <= self.armijo or 1.0 <= self.wolfe):
+            return RetCode.ERR_INVALID_WOLFE
         if self.xtol < 0.0:
             return RetCode.ERR_INVALID_XTOL
         if self.max_linesearch <= 0:

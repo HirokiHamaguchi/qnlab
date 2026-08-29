@@ -21,16 +21,15 @@ def convert_pdf_to_png(current_dir: Path) -> None:
             pdf_file.stem.startswith(str(i)) for i in range(1, 5)
         ):
             continue
+        if "sixhump" in pdf_file.name:
+            continue
 
         png_file = pdf_file.with_suffix(".png")
         try:
-            doc = pymupdf.open(str(pdf_file))
-            page = doc[0]
-            if "sixhump" in pdf_file.name:
-                continue
-            pix = page.get_pixmap(matrix=pymupdf.Matrix(2, 2))
-            pix.save(str(png_file))
-            doc.close()
+            with pymupdf.open(str(pdf_file)) as doc:
+                page = doc[0]
+                pix = page.get_pixmap(matrix=pymupdf.Matrix(2, 2))
+                pix.save(str(png_file))
             print(f"Converted {pdf_file.name} to {png_file.name}")
-        except Exception as e:
+        except (IndexError, OSError, RuntimeError, ValueError) as e:
             print(f"Error converting {pdf_file.name}: {e}")

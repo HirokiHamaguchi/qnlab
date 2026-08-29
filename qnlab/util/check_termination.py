@@ -1,5 +1,4 @@
 from collections import deque
-from typing import Union
 
 import numpy as np
 import numpy.typing as npt
@@ -10,18 +9,17 @@ from qnlab.util.ret_values import RetCode
 
 def check_termination(
     g: npt.NDArray[np.float64],
-    param: Union[LineParameter, OwlParameter, NTRQNParameter],
+    param: LineParameter | OwlParameter | NTRQNParameter,
     fx: np.float64,
     pf: deque,
     k: int,
     eval_count: int,
-) -> Union[RetCode, None]:
+) -> RetCode | None:
     """Check for termination based on gradient norm, function values, and
     iteration count.
     """
-    if 0 < param.past <= len(pf):
-        if abs(max(pf) - fx) < param.ftol * abs(fx):
-            return RetCode.STOP
+    if 0 < param.past <= len(pf) and abs(max(pf) - fx) < param.ftol * abs(fx):
+        return RetCode.STOP
     pf.append(fx)
     if np.linalg.norm(g, ord=np.inf) <= param.gtol:
         return RetCode.SUCCESS if k > 0 else RetCode.ALREADY_MINIMIZED

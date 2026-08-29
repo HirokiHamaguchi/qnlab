@@ -70,7 +70,7 @@ def plot_modified_BFGS_demo():
         (r"$f(x_{k}) < f(x_{k+1})$", 2.0),
     ]
 
-    fig, axes = plt.subplots(1, 3, figsize=(15, 4), sharey=True)
+    _fig, axes = plt.subplots(1, 3, figsize=(15, 4), sharey=True)
 
     xs = np.linspace(xk - 0.5, xk1 + 0.5, 400)
 

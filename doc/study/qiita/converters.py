@@ -4,7 +4,6 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Dict, List
 
 # Ensure imports work from doc/study directory
 sys.path.insert(0, str(Path(__file__).parent))
@@ -13,7 +12,7 @@ from config import ENV_DISPLAY_NAMES, GITHUB_RAW_URL_BASE, USE_GITHUB_URL
 from utils import extract_braced_content, find_matching
 
 
-def convert_cref(line: str, label_map: Dict[str, tuple]) -> str:
+def convert_cref(line: str, label_map: dict[str, tuple]) -> str:
     r"""Convert \cref{label} to appropriate reference format.
 
     Args:
@@ -29,7 +28,7 @@ def convert_cref(line: str, label_map: Dict[str, tuple]) -> str:
         if not labels:
             return match.group(0)
 
-        converted: List[str] = []
+        converted: list[str] = []
         for label in labels:
             if label not in label_map:
                 return match.group(0)
@@ -126,7 +125,7 @@ def convert_nested_itemize_enumerate(content: str) -> str:
 
 def convert_href_to_md(content: str) -> str:
     r"""Convert \href{url}{alt} to Markdown [alt](url)."""
-    result: List[str] = []
+    result: list[str] = []
     cursor = 0
 
     while True:
@@ -227,9 +226,8 @@ def convert_itemize_to_md(block: str) -> str:
             content = stripped[5:].strip()
             indent = "  " * (depth - 1)
             converted.append(f"{indent}- {content}")
-        elif not stripped.startswith("\\"):
-            if converted and stripped:
-                converted[-1] += " " + stripped
+        elif not stripped.startswith("\\") and converted and stripped:
+            converted[-1] += " " + stripped
 
     return "\n".join(converted)
 
@@ -386,13 +384,13 @@ def convert_figure_to_md(block: str, counter: int) -> str:
     return result
 
 
-def extract_figure_images(block: str) -> List[Dict[str, str]]:
+def extract_figure_images(block: str) -> list[dict[str, str]]:
     r"""Extract image paths and widths from figure blocks.
 
     Supports simplified patterns with minipage widths like 0.5\textwidth or 0.33\textwidth.
     Returns a list of dicts with keys: path, width_percent (optional).
     """
-    images: List[Dict[str, str]] = []
+    images: list[dict[str, str]] = []
 
     # Find minipage blocks with includegraphics inside
     minipage_pattern = re.compile(

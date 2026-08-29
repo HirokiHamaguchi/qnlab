@@ -1,5 +1,4 @@
 import os
-from typing import Union
 
 import numpy as np
 
@@ -14,7 +13,7 @@ from qnlab.util.method import Method
 
 
 def trial(
-    prob: Union[RosenbrockProblem, PowellProblem, DixonPriceProblem, ZakharovProblem],
+    prob: RosenbrockProblem | PowellProblem | DixonPriceProblem | ZakharovProblem,
     max_sz: int,
 ):
     name = prob.__class__.__name__.replace("Problem", "")
@@ -22,7 +21,7 @@ def trial(
 
     callback = Callback(gnorm_order=2)
     param = LineParameter(prob.n, {"m": 6, "gtol": 0, "max_iterations": 100})
-    info, fx, x_opt = qn_line(
+    info, _fx, _x_opt = qn_line(
         prob, param, method=Method("Line", "raw", "raw", "bfgs"), callback=callback
     )
     print(f"Info: {info}")

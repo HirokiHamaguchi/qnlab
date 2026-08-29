@@ -1,5 +1,3 @@
-from typing import Tuple, Union
-
 import numpy as np
 import numpy.typing as npt
 
@@ -20,9 +18,9 @@ def qn_ntqn(
     prob: BaseProblem,
     param: NtqnParameter,
     method: Method,
-    callback: Union[Callback, None] = None,
+    callback: Callback | None = None,
     verbose: bool = False,
-) -> Tuple[RetCode, np.float64, npt.NDArray[np.float64]]:
+) -> tuple[RetCode, np.float64, npt.NDArray[np.float64]]:
     assert method.base == "NTQN"
     prob.reset()
 

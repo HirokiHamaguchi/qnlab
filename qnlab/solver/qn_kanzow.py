@@ -1,5 +1,3 @@
-from typing import Tuple, Union
-
 import numpy as np
 import numpy.typing as npt
 
@@ -16,8 +14,8 @@ def qn_kanzow(
     prob: BaseProblem,
     param: KanzowParameter,
     method: Method,
-    callback: Union[Callback, None] = None,
-) -> Tuple[RetCode, np.float64, npt.NDArray[np.float64]]:
+    callback: Callback | None = None,
+) -> tuple[RetCode, np.float64, npt.NDArray[np.float64]]:
     """
     Wrapper for the Kanzow regularization method.
     This wrapper adapts the kanzow.solveNonmonotone function to work with the qnlab interface.

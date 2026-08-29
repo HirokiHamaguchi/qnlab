@@ -1,3 +1,4 @@
+# ruff: noqa: N999 - preserve the upstream module name used by Kanzow's code
 """
 Utility functions and classes to reduce code duplication.
 """

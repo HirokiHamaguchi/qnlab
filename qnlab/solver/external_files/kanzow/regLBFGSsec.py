@@ -1,4 +1,4 @@
-""" """
+"""Limited-memory BFGS solver using the modified secant equation."""
 
 import numpy as np
 

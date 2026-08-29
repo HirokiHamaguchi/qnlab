@@ -3,7 +3,6 @@
 import re
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 # Ensure imports work from doc/study directory
 sys.path.insert(0, str(Path(__file__).parent))
@@ -29,7 +28,7 @@ class GlobalState:
 
     def __init__(self) -> None:
         """Initialize global state with counters and label map."""
-        self.global_counters: Dict[str, int] = {
+        self.global_counters: dict[str, int] = {
             "figure": 0,
             "table": 0,
             "theorem": 0,
@@ -41,7 +40,7 @@ class GlobalState:
             "example": 0,
             "assumption": 0,
         }
-        self.label_map: Dict[str, Tuple[str, int]] = {}
+        self.label_map: dict[str, tuple[str, int]] = {}
 
     def reset(self) -> None:
         """Reset global counters and label map."""
@@ -71,11 +70,11 @@ class LatexToMarkdownConverter:
         """
         self.filepath = filepath
         self.is_japanese_mode = is_japanese_mode
-        self.lines: List[str] = []
-        self.markdown_lines: List[str] = []
+        self.lines: list[str] = []
+        self.markdown_lines: list[str] = []
         self.i = 0
         # Map from (env_name, line_number) to counter value
-        self.env_counters: Dict[Tuple[str, int], int] = {}
+        self.env_counters: dict[tuple[str, int], int] = {}
         self.global_state = get_global_state()
 
     def process_environment_block(self, line: str) -> bool:
@@ -134,7 +133,7 @@ class LatexToMarkdownConverter:
         raise ValueError(f"Missing \\end{{{env_name}}} in {self.filepath}")
 
     def _convert_environment(
-        self, env_name: str, block: str, labels: List[str], env_start_line: int
+        self, env_name: str, block: str, labels: list[str], env_start_line: int
     ) -> str:
         """Convert environment block to Markdown based on environment type.
 
@@ -162,7 +161,7 @@ class LatexToMarkdownConverter:
         return ""
 
     def _convert_numbered_env(
-        self, env_name: str, block: str, labels: List[str], env_start_line: int
+        self, env_name: str, block: str, labels: list[str], env_start_line: int
     ) -> str:
         """Convert numbered environment (figure, table, math) to Markdown.
 
@@ -252,7 +251,7 @@ class LatexToMarkdownConverter:
 
         return i
 
-    def extract_and_remove_labels(self, block: str) -> Tuple[str, List[str]]:
+    def extract_and_remove_labels(self, block: str) -> tuple[str, list[str]]:
         r"""Extract labels from block and return cleaned block + list of labels.
 
         Args:
@@ -268,7 +267,7 @@ class LatexToMarkdownConverter:
         cleaned_block = re.sub(r"\\label\{[^}]+\}", "", cleaned_block)
         return cleaned_block, labels
 
-    def register_labels(self, labels: List[str], env_name: str, counter: int) -> None:
+    def register_labels(self, labels: list[str], env_name: str, counter: int) -> None:
         """Register labels in label map.
 
         Args:
@@ -295,7 +294,7 @@ class LatexToMarkdownConverter:
         line = convert_section_commands(line)
         return line
 
-    def process_file(self) -> List[str]:
+    def process_file(self) -> list[str]:
         """Process the LaTeX file and return list of Markdown lines.
 
         Returns:
@@ -347,7 +346,7 @@ class LatexToMarkdownConverter:
         return self.markdown_lines
 
 
-def process_latex_file(filepath: Path, is_japanese_mode: bool) -> List[str]:
+def process_latex_file(filepath: Path, is_japanese_mode: bool) -> list[str]:
     """Process a single LaTeX file and return list of Markdown lines.
 
     Args:

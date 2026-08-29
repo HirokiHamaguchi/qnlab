@@ -1,8 +1,9 @@
 import time
-from typing import DefaultDict, List, Optional
+from collections import defaultdict
 
 import numpy as np
 import numpy.typing as npt
+
 from qnlab.problem.base import BaseProblem
 
 
@@ -15,7 +16,7 @@ class Callback:
         self,
         gnorm_order=np.inf,
         save_xs=False,
-        time_limit: Optional[float] = None,
+        time_limit: float | None = None,
     ) -> None:
         """Initializes the Callback.
 
@@ -37,12 +38,12 @@ class Callback:
 
     def _reset(self) -> None:
         """Resets the callback data."""
-        self.xs: List[npt.NDArray[np.float64]] = []
-        self.fxs: List[np.float64] = []
-        self.gnorms: List[np.float64] = []
-        self.times: List[float] = []
-        self.calls: List[int] = []
-        self.others: DefaultDict[str, int] = DefaultDict(int)
+        self.xs: list[npt.NDArray[np.float64]] = []
+        self.fxs: list[np.float64] = []
+        self.gnorms: list[np.float64] = []
+        self.times: list[float] = []
+        self.calls: list[int] = []
+        self.others: defaultdict[str, int] = defaultdict(int)
         self.start_time: float = time.perf_counter()
         self.iteration: int = 0
 
@@ -50,7 +51,7 @@ class Callback:
         self,
         prob: BaseProblem,
         x0: npt.NDArray[np.float64],
-        gnorm_vector: Optional[npt.NDArray[np.float64]] = None,
+        gnorm_vector: npt.NDArray[np.float64] | None = None,
     ) -> None:
         """Called at the start of the optimization."""
         prob.reset()
@@ -69,7 +70,7 @@ class Callback:
         x: npt.NDArray[np.float64],
         fx: np.float64,
         g: npt.NDArray[np.float64],
-        gnorm_vector: Optional[npt.NDArray[np.float64]] = None,
+        gnorm_vector: npt.NDArray[np.float64] | None = None,
     ) -> None:
         if self.save_xs:
             self.xs.append(np.copy(x))

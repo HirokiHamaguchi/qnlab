@@ -1,4 +1,4 @@
-from typing import Callable
+from collections.abc import Callable
 
 import matplotlib.patches
 import matplotlib.pyplot as plt
@@ -75,7 +75,7 @@ def trial(
     g3 = gp - sigma3 * (x - xp)
     y3 = fx + g * (xVals - x) + 0.5 * (g3 - g) / (xp - x) * (xVals - x) ** 2
 
-    fig, ax = plt.subplots(figsize=(10, 5))
+    _fig, ax = plt.subplots(figsize=(10, 5))
     ax.set_aspect("equal", adjustable="box")
 
     plt.plot(xVals, yVals, "-", color="tab:blue", label="$f(x)$")

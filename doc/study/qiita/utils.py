@@ -1,7 +1,6 @@
 """Utility functions for LaTeX parsing and conversion."""
 
 import re
-from typing import List
 
 
 def find_matching(s: str, start_pos: int, bracket_type: str = "brace") -> int:
@@ -49,7 +48,7 @@ def find_matching(s: str, start_pos: int, bracket_type: str = "brace") -> int:
     return -1
 
 
-def extract_braced_content(block: str, command: str) -> List[str]:
+def extract_braced_content(block: str, command: str) -> list[str]:
     r"""Extract content from a LaTeX command with braced argument.
 
     Handles nested braces correctly.

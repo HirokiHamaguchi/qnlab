@@ -3,14 +3,16 @@ import numpy.typing as npt
 
 from qnlab.problem.cutest import CUTEstQNProblem
 
+ZERO_NOISE = np.float64(0.0)
+
 
 class CUTEstNoisedProblem(CUTEstQNProblem):
     def __init__(
         self,
         problem_name: str,
         precision: int = 64,
-        function_noise: np.float64 = np.float64(0.0),
-        gradient_noise: np.float64 = np.float64(0.0),
+        function_noise: np.float64 = ZERO_NOISE,
+        gradient_noise: np.float64 = ZERO_NOISE,
         assumed_function_error: np.float64 | None = None,
         seed: int = 0,
     ) -> None:

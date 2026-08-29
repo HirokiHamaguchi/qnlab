@@ -1,5 +1,4 @@
 from collections import deque
-from typing import Deque, Tuple, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -18,11 +17,13 @@ from qnlab.util.ret_values import RetCode
 def qn_owl(
     prob: BaseProblem,
     param: OwlParameter,
-    method: Method = Method(store="raw", secant="raw", update="bfgs"),
-    callback: Union[Callback, None] = None,
-) -> Tuple[RetCode, np.float64, npt.NDArray[np.float64]]:
+    method: Method | None = None,
+    callback: Callback | None = None,
+) -> tuple[RetCode, np.float64, npt.NDArray[np.float64]]:
     """Runs the OWL-QN algorithm for optimization with orthant-wise constraints."""
     prob.reset()
+    if method is None:
+        method = Method(store="raw", secant="raw", update="bfgs")
 
     # Allocate working arrays:
     x = np.array(prob.x0, dtype=np.float64)
@@ -36,7 +37,7 @@ def qn_owl(
 
     w = np.zeros(prob.n, dtype=np.float64)
     lm = QuasiNewtonMemory(g, param.m, method)
-    pf: Deque[np.float64] = deque([], maxlen=param.past)
+    pf: deque[np.float64] = deque([], maxlen=param.past)
 
     xnorm = np.linalg.norm(
         x[param.orthantwise_start : param.orthantwise_end],

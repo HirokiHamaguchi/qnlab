@@ -60,25 +60,37 @@ plt.annotate(
     "",
     xy=(armijo_range[-1], y_arrow),
     xytext=(armijo_range[0], y_arrow),
-    arrowprops=dict(
-        arrowstyle="<->", color=COLOR_ARMIJO, linewidth=2, shrinkA=0, shrinkB=0
-    ),
+    arrowprops={
+        "arrowstyle": "<->",
+        "color": COLOR_ARMIJO,
+        "linewidth": 2,
+        "shrinkA": 0,
+        "shrinkB": 0,
+    },
 )
 plt.annotate(
     "",
     xy=(curvature_range[-1], y_arrow - 0.5),
     xytext=(curvature_range[0], y_arrow - 0.5),
-    arrowprops=dict(
-        arrowstyle="<->", color=COLOR_CURVATURE, linewidth=2, shrinkA=0, shrinkB=0
-    ),
+    arrowprops={
+        "arrowstyle": "<->",
+        "color": COLOR_CURVATURE,
+        "linewidth": 2,
+        "shrinkA": 0,
+        "shrinkB": 0,
+    },
 )
 plt.annotate(
     "",
     xy=(wolfe_range[-1], y_arrow - 1.0),
     xytext=(wolfe_range[0], y_arrow - 1.0),
-    arrowprops=dict(
-        arrowstyle="<->", color=COLOR_WOLFE, linewidth=2, shrinkA=0, shrinkB=0
-    ),
+    arrowprops={
+        "arrowstyle": "<->",
+        "color": COLOR_WOLFE,
+        "linewidth": 2,
+        "shrinkA": 0,
+        "shrinkB": 0,
+    },
 )
 
 plt.text(

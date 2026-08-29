@@ -37,7 +37,7 @@ def plot_surfaces_and_save():
     z_max = max(Z.max() for _, _, Z, _, _ in all_surfaces)
 
     for i, (title, H) in enumerate(hessians):
-        X, Y, Z, b, c = all_surfaces[i]
+        X, Y, Z, _b, _c = all_surfaces[i]
 
         ax = fig.add_subplot(1, 3, i + 1, projection="3d")
         ax.plot_surface(

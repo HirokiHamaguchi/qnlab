@@ -6,13 +6,25 @@ import json
 import platform
 import sys
 import time
+from collections.abc import Callable
 from contextlib import nullcontext
 from dataclasses import asdict, dataclass
+from typing import Protocol
 
 import numpy as np
 import scipy
 from scipy.optimize import minimize
 from threadpoolctl import threadpool_info, threadpool_limits
+
+
+class OptimizationProblem(Protocol):
+    x0: np.ndarray
+    call_f: int
+    call_g: int
+
+    def f(self, x: np.ndarray) -> np.float64: ...
+
+    def g(self, x: np.ndarray) -> np.ndarray: ...
 
 
 class ZeroChainQuadratic:
@@ -52,7 +64,7 @@ class IllQuadratic:
         return self.weights * x
 
 
-PROBLEMS = {
+PROBLEMS: dict[str, Callable[[int], OptimizationProblem]] = {
     "zero_chain": ZeroChainQuadratic,
     "ill_quadratic": IllQuadratic,
 }

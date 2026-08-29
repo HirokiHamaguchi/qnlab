@@ -21,9 +21,9 @@ def delete_temp_data(method, precision):
 
     for file_path in files:
         try:
-            print(f"Deleted: {file_path}")
             os.remove(file_path)
-        except Exception as e:
+            print(f"Deleted: {file_path}")
+        except OSError as e:
             print(f"Error deleting {file_path}: {e}")
 
 

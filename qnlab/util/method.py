@@ -1,4 +1,4 @@
-from typing import List, Literal, Tuple, get_args
+from typing import Literal, get_args
 
 import matplotlib.pyplot as plt
 
@@ -73,7 +73,7 @@ LINE_STYLES.update(
 
 
 def _get_plot_settings(
-    methods: List[Tuple["Method", dict]],
+    methods: list[tuple["Method", dict]],
 ) -> tuple[dict, dict[str, str]]:
     """Return shared plotting settings for the selected methods."""
     labels = [method.label for method, _ in methods]
@@ -154,7 +154,7 @@ class Method:
 
 def get_methods(
     m: int = 10, MI: int = 15000
-) -> Tuple[List[Tuple[Method, dict]], dict, dict]:
+) -> tuple[list[tuple[Method, dict]], dict, dict]:
     """Get standard set of methods for benchmarking.
 
     Args:
@@ -206,7 +206,7 @@ def get_methods(
 
 def get_box_methods(
     m: int = 10, MI: int = 15000
-) -> Tuple[List[Tuple[Method, dict]], dict, dict]:
+) -> tuple[list[tuple[Method, dict]], dict, dict]:
     """Get the standard methods for box-constrained CUTEst benchmarks."""
     methods = [
         (

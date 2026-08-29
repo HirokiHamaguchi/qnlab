@@ -3,9 +3,9 @@ from __future__ import annotations
 from pathlib import Path
 
 __all__ = [
-    "project_root",
-    "doc_imgs_root",
     "doc_imgs_dir",
+    "doc_imgs_root",
+    "project_root",
     "script_imgs_root",
 ]
 

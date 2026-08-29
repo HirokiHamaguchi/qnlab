@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import fitz  # PyMuPDF
+import imageio.v2 as imageio_v2
 import matplotlib.pyplot as plt
 import numpy as np
-import imageio.v2 as imageio_v2
 
 from qnlab.problem import SixHumpProblem
 from qnlab.solver.qn import qn
@@ -89,7 +89,7 @@ def create_surface_grid(prob):
 def run_optimization(prob):
     callback = Callback(gnorm_order=2, save_xs=True)
     method = Method(base="SciPy", scipy_method="L-BFGS-B")
-    _, f_opt, x_opt = qn(
+    _, _f_opt, x_opt = qn(
         prob, method, options={"maxiter": 9}, callback=callback, verbose=False
     )
     if not callback.xs or not np.allclose(callback.xs[-1], x_opt):
@@ -251,7 +251,7 @@ def generate_output(prob, path, path_z, xg, yg, zg, callback, output_dir):
 def main():
     prob = SixHumpProblem()
     xg, yg, zg = create_surface_grid(prob)
-    callback, x_opt = run_optimization(prob)
+    callback, _x_opt = run_optimization(prob)
     output_dir = OUTPUT_DIR
     output_dir.mkdir(parents=True, exist_ok=True)
     path = np.array(callback.xs)

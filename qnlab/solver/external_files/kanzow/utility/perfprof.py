@@ -12,12 +12,14 @@ https://github.com/higham/matlab-guide-3ed/blob/master/perfprof.m
 
 __all__ = ["perfprof"]
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
+DEFAULT_TOL = np.sqrt(np.finfo(np.double).eps)
 
 
 def thetaMax(data, minvals):
-    """ """
+    """Return the largest finite performance ratio."""
     assert np.all(minvals > 0)
     tmax = np.max(data, axis=1, initial=0, where=(data < np.inf))
     thmax = np.max(tmax / minvals, initial=1.01)
@@ -58,9 +60,7 @@ def makeStaircase(col, m, thmax, tol):
     return theta, prob
 
 
-def perfprof(
-    data, linestyle, thmax=None, tol=np.sqrt(np.finfo(np.double).eps), **kwargs
-):
+def perfprof(data, linestyle, thmax=None, tol=DEFAULT_TOL, **kwargs):
     """
     Peformance profile for the input data.
 

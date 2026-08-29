@@ -1,5 +1,6 @@
 import warnings
-from typing import List, Literal, Sequence
+from collections.abc import Sequence
+from typing import Literal
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,7 +16,7 @@ LINE_STYLES = ["-", "--", "-.", ":"]
 GRADIENT_THRESHOLD = 1e-5
 
 
-def _has_trajectory_data(prob: BaseProblem, callbacks: List[Callback]) -> bool:
+def _has_trajectory_data(prob: BaseProblem, callbacks: list[Callback]) -> bool:
     """Return whether every callback contains plottable optimization iterates."""
     return bool(callbacks) and all(
         len(callback.xs) > 0
@@ -88,7 +89,7 @@ def _create_contour_grid(prob: BaseProblem, bounds: tuple) -> tuple:
 
 
 def _plot_2d_contour(
-    prob: BaseProblem, callbacks: List[Callback], labels: List[str], levels: int, ax
+    prob: BaseProblem, callbacks: list[Callback], labels: list[str], levels: int, ax
 ) -> None:
     """Plot 2D contour with trajectories."""
     # Collect all points for bounds calculation
@@ -122,7 +123,7 @@ def _plot_2d_contour(
 
 
 def _plot_1d_function(
-    prob: BaseProblem, callbacks: List[Callback], labels: List[str], ax
+    prob: BaseProblem, callbacks: list[Callback], labels: list[str], ax
 ) -> None:
     """Plot 1D function with trajectories."""
     all_xs: list[float] = []
@@ -148,8 +149,8 @@ def _plot_1d_function(
 
 def _create_contour_plot(
     prob: BaseProblem,
-    callbacks: List[Callback],
-    labels: List[str],
+    callbacks: list[Callback],
+    labels: list[str],
     name: str,
     levels: int,
     ax,
@@ -211,8 +212,8 @@ def _get_plot_properties(
 
 def _plot_function_values(
     prob: BaseProblem,
-    callbacks: List[Callback],
-    labels: List[str],
+    callbacks: list[Callback],
+    labels: list[str],
     name: str,
     shift_val: float,
     x_axis: str,
@@ -260,8 +261,8 @@ def _plot_function_values(
 
 def _plot_gradient_norms(
     prob: BaseProblem,
-    callbacks: List[Callback],
-    labels: List[str],
+    callbacks: list[Callback],
+    labels: list[str],
     name: str,
     x_axis: str,
     ax,
@@ -308,7 +309,7 @@ def _plot_gradient_norms(
     ax.legend()
 
 
-def _calculate_shift_value(callbacks: List[Callback]) -> float:
+def _calculate_shift_value(callbacks: list[Callback]) -> float:
     """Calculate shift value for function values to ensure positivity."""
     min_fx = min(min(float(fx) for fx in callback.fxs) for callback in callbacks)
     shift_val = max(0, -min_fx)
@@ -316,7 +317,7 @@ def _calculate_shift_value(callbacks: List[Callback]) -> float:
 
 
 def _truncate_callbacks(
-    callbacks: List[Callback], max_length: int, x_axis: str = "calls"
+    callbacks: list[Callback], max_length: int, x_axis: str = "calls"
 ) -> None:
     """Truncate callback data to maximum length."""
     for callback in callbacks:
@@ -350,9 +351,9 @@ def _save_or_show_figure(pdf_path: str, suffix: str = "") -> None:
     """Save figure to PDF or show it."""
     plt.tight_layout()
     if pdf_path:
-        assert not pdf_path.endswith(
-            ".pdf"
-        ), "PDF path should not include .pdf extension"
+        assert not pdf_path.endswith(".pdf"), (
+            "PDF path should not include .pdf extension"
+        )
         plt.savefig(f"{pdf_path}{suffix}.pdf", bbox_inches="tight")
     else:
         plt.show()
@@ -360,8 +361,8 @@ def _save_or_show_figure(pdf_path: str, suffix: str = "") -> None:
 
 def vis(
     prob: BaseProblem,
-    callbacks: List[Callback],
-    labels: List[str],
+    callbacks: list[Callback],
+    labels: list[str],
     name: str,
     only_grad: bool = False,
     only_plot: bool = False,

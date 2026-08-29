@@ -1,5 +1,5 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 from qnlab.util.doc_paths import doc_imgs_dir
 
@@ -59,7 +59,7 @@ axes[0].annotate(
     "$f(x)$",
     xy=(-2.2, min_0),
     xytext=(-2.2, max_0 - 0.05 * (max_0 - min_0)),
-    arrowprops=dict(arrowstyle="<-", color="black"),
+    arrowprops={"arrowstyle": "<-", "color": "black"},
     ha="center",
     va="bottom",
     fontsize=12,
@@ -68,7 +68,7 @@ axes[1].annotate(
     "$f'(x)$",
     xy=(-2.2, min_1),
     xytext=(-2.2, max_1 - 0.05 * (max_1 - min_1)),
-    arrowprops=dict(arrowstyle="<-", color="black"),
+    arrowprops={"arrowstyle": "<-", "color": "black"},
     ha="center",
     va="bottom",
     fontsize=12,

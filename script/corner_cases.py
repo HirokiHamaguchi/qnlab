@@ -74,5 +74,5 @@ for f, jac in functions:
             jac=jac,
         )
         print(f"Function: {f.__name__}, Result: {result}")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - this script compares arbitrary failures
         print(f"Function: {f.__name__}, Error: {e}")

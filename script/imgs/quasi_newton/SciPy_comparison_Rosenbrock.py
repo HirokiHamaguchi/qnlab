@@ -1,5 +1,3 @@
-from typing import List, Tuple
-
 import numpy as np
 
 from qnlab.experiment.trial import trial
@@ -9,7 +7,7 @@ from qnlab.util.method import Method
 
 OUTPUT_DIR = doc_imgs_dir("quasi_newton")
 
-methods: List[Tuple[Method, dict]] = [
+methods: list[tuple[Method, dict]] = [
     (Method(base="SciPy", scipy_method="L-BFGS-B"), {}),
     (Method(base="SciPy", scipy_method="CG"), {}),
     (Method(base="SciPy", scipy_method="BFGS"), {}),

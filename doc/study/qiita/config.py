@@ -1,7 +1,5 @@
 """Configuration and constants for LaTeX to Markdown conversion."""
 
-from typing import Dict
-
 # GitHub URL configuration
 USE_GITHUB_URL = True
 GITHUB_RAW_URL_BASE = "https://raw.githubusercontent.com/HirokiHamaguchi/qnlab/master/"
@@ -21,7 +19,7 @@ EQUATION_ENVS = ["equation", "equation*", "align", "align*"]
 OTHER_ENVS = ["proof"]
 
 # Display names for environments
-ENV_DISPLAY_NAMES: Dict[str, str] = {
+ENV_DISPLAY_NAMES: dict[str, str] = {
     "figure": "Fig.",
     "table": "Table",
     "theorem": "Theorem",

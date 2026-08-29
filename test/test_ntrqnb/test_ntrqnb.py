@@ -1,3 +1,5 @@
+import itertools
+
 import numpy as np
 
 from qnlab.parameter import NTRQNParameter
@@ -166,7 +168,7 @@ def test_compact_regularization_matches_ntrqn_two_loop():
         return q @ point + b
 
     memory = QuasiNewtonMemory(grad(points[0]), 10, method)
-    for previous, current in zip(points, points[1:]):
+    for previous, current in itertools.pairwise(points):
         memory.add_new_data(
             current,
             f(current),

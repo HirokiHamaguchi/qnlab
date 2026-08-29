@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Callable, Tuple, Union
+from collections.abc import Callable
 
 import numpy as np
 import numpy.typing as npt
@@ -27,14 +27,11 @@ def line_search_relaxed_armijo(
     verbose: bool,
     is_offo_mode: bool,
     rejection_counter: int,
-    gradient_mapping: Union[
-        Callable[
-            [npt.NDArray[np.float64], npt.NDArray[np.float64]],
-            npt.NDArray[np.float64],
-        ],
-        None,
-    ] = None,
-) -> Tuple[
+    gradient_mapping: Callable[
+        [npt.NDArray[np.float64], npt.NDArray[np.float64]], npt.NDArray[np.float64]
+    ]
+    | None = None,
+) -> tuple[
     RetCode,
     npt.NDArray[np.float64],
     np.float64,
@@ -49,8 +46,8 @@ def line_search_relaxed_armijo(
     delta1 = np.float64(0.2)  # cubic interpolant check
     delta2 = np.float64(0.1)  # quadratic interpolant check
 
-    prev_alpha: Union[np.float64, None] = None
-    prev_f: Union[np.float64, None] = None
+    prev_alpha: np.float64 | None = None
+    prev_f: np.float64 | None = None
 
     dg = np.dot(d, g)
     assert dg < 0, "Search direction d is not a descent direction."
@@ -83,7 +80,7 @@ def line_search_relaxed_armijo(
         if ref_fx + param.armijo * alpha * dg + delta < f_try:
             # Armijo failed: try to shrink alpha using SciPy _zoom-style logic.
             old_alpha = alpha
-            best_alpha: Union[np.float64, None] = None
+            best_alpha: np.float64 | None = None
 
             if prev_alpha is not None:
                 # Try cubic interpolation (_cubicmin) if possible.
@@ -142,26 +139,25 @@ def line_search_relaxed_armijo(
                 continue
 
         return RetCode.SUCCESS, x_try, f_try, g_try, delta, rejection_counter
-    else:
-        if verbose:
-            print("  ❌ Line search failed: maximum number of iterations exceeded.")
-        return (
-            RetCode.ERR_MAXIMUMLINESEARCH,
-            x,
-            fx,
-            g,
-            np.float64(np.inf),
-            rejection_counter,
-        )
+    if verbose:
+        print("  ❌ Line search failed: maximum number of iterations exceeded.")
+    return (
+        RetCode.ERR_MAXIMUMLINESEARCH,
+        x,
+        fx,
+        g,
+        np.float64(np.inf),
+        rejection_counter,
+    )
 
 
 def qn_ntrqn(
     prob: BaseProblem,
     param: NTRQNParameter,
     method: Method,
-    callback: Union[Callback, None] = None,
+    callback: Callback | None = None,
     verbose: bool = False,
-) -> Tuple[RetCode, np.float64, npt.NDArray[np.float64]]:
+) -> tuple[RetCode, np.float64, npt.NDArray[np.float64]]:
     """Runs the L-BFGS algorithm for unconstrained optimization."""
     prob.reset()
     eps = prob.get_machine_eps()

@@ -1,5 +1,5 @@
+import sys
 from pathlib import Path
-from typing import Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -123,7 +123,7 @@ def test_default_solver_does_not_restart_at_initial_infinite_reference():
 
 def run_ls(
     method_name: str,
-    prob: Union[ExponentialProblem, ConvexEvenPolynomialProblem],
+    prob: ExponentialProblem | ConvexEvenPolynomialProblem,
     x,
     c1: np.float64,
     c2: np.float64,
@@ -226,7 +226,7 @@ def plot_method_data(axes, xs, ys, gnorms, name):
 
 
 def visualize_opt_results(
-    prob: Union[ExponentialProblem, ConvexEvenPolynomialProblem],
+    prob: ExponentialProblem | ConvexEvenPolynomialProblem,
     c1: np.float64,
     c2: np.float64,
     output_dir: str,
@@ -380,7 +380,7 @@ if __name__ == "__main__":
 
     yn = input("Run visualization? (y/n): ")
     if yn.lower() != "y":
-        exit()
+        sys.exit()
 
     # Visualize results (only when run directly)
     output_dir = Path(__file__).parent / "temp_imgs"

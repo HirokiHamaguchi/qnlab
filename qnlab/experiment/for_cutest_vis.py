@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Literal, Tuple
+from typing import Literal
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -39,7 +39,7 @@ def _individual_plot_output_path(
 
 def individual_plot(
     problems: list[str],
-    methods: list[Tuple[Method, dict]],
+    methods: list[tuple[Method, dict]],
     precision: int,
     noise: np.float64,
     boxed: bool = False,
@@ -58,7 +58,7 @@ def individual_plot(
             )
         else:
             prob = CUTEstQNProblem(prob_name, precision=precision)
-        callbacks: List[Callback] = []
+        callbacks: list[Callback] = []
         for method, option in methods:
             task = CUTEstTask(
                 prob_name,

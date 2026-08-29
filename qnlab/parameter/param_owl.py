@@ -1,5 +1,3 @@
-from typing import Dict, Optional, Union
-
 import numpy as np
 
 from qnlab.parameter.param_line import LineParameter
@@ -10,7 +8,7 @@ class OwlParameter(LineParameter):
     """Parameters for OWL-QN solvers."""
 
     def __init__(
-        self, n: int, options: Optional[Dict[str, Union[np.float64, int]]] = None
+        self, n: int, options: dict[str, np.float64 | int] | None = None
     ) -> None:
         self.orthantwise_c: np.float64 = np.float64(0.0)
         self.orthantwise_start: int = 0

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Union, final
+from typing import final
 
 import numpy as np
 import numpy.typing as npt
@@ -20,7 +20,7 @@ class BaseProblem(ABC):
         self,
         name: str,
         n: int = 0,
-        x0: Union[npt.NDArray[np.float64], None] = None,
+        x0: npt.NDArray[np.float64] | None = None,
     ):
         """Initializes the objective function."""
         self.name = name
@@ -77,12 +77,10 @@ class BaseProblem(ABC):
     @abstractmethod
     def _f(self, x: npt.NDArray[np.float64]) -> np.float64:
         """Compute the objective function value at x."""
-        pass
 
     @abstractmethod
     def _g(self, x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """Compute the gradient at x."""
-        pass
 
     def _hessian(self, x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """Compute the Hessian matrix at x."""

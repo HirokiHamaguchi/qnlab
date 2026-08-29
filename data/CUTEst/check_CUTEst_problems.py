@@ -60,7 +60,7 @@ def make_n_table(force: bool = False, constraints: ConstraintType = "unconstrain
             with open(json_path, "w") as f:
                 json.dump(dict(sorted(n_table.items())), f, indent=2)
             print(f"  {prob}: n={n_table[prob]}")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - continue checking independent problems
             print(f"  {prob}: Error - {e}")
 
     print(f"\nSaved to {json_path}")
@@ -80,7 +80,7 @@ def check_problem_at_precision(
             g = prob.g(prob.x0, count=False)
             is_valid = np.all(np.isfinite(g))
             q.put(("ok", is_valid))
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - report worker failures via the queue
             q.put(("err", str(e)))
 
     q: multiprocessing.Queue = multiprocessing.Queue()
@@ -96,7 +96,7 @@ def check_problem_at_precision(
     try:
         kind, payload = q.get_nowait()
         return bool(payload) if kind == "ok" else False
-    except Exception:
+    except Exception:  # noqa: BLE001 - an invalid worker result means validation failed
         return False
 
 
@@ -154,11 +154,9 @@ def check_initial_gradient(
         with open(json_path, "w") as f:
             json.dump(
                 {
-                    "valid_problems": {k: sorted(list(v_sets[k])) for k in v_sets},
-                    "invalid_problems": {
-                        k: sorted(list(inv_sets[k])) for k in inv_sets
-                    },
-                    "skipped_problems": sorted(list(skipped_set)),
+                    "valid_problems": {k: sorted(v_sets[k]) for k in v_sets},
+                    "invalid_problems": {k: sorted(inv_sets[k]) for k in inv_sets},
+                    "skipped_problems": sorted(skipped_set),
                 },
                 f,
                 indent=2,

@@ -14,6 +14,9 @@
 # *   classification SUR2-MN-8-0
 
 
+import functools
+import operator
+
 import numpy as np
 
 from qnlab.problem.base import BaseProblem
@@ -71,7 +74,8 @@ y48 = [7.216561, 10.017410, 7.331278, 6.527863, 2.842001]
 y49 = [10.325070, 4.790995, 8.377101, 6.264445, 2.706213]
 y50 = [8.362329, 8.983658, 3.362571, 1.182746, 4.875359]
 ys = np.array(
-    sum(
+    functools.reduce(
+        operator.iadd,
         [y01, y02, y03, y04, y05, y06, y07, y08, y09, y10]
         + [y11, y12, y13, y14, y15, y16, y17, y18, y19, y20]
         + [y21, y22, y23, y24, y25, y26, y27, y28, y29, y30]

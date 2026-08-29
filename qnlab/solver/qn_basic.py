@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Tuple, Union
+from collections.abc import Callable
 
 import numpy as np
 from numpy.linalg import LinAlgError
@@ -11,7 +11,7 @@ from qnlab.util.method import Method
 from qnlab.util.ret_values import RetCode
 
 DirectionFn = Callable[
-    [np.ndarray, np.ndarray], Tuple[Union[np.ndarray, None], Union[RetCode, None]]
+    [np.ndarray, np.ndarray], tuple[np.ndarray | None, RetCode | None]
 ]
 
 
@@ -21,7 +21,7 @@ def _perform_line_search(
     fx: np.float64,
     g: np.ndarray,
     d: np.ndarray,
-) -> Tuple[Union[np.ndarray, None], np.float64, np.ndarray]:
+) -> tuple[np.ndarray | None, np.float64, np.ndarray]:
     alpha, _, _, fx_new, _, g_new = line_search(prob.f, prob.g, x, d, g, fx)
     if alpha is None:
         return None, fx, g
@@ -40,8 +40,8 @@ def _run_first_order(
     direction_fn: DirectionFn,
     max_iter: int,
     tol: float,
-    callback: Union[Callback, None],
-) -> Tuple[RetCode, np.float64, np.ndarray]:
+    callback: Callback | None,
+) -> tuple[RetCode, np.float64, np.ndarray]:
     prob.reset()
 
     x = np.array(prob.x0, dtype=np.float64)
@@ -76,9 +76,11 @@ def _run_first_order(
 def qn_gradient_descent(
     prob: BaseProblem,
     method: Method,
-    options: Dict[str, Union[np.float64, int]] = {},
-    callback: Union[Callback, None] = None,
-) -> Tuple[RetCode, np.float64, np.ndarray]:
+    options: dict[str, np.float64 | int] | None = None,
+    callback: Callback | None = None,
+) -> tuple[RetCode, np.float64, np.ndarray]:
+    if options is None:
+        options = {}
     assert method.base == "GradientDescent"
     max_iter = int(options.get("max_iter", 1000))
     tol = float(options.get("tol", 1e-6))
@@ -89,9 +91,11 @@ def qn_gradient_descent(
 def qn_newton(
     prob: BaseProblem,
     method: Method,
-    options: Dict[str, Union[np.float64, int]] = {},
-    callback: Union[Callback, None] = None,
-) -> Tuple[RetCode, np.float64, np.ndarray]:
+    options: dict[str, np.float64 | int] | None = None,
+    callback: Callback | None = None,
+) -> tuple[RetCode, np.float64, np.ndarray]:
+    if options is None:
+        options = {}
     assert method.base == "Newton"
     max_iter = int(options.get("max_iter", 1000))
     tol = float(options.get("tol", 1e-6))

@@ -1,5 +1,3 @@
-from typing import Dict, Union
-
 import numpy as np
 import numpy.typing as npt
 
@@ -10,7 +8,7 @@ from qnlab.util.ret_values import RetCode
 
 def qn_offo(
     prob: BaseProblem,
-    options: Dict[str, Union[np.float64, int]],
+    options: dict[str, np.float64 | int],
     callback: Callback | None = None,
 ) -> tuple[RetCode, np.float64, npt.NDArray[np.float64]]:
     """Run a first-order objective-function-free baseline."""

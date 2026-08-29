@@ -10,8 +10,9 @@ Even so, our method sometimes uses fewer oracle calls than SciPy's.
 
 import heapq
 from collections import deque
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Protocol, Sequence, TypeAlias, Union, runtime_checkable
+from typing import Protocol, runtime_checkable
 
 import numpy as np
 import numpy.typing as npt
@@ -25,7 +26,7 @@ from qnlab.util.memory_interface import QuasiNewtonMemory
 from qnlab.util.method import Method
 from qnlab.util.ret_values import RetCode
 
-BoundPair: TypeAlias = tuple[float | None, float | None]
+type BoundPair = tuple[float | None, float | None]
 
 
 @runtime_checkable
@@ -39,7 +40,7 @@ class BoundsLike(Protocol):
     def ub(self) -> object: ...
 
 
-BoundsInput: TypeAlias = Sequence[BoundPair] | BoundsLike
+type BoundsInput = Sequence[BoundPair] | BoundsLike
 
 
 def prepare_bounds(
@@ -459,7 +460,7 @@ def qn_ntrqnb(
     bounds: BoundsInput,
     param: NTRQNParameter,
     method: Method,
-    callback: Union[Callback, None] = None,
+    callback: Callback | None = None,
     verbose: bool = False,
 ) -> tuple[RetCode, np.float64, npt.NDArray[np.float64]]:
     """Run projected NTRQN subject to box constraints."""

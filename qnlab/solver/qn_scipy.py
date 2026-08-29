@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from typing import Union
 
 import numpy as np
 import numpy.typing as npt
@@ -19,11 +18,13 @@ from qnlab.util.ret_values import RetCode
 def qn_scipy(
     prob: BaseProblem,
     method: Method,
-    option: dict = {},
-    callback: Union[Callback, None] = None,
+    option: dict | None = None,
+    callback: Callback | None = None,
     verbose: bool = False,
     bounds: BoundsInput | None = None,
 ):
+    if option is None:
+        option = {}
     prob.reset()
 
     gradient_mapping: (

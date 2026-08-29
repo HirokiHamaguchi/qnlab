@@ -1,5 +1,5 @@
 import math
-from typing import Any, Tuple, Union
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -8,7 +8,7 @@ from qnlab.parameter import LineParameter, OwlParameter
 from qnlab.problem.base import BaseProblem
 from qnlab.util.ret_values import RetCode
 
-LineSearchParameter = Union[LineParameter, OwlParameter]
+LineSearchParameter = LineParameter | OwlParameter
 
 # default (MoreThuente)
 LINESEARCH_DEFAULT = 0
@@ -146,7 +146,7 @@ def _update_trial_interval(
     tmin: np.float64,
     tmax: np.float64,
     brackt: bool,
-) -> Tuple[
+) -> tuple[
     np.float64,
     np.float64,
     np.float64,
@@ -248,20 +248,16 @@ def _update_trial_interval(
         dx = dt
 
     # Clip the new trial value within [tmin, tmax].
-    if newt > tmax:
-        newt = tmax
-    if newt < tmin:
-        newt = tmin
+    newt = min(newt, tmax)
+    newt = max(newt, tmin)
 
     # Redefine newt if it is close to the upper bound of the interval.
     if brackt and bound:
         mq_val = x + 0.66 * (y - x)
         if x < y:
-            if mq_val < newt:
-                newt = mq_val
+            newt = min(newt, mq_val)
         else:
-            if newt < mq_val:
-                newt = mq_val
+            newt = max(newt, mq_val)
 
     # Set the new trial value.
     t = newt
@@ -303,7 +299,7 @@ def line_search_backtracking(
     wp: npt.NDArray[np.float64],
     prob: BaseProblem,
     param: LineSearchParameter,
-) -> Tuple[
+) -> tuple[
     RetCode, np.float64, np.float64, npt.NDArray[np.float64], npt.NDArray[np.float64]
 ]:
     """Performs a backtracking line search with Armijo or Wolfe conditions.
@@ -373,7 +369,7 @@ def line_search_backtracking_owlqn(
     wp: npt.NDArray[np.float64],
     prob: BaseProblem,
     param: OwlParameter,
-) -> Tuple[
+) -> tuple[
     RetCode, np.float64, np.float64, npt.NDArray[np.float64], npt.NDArray[np.float64]
 ]:
     """Performs a backtracking line search for OWL-QN.
@@ -434,7 +430,7 @@ def line_search_morethuente(
     wp: Any,
     prob: BaseProblem,
     param: LineSearchParameter,
-) -> Tuple[
+) -> tuple[
     RetCode, np.float64, np.float64, npt.NDArray[np.float64], npt.NDArray[np.float64]
 ]:
     """Performs the More-Thuente line search.
@@ -477,10 +473,8 @@ def line_search_morethuente(
             stmax = stp + 4.0 * (stp - stx)
 
         # Clip stp within [param.min_step, param.max_step]
-        if stp < param.min_step:
-            stp = param.min_step
-        if stp > param.max_step:
-            stp = param.max_step
+        stp = max(stp, param.min_step)
+        stp = min(stp, param.max_step)
 
         # Unusual termination: if conditions are met, choose stx
         if (

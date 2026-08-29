@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Iterator, Optional
+from collections.abc import Iterator
 
 import numpy as np
 import numpy.typing as npt
@@ -183,7 +183,7 @@ class QuasiNewtonMemory:
         xp: npt.NDArray[np.float64],
         fxp: np.float64,
         gp: npt.NDArray[np.float64],
-        callback: Optional[Callback],
+        callback: Callback | None,
         eps: np.float64,
     ) -> None:
         new_data = IterationData()

@@ -1,5 +1,3 @@
-from typing import Tuple
-
 import numpy as np
 import numpy.typing as npt
 
@@ -15,9 +13,13 @@ class IterationData:
 
     def __init__(
         self,
-        s: npt.NDArray[np.float64] = np.array([], dtype=np.float64),
-        y: npt.NDArray[np.float64] = np.array([], dtype=np.float64),
+        s: npt.NDArray[np.float64] | None = None,
+        y: npt.NDArray[np.float64] | None = None,
     ):
+        if s is None:
+            s = np.array([], dtype=np.float64)
+        if y is None:
+            y = np.array([], dtype=np.float64)
         self.s = s  # point difference (Step)
         self.y = y  # gradient difference
         self.ss: np.float64 = np.float64(0.0)  # s^T s
@@ -43,7 +45,7 @@ class IterationData:
         gp: npt.NDArray[np.float64],
         method: Method,
         eps: np.float64,
-    ) -> Tuple[bool, str]:
+    ) -> tuple[bool, str]:
         self.s = x - xp
         self.y = g - gp
         self.ss = np.dot(self.s, self.s)

@@ -41,7 +41,7 @@ def run_benchmark():
             prob = IllQuadraticProblem(n=n)
 
             start_time = time.perf_counter()
-            info, fx, x_opt = qn(prob, method, option, callback=None, verbose=False)
+            _info, fx, _x_opt = qn(prob, method, option, callback=None, verbose=False)
             elapsed_time = time.perf_counter() - start_time
 
             print(
@@ -169,7 +169,7 @@ def generate_latex_table(methods_list: list[str], table_data: pd.DataFrame):
         + r"""}
     \toprule
                                 & """
-        + " & ".join(map(lambda x: r"\texttt{" + x + "}", methods_list))
+        + " & ".join(r"\texttt{" + x + "}" for x in methods_list)
         + r""" \\
     \midrule
     """

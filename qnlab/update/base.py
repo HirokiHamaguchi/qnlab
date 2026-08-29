@@ -37,4 +37,3 @@ class BaseUpdateRule(ABC):
         lm: QuasiNewtonMemory,
     ) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
         """Perform a check on the update."""
-        pass

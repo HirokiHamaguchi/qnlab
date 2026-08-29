@@ -4,10 +4,12 @@ by D. J. Higham and N. J. Higham:
 https://github.com/higham/matlab-guide-3ed/blob/master/perfprof.m
 """
 
-from typing import Any, List
+from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+DEFAULT_TOL = np.sqrt(np.finfo(np.double).eps)
 
 
 def _compute_theta_max(data, minVals):
@@ -56,7 +58,7 @@ def performance_profile(
     linestyle,
     colors,
     thetaMax=None,
-    tol=np.sqrt(np.finfo(np.double).eps),
+    tol=DEFAULT_TOL,
     **kwargs,
 ) -> Any:
     """
@@ -102,7 +104,7 @@ def performance_profile(
     if thetaMax is None:
         thetaMax = _compute_theta_max(data, minVals)
 
-    h: List[Any] = [None] * n
+    h: list[Any] = [None] * n
     for solver in range(n):  # for each solver
         col = _compute_theta(data[:, solver], minVals)  # performance ratio
         col = col[col <= thetaMax]  # crop and remove infs/NaNs

@@ -1,5 +1,3 @@
-from typing import Union
-
 from qnlab.parameter import NtqnParameter
 from qnlab.problem.dixon_price import DixonPriceProblem
 from qnlab.problem.powell import PowellProblem
@@ -10,7 +8,7 @@ from qnlab.util.method import Method
 
 
 def trial(
-    prob: Union[RosenbrockProblem, PowellProblem, DixonPriceProblem, ZakharovProblem],
+    prob: RosenbrockProblem | PowellProblem | DixonPriceProblem | ZakharovProblem,
 ):
     """
     Compare qnlab wrapper with direct ntqn call for final objective value and solution.
@@ -19,7 +17,7 @@ def trial(
     print(f"----- Problem name: {name} -----")
 
     param = NtqnParameter(prob.n)
-    info, fx, x_opt = qn_ntqn(prob, param, method=Method("NTQN"))
+    info, fx, _x_opt = qn_ntqn(prob, param, method=Method("NTQN"))
     print(f"Info (qnlab): {info}")
     print(f"fx (qnlab): {fx}")
 

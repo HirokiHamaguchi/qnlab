@@ -148,7 +148,7 @@ def plot_opt_frame(step_idx, x, xs_opt, colors):
         "",
         xy=(x_quad_min, y_quad_min),
         xytext=(x_i, float(f(x_i))),
-        arrowprops=dict(arrowstyle="->", color="black", lw=1.5),
+        arrowprops={"arrowstyle": "->", "color": "black", "lw": 1.5},
     )
 
     ax.set_title(f"Newton's Method: step {step_idx}")

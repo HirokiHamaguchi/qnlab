@@ -2,8 +2,8 @@
 
 import json
 import re
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Dict, Iterable, Tuple
 
 try:
     from config import CITE_MAPPING_FILE
@@ -15,7 +15,7 @@ except ImportError:
     from config import CITE_MAPPING_FILE
 
 
-def load_cite_mapping(json_file: str = CITE_MAPPING_FILE) -> Dict[str, str]:
+def load_cite_mapping(json_file: str = CITE_MAPPING_FILE) -> dict[str, str]:
     """Load citation key mappings from JSON file.
 
     Args:
@@ -61,7 +61,7 @@ def _sanitize_bbl_text(text: str) -> str:
     return text.strip()
 
 
-def _iter_bbl_entries(lines: Iterable[str]) -> Iterable[Tuple[str, str]]:
+def _iter_bbl_entries(lines: Iterable[str]) -> Iterable[tuple[str, str]]:
     """Yield (key, raw_text) entries from a .bbl file."""
     content = "".join(lines)
     content = content.split("\\end{thebibliography}", maxsplit=1)[0]
@@ -78,7 +78,7 @@ def _iter_bbl_entries(lines: Iterable[str]) -> Iterable[Tuple[str, str]]:
 def generate_cite_mapping_from_bbl(
     bbl_file: str,
     output_json: str = CITE_MAPPING_FILE,
-) -> Dict[str, str]:
+) -> dict[str, str]:
     """Generate cite_mapping.json from a fixed .bbl file.
 
     Args:
@@ -97,7 +97,7 @@ def generate_cite_mapping_from_bbl(
     with open(bbl_path, "r", encoding="utf-8") as f:
         lines = f.readlines()
 
-    mapping: Dict[str, str] = {}
+    mapping: dict[str, str] = {}
     if output_path.exists():
         with open(output_path, "r", encoding="utf-8") as f:
             mapping.update(json.load(f))

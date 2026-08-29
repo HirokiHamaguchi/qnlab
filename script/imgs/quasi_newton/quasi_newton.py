@@ -151,7 +151,7 @@ def draw_common_elements(ax, draw_type: int):
         ax.scatter([x_next[0]], [x_next[1]], [f(x_next)], s=100, color="yellow")
         ax.text(
             x_next[0],
-            x_next[1] + (0.2 if draw_type == 2 else 0.2),
+            x_next[1] + 0.2,
             f(x_next),
             r"$x_{k+1}$" if draw_type == 2 else r"$x_{k+2}$",
             fontsize=45,

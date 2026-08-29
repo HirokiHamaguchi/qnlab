@@ -56,7 +56,7 @@ plt.text(
     r"$\bar f(x_{k+1}) \leq \bar f(x_k)+\Delta_k$",
     fontsize=25,
     ha="center",
-    bbox=dict(facecolor="white"),
+    bbox={"facecolor": "white"},
 )
 plt.text(
     x,
@@ -64,7 +64,7 @@ plt.text(
     r"$(k \in K)$",
     fontsize=20,
     ha="center",
-    bbox=dict(facecolor="white"),
+    bbox={"facecolor": "white"},
 )
 
 x = 6.5
@@ -75,7 +75,7 @@ plt.text(
     r"$\bar f(x_k)\leq \bar f(x_j)-\Delta_{j}$",
     fontsize=25,
     ha="center",
-    bbox=dict(facecolor="white"),
+    bbox={"facecolor": "white"},
 )
 plt.text(
     x,
@@ -83,7 +83,7 @@ plt.text(
     r"$(j, k \in K^0, \, j < k)$",
     fontsize=20,
     ha="center",
-    bbox=dict(facecolor="white"),
+    bbox={"facecolor": "white"},
 )
 
 

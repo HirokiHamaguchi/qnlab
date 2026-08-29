@@ -1,11 +1,14 @@
 repos:
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.4.4
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.16.5
     hooks:
-      - id: ruff
-        exclude: ^submodules/
+      # Run the linter.
+      - id: ruff-check
+        exclude: ^(submodules/|qnlab/solver/external_files/ntqn\.py$)
+      # Run the formatter.
       - id: ruff-format
-        exclude: ^submodules/
+        exclude: ^(submodules/|qnlab/solver/external_files/ntqn\.py$)
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: 'v1.15.0'

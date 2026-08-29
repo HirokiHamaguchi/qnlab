@@ -2,7 +2,6 @@ import json
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Tuple
 from zipfile import BadZipFile
 
 import numpy as np
@@ -14,6 +13,7 @@ from qnlab.util.callback import Callback, CallbackTimeoutError
 from qnlab.util.method import Method
 
 RESULT_ROOT = Path(__file__).resolve().parents[2] / "data" / "temp"
+ZERO_NOISE = np.float64(0)
 
 
 @dataclass
@@ -22,8 +22,8 @@ class CUTEstTask:
     method: Method
     options: dict
     precision: int
-    function_noise: np.float64 = np.float64(0)
-    gradient_noise: np.float64 = np.float64(0)
+    function_noise: np.float64 = ZERO_NOISE
+    gradient_noise: np.float64 = ZERO_NOISE
     assumed_function_error: np.float64 | None = None
     seed: int = 0
     boxed: bool = False
@@ -74,13 +74,13 @@ def load_npz(
             callback.calls = data["calls"].astype(int)
             callback.fxs = data["fxs"]
             callback.gnorms = data["gnorms"]
-            callback.times = data["times"] if "times" in data else []
+            callback.times = data.get("times", [])
         assert len(callback.calls) == len(callback.fxs) == len(callback.gnorms)
         assert len(callback.times) in (0, len(callback.calls))
         assert len(callback.calls) > 0
-    except (EOFError, BadZipFile) as e:
+    except (EOFError, BadZipFile):
         print(file_path)
-        raise e
+        raise
     # Iterates are intentionally not stored in this compact result format.
     callback.xs = []
     return callback
@@ -172,7 +172,7 @@ def solve_problem_with_timeout(
             )
         else:
             print("⚠ Not saving results for time limit less than 600 seconds.")
-    except Exception as error:
+    except Exception as error:  # noqa: BLE001 - persist diagnostics for failed tasks
         print(f"✗ {task.problem_name} with {task.method.label}: {error}")
         save_npz(
             task,
@@ -188,7 +188,7 @@ def solve_problem_with_timeout(
 
 def run_tasks(
     tasks: list[CUTEstTask],
-    error_causing_tasks: list[Tuple[int, str, str]],
+    error_causing_tasks: list[tuple[int, str, str]],
     time_limit: int,
     result_subdir: str | None = None,
     overwrite: bool = False,
@@ -222,17 +222,17 @@ def run_tasks(
                     result_subdir=result_subdir,
                 )
             print(f"[{index + 1}/{len(pending)}] ✓ Success")
-        except Exception as error:
+        except Exception as error:  # noqa: BLE001 - continue the remaining task batch
             print(f"[{index + 1}/{len(pending)}] ⚠ Error: {error}")
             errors.append((file_path, f"Error: {error}"))
 
 
 def run(
     problems: list[str],
-    methods: list[Tuple[Method, dict]],
+    methods: list[tuple[Method, dict]],
     precision: int,
     noise: np.float64,
-    ERROR_CAUSING_TASKS: list[Tuple[int, str, str]],
+    ERROR_CAUSING_TASKS: list[tuple[int, str, str]],
     TL: int,
     boxed: bool = False,
     result_subdir: str | None = None,
@@ -255,7 +255,7 @@ def run(
 
 
 def load_results(
-    methods: list[Tuple[Method, dict]],
+    methods: list[tuple[Method, dict]],
     problems: list[str],
     precision: int,
     noise: np.float64,
@@ -263,7 +263,7 @@ def load_results(
     boxed: bool = False,
     metric: str = "calls",
     result_subdir: str | None = None,
-) -> Tuple[list[str], np.ndarray, np.ndarray, np.ndarray, list[str]]:
+) -> tuple[list[str], np.ndarray, np.ndarray, np.ndarray, list[str]]:
     """Load and aggregate stored results."""
     assert metric in ["calls", "time"]
     alg_names = [method.label for method, _ in methods]

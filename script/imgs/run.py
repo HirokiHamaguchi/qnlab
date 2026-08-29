@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import subprocess
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable, List
 
 import fitz  # PyMuPDF
 
@@ -15,7 +15,7 @@ PROJECT_ROOT = project_root()
 DOC_IMGS_ROOT = doc_imgs_dir()
 
 
-def iter_python_scripts() -> List[Path]:
+def iter_python_scripts() -> list[Path]:
     scripts = []
     for path in SCRIPT_ROOT.rglob("*.py"):
         if path == SELF_PATH or "__pycache__" in path.parts:
@@ -46,13 +46,13 @@ def iter_pdfs(root: Path) -> Iterable[Path]:
     return (path for path in root.rglob("*.pdf") if path.is_file())
 
 
-def convert_pdf(pdf_path: Path) -> List[Path]:
+def convert_pdf(pdf_path: Path) -> list[Path]:
     doc = fitz.open(pdf_path)
     multiple_pages = len(doc) > 1
     zoom = DEFAULT_DPI / 72  # fitz uses 72 DPI as base
     mat = fitz.Matrix(zoom, zoom)
 
-    output_paths: List[Path] = []
+    output_paths: list[Path] = []
     for page_num in range(len(doc)):
         page = doc[page_num]
         pix = page.get_pixmap(matrix=mat)  # type: ignore

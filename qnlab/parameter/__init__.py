@@ -7,9 +7,9 @@ from qnlab.parameter.param_owl import OwlParameter
 
 __all__ = [
     "BaseParameter",
-    "NTRQNParameter",
     "KanzowParameter",
     "LineParameter",
+    "NTRQNParameter",
     "NtqnParameter",
     "OwlParameter",
 ]

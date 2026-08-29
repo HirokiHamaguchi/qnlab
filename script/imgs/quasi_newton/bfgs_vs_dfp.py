@@ -78,7 +78,7 @@ def plot_trajectories(lambda_, x_bfgs, x_dfp):
 
     # Create visualization with 2x1 layout
     # Fixed figsize for consistent appearance
-    fig, axes = plt.subplots(1, 2, figsize=(13, 6), facecolor="white")
+    _fig, axes = plt.subplots(1, 2, figsize=(13, 6), facecolor="white")
 
     x_range = np.linspace(xmin, xmax, 150)
     y_range = np.linspace(ymin, ymax, 150)
@@ -204,10 +204,10 @@ def compare_convergence(lambda_values, eps=1e-4, max_iter=20000):
     results = []
 
     for lambda_ in lambda_values:
-        it_bfgs, f_bfgs, x_bfgs = run_method(
+        it_bfgs, _f_bfgs, x_bfgs = run_method(
             "BFGS", lambda_, eps=eps, max_iter=max_iter
         )
-        it_dfp, f_dfp, x_dfp = run_method("DFP", lambda_, eps=eps, max_iter=max_iter)
+        it_dfp, _f_dfp, x_dfp = run_method("DFP", lambda_, eps=eps, max_iter=max_iter)
 
         bfgs_str = str(it_bfgs) if it_bfgs is not None else ">=max"
         dfp_str = str(it_dfp) if it_dfp is not None else ">=max"

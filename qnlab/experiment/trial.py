@@ -1,5 +1,4 @@
 import time
-from typing import List, Tuple
 
 from qnlab.experiment.vis import vis
 from qnlab.problem.base import BaseProblem
@@ -12,7 +11,7 @@ from qnlab.util.method import Method
 def trial(
     prob: BaseProblem,
     name: str,
-    configs: List[Tuple[Method, dict]],
+    configs: list[tuple[Method, dict]],
     max_length: int = int(1e9),
     do_vis: bool = True,
     pdf_path: str = "",
@@ -21,7 +20,7 @@ def trial(
     only_grad: bool = False,
     verbose: bool = False,
     bounds: BoundsInput | None = None,
-) -> List[Callback]:
+) -> list[Callback]:
     print(f"Trial on problem: {prob.name} (n={prob.n})")
 
     callbacks = []
@@ -43,9 +42,9 @@ def trial(
         T0 = time.perf_counter()
         callback = Callback(save_xs=save_xs)
 
-        info, fx, x_opt = qn(prob, method, options, callback, verbose, bounds=bounds)
+        info, _fx, _x_opt = qn(prob, method, options, callback, verbose, bounds=bounds)
 
-        print(f"{str(method)} info:{info} time:{time.perf_counter() - T0:.2f}sec")
+        print(f"{method!s} info:{info} time:{time.perf_counter() - T0:.2f}sec")
         print(f"Final f:{callback.fxs[-1]:.2e}, ||g||:{callback.gnorms[-1]:.2e}")
         if callback.others:
             print("  others:", callback.others)

@@ -1,5 +1,3 @@
-from typing import Dict, Union
-
 import numpy as np
 
 from qnlab.parameter import (
@@ -26,11 +24,13 @@ from qnlab.util.method import Method
 def qn(
     prob: BaseProblem,
     method: Method,
-    options: Dict[str, Union[np.float64, int]] = {},
-    callback: Union[Callback, None] = None,
+    options: dict[str, np.float64 | int] | None = None,
+    callback: Callback | None = None,
     verbose: bool = False,
     bounds: BoundsInput | None = None,
 ):
+    if options is None:
+        options = {}
     if method.base == "SciPy":
         return qn_scipy(prob, method, options, callback, verbose, bounds)
 

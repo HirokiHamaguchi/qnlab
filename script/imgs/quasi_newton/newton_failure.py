@@ -47,9 +47,12 @@ class StronglyConvexFunction:
                 "",
                 xy=(xs[i + 1], f_points[i + 1]),
                 xytext=(xs[i], f_points[i]),
-                arrowprops=dict(
-                    arrowstyle="->", color="red", lw=1.5, mutation_scale=30
-                ),
+                arrowprops={
+                    "arrowstyle": "->",
+                    "color": "red",
+                    "lw": 1.5,
+                    "mutation_scale": 30,
+                },
             )
 
         plt.legend(loc="upper center")
@@ -96,9 +99,12 @@ class SqrtFunction:
                 "",
                 xy=(xs[i + 1], f_points[i + 1]),
                 xytext=(xs[i], f_points[i]),
-                arrowprops=dict(
-                    arrowstyle="->", color="red", lw=1.5, mutation_scale=30
-                ),
+                arrowprops={
+                    "arrowstyle": "->",
+                    "color": "red",
+                    "lw": 1.5,
+                    "mutation_scale": 30,
+                },
             )
 
         plt.legend(loc="upper center")

@@ -1,7 +1,6 @@
 import importlib
 import os
 import sys
-from typing import Union
 
 import numpy as np
 
@@ -26,7 +25,7 @@ utility = importlib.import_module("utility")
 
 
 def trial(
-    prob: Union[RosenbrockProblem, PowellProblem, DixonPriceProblem, ZakharovProblem],
+    prob: RosenbrockProblem | PowellProblem | DixonPriceProblem | ZakharovProblem,
     maxIter: int,
 ):
     name = prob.__class__.__name__.replace("Problem", "")
@@ -35,7 +34,7 @@ def trial(
     param = KanzowParameter(
         prob.n, {"m": 5, "gtol": np.float64(1e-4), "max_iterations": maxIter}
     )
-    info, fx, x_opt = qn_kanzow(prob, param, method=Method("Kanzow"))
+    _info, fx, x_opt = qn_kanzow(prob, param, method=Method("Kanzow"))
 
     utility.parameters.maxIter = maxIter
     x_true, _ = kanzow.solveNonmonotone(prob.f, prob.g, prob.x0)
@@ -51,7 +50,7 @@ def trial(
 
 
 def trialSec(
-    prob: Union[RosenbrockProblem, PowellProblem, DixonPriceProblem, ZakharovProblem],
+    prob: RosenbrockProblem | PowellProblem | DixonPriceProblem | ZakharovProblem,
     maxIter: int,
 ):
     name = prob.__class__.__name__.replace("Problem", "")
@@ -60,7 +59,7 @@ def trialSec(
     param = KanzowParameter(
         prob.n, {"m": 5, "gtol": np.float64(1e-4), "max_iterations": maxIter}
     )
-    info, fx, x_opt = qn_kanzow(prob, param, method=Method("KanzowSec"))
+    _info, fx, x_opt = qn_kanzow(prob, param, method=Method("KanzowSec"))
 
     utility.parameters.maxIter = maxIter
     x_true, _ = kanzow_sec.solveNonmonotone(prob.f, prob.g, prob.x0)
