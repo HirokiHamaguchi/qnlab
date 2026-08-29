@@ -5,6 +5,7 @@ from typing import Literal
 
 import numpy as np
 import pycutest  # type: ignore[import-untyped]  # pycutest does not provide stubs
+
 from qnlab.problem.cutest import CUTEstQNProblem
 
 ConstraintType = Literal["unconstrained", "bound"]

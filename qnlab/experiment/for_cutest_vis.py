@@ -4,6 +4,7 @@ from typing import Literal
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+
 from qnlab.experiment.for_cutest_run import CUTEstTask, load_npz
 from qnlab.experiment.profile import performance_profile
 from qnlab.experiment.vis import vis

@@ -6,6 +6,7 @@ repos:
       # Run the linter.
       - id: ruff-check
         exclude: ^(submodules/|qnlab/solver/external_files/ntqn\.py$)
+        args: [ --fix ]
       # Run the formatter.
       - id: ruff-format
         exclude: ^(submodules/|qnlab/solver/external_files/ntqn\.py$)
