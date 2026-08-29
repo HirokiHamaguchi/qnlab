@@ -6,7 +6,7 @@ import numpy as np
 import seaborn as sns
 
 from qnlab.experiment.for_cutest_run import CUTEstTask, load_npz
-from qnlab.experiment.profile import performance_profile
+from qnlab.experiment.profile import data_profile, performance_profile
 from qnlab.experiment.vis import vis
 from qnlab.problem.cutest import CUTEstQNProblem
 from qnlab.problem.cutest_noised import CUTEstNoisedProblem
@@ -188,5 +188,39 @@ def draw_pp(
         fig.savefig(output_path, format="pdf", bbox_inches="tight", dpi=300)
         print(f"Saved figure to {output_path}")
 
+    plt.show()
+    plt.close()
+
+
+def draw_data_profile(
+    alg_names: list[str],
+    callsM: np.ndarray,
+    dimensions: np.ndarray,
+    color_palette: dict[str, str],
+    line_styles: dict[str, str],
+    output_path: Path,
+    alpha_max: float | None = None,
+) -> None:
+    """Draw a data profile normalized by each problem's dimension plus one."""
+    sns.set_style("whitegrid")
+    colors = [color_palette.get(name, "black") for name in alg_names]
+    styles = [line_styles.get(name, "o-") for name in alg_names]
+    fig, ax = plt.subplots(figsize=(7, 5))
+    data_profile(
+        callsM.T,
+        dimensions,
+        linestyle=styles,
+        colors=colors,
+        alpha_max=alpha_max,
+        markersize=6,
+        markevery=[0],
+        linewidth=2.2,
+    )
+    ax.grid(True, alpha=0.35, linestyle="-", linewidth=0.6, color="gray")
+    ax.set_axisbelow(True)
+    plt.tight_layout()
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(output_path, format="pdf", bbox_inches="tight", dpi=300)
+    print(f"Saved figure to {output_path}")
     plt.show()
     plt.close()

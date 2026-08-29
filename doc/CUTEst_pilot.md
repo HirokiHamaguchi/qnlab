@@ -17,6 +17,10 @@ The separate `NTRQN-OFFO` method remains available as a branch ablation: it forc
 
 The result summary reports both the percentage solved and the percentage for which each method used the fewest oracle calls, with ties counted for every tied method. The 64-bit, `1e-3` row is the candidate headline number for the Introduction table after the full benchmark has been run. Pilot percentages are diagnostic only and must not be reported as full-benchmark evidence.
 
+Each result file records the solver return code in addition to the execution status. The summary cell separately reports missing files, timeouts, exceptions, error return codes, restart-count statistics, and the original NTQN termination flags. It also generates data profiles normalized by `dimension + 1`.
+
+The primary function-noise profiles exclude `NTRQN-Restart`. When the full `function_only` scenario is plotted, the notebook generates a separate `NTRQN` versus `NTRQN-Restart` appendix profile and restart summary.
+
 ## Running the pilot
 
 Open `notebooks/cutest.ipynb` from the repository root and first execute it with the default dry-run setting. The task preview must say `TINY PILOT (3 problems only)` and `Prepared 6 tasks.`

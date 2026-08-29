@@ -133,3 +133,52 @@ def performance_profile(
     plt.ylabel(r"Proportion of problems")
 
     return thetaMax, h
+
+
+def data_profile(
+    data,
+    dimensions,
+    linestyle,
+    colors,
+    alpha_max=None,
+    **kwargs,
+) -> Any:
+    """Plot fractions solved within ``alpha * (problem dimension + 1)`` calls."""
+    data = np.asarray(data, dtype=np.double)
+    dimensions = np.asarray(dimensions, dtype=np.double)
+    m, n = data.shape
+    if dimensions.shape != (m,):
+        raise ValueError("One problem dimension is required for each data row")
+    if np.any(dimensions <= 0):
+        raise ValueError("Problem dimensions must be positive")
+    if len(linestyle) < n:
+        raise ValueError("Number of line specs < number of solvers")
+
+    normalized = data / (dimensions[:, None] + 1.0)
+    finite = normalized[np.isfinite(normalized)]
+    if alpha_max is None:
+        alpha_max = max(float(np.max(finite, initial=1.0)), 1.0)
+
+    handles: list[Any] = [None] * n
+    for solver in range(n):
+        solved = np.sort(normalized[np.isfinite(normalized[:, solver]), solver])
+        solved = solved[solved <= alpha_max]
+        if len(solved) == 0:
+            continue
+        alpha = np.insert(solved, 0, 0.0)
+        proportion = np.arange(len(solved) + 1) / m
+        handles[solver] = plt.step(
+            alpha,
+            proportion,
+            linestyle[solver],
+            color=colors[solver],
+            where="post",
+            **kwargs,
+            zorder=n + 1 - solver,
+        )
+
+    plt.xlim([0, alpha_max])
+    plt.ylim([0, 1.01])
+    plt.xlabel(r"normalized oracle-call budget $\alpha$")
+    plt.ylabel(r"Proportion of problems solved")
+    return alpha_max, handles

@@ -84,4 +84,7 @@ def qn_ntqn(
         7: RetCode.ERR_NUMERICAL_INSTABILITY,  # No more progress due to numerical issues
     }.get(flag, RetCode.ERR_UNKNOWNERROR)
 
+    if callback is not None:
+        callback.others["NTQN termination flag"] = flag
+
     return ret_code, final_fk, final_xk

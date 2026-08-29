@@ -63,11 +63,19 @@ def load_npz(
     task: CUTEstTask, verbose: bool = True, result_subdir: str | None = None
 ) -> Callback:
     """Load stored callback data for a task."""
+    callback, _ = load_npz_with_metadata(task, verbose, result_subdir)
+    return callback
+
+
+def load_npz_with_metadata(
+    task: CUTEstTask, verbose: bool = True, result_subdir: str | None = None
+) -> tuple[Callback, dict]:
+    """Load stored callback data and metadata for a task."""
     file_path = get_file_path(task, result_subdir)
     if not Path(file_path).exists():
         if verbose:
             warnings.warn(f"File not found: {file_path}, returning empty Callback.")
-        return Callback()
+        return Callback(), {}
     try:
         with np.load(file_path) as data:
             callback = Callback()
@@ -75,15 +83,16 @@ def load_npz(
             callback.fxs = data["fxs"]
             callback.gnorms = data["gnorms"]
             callback.times = data.get("times", [])
+            metadata = json.loads(data["metadata"].item())
         assert len(callback.calls) == len(callback.fxs) == len(callback.gnorms)
         assert len(callback.times) in (0, len(callback.calls))
-        assert len(callback.calls) > 0
     except (EOFError, BadZipFile):
         print(file_path)
         raise
     # Iterates are intentionally not stored in this compact result format.
     callback.xs = []
-    return callback
+    callback.others.update(metadata.get("diagnostics", {}))
+    return callback, metadata
 
 
 def _json_default(value: object) -> object:
@@ -143,7 +152,7 @@ def solve_problem_with_timeout(
     callback = Callback(time_limit=time_limit)
     try:
         print(f"▶ Running: {file_path}")
-        qn(
+        return_code, _, _ = qn(
             problem,
             task.method,
             task.options,
@@ -155,7 +164,13 @@ def solve_problem_with_timeout(
             task,
             callback,
             result_subdir,
-            {"dimension": int(problem.n), "status": "completed", "error": ""},
+            {
+                "dimension": int(problem.n),
+                "status": "completed",
+                "error": "",
+                "return_code": return_code.name,
+                "return_code_value": int(return_code),
+            },
         )
     except CallbackTimeoutError as error:
         print(f"⏱ {task.problem_name} with {task.method.label}: {error}")
@@ -196,7 +211,7 @@ def run_tasks(
     pending = [
         task
         for task in tasks
-        if overwrite or len(load_npz(task, False, result_subdir).calls) == 0
+        if overwrite or not Path(get_file_path(task, result_subdir)).exists()
     ]
     print(f"Total tasks to run: {len(pending)}")
 
