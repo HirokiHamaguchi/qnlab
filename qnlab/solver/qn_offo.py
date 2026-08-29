@@ -31,7 +31,7 @@ def qn_offo(
     prob.reset()
     x = np.array(prob.x0, dtype=np.float64)
     if callback is not None:
-        callback.start(prob, x, function_value=np.float64(np.nan))
+        callback.start(prob, x)
     g = prob.g(x)
     fx = np.float64(np.nan)
     squared_scale = squared_offset
