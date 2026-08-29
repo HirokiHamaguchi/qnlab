@@ -19,5 +19,10 @@ def test_offo_uses_only_gradient_evaluations() -> None:
 
     assert problem.call_f == 0
     assert problem.call_g == 6
-    assert np.all(np.isnan(callback.fxs))
+    assert not np.isnan(callback.gnorms[0])
+    assert np.all(np.isnan(callback.fxs[1:]))
     assert callback.calls == [0, 2, 3, 4, 5, 6]
+
+
+if __name__ == "__main__":
+    test_offo_uses_only_gradient_evaluations()
