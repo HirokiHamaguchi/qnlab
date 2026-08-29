@@ -26,8 +26,9 @@ In this work, we propose a noise-tolerant regularized quasi-Newton method that a
 Our approach combines \MPCchanged{a relaxed Armijo} line \MPCchanged{search,} quadratic \MPCchanged{regularization \citep{uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023},} and \MPCchanged{an OFFO-inspired} strategy~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
 \begin{MPCchange}
 Theorem~1 of Kanzow and Steck~\citep{kanzowRegularizationLimitedMemory2023} assumes a bounded sequence of quasi-Newton matrices and an objective function bounded from below and proves $\liminf_{k\to\infty}\norm{\nabla f(x_k)}=0$, so every fixed gradient tolerance is attained after finitely many iterations.
-Their result establishes global convergence without an iteration-complexity bound, whereas our analysis gives the standard \(\order{1/\varepsilon^2}\) complexity under bounded function-value errors.
-We do not claim that this standard order is itself an improvement; the contribution is instead the guarantee for the hybrid mechanism described below.
+Their result establishes global convergence without an iteration-complexity bound, whereas our analysis gives \(\order{1/\varepsilon^2}\) complexity under bounded function-value errors.
+This dependence on the stationarity tolerance is worst-case optimal for $L$-smooth nonconvex optimization even in the noise-free setting~\citep{carmonLowerBoundsFinding2020}.
+The theoretical contribution is therefore that the hybrid method retains this best possible order while continuing to exploit persistently noisy function values whenever they provide a reliable progress certificate.
 Unlike OFFO algorithms, which deliberately never evaluate the objective function, our hybrid method retains a relaxed line search whenever observed function values certify progress and invokes OFFO-type scaling only otherwise.
 The noise-tolerant quasi-Newton analysis in~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022} yields a stationarity neighborhood whose function-error contribution is proportional to \(\sqrt{M\epsilon_f}\), whereas its gradient-error contribution is proportional to \(\epsilon_g\).
 Its relaxed Armijo condition is closely related to ours; when \(\abs{f}\) is small, our hybrid model gives an error-absorbing scale of approximately \(2\epsilon_f/(1-\epsilon_f)\), while our adaptive recomputation and the \(K^0/K^+\) switch determine when function information is used.
@@ -90,7 +91,7 @@ The two results are therefore complementary, with ours providing the stronger at
              & \ding{51}\ding{51}
              & (practically)
              & nonconvex
-             & $\order{1/\varepsilon^2}$ complexity under exact gradients and fixed bounded relative-or-absolute function errors \\
+             & Order-optimal $\order{1/\varepsilon^2}$ complexity under exact gradients and fixed bounded relative-or-absolute function errors \\
             \bottomrule
         \end{tabular}
     }
@@ -99,7 +100,8 @@ The two results are therefore complementary, with ours providing the stronger at
 
 \begin{MPCchange}
 When a sufficient decrease in observed function value is available, the method uses an unregularized quasi-Newton step; otherwise, it uses regularization governed by an AdaGrad-Norm-type accumulator over the regularized iterations.
-We prove that the resulting method reaches an \(\varepsilon\)-first-order stationary point in \(\order{1/\varepsilon^2}\) iterations for smooth nonconvex objectives under exact gradients and bounded relative-or-absolute function errors.
+We prove that the resulting method reaches an \(\varepsilon\)-first-order stationary point in the order-optimal \(\order{1/\varepsilon^2}\) iterations for smooth nonconvex objectives under exact gradients and bounded relative-or-absolute function errors.
+This matches the best possible worst-case order for the corresponding noise-free class even though the method still uses the available noisy function values selectively.
 We state the exact-gradient scope explicitly and separate theory-aligned function-noise experiments from joint function-and-gradient perturbations, the latter serving as deliberately adverse stress tests rather than evidence for the theorem.
 The CUTEst study also reports problem dimensions, the baseline stopping rules, sensitivity to the supplied function-error estimate, and ablations of the hybrid mechanism.
 \end{MPCchange}

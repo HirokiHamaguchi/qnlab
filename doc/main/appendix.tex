@@ -71,104 +71,10 @@ This point is important because the convergence theorem permits nonconvex object
 \end{MPCchange}
 
 \begin{MPCchange}
-\section{Analysis of the Accumulator-Restart Heuristic}\label{app:analysis_accumulator_restart}
+\section{Accumulator-Restart Ablation}\label{app:restart_experiment}
 
-We analyze the optional variant described in \cref{eq:restart_condition}, which resets only the accumulator in \cref{eq:offo_based_update} when the decrease relative to the reference value reaches a fixed threshold $\tau>0$.
-The sets $K^0$ and $K^+$ and the reference values used in \cref{eq:restart_condition} are retained after a restart.
-For $k \geq 1$, define
-\begin{equation}\label{eq:restart_reference_value}
-    q_k \defeq \min_{j \in K^0,\,j<k} \qty(\overline{f}(x_j)-\Delta_j).
-\end{equation}
-Thus, a restart at iteration $k$ occurs only if $q_k-\overline{f}(x_k)\geq\tau$.
-
-\begin{proposition}\label{prop:finite_accumulator_restarts}
-    Under \cref{ass:bounded,ass:LSmooth,ass:BBounds}, the number $R$ of accumulator restarts satisfying \cref{eq:restart_condition} is finite and satisfies
-    \begin{equation}\label{eq:restart_count_bound}
-        R \leq \frac{\overline{f}(x_0)-\overline{f}^*+\Delta_{\max}}{\tau}.
-    \end{equation}
-\end{proposition}
-\begin{proof}
-    Since $k=0$ belongs to $K^0$, \cref{eq:restart_reference_value} gives $q_1=\overline{f}(x_0)-\Delta_0\leq\overline{f}(x_0)$.
-    By \cref{eq:ass_bounded_overline_f} and the bound $\Delta_k\leq\Delta_{\max}$ for $k\in K^0$ established in the proof of \cref{lem:delta_bound_and_sum}, we have
-    \begin{equation}\label{eq:restart_reference_lower_bound}
-        q_k \geq \overline{f}^*-\Delta_{\max}.
-    \end{equation}
-    Let $r_1<r_2<\cdots<r_R$ be the restart indices.
-    Since \cref{eq:restart_condition} implies $r_i\in K^0$, updating the reference value after iteration $r_i$ gives
-    \begin{align}
-        q_{r_i+1}
-         & \leq \overline{f}(x_{r_i})-\Delta_{r_i}             &  & (\text{\cref{eq:restart_reference_value}}) \notag \\
-         & \leq q_{r_i}-\tau-\Delta_{r_i}                      &  & (\text{\cref{eq:restart_condition}})       \notag \\
-         & \leq q_{r_i}-\tau.                                  &  & (\Delta_{r_i}\geq0)                         \label{eq:restart_reference_decrease}
-    \end{align}
-    The sequence $(q_k)$ is non-increasing by \cref{eq:restart_reference_value}.
-    Applying \cref{eq:restart_reference_decrease} recursively at the restart indices and using $q_1\leq\overline{f}(x_0)$ yields
-    \begin{equation}\label{eq:restart_reference_recursive_bound}
-        q_{r_R+1}\leq q_1-R\tau\leq\overline{f}(x_0)-R\tau.
-    \end{equation}
-    Combining \cref{eq:restart_reference_lower_bound,eq:restart_reference_recursive_bound} and rearranging gives \cref{eq:restart_count_bound}.
-    This completes the proof.
-    \myQED
-\end{proof}
-
-We next show that these finitely many restarts preserve the convergence rate in \cref{thm:gc}.
-Let $r_1<r_2<\cdots<r_R$ again denote the restart indices, and set $r_0=-1$ and $r_{R+1}=k_{\max}$.
-For $i=0,1,\ldots,R$, define the $i$-th phase and its sum of squared gradient norms by
-\begin{equation}\label{eq:restart_phase_definition}
-    K_i^+ \defeq \{k\in K^+\mid r_i<k<r_{i+1}\}, \qquad S_i \defeq \sum_{k\in K_i^+}\norm{g_k}^2.
-\end{equation}
-Within each $K_i^+$, the accumulator is not reset and therefore satisfies
-\begin{equation}\label{eq:offo_based_update_in_restart_phase}
-    \mu_k=\theta_k\sqrt{\varsigma+\sum_{j\in K_i^+,\,j\leq k}\norm{g_j}^2}, \qquad \theta_k\in[\theta_{\min},\theta_{\max}].
-\end{equation}
-
-\begin{theorem}\label{thm:gc_with_accumulator_restarts}
-    Under \cref{ass:exact_gradient,ass:bounded,ass:LSmooth,ass:BBounds}, suppose that only the accumulator in \cref{eq:offo_based_update} is reset according to \cref{eq:restart_condition} with a fixed threshold $\tau>0$.
-    Then, the average of squared gradient norms satisfies
-    \begin{equation*}
-        \frac{1}{k_{\max}}\sum_{k=0}^{k_{\max}-1}\norm{g_k}^2=\order{\frac{1}{k_{\max}}}.
-    \end{equation*}
-\end{theorem}
-\begin{proof}
-    Applying the proof of \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} to \cref{eq:offo_based_update_in_restart_phase} and then following the proof of \cref{lem:sum_small_delta_k_bound_Kplus} for each $K_i^+$ yield
-    \begin{equation}\label{eq:restart_phase_delta_bound}
-        \sum_{k\in K_i^+}\delta_k
-        \geq C_1\qty(\sqrt{\varsigma+S_i}-\sqrt{\varsigma})
-        -C_2\qty(\ln\qty(\varsigma+S_i)-\ln(\varsigma)).
-    \end{equation}
-    Restarting the accumulator does not alter $K^0$ or \cref{eq:mu_0_condition}, so \cref{lem:sum_small_delta_k_bound_K0} remains valid.
-    Combining \cref{lem:sum_small_delta_k_bound_K0,eq:restart_phase_delta_bound} with $f(x_0)-f(x_{k_{\max}})=\sum_{k\in K}\delta_k$ and $f(x_{k_{\max}})\geq f^*$ gives
-    \begin{equation}\label{eq:restart_combined_bound}
-        F_R
-        \geq \frac{c\overline{\alpha}}{M}\sum_{k\in K^0}\norm{g_k}^2
-        +\sum_{i=0}^{R}\qty(C_1\sqrt{\varsigma+S_i}-C_2\ln\qty(\varsigma+S_i)),
-    \end{equation}
-    where
-    \begin{equation}\label{eq:def_F_R}
-        F_R\defeq f(x_0)-f^*+\frac{2}{1-\feps}\qty(\overline{f}(x_0)-\overline{f}^*+\Delta_{\max})+(R+1)\qty(C_1\sqrt{\varsigma}-C_2\ln(\varsigma)).
-    \end{equation}
-    Recall the function $\phi$ and its minimizer $G^*$ defined in the proof of \cref{thm:gc}.
-    Since $\sqrt{\varsigma + S_i} \geq \sqrt{S_i}$ and $\phi(G) \geq \phi(G^*)$ for all $G > 0$, the following holds for every $i=0,1,\ldots,R$:
-    \begin{align}
-        C_1\sqrt{\varsigma+S_i}-C_2\ln\qty(\varsigma+S_i)
-         & =\frac{C_1}{2}\sqrt{\varsigma+S_i}+\phi\qty(\varsigma+S_i)       &  & (\text{\cref{eq:phi_G}}) \notag \\
-         & \geq\frac{C_1}{2}\sqrt{S_i}+\phi(G^*).                            &  & \label{eq:restart_phase_phi_bound}
-    \end{align}
-    Substituting \cref{eq:restart_phase_phi_bound} into \cref{eq:restart_combined_bound} and using $\sum_{i=0}^R\sqrt{S_i}\geq\sqrt{\sum_{i=0}^R S_i}$ yield
-    \begin{equation}\label{eq:restart_final_inequality}
-        0\leq\frac{c\overline{\alpha}}{M}\sum_{k\in K^0}\norm{g_k}^2
-        +\frac{C_1}{2}\sqrt{\sum_{k\in K^+}\norm{g_k}^2}
-        \leq F_R',
-    \end{equation}
-    where $F_R'\defeq F_R-(R+1)\phi(G^*)$.
-    Applying the same maximization argument as in the proof of \cref{thm:gc} to \cref{eq:restart_final_inequality} gives
-    \begin{equation}\label{eq:gc_result_with_accumulator_restarts}
-        \frac{1}{k_{\max}}\sum_{k=0}^{k_{\max}-1}\norm{g_k}^2
-        \leq\frac{1}{k_{\max}}\max\qty(\frac{MF_R'}{c\overline{\alpha}},\frac{4(F_R')^2}{C_1^2}).
-    \end{equation}
-    By \cref{prop:finite_accumulator_restarts}, $R$ is bounded above by a constant independent of $k_{\max}$ for every fixed $\tau>0$.
-    Hence, $F_R'$ is also independent of $k_{\max}$, and \cref{eq:gc_result_with_accumulator_restarts} yields the stated rate.
-    This completes the proof.
-    \myQED
-\end{proof}
+This appendix isolates the earlier accumulator-restart heuristic from the primary no-restart experiments that match \cref{alg:regularized_qn} and the analysis in \cref{sec:analysis}.
+The restart variant uses the condition in \cref{eq:restart_condition}, permits at most ten restarts, and otherwise uses the same problems, seeds, stopping rules, and parameter values as the corresponding no-restart method.
+For each setting, the comparison records oracle calls, failures, the distribution of the number of restarts, and whether the cap is reached.
+% TODO after the full CUTEst rerun: insert the restart/no-restart profile and quantitative summary here.
 \end{MPCchange}

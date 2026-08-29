@@ -621,7 +621,8 @@ Finally, \cref{thm:gc} implies \MPCchanged{the iteration-complexity bound}
 \begin{equation*}
     \min\left\{k \relmiddle| \norm{\nabla f(x_k)} \leq \gtol \right\} = \order{1/\gtol^2}.
 \end{equation*}
-This is a standard convergence guarantee for first-order optimization algorithms applied to $L$-smooth nonconvex functions.
+\MPCchanged{The order $\order{1/\gtol^2}$ is worst-case optimal for first-order stationarity on the class of $L$-smooth nonconvex functions even when function values are exact~\citep{carmonLowerBoundsFinding2020}.}
+\MPCchanged{Hence, bounded nonvanishing errors in the function values used by our hybrid mechanism do not worsen the best possible dependence on $\gtol$, although they affect the constants below.}
 \begin{MPCchange}
 More explicitly, \cref{eq:gc_result} gives the sufficient bound
 \begin{equation*}
@@ -789,18 +790,13 @@ We finally discuss the adjustment of the regularization parameter $\mu_k$ in \re
 Hence \(\mu_k=\theta_kG_k\) with \(\theta_k\in[10^{-2},1]\), exactly as required by \cref{eq:offo_based_update}.
 We set \(\varsigma=10^{-20}\), so that its square root, the initial scale \(G_{-1}\), equals \(10^{-10}\).
 The primary implementation sets the permitted number of restarts to zero and therefore coincides exactly with the analyzed accumulator.
-The restart was originally intended only as a practical heuristic used a small finite number of times after unusually large certified progress, rather than as an essential part of the proposed algorithm.
-More precisely, for a fixed threshold $\tau>0$, the optional variant resets only the accumulator in \cref{eq:offo_based_update} whenever
+The restart was originally intended only as a practical heuristic rather than as an essential part of the proposed algorithm.
+For the optional heuristic, a fixed threshold $\tau>0$ resets only the accumulator in \cref{eq:offo_based_update} whenever
 \begin{equation}\label{eq:restart_condition}
     \min_{j \in K^0,\,j<k} \qty(\overline{f}(x_j)-\Delta_j)-\overline{f}(x_k) \geq \tau.
 \end{equation}
 The sets $K^0$ and $K^+$ and the reference values in \cref{eq:restart_condition} are not reset.
-As proved in \cref{prop:finite_accumulator_restarts}, the positive fixed threshold itself gives a finite problem-dependent upper bound on the number of restarts.
-\MPCchanged{The formal statement and proof of this proposition are given in \cref{app:analysis_accumulator_restart}.}
-Applying the accumulator argument separately between consecutive restarts then preserves the convergence rate of \cref{thm:gc}, as stated in \cref{thm:gc_with_accumulator_restarts}.
-\MPCchanged{The formal statement and proof of this theorem are also given in \cref{app:analysis_accumulator_restart}.}
-For the restart ablation, we additionally impose the safeguard $R=10$, independent of the iteration limit, and record the actual number of restarts in every run.
-The experiments will report the restart-count distribution and whether the cap is ever reached, which directly tests whether repeated restart is confined to pathological cases.
+Because this optional rule is heuristic, all primary experiments use the analyzed no-restart method; the variant with at most ten restarts is reserved for the separate appendix ablation in \cref{app:restart_experiment}.
 \end{MPCchange}
 
 \section{Numerical Experiments}\label{sec:experiments}
@@ -816,6 +812,7 @@ We compared the following methods in our experiments.
           \begin{itemize}
               \item We used \cref{alg:regularized_qn,alg:backtracking_linesearch} with the details in \cref{sec:proposed_choice}.
               \item (\texttt{Ours-MS}) means the variant incorporating the modified secant condition described in \cref{sec:proposed_choice_Bk}.
+              \MPCchanged{\item (\texttt{NTRQN-OFFO}) is the branch ablation that always uses the OFFO-based regularization branch.}
           \end{itemize}
 
     \item (\texttt{Line}): Line search L-BFGS method
@@ -849,10 +846,12 @@ We compared the following methods in our experiments.
               \item We therefore report both solver-declared termination and attainment of the common scoring tolerance and interpret any early truncation separately from oracle efficiency.
               \end{MPCchange}
           \end{itemize}
+
+    \MPCchanged{\item (\texttt{OFFO}): A standalone first-order objective-function-free method using the cumulative gradient-norm scale in \cref{sec:prel_offo}.}
 \end{itemize}
 
 In the following, each method is referred to by the name given in parentheses.
-All these methods are L-BFGS-based, and we set the number of stored curvature pairs to $10$, the default value in SciPy's L-BFGS-B implementation.
+\MPCchanged{Except for the first-order \texttt{OFFO} baseline,} all these methods are L-BFGS-based, and we set the number of stored curvature pairs to $10$, the default value in SciPy's L-BFGS-B implementation.
 All experiments were conducted on a Microsoft Windows 11 Home system (version~10.0, build~26100) equipped with a 13th Gen Intel\textsuperscript{\textregistered} Core\textsuperscript{\texttrademark} i7-1360P CPU, featuring 12 physical cores and 16 logical processors.
 All computations were performed using the CPU only.
 
@@ -914,8 +913,8 @@ Following standard implementations~\citep{2020SciPy-NMeth}, we used the infinity
 We first separate the theory-aligned function-noise experiment from the joint-noise stress test described in \cref{sssec:problems}.
 The former tests the assumptions of \cref{sec:analysis}; the latter asks whether the implementation remains useful when both available quantities are perturbed.
 Therefore, success in the joint-noise experiment is evidence that the method can remain effective even in a setting that is theoretically unfavorable to it, but it is not presented as validation of the exact-gradient complexity result.
-The experiment notebook also compares the hybrid method with an always-OFFO variant and the earlier accumulator-restart heuristic, and varies the supplied \(\feps\) over two orders of magnitude around its nominal value.
-For the restart ablation, we aggregate the number of restarts over problems and seeds, report its distribution and maximum, and state whether the fixed cap $R=10$ is reached.
+The experiment notebook compares the hybrid method with both the standalone first-order \texttt{OFFO} baseline and the always-OFFO branch ablation \texttt{NTRQN-OFFO}, and varies the supplied \(\feps\) over two orders of magnitude around its nominal value.
+All main-text profiles use the analyzed no-restart method; the earlier accumulator-restart heuristic is evaluated separately in the appendix.
 \end{MPCchange}
 
 \begin{figure}[t]
@@ -1057,7 +1056,7 @@ In \cref{tab:time_results}, we report the total number of oracle calls (calls of
 
 \begin{MPCchange}
 We proposed a hybrid regularized quasi-Newton method for smooth nonconvex optimization with bounded errors in objective-function values.
-Under exact gradients and explicit uniform spectral bounds on the quasi-Newton matrices, the method has the standard \(\order{1/\varepsilon^2}\) first-order iteration complexity.
+Under exact gradients and explicit uniform spectral bounds on the quasi-Newton matrices, the method retains the order-optimal \(\order{1/\varepsilon^2}\) first-order iteration complexity of the noise-free $L$-smooth nonconvex setting while selectively using noisy function values.
 The implementation enforces the required two-sided curvature conditions directly and uses the same non-restarted OFFO accumulator as the analysis.
 The experiments distinguish function-value noise covered by the theorem from a joint-noise stress test outside its scope and assess sensitivity to the supplied error bound.
 An analysis with inexact gradients, which can at best guarantee convergence to a noise-dependent neighborhood without additional assumptions, remains future work.
