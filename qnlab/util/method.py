@@ -10,6 +10,7 @@ BaseType = Literal[
     "NTRQNB",
     "SciPy",
     "NTQN",
+    "OFFO",
     "GradientDescent",
     "Newton",
 ]
@@ -43,6 +44,7 @@ COLORS = {
     "Reg-Sec": TAB20(5),
     "SciPy": TAB20(6),
     "NTQN": TAB20(8),
+    "OFFO": TAB20(10),
 }
 COLORS.update(
     {
@@ -60,6 +62,7 @@ LINE_STYLES = {
     "Reg-Sec": "D-.",
     "SciPy": "v:",
     "NTQN": "s-.",
+    "OFFO": "P:",
 }
 LINE_STYLES.update(
     {

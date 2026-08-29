@@ -3,7 +3,6 @@ from typing import DefaultDict, List, Optional
 
 import numpy as np
 import numpy.typing as npt
-
 from qnlab.problem.base import BaseProblem
 
 

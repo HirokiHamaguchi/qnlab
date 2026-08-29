@@ -16,6 +16,7 @@ from qnlab.solver.qn_line import qn_line
 from qnlab.solver.qn_ntqn import qn_ntqn
 from qnlab.solver.qn_ntrqn import qn_ntrqn
 from qnlab.solver.qn_ntrqnb import BoundsInput, qn_ntrqnb
+from qnlab.solver.qn_offo import qn_offo
 from qnlab.solver.qn_owl import qn_owl
 from qnlab.solver.qn_scipy import qn_scipy
 from qnlab.util.callback import Callback
@@ -38,6 +39,9 @@ def qn(
 
     if method.base == "Newton":
         return qn_newton(prob, method, options, callback)
+
+    if method.base == "OFFO":
+        return qn_offo(prob, options, callback)
 
     if method.base == "Line":
         orthantwise_c = options.get("orthantwise_c", 0.0)
