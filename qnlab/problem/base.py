@@ -1,8 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import final
+from collections.abc import Callable
+from typing import TypeVar, final
 
 import numpy as np
 import numpy.typing as npt
+
+T = TypeVar("T")
 
 
 class BaseProblem(ABC):
@@ -47,7 +50,8 @@ class BaseProblem(ABC):
         """Compute the objective function value at x."""
         if count:
             self.call_f += 1
-        return self._f(x)
+            return self._f(x)
+        return self._evaluate_without_count(lambda: self._f(x))
 
     @final
     def g(
@@ -56,7 +60,8 @@ class BaseProblem(ABC):
         """Compute the gradient at x."""
         if count:
             self.call_g += 1
-        return self._g(x)
+            return self._g(x)
+        return self._evaluate_without_count(lambda: self._g(x))
 
     @final
     def hvp(
@@ -65,12 +70,17 @@ class BaseProblem(ABC):
         """Compute the Hessian-vector product at x with vector v."""
         if count:
             self.call_hvp += 1
-        return self._hvp(x, v)
+            return self._hvp(x, v)
+        return self._evaluate_without_count(lambda: self._hvp(x, v))
 
     @final
     def count_calls(self) -> int:
         """Returns the total number of function evaluations."""
         return self.call_f + self.call_g + self.call_hvp
+
+    def _evaluate_without_count(self, evaluation: Callable[[], T]) -> T:
+        """Evaluate a diagnostic quantity without changing problem state."""
+        return evaluation()
 
     # ------ Abstract methods ------ (Will be implemented by subclasses)
 

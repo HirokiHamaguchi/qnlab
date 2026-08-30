@@ -1,9 +1,14 @@
+import copy
+from collections.abc import Callable
+from typing import TypeVar
+
 import numpy as np
 import numpy.typing as npt
 
 from qnlab.problem.cutest import CUTEstQNProblem
 
 ZERO_NOISE = np.float64(0.0)
+T = TypeVar("T")
 
 
 class CUTEstNoisedProblem(CUTEstQNProblem):
@@ -32,6 +37,13 @@ class CUTEstNoisedProblem(CUTEstQNProblem):
             else np.float64(assumed_function_error)
         )
         self.rng = np.random.default_rng(seed=seed)
+
+    def _evaluate_without_count(self, evaluation: Callable[[], T]) -> T:
+        state = copy.deepcopy(self.rng.bit_generator.state)
+        try:
+            return evaluation()
+        finally:
+            self.rng.bit_generator.state = state
 
     def _f(self, x: npt.NDArray[np.float64]) -> np.float64:
         f = super()._f(x)

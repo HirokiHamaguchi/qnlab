@@ -51,7 +51,9 @@ def test_solve_problem_saves_return_code(monkeypatch) -> None:
     task = _task(method)
     problem = Mock(n=3, bounds=None)
     monkeypatch.setattr(for_cutest_run, "_create_problem", Mock(return_value=problem))
-    monkeypatch.setattr(for_cutest_run, "get_file_path", Mock(return_value="result.npz"))
+    monkeypatch.setattr(
+        for_cutest_run, "get_file_path", Mock(return_value="result.npz")
+    )
     monkeypatch.setattr(
         for_cutest_run,
         "qn",
@@ -68,7 +70,9 @@ def test_solve_problem_saves_return_code(monkeypatch) -> None:
     assert metadata["return_code_value"] == int(RetCode.ERR_MAXIMUMITERATION)
 
 
-def test_empty_error_result_can_be_loaded_and_is_not_rerun(monkeypatch, tmp_path) -> None:
+def test_empty_error_result_can_be_loaded_and_is_not_rerun(
+    monkeypatch, tmp_path
+) -> None:
     result_path = tmp_path / "error.npz"
     monkeypatch.setattr(
         for_cutest_run, "get_file_path", Mock(return_value=str(result_path))
