@@ -21,6 +21,10 @@ Each result file records the solver return code in addition to the execution sta
 
 The primary function-noise profiles exclude `NTRQN-Restart`. When the full `function_only` scenario is plotted, the notebook generates a separate `NTRQN` versus `NTRQN-Restart` appendix profile and restart summary.
 
+All paper-specific scenario values, method variants, solver-option overrides, limits, seeds, and ablation settings are declared in `notebooks/cutest.ipynb`. The solver implementations and the checked valid-problem lists remain in their library and data modules.
+
+The misspecification study compares only `NTRQN` and `NTRQN-MS`. The nominal setting is identical to those methods' `function_only` tasks, so it is loaded from that scenario rather than rerun. Exact-gradient `OFFO` is run only with seed `0` and reused for the other noisy seeds. The dry-run preview prints the number of tasks omitted through such reuse.
+
 ## Running the pilot
 
 Open `notebooks/cutest.ipynb` from the repository root and first execute it with the default dry-run setting. The task preview must say `TINY PILOT (3 problems only)` and `Prepared 6 tasks.`
