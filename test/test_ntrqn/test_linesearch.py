@@ -7,6 +7,7 @@ import numpy.typing as npt
 from scipy.optimize import line_search
 
 from qnlab.parameter import NTRQNParameter
+from qnlab.problem import ZakharovProblem
 from qnlab.problem.base import BaseProblem
 from qnlab.solver.qn_ntrqn import line_search_relaxed_armijo, qn_ntrqn
 from qnlab.util.callback import Callback
@@ -119,6 +120,20 @@ def test_default_solver_does_not_restart_at_initial_infinite_reference():
     )
 
     assert callback.others["OFFO accumulator restart"] == 0
+
+
+def test_scaled_curvature_converges_on_zakharov():
+    problem = ZakharovProblem(n=100)
+    callback = Callback()
+    code, _, _ = qn_ntrqn(
+        problem,
+        NTRQNParameter(problem.n, {"max_iterations": 100}),
+        Method("NTRQN", "cautious", "damped", "bfgs"),
+        callback,
+    )
+
+    assert code == RetCode.SUCCESS
+    assert callback.gnorms[-1] <= 1e-5
 
 
 def run_ls(

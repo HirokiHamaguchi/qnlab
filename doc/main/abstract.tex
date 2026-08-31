@@ -1,6 +1,6 @@
 Many practical optimization problems involve objective function values that are corrupted by \MPCchanged{bounded, nonvanishing} numerical errors.
 \MPCchanged{We} propose a noise-tolerant regularized quasi-Newton method \MPCchanged{that exploits a relaxed Armijo line search when observed function values provide reliable progress and switches to an objective-function-free regularization mechanism otherwise}.
-\MPCchanged{With exact gradients and uniformly bounded quasi-Newton matrices, we prove an order-optimal \(\order{1/\varepsilon^2}\) iteration-complexity bound despite bounded relative-or-absolute function errors.}
+\MPCchanged{With exact gradients and quasi-Newton matrices satisfying a fixed lower and gradient-scaled upper spectral bound, we prove an order-optimal \(\order{1/\varepsilon^2}\) iteration-complexity bound despite bounded relative-or-absolute function errors.}
 \MPCchanged{Thus, although the method uses persistently noisy function values whenever they certify progress, it retains the best possible worst-case dependence on the stationarity tolerance available in the noise-free $L$-smooth nonconvex setting.}
 \MPCchanged{The exact-gradient qualification is essential to the stated theorem; experiments with perturbed gradients are reported separately as deliberately adverse robustness tests beyond its scope.}
 \MPCchanged{Experiments on CUTEst include function-value-only noise, joint function-and-gradient noise, and 64-, 32-, and 16-bit arithmetic.}

@@ -164,10 +164,12 @@ class QuasiNewtonMemory:
         maxlen: int,
         method: Method,
         zero_regularized_hessian_scale: np.float64 | None = None,
+        curvature_scale_floor: np.float64 | None = None,
     ) -> None:
         self._deque: deque[IterationData] = deque(maxlen=maxlen)
         self._maxlen = maxlen
         self._method = method
+        self.curvature_scale_floor = curvature_scale_floor
         self.workspace = LBFGSWorkspace(g.size, maxlen)
         gnorm = np.linalg.norm(g)
         self.zero_hessian_scale = np.float64(gnorm if gnorm > 0 else 1.0)
@@ -200,7 +202,17 @@ class QuasiNewtonMemory:
         eps: np.float64,
     ) -> None:
         new_data = IterationData()
-        is_valid, message = new_data.set(x, fx, g, xp, fxp, gp, self._method, eps)
+        is_valid, message = new_data.set(
+            x,
+            fx,
+            g,
+            xp,
+            fxp,
+            gp,
+            self._method,
+            eps,
+            self.curvature_scale_floor,
+        )
         if not is_valid:
             if callback is not None:
                 callback.others[message] += 1

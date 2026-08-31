@@ -7,7 +7,7 @@ from scipy.optimize._linesearch import _cubicmin, _quadmin  # type: ignore
 
 from qnlab.parameter import NTRQNParameter
 from qnlab.problem.base import BaseProblem
-from qnlab.update.update import get_direction_reg
+from qnlab.update.update import get_direction_scaled_reg
 from qnlab.util.callback import Callback
 from qnlab.util.check_termination import check_termination
 from qnlab.util.memory_interface import QuasiNewtonMemory
@@ -170,11 +170,12 @@ def qn_ntrqn(
     fx = prob.f(x)
     g = prob.g(x)
 
+    omega_min = min(np.float64(1.0), np.sqrt(param.offo_squared_offset))
     lm = QuasiNewtonMemory(
         g,
         param.m,
         method,
-        zero_regularized_hessian_scale=param.offo_squared_offset,
+        curvature_scale_floor=omega_min,
     )
     pf: deque[np.float64] = deque([], maxlen=param.past)
     pf2: deque[np.float64] = deque([fx], maxlen=param.non_monotone)
@@ -215,7 +216,15 @@ def qn_ntrqn(
             mu = gnorm * param.mu_scale
             mu = np.clip(mu, param.mu_min_fraction * offo_scale, offo_scale)
 
-        d = get_direction_reg(method, x, g, lm, mu)
+        d = get_direction_scaled_reg(
+            method,
+            x,
+            g,
+            lm,
+            mu,
+            max(omega_min, gnorm),
+            omega_min,
+        )
 
         ref_fx = max(pf2) if len(pf2) > 0 else fx  # type: ignore[type-var]
         ls_res, new_x, new_f, new_g, delta, rejection_counter = (

@@ -1,7 +1,12 @@
 import numpy as np
 import numpy.typing as npt
 
-from qnlab.update.update import check_direction, get_direction, get_direction_reg
+from qnlab.update.update import (
+    check_direction,
+    get_direction,
+    get_direction_reg,
+    get_direction_scaled_reg,
+)
 from qnlab.util.iteration_data import (
     CAUTIOUS_CURVATURE_LOWER,
     CAUTIOUS_CURVATURE_UPPER,
@@ -114,6 +119,25 @@ def test_cautious_rule_enforces_both_uniform_curvature_bounds():
     assert message == "skip by cautious update"
 
 
+def test_scaled_cautious_rule_accepts_large_finite_curvature():
+    data = IterationData()
+    is_valid, message = data.set(
+        np.array([1.0]),
+        np.float64(0.0),
+        np.array([1e20]),
+        np.array([0.0]),
+        np.float64(0.0),
+        np.array([0.0]),
+        Method("NTRQN", "cautious", "raw", "bfgs"),
+        np.float64(0.0),
+        np.float64(1e-10),
+    )
+
+    assert is_valid, message
+    np.testing.assert_allclose(data.y, np.array([1.0]))
+    assert data.ys >= data.yy / CAUTIOUS_CURVATURE_UPPER
+
+
 def test_zero_memory_direction_uses_positive_fixed_hessian_scale():
     gradient = np.array([3.0, 4.0])
     memory = QuasiNewtonMemory(
@@ -213,6 +237,50 @@ def test_workspace_two_loop_matches_pairwise_reference():
         np.testing.assert_allclose(
             get_direction_reg(method, point, gradient, memory, mu), direction
         )
+
+
+def test_scaled_regularized_direction_reuses_two_loop():
+    rng = np.random.default_rng(22)
+    method = Method("NTRQN", "raw", "raw", "bfgs")
+    memory = QuasiNewtonMemory(np.ones(4), maxlen=3, method=method)
+    point = np.zeros(4)
+    for _ in range(3):
+        new_point = point + rng.normal(size=4)
+        memory.add_new_data(
+            new_point,
+            np.float64(0.0),
+            2.0 * new_point,
+            point,
+            np.float64(0.0),
+            2.0 * point,
+            None,
+            np.float64(0.0),
+        )
+        point = new_point
+
+    gradient = rng.normal(size=4)
+    scale = np.float64(3.0)
+    scale_floor = np.float64(0.5)
+    mu = np.float64(0.7)
+    np.testing.assert_allclose(
+        get_direction_scaled_reg(
+            method,
+            point,
+            gradient,
+            memory,
+            mu,
+            scale,
+            scale_floor,
+        ),
+        get_direction_reg(
+            method,
+            point,
+            gradient,
+            memory,
+            (mu + scale_floor) / scale,
+        )
+        / scale,
+    )
 
 
 def test_dir_DFP_and_check():

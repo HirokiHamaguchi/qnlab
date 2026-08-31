@@ -24,49 +24,26 @@ The proof of \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} is similar to exist
 
 \section{Proof of \texorpdfstring{\cref{prop:bounded_BFGS}}{Proposition \ref{prop:bounded_BFGS}}}\label{app:proof_of_bounded_BFGS}
 
-The proof of \cref{prop:bounded_BFGS} is similar to existing results~\citep[Theorem 5.5]{gaoQuasiNewtonMethodsSuperlinear2018}~\citep[Lemma 1]{gowerStochasticBlockBFGS2016}.
+\MPCchanged{The proof of \cref{prop:bounded_BFGS} uses the standard BFGS update.}
 \begin{proof}
-    We consider standard BFGS updates with a single curvature pair $(s,y)$.
-    From \cref{eq:curvature_conditions1,eq:curvature_conditions2}, we have
-    \begin{equation}\label{eq:curvature_norm_bounds}
-        \norm{\frac{y y^\top}{y^\top s}} = \frac{y^\top y}{y^\top s} \le \Lambda, \quad
-        \norm{\frac{y s^\top}{y^\top s}} \le \frac{\norm{y}\norm{s}}{\sqrt{\frac{1}{\Lambda}\norm{y}^2}\sqrt{\lambda\norm{s}^2}} = \sqrt{\kappa}, \quad
-        \norm{\frac{s s^\top}{y^\top s}} = \frac{s^\top s}{y^\top s} \le \frac{1}{\lambda}.
-    \end{equation}
-    We next bound the scalar $\gamma$ used in the initial matrix $\gamma I$.
-    From \cref{eq:curvature_conditions1}, we have $\gamma \le \Lambda$.
-    By \MPCchanged{the }Cauchy--Schwarz inequality and \cref{eq:curvature_conditions2}, we have $\gamma \ge \norm{y_{k_0}}^2 / \norm{y_{k_0}}\norm{s_{k_0}} = \norm{y_{k_0}} / \norm{s_{k_0}} \ge \lambda$.
-    Thus, $\gamma$ is bounded by $\lambda \le \gamma \le \Lambda$.
-
-    Let $B, H$ denote the positive definite Hessian approximation and its inverse before the update, and $B_+, H_+$ the updated matrices.
+    \MPCchanged{From \cref{eq:curvature_conditions1}, the initial scalar satisfies $0<\gamma=\norm{y_{k_0}}^2/(y_{k_0}^\top s_{k_0})\leq\Lambda$.}
+    \MPCchanged{Let $B$ and $B_+$ denote the positive definite Hessian approximations before and after one update.}
     The BFGS update rule is
     \begin{equation*}
-        B_+   =B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}, \quad
-        H_+   =\left(I-\frac{s y^\top}{y^\top s}\right)H\left(I-\frac{y s^\top}{y^\top s}\right)+\frac{s s^\top}{y^\top s}.
+        \MPCchanged{B_+=B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}}.
     \end{equation*}
-    Since $B$ is \MPCchanged{a }symmetric positive definite matrix and $s \neq 0$, we have
-    \begin{align}
-        \norm{B_+} & \le\norm{B}+\norm{\frac{yy^\top}{y^\top s}} \le \norm{B}+\Lambda,\label{eq:BFGS_B_norm_bound}                                                                                                                                                     \\
-        \norm{H_+} & =\norm{\qty(I-\frac{y s^\top}{y^\top s})^\top H\qty(I-\frac{y s^\top}{y^\top s})+\frac{s s^\top}{y^\top s}}                                                                                \notag                                                 \\
-                   & \le\norm{I-\frac{y s^\top}{y^\top s}}^2\norm{H}+\norm{\frac{s s^\top}{y^\top s}}                                                                                                       \notag                                                     \\
-                   & \le\qty(1+\norm{\frac{y s^\top}{y^\top s}})^2\norm{H}+\norm{\frac{s s^\top}{y^\top s}}                                                                                                       \notag                                               \\
-                   & \le \qty(1+\sqrt{\kappa})^2\norm{H}+\frac{1}{\lambda}.  \label{eq:BFGS_H_norm_bound}                                                                                                                &  & (\text{\cref{eq:curvature_norm_bounds}})
-    \end{align}
-    Recall that $\mathrm{BFGS}(\{(s_{k_i},y_{k_i})\}_{i=0}^{p-1})$ denotes the matrix obtained by sequentially applying the BFGS update to the initial matrix $\gamma I$ using the curvature pairs $\{(s_{k_i},y_{k_i})\}_{i=0}^{p-1}$.
-    Applying \cref{eq:BFGS_B_norm_bound,eq:BFGS_H_norm_bound} recursively over $p$ updates and using the initial matrix $\gamma I$, we obtain
-    \begin{align*}
-        \norm{\mathrm{BFGS}(\{s_{k_i},y_{k_i}\}_{i=0}^{p-1})}        & \le \gamma + p\Lambda \le (1+p) \Lambda,                                                                               \\
-        \norm{(\mathrm{BFGS}(\{s_{k_i},y_{k_i}\}_{i=0}^{p-1}))^{-1}} & \le (1+\sqrt{\kappa})^{2p} \gamma^{-1} +\frac{1}{\lambda}\sum_{i=0}^{p-1}(1+\sqrt{\kappa})^{2i}                        \\
-                                                                     & \le (1+\sqrt{\kappa})^{2p} \frac{1}{\lambda}+\frac{1}{\lambda}\frac{(1+\sqrt{\kappa})^{2p}-1}{(1+\sqrt{\kappa})^{2}-1} \\
-                                                                     & \le (1+\sqrt{\kappa})^{2p}\qty(\frac{1}{\lambda}+\frac{1}{\lambda\qty(2\sqrt{\kappa}+\kappa)}).
-    \end{align*}
-    Therefore, $\mathrm{BFGS}(\{s_{k_i},y_{k_i}\}_{i=0}^{p-1})$ satisfies the stated bounds in \cref{eq:bounded_BFGS_mM}.
+    \MPCchanged{Positive definiteness follows from $B\succ0$, $s\neq0$, and $y^\top s>0$.}
+    \MPCchanged{Moreover, \cref{eq:curvature_conditions1} and the fact that $Bss^\top B/(s^\top Bs)$ is positive semidefinite give}
+    \begin{equation*}
+        \MPCchanged{B_+\preceq B+\frac{yy^\top}{y^\top s}\preceq B+\Lambda I}.
+    \end{equation*}
+    \MPCchanged{Applying this inequality recursively over $p$ updates from $B^{(0)}=\gamma I\preceq\Lambda I$ proves \cref{eq:bounded_BFGS_mM}.}
     \myQED
 \end{proof}
 
 \begin{MPCchange}
-The two curvature inequalities are standard sufficient conditions for bounded limited-memory BFGS matrices~\citep[Theorem 2.1]{byrdToolAnalysisQuasiNewton1989}.
-In the implementation they are enforced directly by \cref{eq:implemented_cautious_test}; no convexity or cocoercivity assumption is used.
+The normalized upper-curvature inequality is enforced directly by \cref{eq:implemented_cautious_test}, while the fixed shift in \cref{eq:proposed_choice_of_Bk} supplies the lower spectral bound.
+No convexity or cocoercivity assumption is used.
 This point is important because the convergence theorem permits nonconvex objectives.
 \end{MPCchange}
 

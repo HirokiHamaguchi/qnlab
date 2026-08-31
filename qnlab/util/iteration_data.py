@@ -45,6 +45,7 @@ class IterationData:
         gp: npt.NDArray[np.float64],
         method: Method,
         eps: np.float64,
+        curvature_scale_floor: np.float64 | None = None,
     ) -> tuple[bool, str]:
         self.s = x - xp
         self.y = g - gp
@@ -91,13 +92,26 @@ class IterationData:
         else:
             self.ys = np.dot(self.y, self.s)
 
+        if curvature_scale_floor is not None:
+            self.y /= max(
+                curvature_scale_floor,
+                np.linalg.norm(g),
+                np.linalg.norm(gp),
+            )
+            self.ys = np.dot(self.y, self.s)
+            self.yy = np.dot(self.y, self.y)
+
         # Check if we should store this vector based on the store rule
         if method.store == "cautious":
             curvature_floor = max(
-                CAUTIOUS_CURVATURE_LOWER * self.ss,
                 self.yy / CAUTIOUS_CURVATURE_UPPER,
                 CAUTIOUS_ABSOLUTE_FLOOR,
             )
+            if curvature_scale_floor is None:
+                curvature_floor = max(
+                    curvature_floor,
+                    CAUTIOUS_CURVATURE_LOWER * self.ss,
+                )
             if self.ys < curvature_floor:
                 return False, "skip by cautious update"
 

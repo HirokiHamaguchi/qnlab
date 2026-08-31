@@ -49,6 +49,31 @@ def get_direction_reg(
         raise ValueError(f"Unknown reg update method: {method.update}")
 
 
+def get_direction_scaled_reg(
+    method: Method,
+    x: npt.NDArray[np.float64],
+    g: npt.NDArray[np.float64],
+    lm: QuasiNewtonMemory,
+    mu: np.float64,
+    scale: np.float64,
+    scale_floor: np.float64,
+) -> npt.NDArray[np.float64]:
+    """Compute a direction for ``scale_floor*I + scale*B + mu*I``."""
+    if len(lm) == 0:
+        return -g / (scale_floor + scale + mu)
+    if method.update != "bfgs":
+        raise ValueError("Scaled regularization is implemented only for BFGS.")
+    return (
+        BFGSUpdateRule.compute_dir_reg(
+            x,
+            g,
+            lm,
+            (mu + scale_floor) / scale,
+        )
+        / scale
+    )
+
+
 def check_direction(
     method: Method,
     n: int,
