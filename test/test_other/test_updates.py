@@ -132,6 +132,26 @@ def test_zero_memory_direction_uses_positive_fixed_hessian_scale():
     )
 
 
+def test_zero_memory_direction_can_use_small_regularized_hessian_scale():
+    gradient = np.array([3.0, 4.0])
+    regularized_scale = np.float64(1e-20)
+    memory = QuasiNewtonMemory(
+        gradient,
+        maxlen=3,
+        method=Method("NTRQN", "cautious", "damped", "bfgs"),
+        zero_regularized_hessian_scale=regularized_scale,
+    )
+
+    np.testing.assert_allclose(
+        memory.zero_memory_direction(gradient, np.float64(0.0)),
+        -gradient / 5.0,
+    )
+    np.testing.assert_allclose(
+        memory.zero_memory_direction(gradient, np.float64(2.0)),
+        -gradient / (regularized_scale + 2.0),
+    )
+
+
 def test_scalar_damping_matches_documented_rule():
     data = IterationData()
     is_valid, message = data.set(

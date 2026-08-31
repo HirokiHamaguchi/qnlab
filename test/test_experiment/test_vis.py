@@ -45,6 +45,40 @@ def test_get_plot_properties_uses_performance_profile_style() -> None:
     }
 
 
+def test_get_plot_properties_uses_default_color_cycle_without_palette() -> None:
+    props = vis_module._get_plot_properties("method", 0)
+
+    assert props["color"] is None
+
+
+def test_plot_gradient_norms_uses_distinct_default_colors() -> None:
+    _, ax = vis_module.plt.subplots()
+
+    vis_module._plot_gradient_norms(
+        Mock(n=1),
+        [_callback([]), _callback([])],
+        ["first", "second"],
+        "problem",
+        "calls",
+        ax,
+    )
+
+    assert ax.lines[0].get_color() != ax.lines[1].get_color()
+    vis_module.plt.close(ax.figure)
+
+
+def test_plot_1d_function_evaluates_vector_points() -> None:
+    prob = Mock(n=1, x0=np.array([0.0]))
+    prob._f.side_effect = lambda x: x[0] ** 2
+    callback = _callback([np.array([1.0]), np.array([2.0])])
+    _, ax = vis_module.plt.subplots()
+
+    vis_module._plot_1d_function(prob, [callback], ["method"], ax)
+
+    assert all(call.args[0].shape == (1,) for call in prob._f.call_args_list)
+    vis_module.plt.close(ax.figure)
+
+
 def test_get_marker_indices_uses_all_points_for_short_series() -> None:
     assert vis_module._get_marker_indices([0, 10, 20], target_count=4) == [0, 1, 2]
 

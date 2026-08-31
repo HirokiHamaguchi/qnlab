@@ -49,7 +49,7 @@ authors = [
 ]
 description = "Quasi-Newton Methods for Academic Research"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
@@ -58,7 +58,6 @@ license = "MIT"
 license-files = ["LICEN[CS]E*"]
 
 [project.urls]
-Documentation = "https://qnlab.readthedocs.io/"
 Repository = "https://github.com/HirokiHamaguchi/qnlab"
 Issues = "https://github.com/HirokiHamaguchi/qnlab/issues"
 

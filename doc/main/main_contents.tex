@@ -700,7 +700,13 @@ After damping, a pair \((s,\overline y)\) is retained only if
 Thus every stored pair satisfies \cref{eq:curvature_conditions1,eq:curvature_conditions2} with the iteration-independent constants \(\lambda=10^{-8}\) and \(\Lambda=10^8\).
 The finite memory bound and \cref{prop:bounded_BFGS} then provide uniform constants \(m\) and \(M\), independent of \(k\), for the matrices actually used by the implementation.
 The absolute floor in \cref{eq:implemented_cautious_test} rejects numerically degenerate pairs but is not needed for this implication.
-If no curvature pair is stored, including when all candidate pairs have been rejected, the implementation uses $B_k = \gamma_0 I$.
+If no curvature pair is available, including when all candidate pairs have been rejected, the implementation uses $B_k = \gamma_k^{(0)} I$, where
+\begin{equation*}
+    \gamma_k^{(0)} = \begin{cases}
+        \gamma_0, & \mu_k = 0,\\
+        \varsigma, & \mu_k > 0.
+    \end{cases}
+\end{equation*}
 Define $\gamma_0$ by
 \begin{equation*}
     \gamma_0 = \begin{cases}
@@ -708,7 +714,7 @@ Define $\gamma_0$ by
         1, & \norm{g_0} = 0.
     \end{cases}
 \end{equation*}
-Thus the zero-memory case is also positive definite and has iteration-independent spectral bounds.
+Thus the zero-memory case is also positive definite and has iteration-independent spectral bounds because both $\gamma_0$ and $\varsigma$ are fixed positive constants.
 \end{MPCchange}
 
 \MPCchanged{We use}

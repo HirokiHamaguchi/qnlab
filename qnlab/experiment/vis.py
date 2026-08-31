@@ -140,7 +140,7 @@ def _plot_1d_function(
     # Plot function
     min_x, max_x = min(all_xs), max(all_xs)
     X = np.linspace(min_x - 0.1, max_x + 0.1, 1000)
-    Z = np.array([prob._f(x) for x in X])
+    Z = np.array([prob._f(np.array([x])) for x in X])
     ax.plot(X, Z, "k--", label="$f(x)$", linewidth=2)
 
     ax.set_xlabel("$x$")
@@ -203,7 +203,7 @@ def _get_plot_properties(
     return {
         "linewidth": 2.2,
         "alpha": 1.0,
-        "color": (color_palette or {}).get(label, "black"),
+        "color": (color_palette or {}).get(label),
         "fmt": (line_styles or {}).get(label, "o-"),
         "markersize": 6,
         "zorder": 5 - i / 10 if "SciPy" not in label else 10,

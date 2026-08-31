@@ -122,7 +122,7 @@ class _CompactBFGS:
     ) -> "_CompactBFGS":
         """Build the same regularized L-BFGS matrix used by NTRQN's two loops."""
         if len(memory) == 0:
-            diagonal = memory.zero_hessian_scale + mu
+            diagonal = memory.zero_memory_hessian_scale(mu) + mu
             return cls(
                 np.float64(diagonal),
                 np.empty((n, 0), dtype=np.float64),
@@ -140,7 +140,7 @@ class _CompactBFGS:
             regularized_pair_products > 0.0
         )
         if not np.any(valid):
-            diagonal = memory.zero_hessian_scale + mu
+            diagonal = memory.zero_memory_hessian_scale(mu) + mu
             return cls(
                 np.float64(diagonal),
                 np.empty((n, 0), dtype=np.float64),
@@ -164,7 +164,7 @@ class _CompactBFGS:
         last_ys = regularized_step_gradient[-1, -1]
         diagonal = np.float64(regularized_gradient_products[-1, -1] / last_ys)
         if not np.isfinite(diagonal) or diagonal <= 0.0:
-            diagonal = memory.zero_hessian_scale + mu
+            diagonal = memory.zero_memory_hessian_scale(mu) + mu
             return cls(
                 np.float64(diagonal),
                 np.empty((n, 0), dtype=np.float64),
@@ -492,7 +492,12 @@ def qn_ntrqnb(
     if np.linalg.norm(pg, ord=np.inf) <= param.gtol:
         return RetCode.ALREADY_MINIMIZED, fx, x
 
-    memory = QuasiNewtonMemory(pg, param.m, method)
+    memory = QuasiNewtonMemory(
+        pg,
+        param.m,
+        method,
+        zero_regularized_hessian_scale=param.offo_squared_offset,
+    )
     box_workspace = _BoxWorkspace.create(prob.n)
     past_fx: deque[np.float64] = deque([], maxlen=param.past)
     reference_values: deque[np.float64] = deque([fx], maxlen=param.non_monotone)

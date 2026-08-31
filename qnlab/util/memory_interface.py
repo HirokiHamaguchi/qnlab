@@ -158,13 +158,26 @@ class LBFGSWorkspace:
 class QuasiNewtonMemory:
     """Limited-memory container used by quasi-Newton methods."""
 
-    def __init__(self, g: np.ndarray, maxlen: int, method: Method) -> None:
+    def __init__(
+        self,
+        g: np.ndarray,
+        maxlen: int,
+        method: Method,
+        zero_regularized_hessian_scale: np.float64 | None = None,
+    ) -> None:
         self._deque: deque[IterationData] = deque(maxlen=maxlen)
         self._maxlen = maxlen
         self._method = method
         self.workspace = LBFGSWorkspace(g.size, maxlen)
         gnorm = np.linalg.norm(g)
         self.zero_hessian_scale = np.float64(gnorm if gnorm > 0 else 1.0)
+        self.zero_regularized_hessian_scale = (
+            self.zero_hessian_scale
+            if zero_regularized_hessian_scale is None
+            else np.float64(zero_regularized_hessian_scale)
+        )
+        if self.zero_regularized_hessian_scale <= 0.0:
+            raise ValueError("zero_regularized_hessian_scale must be positive")
 
     def __iter__(self) -> Iterator[IterationData]:
         return iter(self._deque)
@@ -210,4 +223,9 @@ class QuasiNewtonMemory:
         return item
 
     def zero_memory_direction(self, g: np.ndarray, mu: np.float64) -> np.ndarray:
-        return -g / (self.zero_hessian_scale + mu)
+        return -g / (self.zero_memory_hessian_scale(mu) + mu)
+
+    def zero_memory_hessian_scale(self, mu: np.float64) -> np.float64:
+        if mu > 0.0:
+            return self.zero_regularized_hessian_scale
+        return self.zero_hessian_scale

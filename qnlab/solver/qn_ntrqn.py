@@ -170,7 +170,12 @@ def qn_ntrqn(
     fx = prob.f(x)
     g = prob.g(x)
 
-    lm = QuasiNewtonMemory(g, param.m, method)
+    lm = QuasiNewtonMemory(
+        g,
+        param.m,
+        method,
+        zero_regularized_hessian_scale=param.offo_squared_offset,
+    )
     pf: deque[np.float64] = deque([], maxlen=param.past)
     pf2: deque[np.float64] = deque([fx], maxlen=param.non_monotone)
     gnorm: np.float64 = np.float64(np.linalg.norm(g))
