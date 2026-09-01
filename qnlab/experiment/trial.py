@@ -1,4 +1,7 @@
 import time
+from contextlib import nullcontext
+
+from threadpoolctl import threadpool_limits
 
 from qnlab.experiment.vis import vis
 from qnlab.problem.base import BaseProblem
@@ -20,6 +23,7 @@ def trial(
     only_grad: bool = False,
     verbose: bool = False,
     bounds: BoundsInput | None = None,
+    blas_threads: int | None = 1,
 ) -> list[Callback]:
     print(f"Trial on problem: {prob.name} (n={prob.n})")
 
@@ -27,31 +31,39 @@ def trial(
     labels = []
     save_xs = True
 
-    for method, _options in configs:
-        assert isinstance(method, Method)
-        options = _options.copy()
-        assert isinstance(options, dict)
+    thread_context = (
+        threadpool_limits(limits=blas_threads, user_api="blas")
+        if blas_threads is not None
+        else nullcontext()
+    )
+    with thread_context:
+        for method, _options in configs:
+            assert isinstance(method, Method)
+            options = _options.copy()
+            assert isinstance(options, dict)
 
-        m = 10  # Default value for m
-        if method.base == "SciPy":
-            if method.scipy_method == "L-BFGS-B":
-                options.setdefault("maxcor", m)
-        else:
-            options.setdefault("m", m)
+            m = 10  # Default value for m
+            if method.base == "SciPy":
+                if method.scipy_method == "L-BFGS-B":
+                    options.setdefault("maxcor", m)
+            else:
+                options.setdefault("m", m)
 
-        T0 = time.perf_counter()
-        callback = Callback(save_xs=save_xs)
+            T0 = time.perf_counter()
+            callback = Callback(save_xs=save_xs)
 
-        info, _fx, _x_opt = qn(prob, method, options, callback, verbose, bounds=bounds)
+            info, _fx, _x_opt = qn(
+                prob, method, options, callback, verbose, bounds=bounds
+            )
 
-        print(f"{method!s} info:{info} time:{time.perf_counter() - T0:.2f}sec")
-        print(f"Final f:{callback.fxs[-1]:.2e}, ||g||:{callback.gnorms[-1]:.2e}")
-        if callback.others:
-            print("  others:", callback.others)
-        callbacks.append(callback)
+            print(f"{method!s} info:{info} time:{time.perf_counter() - T0:.2f}sec")
+            print(f"Final f:{callback.fxs[-1]:.2e}, ||g||:{callback.gnorms[-1]:.2e}")
+            if callback.others:
+                print("  others:", callback.others)
+            callbacks.append(callback)
 
-        labelName = options.get("label_name", method.label)
-        labels.append(labelName)
+            labelName = options.get("label_name", method.label)
+            labels.append(labelName)
 
     if do_vis:
         vis(

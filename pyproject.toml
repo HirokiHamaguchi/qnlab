@@ -34,6 +34,7 @@ dependencies = [
   "seaborn>=0.13.2",
   "setuptools>=80.8.0",
   "sympy>=1.14.0",
+  "threadpoolctl>=3.6.0",
   "torch>=2.7.1",
   "PyYaml>=6.0.2",
   "numba>=0.61.2",
