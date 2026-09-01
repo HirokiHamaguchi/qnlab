@@ -119,7 +119,8 @@ def test_cautious_rule_enforces_both_uniform_curvature_bounds():
     assert message == "skip by cautious update"
 
 
-def test_scaled_cautious_rule_accepts_large_finite_curvature():
+def test_fixed_initial_scale_accepts_large_finite_curvature():
+    initial_scale = np.float64(1e20)
     data = IterationData()
     is_valid, message = data.set(
         np.array([1.0]),
@@ -130,12 +131,12 @@ def test_scaled_cautious_rule_accepts_large_finite_curvature():
         np.array([0.0]),
         Method("NTRQN", "cautious", "raw", "bfgs"),
         np.float64(0.0),
-        np.float64(1e-10),
+        initial_scale,
     )
 
     assert is_valid, message
-    np.testing.assert_allclose(data.y, np.array([1.0]))
-    assert data.ys >= data.yy / CAUTIOUS_CURVATURE_UPPER
+    np.testing.assert_allclose(data.y, np.array([1e20]))
+    assert data.ys >= data.yy / (CAUTIOUS_CURVATURE_UPPER * initial_scale)
 
 
 def test_zero_memory_direction_uses_positive_fixed_hessian_scale():

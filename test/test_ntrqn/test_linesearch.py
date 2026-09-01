@@ -82,7 +82,18 @@ class NonfiniteTrialProblem(BaseProblem):
         return np.array([x[0] + 1.0], dtype=np.float64)
 
 
-def test_linesearch_rejects_nonfinite_function_value():
+class PositiveInfiniteProblem(BaseProblem):
+    def __init__(self):
+        super().__init__("positive infinite", 1, np.zeros(1, dtype=np.float64))
+
+    def _f(self, x: npt.NDArray[np.float64]) -> np.float64:
+        return np.float64(np.inf)
+
+    def _g(self, x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+        return np.ones(1, dtype=np.float64)
+
+
+def test_linesearch_rejects_nan_function_value():
     problem = NonfiniteTrialProblem()
     x = problem.x0.copy()
     fx = problem.f(x)
@@ -107,6 +118,31 @@ def test_linesearch_rejects_nonfinite_function_value():
     assert np.isfinite(new_f)
 
 
+def test_linesearch_allows_positive_infinite_function_value():
+    problem = PositiveInfiniteProblem()
+    x = problem.x0.copy()
+    fx = problem.f(x)
+    g = problem.g(x)
+    result = line_search_relaxed_armijo(
+        x,
+        fx,
+        g,
+        -g,
+        problem,
+        NTRQNParameter(1),
+        problem.get_machine_eps(),
+        fx,
+        verbose=False,
+        is_offo_mode=False,
+        rejection_counter=0,
+    )
+
+    code, new_x, new_f, *_ = result
+    assert code == RetCode.SUCCESS
+    np.testing.assert_allclose(new_x, [-1.0])
+    assert np.isposinf(new_f)
+
+
 def test_default_solver_does_not_restart_at_initial_infinite_reference():
     problem = ConvexEvenPolynomialProblem(degree=2)
     callback = Callback()
@@ -122,8 +158,8 @@ def test_default_solver_does_not_restart_at_initial_infinite_reference():
     assert callback.others["OFFO accumulator restart"] == 0
 
 
-def test_scaled_curvature_converges_on_zakharov():
-    problem = ZakharovProblem(n=100)
+def test_fixed_initial_scale_converges_on_zakharov():
+    problem = ZakharovProblem(n=1000)
     callback = Callback()
     code, _, _ = qn_ntrqn(
         problem,
@@ -134,6 +170,7 @@ def test_scaled_curvature_converges_on_zakharov():
 
     assert code == RetCode.SUCCESS
     assert callback.gnorms[-1] <= 1e-5
+    assert callback.others["skip by cautious update"] == 0
 
 
 def run_ls(

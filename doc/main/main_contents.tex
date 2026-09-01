@@ -224,20 +224,19 @@ The second assumption ensures smoothness of the objective function.
     \end{equation*}
 \end{assumption}
 
-\MPCchanged{Set $\omega_{\min}\defeq\min\{1,\sqrt{\varsigma}\}>0$ and $\omega_k\defeq\max\{\omega_{\min},\norm{g_k}\}$.}
-The third assumption requires the matrices $\{B_k\}_{k=0}^{k_{\mathrm{max}}-1}$ to be uniformly positive definite and \MPCchanged{upper bounded relative to $\omega_k$}.
+The third assumption requires the matrices $\{B_k\}_{k=0}^{k_{\mathrm{max}}-1}$ to be uniformly positive definite and bounded.
 \begin{assumption}\label{ass:BBounds}
     There exist constants $0 < m \leq M$ such that all $B_k$ satisfy
     \begin{equation*}\label{eq:BBounds}
-        mI \preceq B_k \preceq M\MPCchanged{\omega_k} I.
+        mI \preceq B_k \preceq MI.
     \end{equation*}
 \end{assumption}
 As we will discuss in \cref{sec:proposed_choice}, the standard BFGS update with a slight modification guarantees \cref{ass:BBounds} in practice.
 By \cref{ass:BBounds}, we can derive useful bounds involving $g_k$ and $d_k$.
-Using $d_k=-(B_k+\mu_k I)^{-1} g_k$ (\refLine{line:d_k}) and \cref{ass:BBounds} asserting $(m + \mu_k)I \preceq B_k + \mu_k I \preceq (M\MPCchanged{\omega_k} + \mu_k)I$, we obtain the following bounds:
+Using $d_k=-(B_k+\mu_k I)^{-1} g_k$ (\refLine{line:d_k}) and \cref{ass:BBounds} asserting $(m + \mu_k)I \preceq B_k + \mu_k I \preceq (M + \mu_k)I$, we obtain the following bounds:
 \begin{align}
     -g_k^\top d_k & = d_k^\top (B_k+\mu_k I) d_k      \ge (m+\mu_k)\norm{d_k}^2 \ge m \norm{d_k}^2, \label{eq:BBounds_results_zero} \\
-    -g_k^\top d_k & = g_k^\top (B_k+\mu_k I)^{-1} g_k \ge \frac{1}{M\MPCchanged{\omega_k}+\mu_k}\norm{g_k}^2, \label{eq:BBounds_results_first}           \\
+    -g_k^\top d_k & = g_k^\top (B_k+\mu_k I)^{-1} g_k \ge \frac{1}{M+\mu_k}\norm{g_k}^2, \label{eq:BBounds_results_first}           \\
     \norm{d_k}^2  & = \norm{(B_k+\mu_k I)^{-1}g_k}^2 \le \frac{1}{(m+\mu_k)^2}\norm{g_k}^2. \label{eq:BBounds_results_second}
 \end{align}
 
@@ -430,11 +429,11 @@ We introduce the following constant $\Delta_{\max}$, which serves as an upper bo
     \myQED
 \end{proof}
 
-We now bound the sum of $\delta_k = f(x_k) - f(x_{k+1})$ over $k \in K^0$ with \MPCchanged{$\norm{g_{k}}^2/\omega_k$} as follows.
+We now bound the sum of $\delta_k = f(x_k) - f(x_{k+1})$ over $k \in K^0$ with $\norm{g_{k}}^2$ as follows.
 \begin{lemma}\label{lem:sum_small_delta_k_bound_K0}
     Under \cref{ass:bounded,ass:LSmooth,ass:BBounds}, the sum of $\delta_k$ over $k \in K^0$ satisfies
     \begin{equation*}
-        \sum_{k \in K^0} \delta_{k} \geq \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \MPCchanged{\frac{\norm{g_{k}}^2}{\omega_k}} - \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}).
+        \sum_{k \in K^0} \delta_{k} \geq \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \norm{g_{k}}^2 - \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}).
     \end{equation*}
 \end{lemma}
 \begin{proof}
@@ -443,8 +442,8 @@ We now bound the sum of $\delta_k = f(x_k) - f(x_{k+1})$ over $k \in K^0$ with \
         \overline{\delta}_{k} + \Delta_{k}
          & = \overline{f}(x_{k}) - \overline{f}(x_{k+1}) + \Delta_{k} &  & (\text{\cref{eq:def_overline_small_delta_k}})                                   \notag     \\
          & \ge -c \alpha_{k} g_{k}^\top d_{k}                         &  & (\text{\cref{eq:relaxed_Armijo_condition}}) \notag                                         \\
-         & \ge \frac{c \overline{\alpha}}{M\MPCchanged{\omega_k}+\mu_{k}} \norm{g_{k}}^2   &  & (\text{\cref{prop:backtracking_summary} and \cref{eq:BBounds_results_first}})\notag        \\
-         & = \frac{c \overline{\alpha}}{M\MPCchanged{\omega_k}} \norm{g_{k}}^2.            &  & (\mu_{k} = 0 \text{ since } k \in K^0) \label{eq:lower_bound_overline_delta_plus_Delta_K0}
+         & \ge \frac{c \overline{\alpha}}{M+\mu_{k}} \norm{g_{k}}^2   &  & (\text{\cref{prop:backtracking_summary} and \cref{eq:BBounds_results_first}})\notag        \\
+         & = \frac{c \overline{\alpha}}{M} \norm{g_{k}}^2.            &  & (\mu_{k} = 0 \text{ since } k \in K^0) \label{eq:lower_bound_overline_delta_plus_Delta_K0}
     \end{align}
     Using \cref{lem:error_delta_bounded_by_Delta}, we also have
     \begin{equation}
@@ -452,7 +451,7 @@ We now bound the sum of $\delta_k = f(x_k) - f(x_{k+1})$ over $k \in K^0$ with \
     \end{equation}
     Then, combining \cref{eq:lower_bound_overline_delta_plus_Delta_K0,eq:upper_bound_overline_delta_plus_Delta_K0} and summing over $k \in K^0$ gives
     \begin{equation*}
-        \sum_{k \in K^0} \frac{c \overline{\alpha}}{M\MPCchanged{\omega_k}} \norm{g_{k}}^2   \leq \sum_{k \in K^0} \delta_{k} + \frac{2}{1-\feps} \sum_{k \in K^0} \Delta_{k}
+        \sum_{k \in K^0} \frac{c \overline{\alpha}}{M} \norm{g_{k}}^2   \leq \sum_{k \in K^0} \delta_{k} + \frac{2}{1-\feps} \sum_{k \in K^0} \Delta_{k}
         \leq \sum_{k \in K^0} \delta_{k} + \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}),
     \end{equation*}
     where the last inequality follows from \cref{lem:delta_bound_and_sum}.
@@ -480,9 +479,8 @@ Its proof is deferred to \cref{sec:proof_of_sum_norm_g_over_mu_geq_2sqrt_leq_log
 We now lower bound the sum of $\delta_k$ over $k \in K^+$ with $\norm{g_{k}}^2$.
 We define the following constants for later use:
 \begin{equation*}
-    \MPCchanged{D \defeq 1+\frac{M}{\theta_{\min}}, \qquad}
-    \MPCchanged{C_1 \defeq \frac{\overline{\alpha}}{D\theta_{\max}}, \qquad}
-    \MPCchanged{C_2 \defeq \frac{L}{2\theta_{\min}^2}.}
+    C_1 \defeq \frac{\overline{\alpha}}{\theta_{\max}}, \qquad
+    C_2 \defeq \frac{M\overline{\alpha}+L/2}{\theta_{\min}^2}.
 \end{equation*}
 \begin{lemma}\label{lem:sum_small_delta_k_bound_Kplus}
     Under \cref{ass:LSmooth,ass:BBounds}, the sum of $\delta_k$ over $k \in K^+$ satisfies
@@ -497,24 +495,23 @@ We define the following constants for later use:
     \begin{align}
         \delta_k & = f(x_k) - f(x_k + \alpha_{k} d_{k})                                                          &  & (\text{\cref{eq:def_small_delta_k} and } x_{{k}+1}=x_{k} + \alpha_{k} d_{k})      \notag \\
                  & \ge -\alpha_{k} g_{k}^\top d_{k} - \frac{\alpha_{k}^2 L}{2} \norm{d_{k}}^2                    &  & (\text{\cref{ass:LSmooth}})      \notag                                                  \\
-                 & \ge \qty(\frac{\alpha_{k}}{M\MPCchanged{\omega_k}+\mu_{k}} - \frac{\alpha_{k}^2 L}{2(m+\mu_{k})^2}) \norm{g_{k}}^2 &  & (\text{\cref{eq:BBounds_results_first,eq:BBounds_results_second}}) \notag                \\
-                 & \ge \qty(\frac{\overline{\alpha}}{M\MPCchanged{\omega_k}+\mu_{k}} - \frac{L}{2(m+\mu_{k})^2}) \norm{g_{k}}^2.      &  & (\text{\cref{prop:backtracking_summary} and $\alpha_k \leq 1$})
+                 & \ge \qty(\frac{\alpha_{k}}{M+\mu_{k}} - \frac{\alpha_{k}^2 L}{2(m+\mu_{k})^2}) \norm{g_{k}}^2 &  & (\text{\cref{eq:BBounds_results_first,eq:BBounds_results_second}}) \notag                \\
+                 & \ge \qty(\frac{\overline{\alpha}}{M+\mu_{k}} - \frac{L}{2(m+\mu_{k})^2}) \norm{g_{k}}^2.      &  & (\text{\cref{prop:backtracking_summary} and $\alpha_k \leq 1$})
         \label{eq:mu_positive_diff}
     \end{align}
-    \MPCchanged{Since $\omega_{\min}\leq\sqrt{\varsigma}$ and the accumulator defining $\mu_k$ includes the current gradient, we have $\omega_k\leq\mu_k/\theta_{\min}$ for $k\in K^+$.}
-    \MPCchanged{We can therefore bound the terms in \cref{eq:mu_positive_diff} as}
+    We can further bound the terms in \cref{eq:mu_positive_diff} as
     \begin{equation}\label{eq:mu_positive_diff_bound}
-        \MPCchanged{\frac{\overline{\alpha}}{M\omega_k+\mu_{k}} \geq \frac{\overline{\alpha}}{D\mu_k}}, \quad
+        \frac{\overline{\alpha}}{M+\mu_{k}} = \frac{\overline{\alpha}}{\mu_{k}} \frac{1}{1+\frac{M}{\mu_{k}}} \geq \frac{\overline{\alpha}}{\mu_{k}} \qty(1-\frac{M}{\mu_{k}}) = \frac{\overline{\alpha}}{\mu_{k}} - \frac{M\overline{\alpha}}{\mu_{k}^2}, \quad
         \frac{L}{2(m+\mu_{k})^2} \le \frac{L}{2\mu_{k}^2}.
     \end{equation}
     Thus, applying \cref{eq:mu_positive_diff_bound} to \cref{eq:mu_positive_diff} yields
     \begin{equation}\label{eq:mu_positive_diff_desired}
-        \delta_k \ge \MPCchanged{\qty(\frac{\overline{\alpha}}{D\mu_{k}} - \frac{L}{2\mu_{k}^2})} \norm{g_{k}}^2.
+        \delta_k \ge \qty(\frac{\overline{\alpha}}{\mu_{k}} - \frac{M\overline{\alpha}+L/2}{\mu_{k}^2}) \norm{g_{k}}^2.
     \end{equation}
     Summing \cref{eq:mu_positive_diff_desired} over $k \in K^+$ and applying \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} yield
     \begin{align*}
-              & \sum_{{k} \in K^+} \delta_k \ge \sum_{{k} \in K^+} \MPCchanged{\qty(\frac{\overline{\alpha}}{D\mu_{k}} - \frac{L}{2\mu_{k}^2})}\norm{g_{k}}^2                                                                                                 \\
-        \ge{} & \MPCchanged{\frac{\overline{\alpha}}{D\theta_{\max}} \qty(\sqrt{\varsigma + \sum_{{k} \in K^+} \norm{g_{k}}^2} - \sqrt{\varsigma}) - \frac{L}{2\theta_{\min}^2} \qty(\ln\qty(\varsigma+\sum_{{k} \in K^+} \norm{g_{k}}^2) - \ln(\varsigma))},
+              & \sum_{{k} \in K^+} \delta_k \ge \sum_{{k} \in K^+} \qty(\frac{\overline{\alpha}}{\mu_{k}} - \frac{M\overline{\alpha}+L/2}{\mu_{k}^2})\norm{g_{k}}^2                                                                                                 \\
+        \ge{} & \frac{\overline{\alpha}}{\theta_{\max}} \qty(\sqrt{\varsigma + \sum_{{k} \in K^+} \norm{g_{k}}^2} - \sqrt{\varsigma}) - \frac{M\overline{\alpha}+L/2}{\theta_{\min}^2} \qty(\ln\qty(\varsigma+\sum_{{k} \in K^+} \norm{g_{k}}^2) - \ln(\varsigma)),
     \end{align*}
     which yields the desired result.
     \myQED
@@ -533,7 +530,7 @@ Then, we can obtain the following unified bound \MPCchanged{for the two types of
     Under \cref{ass:bounded,ass:LSmooth,ass:BBounds}, the sum of $\norm{g_{k}}^2$ over $k \in \MPCchanged{K=K^0\cup K^+}$ satisfies
     \begin{equation*}
         F \ge
-        \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \MPCchanged{\frac{\norm{g_{k}}^2}{\omega_k}} +
+        \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \norm{g_{k}}^2 +
         C_1 \sqrt{\varsigma + \sum_{k \in K^+} \norm{g_{k}}^2} -
         C_2 \ln\qty(\varsigma+\sum_{k \in K^+} \norm{g_{k}}^2),
     \end{equation*}
@@ -546,7 +543,7 @@ Then, we can obtain the following unified bound \MPCchanged{for the two types of
     From \cref{lem:sum_small_delta_k_bound_K0,lem:sum_small_delta_k_bound_Kplus}, we can further bound as
     \begin{multline*}
         f(x_0) - f^*
-        \ge \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \MPCchanged{\frac{\norm{g_{k}}^2}{\omega_k}}
+        \ge \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \norm{g_{k}}^2
         - \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max})\\
         +C_1 \sqrt{\varsigma + \sum_{k \in K^+} \norm{g_{k}}^2}
         - C_1 \sqrt{\varsigma}
@@ -575,12 +572,12 @@ Now, we establish the following \MPCchanged{iteration-complexity result} for \cr
     \begin{align*}
         F
          & \ge
-        \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \MPCchanged{\frac{\norm{g_{k}}^2}{\omega_k}} + \frac{C_1}{2} \sqrt{\sum_{k \in K^+} \norm{g_{k}}^2} + \phi\qty(\sum_{k \in K^+} \norm{g_{k}}^2 + \varsigma) \\
-         & \ge \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \MPCchanged{\frac{\norm{g_{k}}^2}{\omega_k}} + \frac{C_1}{2} \sqrt{\sum_{k \in K^+} \norm{g_{k}}^2} + \phi(G^\ast),
+        \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \norm{g_{k}}^2 + \frac{C_1}{2} \sqrt{\sum_{k \in K^+} \norm{g_{k}}^2} + \phi\qty(\sum_{k \in K^+} \norm{g_{k}}^2 + \varsigma) \\
+         & \ge \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \norm{g_{k}}^2 + \frac{C_1}{2} \sqrt{\sum_{k \in K^+} \norm{g_{k}}^2} + \phi(G^\ast),
     \end{align*}
     which is equivalent to
     \begin{equation}\label{eq:final_inequality_for_gc}
-        0 \leq \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \MPCchanged{\frac{\norm{g_{k}}^2}{\omega_k}} + \frac{C_1}{2} \sqrt{\sum_{k \in K^+} \norm{g_{k}}^2} \leq F'
+        0 \leq \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \norm{g_{k}}^2 + \frac{C_1}{2} \sqrt{\sum_{k \in K^+} \norm{g_{k}}^2} \leq F'
     \end{equation}
     where
     \begin{align*}
@@ -590,7 +587,7 @@ Now, we establish the following \MPCchanged{iteration-complexity result} for \cr
 
     \begin{MPCchange}
     Suppose that $\norm{g_k}>\varepsilon$ for every $0\leq k<k_{\max}$, where $0<\varepsilon\leq1$.
-    Since $\omega_{\min}\leq1$, the definition of $\omega_k$ gives $\norm{g_k}^2/\omega_k>\varepsilon^2$ for $k\in K^0$.
+    We then have $\sum_{k\in K^0}\norm{g_k}^2>\varepsilon^2\abs{K^0}$.
     We also have $\sqrt{\sum_{k\in K^+}\norm{g_k}^2}>\varepsilon\sqrt{\abs{K^+}}$.
     Applying these two bounds to \cref{eq:final_inequality_for_gc} yields
     \begin{equation*}
@@ -613,7 +610,7 @@ Using this function, the equation $\phi(G)=0$ can be solved in closed form, whic
 Since this is not essential for the main argument, we omit the details and refer to~\citep{Gratton08022024}.
 
 We next interpret \cref{eq:gc_result} in the proof of \cref{thm:gc}.
-\MPCchanged{The contribution of the indices in $K^0$ uses the scale-adjusted quantity $\norm{g_k}^2/\omega_k$, which equals $\norm{g_k}^2/\omega_{\min}$ near stationarity and therefore retains the classical first-order stationarity order.}
+The contribution of the indices in $K^0$ is analogous to the classical analysis of gradient descent.
 Indeed, for gradient descent with fixed step size $\alpha = 1/L$, one has
 \begin{equation*}
     \frac{1}{k_{\max}}\sum_{k=0}^{k_{\max}-1} \norm{g_k}^2 \le \frac{1}{k_{\max}}\frac{2(f(x_0)-f^*)}{\alpha}.
@@ -633,8 +630,8 @@ More explicitly, \cref{eq:gc_result} gives the sufficient bound
     k_{\max}\geq \frac{1}{\gtol^2}
     \qty(\frac{MF'}{c\overline\alpha}+\frac{4(F')^2}{C_1^2}).
 \end{equation*}
-Here \(\overline\alpha\) depends only on \(c,L,m\) and the backtracking bounds, \(D=1+M/\theta_{\min}\), \(C_1=\overline\alpha/(D\theta_{\max})\), \(C_2=L/(2\theta_{\min}^2)\), and \(F'\) is displayed in the proof and contains \(\feps\), \(\varsigma\), the initial true and observed optimality gaps, and \(\Delta_{\max}\).
-The construction in \cref{sec:proposed_choice_Bk} gives $m=\omega_{\min}$ and $M=1+(1+p)\Lambda$, so the memory length enters the sufficient iteration bound through $M$.
+Here $\overline\alpha$ depends only on $c,L,m$ and the backtracking bounds, $C_1=\overline\alpha/\theta_{\max}$, $C_2=(M\overline\alpha+L/2)/\theta_{\min}^2$, and $F'$ is displayed in the proof and contains $\feps$, $\varsigma$, the initial true and observed optimality gaps, and $\Delta_{\max}$.
+The construction in \cref{sec:proposed_choice_Bk} gives $m=\omega_{\min}$ and $M=\qty(1+(1+p)\Lambda)\rho_0$, so the memory length and fixed initial scale enter the sufficient iteration bound through $M$.
 Thus the order symbol suppresses no dependence on the iteration counter, but it does suppress these problem and algorithm parameters; the guarantee deteriorates as the permitted function error approaches \(1\) through the factor \((1-\feps)^{-1}\).
 \end{MPCchange}
 
@@ -647,7 +644,7 @@ The quantities to be discussed here are the matrices $B_k$, the step sizes $\alp
 \subsection{Approximate Hessian \texorpdfstring{$B_k$}{B k}}\label{sec:proposed_choice_Bk}
 
 We first discuss the construction of the matrices $B_k$ used in \refLine{line:d_k} of \cref{alg:regularized_qn}.
-\MPCchanged{The purpose of this subsection is to show that a scaled L-BFGS construction with modified and carefully selected curvature pairs can satisfy \cref{ass:BBounds}.}
+\MPCchanged{The purpose of this subsection is to show that a shifted raw L-BFGS construction with modified and carefully selected curvature pairs can satisfy \cref{ass:BBounds}.}
 
 \paragraph{Construction of $B_k$: }
 
@@ -685,29 +682,37 @@ When fewer than $p$ curvature pairs are available, the BFGS update is applied us
 
 \begin{MPCchange}
 The original manuscript already intended the pair selection as a cautious update in the spirit of curvature-based cautious updates~\citep{liGlobalConvergenceBFGS2001,mannelStructuredLBFGSMethod2024,mannelGlobalizationLBFGSBarzilai2025a}.
-To make the upper test insensitive to the local gradient scale, define
+Define the fixed initial scale and diagonal shift by
 \begin{equation*}
-    \omega_{k_i}^{\mathrm{pair}}\defeq\max\{\omega_{\min},\norm{g_{k_i}},\norm{g_{k_i+1}}\},
+    \rho_0\defeq\max\{1,\norm{g_0}\},
     \qquad
-    \widehat y_{k_i}\defeq\frac{\overline y_{k_i}}{\omega_{k_i}^{\mathrm{pair}}}.
+    \omega_{\min}\defeq\min\{1,\sqrt{\varsigma}\}>0.
 \end{equation*}
-After damping and normalization, a pair \((s,\widehat y)\) is retained only if
+After damping, a raw pair \((s,\overline y)\) is retained only if
 \begin{equation}\label{eq:implemented_cautious_test}
-    \widehat y^\top s \geq \max\left\{\frac{\norm{\widehat y}^2}{10^8},10^{-16}\right\}.
+    \overline y^\top s \geq \max\left\{\frac{\norm{\overline y}^2}{10^8\rho_0},10^{-16}\right\}.
 \end{equation}
-Thus every stored normalized pair satisfies \cref{eq:curvature_conditions1} with the iteration-independent constant \(\Lambda=10^8\).
+For the proof only, define $\widehat y\defeq\overline y/\rho_0$.
+Then every stored pair $(s,\widehat y)$ satisfies \cref{eq:curvature_conditions1} with the iteration-independent constant $\Lambda=10^8$.
 The absolute floor rejects numerically degenerate pairs but is not needed for the upper bound.
-Using at most $p=10$ pairs, define $\widehat B_k=\mathrm{BFGS}(\{(s_{k_i},\widehat y_{k_i})\})$ when the memory is nonempty and $\widehat B_k=I$ otherwise.
-We then set
-\begin{equation}\label{eq:proposed_choice_of_Bk}
-    B_k=\omega_{\min}I+\omega_k\widehat B_k.
-\end{equation}
-By \cref{prop:bounded_BFGS}, $0\prec\widehat B_k\preceq(1+p)\Lambda I$ for nonempty memory, while the same upper bound holds for empty memory because $(1+p)\Lambda\geq1$.
-Since \(\omega_{\min}\leq\omega_k\), it follows that
+The homogeneity of the BFGS update gives
 \begin{equation*}
-    \omega_{\min}I\preceq B_k\preceq\qty(1+(1+p)\Lambda)\omega_kI.
+    \mathrm{BFGS}(\{(s_{k_i},\overline y_{k_i})\})
+    =\rho_0\mathrm{BFGS}(\{(s_{k_i},\widehat y_{k_i})\}).
 \end{equation*}
-Thus \cref{ass:BBounds} holds with the iteration-independent constants $m=\omega_{\min}$ and $M=1+(1+p)\Lambda$.
+Using at most $p=10$ pairs, we set
+\begin{equation}\label{eq:proposed_choice_of_Bk}
+    B_k=
+    \begin{cases}
+        \omega_{\min}I+\mathrm{BFGS}(\{(s_{k_i},\overline y_{k_i})\}), & \text{if the memory is nonempty}, \\
+        (\omega_{\min}+\rho_0)I,                                      & \text{otherwise}.
+    \end{cases}
+\end{equation}
+By \cref{prop:bounded_BFGS}, the homogeneity identity, and $\omega_{\min}\leq1\leq\rho_0$, it follows that
+\begin{equation*}
+    \omega_{\min}I\preceq B_k\preceq\qty(1+(1+p)\Lambda)\rho_0I.
+\end{equation*}
+Thus \cref{ass:BBounds} holds with the iteration-independent constants $m=\omega_{\min}$ and $M=\qty(1+(1+p)\Lambda)\rho_0$.
 \end{MPCchange}
 \begin{MPCchange}
 For a candidate pair with $y_{k_i}^{\top}s_{k_i} < 0$, the implementation applies a scalar Powell-type damping before the cautious test.
@@ -721,8 +726,8 @@ Specifically, it sets $b_i = \norm{y_{k_i}}^2 / \abs{y_{k_i}^{\top}s_{k_i}}$ and
     = \frac{0.8 b_i \norm{s_{k_i}}^2}{b_i \norm{s_{k_i}}^2 - y_{k_i}^{\top} s_{k_i}} \in [0, 1).
 \end{equation*}
 If $y_{k_i}^{\top}s_{k_i} \geq 0$, it sets $\overline y_{k_i} = y_{k_i}$.
-Candidates for which this scalar damping is numerically unsafe are discarded before normalization and \cref{eq:implemented_cautious_test}.
-This is the damping rule used in the released code; the normalized upper test and the fixed diagonal shift, rather than damping itself, guarantee the two bounds in \cref{ass:BBounds}.
+Candidates for which this scalar damping is numerically unsafe are discarded before \cref{eq:implemented_cautious_test}.
+This is the damping rule used in the released code; the fixed initial-scale upper test and the diagonal shift, rather than damping itself, guarantee the two bounds in \cref{ass:BBounds}.
 No convexity or cocoercivity assumption on \(\nabla f\) is used.
 \end{MPCchange}
 
@@ -735,15 +740,14 @@ We begin by describing how to compute the search direction
 \end{equation*}
 with $B_k$ in \cref{eq:proposed_choice_of_Bk}.
 \MPCchanged{Regularized limited-memory schemes may be employed to account for the diagonal shift~\citep{kanzowRegularizationLimitedMemory2023}.}
-\MPCchanged{Define $\widehat\mu_k\defeq(\mu_k+\omega_{\min})/\omega_k$.}
 \MPCchanged{We use the simple approximation mentioned in the same reference,}
 \begin{MPCchange}
 \begin{equation}\label{eq:approx_computation_of_regularized_quasi_Newton}
-    \widehat B_k+\widehat\mu_k I
-    \approx\mathrm{BFGS}(\{s_{k_i},\widehat y_{k_i}+\widehat\mu_k s_{k_i}\}_{i=0}^{p-1}).
+    B_k+\mu_k I
+    \approx\mathrm{BFGS}(\{s_{k_i},\overline y_{k_i}+(\mu_k+\omega_{\min})s_{k_i}\}_{i=0}^{p-1}).
 \end{equation}
 \end{MPCchange}
-\MPCchanged{The direction is then computed as $d_k\approx-\omega_k^{-1}\mathrm{BFGS}(\{s_{k_i},\widehat y_{k_i}+\widehat\mu_k s_{k_i}\})^{-1}g_k$ using the standard two-loop recursion~\citep{liuLimitedMemoryBFGS1989,nocedal1999numerical}.}
+\MPCchanged{The direction is then computed from the raw curvature pairs using the standard two-loop recursion~\citep{liuLimitedMemoryBFGS1989,nocedal1999numerical}; when the memory is empty, the implementation uses $d_k=-g_k/(\rho_0+\omega_{\min}+\mu_k)$.}
 Although this approximation is inexact, it has been reported to yield nearly identical practical performance while remaining comparatively simple to implement~\citep{kanzowRegularizationLimitedMemory2023}.
 We adopt this approximation in our numerical experiments.
 
@@ -1051,8 +1055,8 @@ In \cref{tab:time_results}, we report the total number of oracle calls (calls of
 
 \begin{MPCchange}
 We proposed a hybrid regularized quasi-Newton method for smooth nonconvex optimization with bounded errors in objective-function values.
-Under exact gradients, a fixed positive lower spectral bound, and a gradient-scaled upper spectral bound on the quasi-Newton matrices, the method retains the order-optimal \(\order{1/\varepsilon^2}\) first-order iteration complexity of the noise-free $L$-smooth nonconvex setting while selectively using noisy function values.
-The implementation enforces the normalized upper-curvature condition, supplies the lower bound through a fixed diagonal shift, and uses the same non-restarted OFFO accumulator as the analysis.
+Under exact gradients and uniformly bounded positive definite quasi-Newton matrices, the method retains the order-optimal \(\order{1/\varepsilon^2}\) first-order iteration complexity of the noise-free $L$-smooth nonconvex setting while selectively using noisy function values.
+The implementation enforces the fixed-initial-scale upper-curvature condition on raw pairs, supplies the lower bound through a fixed diagonal shift, and uses the same non-restarted OFFO accumulator as the analysis.
 The experiments distinguish function-value noise covered by the theorem from a joint-noise stress test outside its scope and assess sensitivity to the supplied error bound.
 An analysis with inexact gradients, which can at best guarantee convergence to a noise-dependent neighborhood without additional assumptions, remains future work.
 \end{MPCchange}
