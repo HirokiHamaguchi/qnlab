@@ -197,11 +197,13 @@ def qn_ntrqn(
     restart_count = 0
 
     while True:
-        if not param.force_offo and min_fx_minus_delta >= fx:
+        if min_fx_minus_delta >= fx:
+            returned_from_offo = is_offo_mode
             is_offo_mode = False
             mu = np.float64(0.0)
             if (
-                restart_count < param.max_restarts
+                returned_from_offo
+                and restart_count < param.max_restarts
                 and np.isfinite(min_fx_minus_delta)
                 and min_fx_minus_delta - fx >= param.restart_threshold
             ):

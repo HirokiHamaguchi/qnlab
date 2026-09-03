@@ -790,7 +790,7 @@ Hence \(\mu_k=\theta_kG_k\) with \(\theta_k\in[10^{-2},1]\), exactly as required
 We set \(\varsigma=10^{-20}\), so that its square root, the initial scale \(G_{-1}\), equals \(10^{-10}\).
 The primary implementation sets the permitted number of restarts to zero and therefore coincides exactly with the analyzed accumulator.
 The restart was originally intended only as a practical heuristic rather than as an essential part of the proposed algorithm.
-For the optional heuristic, a fixed threshold $\tau>0$ resets only the accumulator in \cref{eq:offo_based_update} whenever
+For the optional heuristic, a fixed threshold $\tau>0$ resets only the accumulator in \cref{eq:offo_based_update} when the method returns from $K^+$ to $K^0$ and
 \begin{equation}\label{eq:restart_condition}
     \min_{j \in K^0,\,j<k} \qty(\overline{f}(x_j)-\Delta_j)-\overline{f}(x_k) \geq \tau.
 \end{equation}
@@ -811,7 +811,6 @@ We compared the following methods in our experiments.
           \begin{itemize}
               \item We used \cref{alg:regularized_qn,alg:backtracking_linesearch} with the details in \cref{sec:proposed_choice}.
               \item (\texttt{Ours-MS}) means the variant incorporating the modified secant condition described in \cref{sec:proposed_choice_Bk}.
-              \MPCchanged{\item (\texttt{NTRQN-OFFO}) is the branch ablation that always uses the OFFO-based regularization branch.}
           \end{itemize}
 
     \item (\texttt{Line}): Line search L-BFGS method
@@ -846,11 +845,11 @@ We compared the following methods in our experiments.
               \end{MPCchange}
           \end{itemize}
 
-    \MPCchanged{\item (\texttt{OFFO}): A standalone first-order objective-function-free method using the cumulative gradient-norm scale in \cref{sec:prel_offo}.}
+    \MPCchanged{\item (\texttt{ASTR1-Adagrad}): The purely first-order \texttt{adagrad} variant of ASTR1 reported by Gratton et al.~\citep[Table~1]{Gratton08022024}, using $B_k = 0$, $\gamma_k = 1$, $\mu = 1/2$, $\varsigma = 1/100$, and $\vartheta = \theta = 1$. Its steps and stopping decision use only gradients; the shared callback records the initial objective value solely for diagnostics and does not expose it to the method.}
 \end{itemize}
 
 In the following, each method is referred to by the name given in parentheses.
-\MPCchanged{Except for the first-order \texttt{OFFO} baseline,} all these methods are L-BFGS-based, and we set the number of stored curvature pairs to $10$, the default value in SciPy's L-BFGS-B implementation.
+\MPCchanged{Except for the first-order \texttt{ASTR1-Adagrad} baseline,} all these methods are L-BFGS-based, and we set the number of stored curvature pairs to $10$, the default value in SciPy's L-BFGS-B implementation.
 All experiments were conducted on a Microsoft Windows 11 Home system (version~10.0, build~26100) equipped with a 13th Gen Intel\textsuperscript{\textregistered} Core\textsuperscript{\texttrademark} i7-1360P CPU, featuring 12 physical cores and 16 logical processors.
 All computations were performed using the CPU only.
 
@@ -883,7 +882,9 @@ This setting is particularly adverse for our method because its theory and regul
 Each setting uses a different error rate $\feps$ in the error model (\cref{eq:error_model}), as summarized in \cref{tab:machine_epsilon}.
 The table relates the machine epsilon (maximum relative rounding error) for each floating-point precision to the $\feps$ value used in our experiments.
 The relatively large $\feps$ values are chosen to account for the cumulative errors that may arise during optimization.
-We also set the maximum number of iterations to $k_{\max} = 15{,}000$ and timed out runs exceeding 10 minutes per problem.
+\MPCchanged{We first run \texttt{SciPy} with a limit of $15{,}000$ iterations on each problem.}
+\MPCchanged{If it attains the scenario's gradient tolerance after $k_{\mathrm{SciPy}}$ iterations, every other method is limited to $\min\{15{,}000,15k_{\mathrm{SciPy}}\}$ iterations; otherwise, the limit is $15{,}000$.}
+We timed out runs exceeding 10 minutes per problem.
 
 \input{check/machine_epsilon_table}
 
@@ -912,7 +913,7 @@ Following standard implementations~\citep{2020SciPy-NMeth}, we used the infinity
 We first separate the theory-aligned function-noise experiment from the joint-noise stress test described in \cref{sssec:problems}.
 The former tests the assumptions of \cref{sec:analysis}; the latter asks whether the implementation remains useful when both available quantities are perturbed.
 Therefore, success in the joint-noise experiment is evidence that the method can remain effective even in a setting that is theoretically unfavorable to it, but it is not presented as validation of the exact-gradient complexity result.
-The experiment notebook compares the hybrid method with both the standalone first-order \texttt{OFFO} baseline and the always-OFFO branch ablation \texttt{NTRQN-OFFO}, and varies the supplied \(\feps\) over two orders of magnitude around its nominal value.
+The experiment notebook compares the hybrid method with the first-order \texttt{ASTR1-Adagrad} baseline of Gratton et al.~\citep{Gratton08022024} and varies the supplied \(\feps\) over two orders of magnitude around its nominal value.
 All main-text profiles use the analyzed no-restart method; the earlier accumulator-restart heuristic is evaluated separately in the appendix.
 \end{MPCchange}
 

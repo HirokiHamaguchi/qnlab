@@ -59,13 +59,18 @@ def qn_scipy(
         gradient_mapping = map_gradient
 
     scipy_options = cast(Any, option)
+    last_recorded_x: npt.NDArray[np.float64] | None = None
 
     def record_callback(xk: npt.NDArray[np.float64]) -> None:
+        nonlocal last_recorded_x
         assert callback is not None
+        if last_recorded_x is not None and np.array_equal(xk, last_recorded_x):
+            return
         fx = prob.f(xk, count=False)
         g = prob.g(xk, count=False)
         stationarity = None if gradient_mapping is None else gradient_mapping(xk, g)
         callback.callback(prob, xk, fx, g, gnorm_vector=stationarity)
+        last_recorded_x = np.copy(xk)
 
     def callback_scipy_func(xk: npt.NDArray[np.float64]) -> None:
         record_callback(xk)
@@ -81,6 +86,7 @@ def qn_scipy(
             initial_g = prob.g(prob.x0, count=False)
             initial_stationarity = gradient_mapping(prob.x0, initial_g)
         callback.start(prob, prob.x0, gnorm_vector=initial_stationarity)
+        last_recorded_x = np.copy(prob.x0)
 
     if method.scipy_method in ["Powell", "Nelder-Mead", "COBYLA"]:
         res = scipy.optimize.minimize(
@@ -126,5 +132,8 @@ def qn_scipy(
 
     if verbose:
         print(f"{res.message=}")
+
+    if callback:
+        record_callback(np.asarray(res.x, dtype=np.float64))
 
     return RetCode.SUCCESS if res.success else RetCode.ERR_UNKNOWNERROR, res.fun, res.x

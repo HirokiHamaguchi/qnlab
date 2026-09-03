@@ -51,7 +51,7 @@ This point is important because the convergence theorem permits nonconvex object
 \section{Accumulator-Restart Ablation}\label{app:restart_experiment}
 
 This appendix isolates the earlier accumulator-restart heuristic from the primary no-restart experiments that match \cref{alg:regularized_qn} and the analysis in \cref{sec:analysis}.
-The restart variant uses the condition in \cref{eq:restart_condition}, permits at most ten restarts, and otherwise uses the same problems, seeds, stopping rules, and parameter values as the corresponding no-restart method.
+The restart variant applies the condition in \cref{eq:restart_condition} only when returning from $K^+$ to $K^0$, permits at most ten restarts, and otherwise uses the same problems, seeds, stopping rules, and parameter values as the corresponding no-restart method.
 For each setting, the comparison records oracle calls, failures, the distribution of the number of restarts, and whether the cap is reached.
 % TODO after the full CUTEst rerun: insert the restart/no-restart profile and quantitative summary here.
 \end{MPCchange}

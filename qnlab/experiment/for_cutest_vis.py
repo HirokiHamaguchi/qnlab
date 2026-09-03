@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 from typing import Literal
 
@@ -131,7 +132,7 @@ def draw_pp(
     sns.set_style("whitegrid")
     plt.rcParams.update(
         {
-            "text.usetex": True,
+            "text.usetex": shutil.which("latex") is not None,
             "font.family": "serif",
             "font.size": 20,
             "figure.dpi": 300,
@@ -203,6 +204,7 @@ def draw_data_profile(
 ) -> None:
     """Draw a data profile normalized by each problem's dimension plus one."""
     sns.set_style("whitegrid")
+    plt.rcParams.update({"text.usetex": shutil.which("latex") is not None})
     colors = [color_palette.get(name, "black") for name in alg_names]
     styles = [line_styles.get(name, "o-") for name in alg_names]
     fig, ax = plt.subplots(figsize=(7, 5))

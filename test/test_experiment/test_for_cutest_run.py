@@ -96,6 +96,50 @@ def test_empty_error_result_can_be_loaded_and_is_not_rerun(
     solve.assert_not_called()
 
 
+def test_result_with_different_options_is_rerun(monkeypatch, tmp_path) -> None:
+    result_path = tmp_path / "stale.npz"
+    monkeypatch.setattr(
+        for_cutest_run, "get_file_path", Mock(return_value=str(result_path))
+    )
+    method = Mock(label="method")
+    stored_task = _task(method)
+    requested_task = for_cutest_run.CUTEstTask(
+        "ARWHEAD", method, {"m": 10}, 64
+    )
+    for_cutest_run.save_npz(stored_task, Callback())
+
+    solve = Mock()
+    monkeypatch.setattr(for_cutest_run, "solve_problem_with_timeout", solve)
+    for_cutest_run.run_tasks([requested_task], [], 600)
+
+    solve.assert_called_once_with(
+        requested_task, 600, allow_save=True, result_subdir=None
+    )
+
+
+def test_loading_result_with_different_options_fails(monkeypatch, tmp_path) -> None:
+    result_path = tmp_path / "stale.npz"
+    monkeypatch.setattr(
+        for_cutest_run, "get_file_path", Mock(return_value=str(result_path))
+    )
+    method = Mock(label="method")
+    for_cutest_run.save_npz(_task(method), Callback())
+    requested_task = for_cutest_run.CUTEstTask(
+        "ARWHEAD", method, {"m": 10}, 64
+    )
+
+    with np.testing.assert_raises(ValueError):
+        for_cutest_run.load_npz_with_metadata(requested_task)
+
+
+def test_legacy_result_protocol_does_not_match_current_task() -> None:
+    task = _task(Mock(label="method"))
+    legacy_metadata = task.metadata()
+    legacy_metadata.pop("result_protocol_version")
+
+    assert not for_cutest_run.metadata_matches_task(legacy_metadata, task)
+
+
 def test_load_results_can_use_time_to_gradient_tolerance(monkeypatch) -> None:
     method = Mock(label="method")
     callback = Callback()
@@ -124,3 +168,21 @@ def test_load_results_can_use_time_to_gradient_tolerance(monkeypatch) -> None:
     load_npz.assert_called_once()
     assert load_npz.call_args.args[1] is False
     assert load_npz.call_args.args[2] == "time"
+
+
+def test_scaled_iteration_limit_uses_first_successful_reference_iterate() -> None:
+    callback = Callback()
+    callback.gnorms = [1.0, 0.1, 0.01, 0.001]
+
+    assert for_cutest_run.scaled_iteration_limit(
+        callback, np.float64(0.01)
+    ) == 30
+
+
+def test_scaled_iteration_limit_uses_maximum_if_reference_does_not_solve() -> None:
+    callback = Callback()
+    callback.gnorms = [1.0, 0.1]
+
+    assert for_cutest_run.scaled_iteration_limit(
+        callback, np.float64(0.01)
+    ) == 15_000

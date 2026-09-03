@@ -14,6 +14,23 @@ from qnlab.util.method import Method
 
 RESULT_ROOT = Path(__file__).resolve().parents[2] / "data" / "temp"
 ZERO_NOISE = np.float64(0)
+RESULT_PROTOCOL_VERSION = 2
+
+
+def scaled_iteration_limit(
+    reference_callback: Callback,
+    gtol: np.float64,
+    maximum: int = 15_000,
+    multiplier: int = 15,
+) -> int:
+    """Scale an iteration limit from the first successful reference iterate."""
+    if maximum <= 0 or multiplier <= 0:
+        raise ValueError("maximum and multiplier must be positive.")
+    reached = np.flatnonzero(np.asarray(reference_callback.gnorms) <= gtol)
+    if reached.size == 0:
+        return maximum
+    reference_iterations = max(1, int(reached[0]))
+    return min(maximum, multiplier * reference_iterations)
 
 
 @dataclass
@@ -31,6 +48,7 @@ class CUTEstTask:
 
     def metadata(self) -> dict:
         return {
+            "result_protocol_version": RESULT_PROTOCOL_VERSION,
             "problem": self.problem_name,
             "method": self.method.label,
             "options": self.options,
@@ -84,6 +102,10 @@ def load_npz_with_metadata(
             callback.gnorms = data["gnorms"]
             callback.times = data.get("times", [])
             metadata = json.loads(data["metadata"].item())
+        if not metadata_matches_task(metadata, task):
+            raise ValueError(
+                f"Stored result metadata does not match the requested task: {file_path}"
+            )
         assert len(callback.calls) == len(callback.fxs) == len(callback.gnorms)
         assert len(callback.times) in (0, len(callback.calls))
     except (EOFError, BadZipFile):
@@ -99,6 +121,27 @@ def _json_default(value: object) -> object:
     if isinstance(value, np.generic):
         return value.item()
     raise TypeError(f"Object of type {type(value).__name__} is not JSON serializable")
+
+
+def metadata_matches_task(metadata: dict, task: CUTEstTask) -> bool:
+    """Return whether stored task-defining metadata matches ``task`` exactly."""
+    expected = json.loads(json.dumps(task.metadata(), default=_json_default))
+    return all(metadata.get(key) == value for key, value in expected.items())
+
+
+def result_matches_task(
+    task: CUTEstTask, result_subdir: str | None = None
+) -> bool:
+    """Return whether a readable stored result belongs to the requested task."""
+    file_path = Path(get_file_path(task, result_subdir))
+    if not file_path.exists():
+        return False
+    try:
+        with np.load(file_path) as data:
+            metadata = json.loads(data["metadata"].item())
+    except (EOFError, BadZipFile, KeyError, ValueError, json.JSONDecodeError):
+        return False
+    return metadata_matches_task(metadata, task)
 
 
 def save_npz(
@@ -211,7 +254,7 @@ def run_tasks(
     pending = [
         task
         for task in tasks
-        if overwrite or not Path(get_file_path(task, result_subdir)).exists()
+        if overwrite or not result_matches_task(task, result_subdir)
     ]
     print(f"Total tasks to run: {len(pending)}")
 

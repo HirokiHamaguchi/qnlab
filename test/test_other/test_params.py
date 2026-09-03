@@ -55,8 +55,6 @@ def test_ntrqn_rejects_invalid_algorithm_options():
     with pytest.raises(ValueError):
         NTRQNParameter(2, {"offo_squared_offset": np.float64(0.0)})
     with pytest.raises(ValueError):
-        NTRQNParameter(2, {"force_offo": 2})
-    with pytest.raises(ValueError):
         NTRQNParameter(2, {"max_restarts": -1})
 
 

@@ -6,6 +6,7 @@ import numpy as np
 import numpy.typing as npt
 from scipy.optimize import line_search
 
+import qnlab.solver.qn_ntrqn as ntrqn_module
 from qnlab.parameter import NTRQNParameter
 from qnlab.problem import ZakharovProblem
 from qnlab.problem.base import BaseProblem
@@ -156,6 +157,44 @@ def test_default_solver_does_not_restart_at_initial_infinite_reference():
     )
 
     assert callback.others["OFFO accumulator restart"] == 0
+
+
+def test_restart_occurs_only_when_returning_from_offo(monkeypatch):
+    function_values = iter([6.0, 3.0, 2.0])
+
+    def fake_line_search(x, *args, **kwargs):
+        return (
+            RetCode.SUCCESS,
+            x + 1.0,
+            np.float64(next(function_values)),
+            np.ones_like(x),
+            np.float64(0.0),
+            0,
+        )
+
+    monkeypatch.setattr(
+        ntrqn_module, "line_search_relaxed_armijo", fake_line_search
+    )
+    problem = ConvexEvenPolynomialProblem(degree=2)
+    callback = Callback()
+    parameter = NTRQNParameter(
+        1,
+        {
+            "gtol": np.float64(0.0),
+            "max_iterations": 3,
+            "restart_threshold": np.float64(1.0),
+            "max_restarts": 10,
+        },
+    )
+
+    qn_ntrqn(
+        problem,
+        parameter,
+        Method("NTRQN", "cautious", "damped", "bfgs"),
+        callback,
+    )
+
+    assert callback.others["OFFO accumulator restart"] == 1
 
 
 def test_fixed_initial_scale_converges_on_zakharov():

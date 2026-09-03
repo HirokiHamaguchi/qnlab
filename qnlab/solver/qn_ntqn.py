@@ -29,14 +29,23 @@ def qn_ntqn(
 
     final_xk = np.empty_like(prob.x0, dtype=np.float64)
     final_fk = np.float64(np.nan)
+    last_recorded_x = np.copy(prob.x0) if callback is not None else None
+
+    def _record_iterate(x: npt.NDArray[np.float64]) -> tuple[np.float64, npt.NDArray[np.float64]]:
+        nonlocal last_recorded_x
+        fx = prob.f(x, count=False)
+        gx = prob.g(x, count=False)
+        if callback is not None and (
+            last_recorded_x is None or not np.array_equal(x, last_recorded_x)
+        ):
+            callback.callback(prob, x, fx, gx)
+            last_recorded_x = np.copy(x)
+        return fx, gx
 
     def _ntqn_callback_impl(x: npt.NDArray[np.float64]) -> None:
         nonlocal final_xk, final_fk
 
-        fx = prob.f(x, count=False)
-        gx = prob.g(x, count=False)
-        if callback:
-            callback.callback(prob, x, fx, gx)
+        fx, gx = _record_iterate(x)
         if param.stop_at_gtol and np.linalg.norm(gx, ord=np.inf) < param.gtol:
             final_xk[:] = x
             final_fk = fx
@@ -69,6 +78,8 @@ def qn_ntqn(
         )
         final_xk[:] = x_k
         final_fk = f_k
+        if callback is not None:
+            _record_iterate(x_k)
     except StopOptimization:
         flag = 0  # Indicate successful convergence
 
