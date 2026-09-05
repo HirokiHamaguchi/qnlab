@@ -96,6 +96,28 @@ def test_empty_error_result_can_be_loaded_and_is_not_rerun(
     solve.assert_not_called()
 
 
+def test_hard_timeout_result_is_saved_and_not_rerun(monkeypatch, tmp_path) -> None:
+    result_path = tmp_path / "timeout.npz"
+    monkeypatch.setattr(
+        for_cutest_run, "get_file_path", Mock(return_value=str(result_path))
+    )
+    task = _task(Mock(label="method"))
+
+    for_cutest_run.save_hard_timeout_result(task, time_limit=60, elapsed=90.25)
+
+    loaded, metadata = for_cutest_run.load_npz_with_metadata(task)
+    assert len(loaded.calls) == 0
+    assert metadata["status"] == "timeout"
+    assert metadata["timeout_kind"] == "hard"
+    assert metadata["time_limit"] == 60
+    assert metadata["elapsed"] == 90.25
+
+    solve = Mock()
+    monkeypatch.setattr(for_cutest_run, "solve_problem_with_timeout", solve)
+    for_cutest_run.run_tasks([task], [], 600)
+    solve.assert_not_called()
+
+
 def test_result_with_different_options_is_rerun(monkeypatch, tmp_path) -> None:
     result_path = tmp_path / "stale.npz"
     monkeypatch.setattr(

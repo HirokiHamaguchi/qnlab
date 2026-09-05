@@ -166,6 +166,30 @@ def save_npz(
     )
 
 
+def save_hard_timeout_result(
+    task: CUTEstTask,
+    time_limit: int,
+    elapsed: float,
+    result_subdir: str | None = None,
+) -> None:
+    """Persist an empty result after the parent hard-kills a task process."""
+    save_npz(
+        task,
+        Callback(),
+        result_subdir,
+        {
+            "status": "timeout",
+            "error": (
+                f"Child process exceeded hard timeout after {elapsed:.2f}s "
+                "and was terminated."
+            ),
+            "timeout_kind": "hard",
+            "time_limit": time_limit,
+            "elapsed": elapsed,
+        },
+    )
+
+
 def _create_problem(task: CUTEstTask) -> CUTEstQNProblem:
     has_noise_model = (
         task.function_noise > 0
