@@ -25,18 +25,18 @@ In particular, it is desirable to design algorithms that (i) retain computationa
 In this work, we propose a noise-tolerant regularized quasi-Newton method that addresses these challenges.
 Our approach combines \MPCchanged{a relaxed Armijo} line \MPCchanged{search,} quadratic \MPCchanged{regularization \citep{uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023},} and \MPCchanged{an OFFO-inspired} strategy~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
 \begin{MPCchange}
-Theorem~1 of Kanzow and Steck~\citep{kanzowRegularizationLimitedMemory2023} assumes a bounded sequence of quasi-Newton matrices and an objective function bounded from below and proves $\liminf_{k\to\infty}\norm{\nabla f(x_k)}=0$, so every fixed gradient tolerance is attained after finitely many iterations.
-Their result establishes global convergence without an iteration-complexity bound, whereas our analysis gives \(\order{1/\varepsilon^2}\) complexity under bounded function-value errors.
-This dependence on the stationarity tolerance is worst-case optimal for $L$-smooth nonconvex optimization even in the noise-free setting~\citep{carmonLowerBoundsFinding2020}.
-The theoretical contribution is therefore that the hybrid method retains this best possible order while continuing to exploit persistently noisy function values whenever they provide a reliable progress certificate.
-Unlike OFFO algorithms, which deliberately never evaluate the objective function, our hybrid method retains a relaxed line search whenever observed function values certify progress and invokes OFFO-type scaling only otherwise.
-The noise-tolerant quasi-Newton analysis in~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022} yields a stationarity neighborhood whose function-error contribution is proportional to \(\sqrt{M\epsilon_f}\), whereas its gradient-error contribution is proportional to \(\epsilon_g\).
-Its relaxed Armijo condition is closely related to ours; when \(\abs{f}\) is small, our hybrid model gives an error-absorbing scale of approximately \(2\epsilon_f/(1-\epsilon_f)\), while our adaptive recomputation and the \(K^0/K^+\) switch determine when function information is used.
-Consequently, up to problem-dependent constants, making the former no larger than the latter requires the comparatively restrictive regime \(\epsilon_f=\order{\epsilon_g^2/M}\).
-The difference is particularly clear when gradients are exact: even with \(\epsilon_g=0\), the neighborhood in~\citep[Theorem~3.5]{shiNoiseTolerantQuasiNewtonAlgorithm2022} retains a stationarity threshold proportional to \(\sqrt{M\epsilon_f}\), whereas in our result a fixed \(0\leq\epsilon_f<1\) affects the complexity constant but does not impose a stationarity floor.
-Thus, under exact gradients, our method can reach an arbitrary prescribed first-order tolerance despite fixed nonvanishing relative-or-absolute function errors because it can fall back on an objective-function-free scale when function comparisons are uninformative.
-This advantage is conditional rather than uniform: Shi et al. allow bounded gradient errors and stabilize noisy curvature pairs through lengthening, whereas our complexity theorem assumes exact gradients.
-The two results are therefore complementary, with ours providing the stronger attainable-accuracy guarantee for persistent function-value errors under exact gradients and theirs covering the more general case of simultaneous function and gradient errors under strong convexity.
+The closest regularized L-BFGS result is Theorem~1 of Kanzow and Steck~\citep{kanzowRegularizationLimitedMemory2023}.
+Under bounded quasi-Newton matrices and a lower-bounded objective, it proves that the gradient norm has limit inferior zero, but assumes reliable function values and gives no iteration-complexity bound.
+Our result instead gives the order-optimal \(\order{1/\varepsilon^2}\) bound for smooth nonconvex optimization under persistent bounded relative-or-absolute function errors~\citep{carmonLowerBoundsFinding2020}.
+Rather than merely relaxing the line search, our method uses noisy function values only while they certify a reference decrease and otherwise switches to an objective-function-free regularization scale.
+It thereby retains useful line-search behavior without making continued progress depend on unreliable comparisons.
+
+OFFO methods avoid unreliable function values altogether~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}, whereas our method uses them selectively.
+The noise-tolerant quasi-Newton analysis of Shi et al.~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022} permits both function and gradient errors but assumes strong convexity and converges linearly only to a noise-dependent neighborhood.
+Its stationarity radius contains a function-error contribution proportional to \(\sqrt{M\epsilon_f}\) and a gradient-error contribution proportional to \(\epsilon_g\), so keeping the former below the latter requires \(\epsilon_f=\order{\epsilon_g^2/M}\) up to problem-dependent constants.
+In particular, even when \(\epsilon_g=0\), their bound retains a threshold proportional to \(\sqrt{M\epsilon_f}\), whereas a fixed \(0\leq\epsilon_f<1\) changes the constants in our bound but imposes no stationarity floor.
+This distinction follows from our adaptively recomputed error allowance and the $K^0/K^+$ switch, which stops relying on function comparisons when they cease to certify progress.
+Shi et al. cover bounded gradient errors and protect curvature pairs by lengthening, whereas our arbitrary-accuracy and complexity guarantees require exact gradients.
 \end{MPCchange}
 
 \begin{table*}[t]
@@ -44,54 +44,52 @@ The two results are therefore complementary, with ours providing the stronger at
     \ifdefined\MPCRevision\captionsetup{font={color=red}}\fi
     \centering
     \caption{
-        Comparison of the proposed method with its numerical baselines and first-order objective-function-free optimization (OFFO).
-        A \ding{51} in the Function Values Used column indicates that the algorithm evaluates function values, while a \ding{51} in a noise column indicates that the corresponding nonvanishing error is covered by the stated theory; a blank entry means that it is not covered.
-        The noise columns describe theoretical assumptions rather than whether noisy experiments were performed.
-        In particular, the guarantee for NTQN contains a function-error-dependent stationarity floor, whereas our guarantee permits fixed nonvanishing relative-or-absolute function errors without such a floor under exact gradients.
+        Quasi-Newton-focused comparison of the proposed method and its baselines; OFFO is included as the first-order source of the fallback scaling.
+        A \ding{51} denotes theoretical coverage and ``--'' its absence; the asterisk marks empirical robustness outside our gradient-noise theory.
     }
     \label{tab:related_work_comparison}
-    {\small
-        \setlength{\tabcolsep}{3pt}
+    {\scriptsize
+        \setlength{\tabcolsep}{2pt}
         \renewcommand{\arraystretch}{1.05}
-        \begin{tabular}{@{}>{\centering\arraybackslash}p{0.15\linewidth}ccc>{\centering\arraybackslash}p{0.15\linewidth}>{\centering\arraybackslash}p{0.30\linewidth}@{}}
+        \begin{tabular}{@{}>{\centering\arraybackslash}p{0.18\linewidth}cccc>{\centering\arraybackslash}p{0.25\linewidth}@{}}
             \toprule
             Algorithm
              & \makecell[c]{Utilize\\Function\\values}
              & \makecell[c]{Tolerant to\\Function\\noise}
              & \makecell[c]{Gradient\\noise\\allowed}
-             & \makecell[c]{Problem\\class}
-             & Guarantee \\
+             & Nonconvex
+             & \makecell[c]{Rate / complexity\\(target)} \\
             \midrule
-            \makecell[c]{\textbf{\texttt{Line}} / \textbf{\texttt{SciPy}} \\[-0.4em]\scalebox{0.8}{\citep{Okazaki2007libLBFGS,2020SciPy-NMeth}}}
+            \makecell[c]{\textbf{\texttt{Line}} / \textbf{\texttt{SciPy}} \\[-0.4em]\scalebox{0.8}{\citep{liuLimitedMemoryBFGS1989,Okazaki2007libLBFGS,2020SciPy-NMeth}}}
              & \ding{51}
              & --
              & --
-             & nonconvex
-             & -- \\
+             & \ding{51}
+             & \makecell[c]{R-linear\\objective gap} \\
             \makecell[c]{\textbf{\texttt{Reg}}\\[-0.4em]\scalebox{0.8}{\citep{kanzowRegularizationLimitedMemory2023}}}
              & \ding{51}
              & --
              & --
-             & nonconvex
-             & $\underset{k \to \infty}{\text{lim inf}} \norm{\nabla f(x_k)}=0$ \\
+             & \ding{51}
+             & -- \\
             \makecell[c]{\textbf{\texttt{NTQN}}\\[-0.4em]\scalebox{0.8}{\citep{xieAnalysisBFGSMethod2020,shiNoiseTolerantQuasiNewtonAlgorithm2022}}}
              & \ding{51}
              & \ding{51}
              & \ding{51}
-             & \makecell[c]{Strongly\\convex}
-             & Linear convergence to a noise-dependent neighborhood. The stationarity floor contains an $\order{\sqrt{M\epsilon_f}}$ function-error term and an $\order{\epsilon_g}$ gradient-error term \\
+             & --
+             & \makecell[c]{R-linear objective gap\\to the noise floor} \\
             \makecell[c]{\textbf{\texttt{OFFO}}\\[-0.4em]\scalebox{0.8}{\citep{Gratton08022024}}}
              & --
-             & \ding{51}\ding{51}
+             & \ding{51}
              & --
-             & nonconvex
-             & $\order{1/\varepsilon^2}$ first-order complexity without function-value evaluations \\
+             & \ding{51}
+             & \makecell[c]{\(\order{\varepsilon^{-2}}\) to\\\(\|\nabla f\|\leq\varepsilon\)} \\
             \makecell[c]{\textbf{\texttt{Ours}}\\[-0.4em]\scalebox{0.8}{\cref{alg:regularized_qn}}}
              & \ding{51}
-             & \ding{51}\ding{51}
-             & (practically)
-             & nonconvex
-             & Order-optimal $\order{1/\varepsilon^2}$ complexity under exact gradients and fixed bounded relative-or-absolute function errors \\
+             & \ding{51}
+             & --\textsuperscript{*}
+             & \ding{51}
+             & \makecell[c]{\(\order{\varepsilon^{-2}}\) to\\\(\|\nabla f\|\leq\varepsilon\)} \\
             \bottomrule
         \end{tabular}
     }
@@ -99,11 +97,16 @@ The two results are therefore complementary, with ours providing the stronger at
 \end{table*}
 
 \begin{MPCchange}
-When a sufficient decrease in observed function value is available, the method uses an unregularized quasi-Newton step; otherwise, it uses regularization governed by an AdaGrad-Norm-type accumulator over the regularized iterations.
-We prove that the resulting method reaches an \(\varepsilon\)-first-order stationary point in the order-optimal \(\order{1/\varepsilon^2}\) iterations for smooth nonconvex objectives under exact gradients and bounded relative-or-absolute function errors.
-This matches the best possible worst-case order for the corresponding noise-free class even though the method still uses the available noisy function values selectively.
-We state the exact-gradient scope explicitly and separate theory-aligned function-noise experiments from joint function-and-gradient perturbations, the latter serving as deliberately adverse stress tests rather than evidence for the theorem.
-The CUTEst study also reports problem dimensions, the baseline stopping rules, sensitivity to the supplied function-error estimate, and ablations of the hybrid mechanism.
+The rates in \cref{tab:related_work_comparison} have different targets and assumptions.
+For line-search L-BFGS with exact evaluations, Theorem~7.1 of Liu and Nocedal~\citep{liuLimitedMemoryBFGS1989} proves R-linear convergence of the objective gap under uniform convexity and bounded initial scaling matrices.
+For NTQN, Theorem~3.5 of Shi et al.~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022} proves \(\phi(x_k)-\phi^*\leq\rho^k(\phi(x_0)-\phi^*)+2\epsilon_f\), where \(0<\rho<1\), until the iterates enter a noise-dependent neighborhood.
+Thus NTQN has an order-level linear rate under strong convexity, but does not guarantee an arbitrary smaller stationarity tolerance.
+By contrast, OFFO and our method have \(\order{1/\varepsilon^2}\) worst-case complexity for first-order stationarity on smooth nonconvex objectives, and our result additionally permits persistent bounded function errors.
+
+When the observed function value certifies sufficient decrease, the method uses an unregularized quasi-Newton step; otherwise, an AdaGrad-Norm-type accumulator controls the regularization over iterations in $K^+$.
+Under exact gradients and bounded relative-or-absolute function errors, the method reaches an \(\varepsilon\)-first-order stationary point in the order-optimal \(\order{1/\varepsilon^2}\) iterations.
+The CUTEst study reports problem dimensions, stopping rules, sensitivity to the supplied error estimate, and ablations of the hybrid mechanism.
+It separates theory-aligned function-noise experiments from joint function-and-gradient perturbations, which are deliberately adverse stress tests rather than evidence for the theorem.
 \end{MPCchange}
 
 \ifSubfilesClassLoaded{

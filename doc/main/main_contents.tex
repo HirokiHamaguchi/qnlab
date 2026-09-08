@@ -872,7 +872,8 @@ In addition to these precision experiments, we distinguish two additive-noise ex
 \end{enumerate}
 We supply \(\feps=10^{-2}\) in both settings and additionally test \(10^{-4}\) and \(10^{-1}\) to assess under- and overestimation of this error parameter.
 Underestimating $\feps$ makes $\Delta_k$ too small to absorb the actual function error, makes the $K^0$ test easier to satisfy, and can therefore cause the method to trust unreliable comparisons and take more unregularized steps outside the theorem's error model.
-Overestimating $\feps$ enlarges $\Delta_k$, relaxes the Armijo acceptance test, and simultaneously makes entry into $K^0$ more stringent through $\overline f(x_j)-\Delta_j$, so the expected effect is a safer but potentially more conservative use of $K^+$.
+Overestimating $\feps$ has two competing effects: it relaxes Armijo acceptance through a larger $\Delta_k$, but it lowers every reference value $\overline f(x_j)-\Delta_j$ and thereby makes subsequent entry into $K^0$ harder.
+The latter effect can keep the method in $K^+$, where the accumulated scale $G_k$ is nondecreasing and can produce increasingly damped steps; meanwhile, the relaxed Armijo test may accept steps on the basis of an allowance far larger than the actual $10^{-3}$ perturbation.
 The sensitivity experiment tests these two qualitatively different failure modes rather than treating misspecification as a purely numerical parameter sweep.
 Each noisy experiment uses the five seeds $0, 1, 2, 3, 4$, records the seed, and supplies the same seed to all solvers for a given problem and scenario.
 The joint-noise setting deliberately violates \cref{eq:exact_gradient_assumption}; it is included to test performance under an unfavorable perturbation, not to validate the exact-gradient theorem.
@@ -906,6 +907,7 @@ For a given threshold $\tau \geq 1$ and solver $s$, the performance profile plot
 \end{equation*}
 A curve that lies above others indicates better performance.
 Following standard implementations~\citep{2020SciPy-NMeth}, we used the infinity norm for the gradient, though other norms may equally be employed.
+\MPCchanged{All reported success percentages use the same common gradient tolerance as the corresponding profiles; a run that terminates without attaining that tolerance is counted as unsolved for this metric.}
 
 \subsubsection{Results with Artificial Noise}\label{sssec:noise_results}
 
@@ -915,21 +917,80 @@ The former tests the assumptions of \cref{sec:analysis}; the latter asks whether
 Therefore, success in the joint-noise experiment is evidence that the method can remain effective even in a setting that is theoretically unfavorable to it, but it is not presented as validation of the exact-gradient complexity result.
 The experiment notebook compares the hybrid method with the first-order \texttt{ASTR1-Adagrad} baseline of Gratton et al.~\citep{Gratton08022024} and varies the supplied \(\feps\) over two orders of magnitude around its nominal value.
 All main-text profiles use the analyzed no-restart method; the earlier accumulator-restart heuristic is evaluated separately in the appendix.
+Across the $220$ problems and five paired seeds, \texttt{Ours} and \texttt{Ours-MS} attain \(\gtol = 10^{-2}\) on $83.9\%$ and $84.8\%$, respectively, of the $1{,}100$ function-noise instances; their seed-to-seed standard deviations in the solved fraction are only $0.52$ and $0.83$ percentage points.
+The corresponding rates for \texttt{NTQN}, \texttt{Reg}, \texttt{Reg-Sec}, and \texttt{ASTR1-Adagrad} are $81.2\%$, $77.8\%$, $74.0\%$, and $41.5\%$.
+Among successful runs, the median oracle-call counts are $62$ for \texttt{Ours}, $71$ for \texttt{Ours-MS}, $64$ for \texttt{NTQN}, and $131$ for \texttt{ASTR1-Adagrad}; the complete distributions, including failures, are represented by the profiles in \cref{fig:results_function_noise}.
+Both proposed variants solve at least one instance of dimension $123{,}200$, the largest dimension in the retained collection.
+In the joint-noise stress test, \texttt{Ours} and \texttt{Ours-MS} solve $80.7\%$ and $83.1\%$ of the instances, compared with $71.9\%$ for \texttt{NTQN}, $73.5\%$ for \texttt{Reg}, and $42.8\%$ for \texttt{ASTR1-Adagrad}; the two proposed rates have seed-to-seed standard deviations of $0.61$ and $0.75$ percentage points.
+Here the componentwise gradient perturbation $10^{-3}$ is one order below the common scoring tolerance, and the regularized $K^+$ steps damp the effect of an inaccurate gradient when function comparisons cease to certify progress.
+This offers a plausible explanation for the strong empirical result, including the higher solved fraction than NTQN under the common stopping criterion, but it does not establish gradient-noise tolerance or extend the exact-gradient theorem.
+\end{MPCchange}
+
+\begin{MPCchange}
+\begin{figure}[t]
+    \centering
+    \begin{subfigure}[b]{0.72\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_function_only_gtol1e-02.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.98\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_legend_noise.pdf}
+    \end{subfigure}
+    \caption{\MPCchanged{Theory-aligned function-value-noise results at noise level $10^{-3}$, supplied error bound \(\feps = 10^{-2}\), and \(\gtol = 10^{-2}\).}}
+    \label{fig:results_function_noise}
+\end{figure}
 \end{MPCchange}
 
 \begin{figure}[t]
     \centering
-    \begin{subfigure}[b]{\resultsNoiseMainWidth\textwidth}
+    \begin{subfigure}[b]{0.72\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_pp_noise0.001_gtol1e-02.pdf}
     \end{subfigure}
-    \begin{subfigure}[b]{\resultsNoiseLegendWidth\textwidth}
+    \begin{subfigure}[b]{0.98\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../imgs/compare/_legend.pdf}
+        \includegraphics[width=\textwidth]{../imgs/compare/_legend_noise.pdf}
     \end{subfigure}
     \caption{Performance profile for \MPCchanged{the deliberately adverse joint function-and-gradient} noise setting \MPCchanged{(componentwise level \(10^{-3}\))} and $\gtol=10^{-2}$\MPCchanged{; this experiment lies outside the exact-gradient theory}.}
     \label{fig:results_noise}
 \end{figure}
+
+\begin{MPCchange}
+For the error-bound sensitivity study, underestimating \(\feps\) as $10^{-4}$ gives solved fractions of $85.5\%$ for \texttt{Ours} and $75.3\%$ for \texttt{Ours-MS}, whereas the nominal $10^{-2}$ gives $83.9\%$ and $84.8\%$, and overestimating it as $10^{-1}$ gives $72.5\%$ and $71.5\%$.
+Thus, underestimation happens to improve the aggregate success rate of the unmodified variant but substantially harms the modified-secant variant, while the tenfold overestimate reduces both rates by about $12$--$13$ percentage points relative to the nominal setting.
+For $\feps=10^{-1}$, the multiplier $2\feps/(1-\feps)$ in $\Delta_k$ equals approximately $0.222$, more than one hundred times the actual additive-noise level.
+The resulting reference shift can force prolonged $K^+$ use and an overly large accumulated regularization scale, while the simultaneously loosened Armijo test no longer discriminates well between genuine decrease and an allowed increase.
+This explains why overestimation is not simply ``safer'': both parts of the hybrid decision become poorly calibrated, yielding conservative steps without a commensurate gain in noise protection.
+This asymmetric response supports treating \(\feps\) as a practically consequential error bound rather than as a tuning parameter for which either systematic under- or overestimation is uniformly safe.
+
+\begin{figure}[t]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_eps_under_gtol1e-02.pdf}
+        \caption{\MPCchanged{\(\feps = 10^{-4}\).}}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_eps_nominal_gtol1e-02.pdf}
+        \caption{\MPCchanged{\(\feps = 10^{-2}\).}}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_eps_over_gtol1e-02.pdf}
+        \caption{\MPCchanged{\(\feps = 10^{-1}\).}}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_legend_sensitivity.pdf}
+    \end{subfigure}
+    \caption{\MPCchanged{Performance profiles for error-bound misspecification under function-value-only noise of level $10^{-3}$ and \(\gtol = 10^{-2}\).}}
+    \label{fig:results_error_bound_sensitivity}
+\end{figure}
+\end{MPCchange}
 
 \subsubsection{Results at Different Precision Levels}\label{sssec:exact_results}
 
@@ -938,7 +999,8 @@ We evaluated each method at three gradient norm tolerance levels, i.e., $\gtol \
 These tolerance levels represent different optimization regimes, from moderate accuracy to high precision requirements.
 \Cref{fig:results_all_precisions} shows the comprehensive performance profiles across all three precision levels.
 \begin{MPCchange}
-The profiles show that \texttt{Ours} and \texttt{Ours-MS} solve a large fraction of the retained problems across the three precision levels.
+At the strictest tolerance \(\gtol = 10^{-5}\), \texttt{Ours} and \texttt{Ours-MS} solve $85.5\%$ and $86.4\%$ of the 64-bit problems, $52.7\%$ and $52.3\%$ of the 32-bit problems, and $28.9\%$ and $28.9\%$ of the 16-bit problems.
+The decreasing rates quantify the expected loss of attainable accuracy as arithmetic precision is reduced, while both variants remain among the most robust methods in the profiles.
 Their relative ranking depends on the tolerance and precision, so we avoid claiming uniform superiority and report both the fraction solved and the performance ratios in \cref{fig:results_all_precisions}.
 \end{MPCchange}
 
@@ -1010,7 +1072,7 @@ Their relative ranking depends on the tolerance and precision, so we avoid claim
     % Legend
     \begin{subfigure}[b]{0.8\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../imgs/compare/_legend.pdf}
+        \includegraphics[width=\textwidth]{../imgs/compare/_legend_precision.pdf}
     \end{subfigure}
     \caption{\MPCchanged{Performance profiles across floating-point precisions (64-, 32-, and 16-bit) and tolerance levels.}}
     \label{fig:results_all_precisions}

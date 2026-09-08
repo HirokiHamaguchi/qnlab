@@ -45,6 +45,9 @@ COLORS = {
     "SciPy": TAB20(6),
     "NTQN": TAB20(8),
     "ASTR1-Adagrad": TAB20(10),
+    "NTRQN-Restart": "#004488",
+    "NTRQN-MS-Restart": "#5B8DB8",
+    "NTQN-Default-Termination": TAB20(9),
 }
 COLORS.update(
     {
@@ -63,6 +66,9 @@ LINE_STYLES = {
     "SciPy": "v:",
     "NTQN": "s-.",
     "ASTR1-Adagrad": "P:",
+    "NTRQN-Restart": "s--",
+    "NTRQN-MS-Restart": "D-.",
+    "NTQN-Default-Termination": "s:",
 }
 LINE_STYLES.update(
     {

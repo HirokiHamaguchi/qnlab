@@ -1,16 +1,65 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import seaborn as sns
 
-from qnlab.util.method import get_methods
+from qnlab.util.method import COLORS, LINE_STYLES
 
 
-def create_legend():
-    methods, ALGORITHM_COLORS, ALGORITHM_LINE_STYLES = get_methods()
-    alg_names = [method.label for method, _ in methods]
+LEGENDS = {
+    "_legend.pdf": [
+        ("NTRQN", "Ours"),
+        ("NTRQN-MS", "Ours-MS"),
+        ("Line", "Line"),
+        ("Line-MS", "Line-MS"),
+        ("Reg", "Reg"),
+        ("Reg-Sec", "Reg-Sec"),
+        ("SciPy", "SciPy"),
+        ("NTQN", "NTQN"),
+    ],
+    "_legend_noise.pdf": [
+        ("NTRQN", "Ours"),
+        ("NTRQN-MS", "Ours-MS"),
+        ("Line", "Line"),
+        ("Line-MS", "Line-MS"),
+        ("Reg", "Reg"),
+        ("Reg-Sec", "Reg-Sec"),
+        ("SciPy", "SciPy"),
+        ("NTQN", "NTQN (common stop)"),
+        ("ASTR1-Adagrad", "ASTR1-Adagrad"),
+        ("NTQN-Default-Termination", "NTQN (recommended stop)"),
+    ],
+    "_legend_precision.pdf": [
+        ("NTRQN", "Ours"),
+        ("NTRQN-MS", "Ours-MS"),
+        ("Line", "Line"),
+        ("Line-MS", "Line-MS"),
+        ("Reg", "Reg"),
+        ("Reg-Sec", "Reg-Sec"),
+        ("SciPy", "SciPy"),
+        ("NTQN", "NTQN"),
+        ("ASTR1-Adagrad", "ASTR1-Adagrad"),
+    ],
+    "_legend_sensitivity.pdf": [
+        ("NTRQN", "Ours"),
+        ("NTRQN-MS", "Ours-MS"),
+    ],
+    "_legend_restart.pdf": [
+        ("NTRQN", "Ours (no restart)"),
+        ("NTRQN-Restart", "Ours-R (restart)"),
+    ],
+    "_legend_misspec_restart.pdf": [
+        ("NTRQN", "Ours"),
+        ("NTRQN-Restart", "Ours-R"),
+        ("NTRQN-MS", "Ours-MS"),
+        ("NTRQN-MS-Restart", "Ours-MS-R"),
+    ],
+}
 
-    sns.set_style("whitegrid")
+
+def create_legend(filename, entries):
+    alg_names = [name for name, _ in entries]
+
+    plt.style.use("seaborn-v0_8-whitegrid")
     plt.rcParams.update(
         {
             "text.usetex": True,
@@ -21,17 +70,19 @@ def create_legend():
         }
     )
 
-    fig, ax = plt.subplots(figsize=(6, 1.5))
+    ncol = 5 if len(entries) > 5 else len(entries)
+    fig_width = 11 if len(entries) > 5 else max(4, 2.6 * len(entries))
+    fig, ax = plt.subplots(figsize=(fig_width, 1.45))
     handles = []
     for name in alg_names:
-        color = ALGORITHM_COLORS.get(name, "black")
-        linestyle = ALGORITHM_LINE_STYLES.get(name, "o-")
-        (handle,) = plt.step(
-            [0, 0], [0, 0], linestyle, color=color, linewidth=2.5, markersize=8
+        color = COLORS[name]
+        linestyle = LINE_STYLES[name]
+        (handle,) = ax.plot(
+            [], [], linestyle, color=color, linewidth=2.5, markersize=8
         )
         handles.append(handle)
 
-    legend_names = [name.replace("NTRQN", "Ours") for name in alg_names]
+    legend_names = [display_name for _, display_name in entries]
     ax.legend(
         handles,
         legend_names,
@@ -39,8 +90,8 @@ def create_legend():
         framealpha=0.98,
         edgecolor="black",
         fancybox=True,
-        fontsize=16,
-        ncol=max(1, (len(alg_names) + 1) // 2),
+        fontsize=14,
+        ncol=ncol,
         frameon=True,
     )
     ax.axis("off")
@@ -48,11 +99,12 @@ def create_legend():
 
     out_dir = Path(__file__).parent.parent.parent.parent / "doc" / "imgs" / "compare"
     out_dir.mkdir(parents=True, exist_ok=True)
-    legend_path = out_dir / "_legend.pdf"
+    legend_path = out_dir / filename
     fig.savefig(legend_path, format="pdf", bbox_inches="tight", dpi=300)
     plt.close(fig)
     print(f"Saved legend to {legend_path}")
 
 
 if __name__ == "__main__":
-    create_legend()
+    for filename, entries in LEGENDS.items():
+        create_legend(filename, entries)

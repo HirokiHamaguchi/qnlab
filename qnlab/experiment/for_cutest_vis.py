@@ -170,6 +170,7 @@ def draw_pp(
         fontsize=18,
         fontweight="normal",
     )
+    ax.set_xticks([2, 4, 6, 8, 10])
 
     # Grid styling
     ax.grid(True, alpha=0.35, linestyle="-", linewidth=0.6, color="gray")
