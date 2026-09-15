@@ -179,5 +179,6 @@
         "Quasi-Newton",
         "Ya-Xiang",
         "Kang-Hoh"
-    ]
+    ],
+    "cmake.sourceDirectory": "C:/Users/hirok/Documents/University/Research/qnlab/test/test_liblbfgs/liblbfgs"
 }

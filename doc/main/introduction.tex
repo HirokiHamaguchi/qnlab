@@ -44,8 +44,10 @@ Shi et al. cover bounded gradient errors and protect curvature pairs by lengthen
     \ifdefined\MPCRevision\captionsetup{font={color=red}}\fi
     \centering
     \caption{
-        Quasi-Newton-focused comparison of the proposed method and its baselines; OFFO is included as the first-order source of the fallback scaling.
-        A \ding{51} denotes theoretical coverage and ``--'' its absence; the asterisk marks empirical robustness outside our gradient-noise theory.
+        Quasi-Newton-focused comparison of the proposed method and its baselines.
+        OFFO is included as the first-order source of the fallback scaling.
+        A \ding{51} denotes theoretical coverage and ``--'' its absence.
+        The asterisk marks empirical robustness outside our gradient-noise theory.
     }
     \label{tab:related_work_comparison}
     {\scriptsize
@@ -103,7 +105,8 @@ For NTQN, Theorem~3.5 of Shi et al.~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2
 Thus NTQN has an order-level linear rate under strong convexity, but does not guarantee an arbitrary smaller stationarity tolerance.
 By contrast, OFFO and our method have \(\order{1/\varepsilon^2}\) worst-case complexity for first-order stationarity on smooth nonconvex objectives, and our result additionally permits persistent bounded function errors.
 
-When the observed function value certifies sufficient decrease, the method uses an unregularized quasi-Newton step; otherwise, an AdaGrad-Norm-type accumulator controls the regularization over iterations in $K^+$.
+When the observed function value certifies sufficient decrease, the method uses an unregularized quasi-Newton step.
+Otherwise, an AdaGrad-Norm-type accumulator controls the regularization over iterations in $K^+$.
 Under exact gradients and bounded relative-or-absolute function errors, the method reaches an \(\varepsilon\)-first-order stationary point in the order-optimal \(\order{1/\varepsilon^2}\) iterations.
 The CUTEst study reports problem dimensions, stopping rules, sensitivity to the supplied error estimate, and ablations of the hybrid mechanism.
 It separates theory-aligned function-noise experiments from joint function-and-gradient perturbations, which are deliberately adverse stress tests rather than evidence for the theorem.

@@ -24,8 +24,11 @@ LEGENDS = {
         ("Reg", "Reg"),
         ("Reg-Sec", "Reg-Sec"),
         ("SciPy", "SciPy"),
-        ("NTQN", "NTQN (common stop)"),
+        ("NTQN", "NTQN"),
         ("ASTR1-Adagrad", "ASTR1-Adagrad"),
+    ],
+    "_legend_ntqn_termination.pdf": [
+        ("NTQN", "NTQN (common stop)"),
         ("NTQN-Default-Termination", "NTQN (recommended stop)"),
     ],
     "_legend_precision.pdf": [
@@ -46,12 +49,6 @@ LEGENDS = {
     "_legend_restart.pdf": [
         ("NTRQN", "Ours (no restart)"),
         ("NTRQN-Restart", "Ours-R (restart)"),
-    ],
-    "_legend_misspec_restart.pdf": [
-        ("NTRQN", "Ours"),
-        ("NTRQN-Restart", "Ours-R"),
-        ("NTRQN-MS", "Ours-MS"),
-        ("NTRQN-MS-Restart", "Ours-MS-R"),
     ],
 }
 

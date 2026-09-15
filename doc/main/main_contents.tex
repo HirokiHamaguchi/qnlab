@@ -70,22 +70,31 @@ We assume that only an error-contaminated function value $\overline{f}(x)$ is ac
 where $0 \le \feps < 1$ is an error rate.
 The error is predominantly relative when $\abs{f(x)}$ is large and effectively absolute when $\abs{f(x)}$ is small, capturing the typical behavior of rounding errors in IEEE~754 floating-point arithmetic~\citep{highamAccuracyStabilityNumerical2002}.
 \begin{MPCchange}
-The choice of $\feps$ is motivated by the practical heuristic used in numerical stopping rules rather than by treating one rounding operation as the total error.
-For example, SciPy's L-BFGS-B uses $\mathtt{ftol}=\mathtt{factr}\,\epsilon_{\mathrm{mach}}$ with the moderate-accuracy default $\mathtt{factr}=10^7$~\citep{2020SciPy-NMeth}.
-We similarly use a precision-dependent multiple of machine epsilon as an aggregate error allowance and assess sensitivity to this supplied value in \cref{sec:experiments}.
+The value of $\feps$ serves as a safety margin for errors in the computed function values.
+Underestimating $\feps$ can violate \cref{eq:error_model} and cause the method to treat unreliable function-value comparisons as informative.
+By contrast, choosing a larger value preserves the analysis as long as $\feps<1$ and the error bound remains valid, although it moves the method earlier or more frequently into the more conservative OFFO-type regime $K^+$.
+Because a function evaluation generally involves many floating-point operations whose errors can accumulate, we choose a precision-dependent multiple of machine epsilon as an aggregate error allowance rather than identifying $\feps$ with the error from a single rounding operation.
+Specifically, our choices are guided by numerical stopping rules such as the default SciPy L-BFGS-B function tolerance, which uses $10^7$ times machine epsilon~\citep{2020SciPy-NMeth}.
+The values used at each precision and a sensitivity study with under- and overestimated values are reported in \cref{sec:experiments}.
 
-We distinguish the setting covered by the analysis from the additional stress tests in \cref{sec:experiments}.
-The convergence theory makes the following exact-gradient assumption.
+We next specify the assumption on gradient evaluations.
+In practice, termination is typically based on a gradient tolerance $\gtol$, and $\norm{g(x)}\leq\gtol$ is used as a stopping criterion.
+Thus, before termination, $\norm{g(x)}>\gtol$.
+If the gradient error $\norm{g(x)-\nabla f(x)}$ were comparable to or larger than $\gtol$, this stopping criterion would not reliably indicate stationarity even when $\nabla f(x)=0$.
+Meaningful termination therefore requires the gradient error to be sufficiently small relative to $\gtol$.
+In particular, before termination, we have in mind the regime $\norm{g(x)-\nabla f(x)}\ll\gtol<\norm{g(x)}$.
+Under this regime, $g(x)$ is a sufficiently accurate approximation of $\nabla f(x)$ for the required accuracy.
+For simplicity, the convergence analysis adopts the following exact-gradient assumption.
 \begin{assumption}[Exact gradient]\label{ass:exact_gradient}
     The algorithm has access to a gradient oracle $g$ such that, for every evaluated point $x$,
     \begin{equation}\label{eq:exact_gradient_assumption}
         g(x)=\nabla f(x).
     \end{equation}
 \end{assumption}
-The gradient oracle is independent of the inexact function-value oracle $\overline f$; in particular, $\overline f$ need not be differentiable.
-This assumption is not implied by the function-value error model in \cref{eq:error_model} and is therefore stated independently.
-With a bounded nonvanishing gradient error, exact first-order stationarity is generally impossible to certify below the noise floor; a result in that setting would instead have to bound convergence to a neighborhood.
-Accordingly, function-value-only noise is the theory-aligned artificial experiment, while joint function-and-gradient noise is reported as a deliberately adverse robustness test beyond the theorem.
+This assumption is a modeling simplification for the analysis rather than a claim that practical gradients are exact.
+The proposed method does not use Wolfe conditions and therefore does not require gradient evaluations at trial points to verify such conditions.
+The function-value-only experiments satisfy \cref{ass:exact_gradient}, whereas the joint-noise experiments deliberately violate it and lie outside the theory.
+The latter experiments are included to assess the empirical robustness of the proposed method, not to validate or extend the convergence result.
 \end{MPCchange}
 
 \section{Proposed Algorithm}\label{sec:algorithm}
@@ -554,9 +563,13 @@ Then, we can obtain the following unified bound \MPCchanged{for the two types of
     \myQED
 \end{proof}
 
-Now, we establish the following \MPCchanged{iteration-complexity result} for \cref{alg:regularized_qn}.
+Now, we establish the following \MPCchanged{convergence-rate and iteration-complexity result} for \cref{alg:regularized_qn}.
 \begin{theorem}\label{thm:gc}
-    \MPCchanged{Under \cref{ass:exact_gradient,ass:bounded,ass:LSmooth,ass:BBounds}, for every $0<\varepsilon\leq1$, \cref{alg:regularized_qn} generates an iterate satisfying $\norm{g_k}\leq\varepsilon$ within $\order{1/\varepsilon^2}$ iterations.}
+    \MPCchanged{Under \cref{ass:exact_gradient,ass:bounded,ass:LSmooth,ass:BBounds}, the iterates generated by \cref{alg:regularized_qn} satisfy}
+    \begin{equation*}
+        \MPCchanged{\frac{1}{k_{\max}}\sum_{k=0}^{k_{\max}-1}\norm{g_k}^2=\order{\frac{1}{k_{\max}}}.}
+    \end{equation*}
+    \MPCchanged{Consequently, for every $0<\varepsilon\leq1$, the algorithm generates an iterate satisfying $\norm{g_k}\leq\varepsilon$ within $\order{1/\varepsilon^2}$ iterations.}
 \end{theorem}
 \begin{proof}
     Let us define the function $\phi\colon \mathbb{R}_{>0} \to \mathbb{R}$ as
@@ -586,18 +599,19 @@ Now, we establish the following \MPCchanged{iteration-complexity result} for \cr
     \end{align*}
 
     \begin{MPCchange}
-    Suppose that $\norm{g_k}>\varepsilon$ for every $0\leq k<k_{\max}$, where $0<\varepsilon\leq1$.
-    We then have $\sum_{k\in K^0}\norm{g_k}^2>\varepsilon^2\abs{K^0}$.
-    We also have $\sqrt{\sum_{k\in K^+}\norm{g_k}^2}>\varepsilon\sqrt{\abs{K^+}}$.
-    Applying these two bounds to \cref{eq:final_inequality_for_gc} yields
-    \begin{equation*}
-        \abs{K^0}<\frac{MF'}{c\overline\alpha\varepsilon^2},
-        \qquad
-        \abs{K^+}<\frac{4(F')^2}{C_1^2\varepsilon^2}.
-    \end{equation*}
-    Since $k_{\max}=\abs{K^0}+\abs{K^+}$, there must therefore be an iterate with $\norm{g_k}\leq\varepsilon$ whenever
+    It remains to bound $\sum_{k\in K}\norm{g_k}^2=\sum_{k\in K^0}\norm{g_k}^2+\sum_{k\in K^+}\norm{g_k}^2$ under \cref{eq:final_inequality_for_gc}.
+    More generally, let $a,b>0$, $c\geq0$, and $x,y\geq0$, and consider maximizing $x+y$ subject to $ax+b\sqrt{y}\leq c$.
+    The maximum is attained on the boundary $ax+b\sqrt{y}=c$ because the objective is increasing in both variables.
+    On this boundary, $y=(c-ax)^2/b^2$, so the objective is convex over $0\leq x\leq c/a$ and attains its maximum at an endpoint.
+    Evaluating the two endpoints gives $x+y\leq\max\{c/a,c^2/b^2\}$.
+    Applying this bound to \cref{eq:final_inequality_for_gc} yields
+    \begin{equation}\label{eq:average_gradient_bound}
+        \frac{1}{k_{\max}}\sum_{k=0}^{k_{\max}-1}\norm{g_k}^2
+        \leq\frac{1}{k_{\max}}\max\left\{\frac{MF'}{c\overline\alpha},\frac{4(F')^2}{C_1^2}\right\}.
+    \end{equation}
+    Since the minimum is no larger than the average, \cref{eq:average_gradient_bound} also guarantees an iterate satisfying $\norm{g_k}\leq\varepsilon$ whenever
     \begin{equation}\label{eq:gc_result}
-        k_{\max}\geq\frac{1}{\varepsilon^2}\qty(\frac{MF'}{c\overline\alpha}+\frac{4(F')^2}{C_1^2}).
+        k_{\max}\geq\frac{1}{\varepsilon^2}\max\left\{\frac{MF'}{c\overline\alpha},\frac{4(F')^2}{C_1^2}\right\}.
     \end{equation}
     This completes the proof.
     \end{MPCchange}
@@ -628,11 +642,12 @@ Finally, \cref{thm:gc} implies \MPCchanged{the iteration-complexity bound}
 More explicitly, \cref{eq:gc_result} gives the sufficient bound
 \begin{equation*}
     k_{\max}\geq \frac{1}{\gtol^2}
-    \qty(\frac{MF'}{c\overline\alpha}+\frac{4(F')^2}{C_1^2}).
+    \max\left\{\frac{MF'}{c\overline\alpha},\frac{4(F')^2}{C_1^2}\right\}.
 \end{equation*}
 Here $\overline\alpha$ depends only on $c,L,m$ and the backtracking bounds, $C_1=\overline\alpha/\theta_{\max}$, $C_2=(M\overline\alpha+L/2)/\theta_{\min}^2$, and $F'$ is displayed in the proof and contains $\feps$, $\varsigma$, the initial true and observed optimality gaps, and $\Delta_{\max}$.
 The construction in \cref{sec:proposed_choice_Bk} gives $m=\omega_{\min}$ and $M=\qty(1+(1+p)\Lambda)\rho_0$, so the memory length and fixed initial scale enter the sufficient iteration bound through $M$.
-Thus the order symbol suppresses no dependence on the iteration counter, but it does suppress these problem and algorithm parameters; the guarantee deteriorates as the permitted function error approaches \(1\) through the factor \((1-\feps)^{-1}\).
+Thus the order symbol suppresses no dependence on the iteration counter, but it does suppress these problem and algorithm parameters.
+The guarantee deteriorates as the permitted function error approaches \(1\) through the factor \((1-\feps)^{-1}\).
 \end{MPCchange}
 
 \section{Practical Choices of Algorithmic Variables}\label{sec:proposed_choice}
@@ -678,10 +693,11 @@ When fewer than $p$ curvature pairs are available, the BFGS update is applied us
         \MPCchanged{0\prec \mathrm{BFGS}(\{s_{k_i},y_{k_i}\}_{i=0}^{p-1}) \preceq (1+p)\Lambda I}.
     \end{equation}
 \end{proposition}
-\MPCchanged{Proposition~\ref{prop:bounded_BFGS} gives the upper spectral bound needed below; a fixed diagonal shift will provide the lower bound in \cref{ass:BBounds}.}
+\MPCchanged{Proposition~\ref{prop:bounded_BFGS} gives the upper spectral bound needed below.}
+\MPCchanged{A fixed diagonal shift provides the lower bound in \cref{ass:BBounds}.}
 
 \begin{MPCchange}
-The original manuscript already intended the pair selection as a cautious update in the spirit of curvature-based cautious updates~\citep{liGlobalConvergenceBFGS2001,mannelStructuredLBFGSMethod2024,mannelGlobalizationLBFGSBarzilai2025a}.
+We select curvature pairs using a cautious update in the spirit of curvature-based cautious updates~\citep{liGlobalConvergenceBFGS2001,mannelStructuredLBFGSMethod2024,mannelGlobalizationLBFGSBarzilai2025a}.
 Define the fixed initial scale and diagonal shift by
 \begin{equation*}
     \rho_0\defeq\max\{1,\norm{g_0}\},
@@ -727,7 +743,8 @@ Specifically, it sets $b_i = \norm{y_{k_i}}^2 / \abs{y_{k_i}^{\top}s_{k_i}}$ and
 \end{equation*}
 If $y_{k_i}^{\top}s_{k_i} \geq 0$, it sets $\overline y_{k_i} = y_{k_i}$.
 Candidates for which this scalar damping is numerically unsafe are discarded before \cref{eq:implemented_cautious_test}.
-This is the damping rule used in the released code; the fixed initial-scale upper test and the diagonal shift, rather than damping itself, guarantee the two bounds in \cref{ass:BBounds}.
+This is the damping rule used in the released code.
+The fixed initial-scale upper test and the diagonal shift, rather than damping itself, guarantee the two bounds in \cref{ass:BBounds}.
 No convexity or cocoercivity assumption on \(\nabla f\) is used.
 \end{MPCchange}
 
@@ -747,7 +764,8 @@ with $B_k$ in \cref{eq:proposed_choice_of_Bk}.
     \approx\mathrm{BFGS}(\{s_{k_i},\overline y_{k_i}+(\mu_k+\omega_{\min})s_{k_i}\}_{i=0}^{p-1}).
 \end{equation}
 \end{MPCchange}
-\MPCchanged{The direction is then computed from the raw curvature pairs using the standard two-loop recursion~\citep{liuLimitedMemoryBFGS1989,nocedal1999numerical}; when the memory is empty, the implementation uses $d_k=-g_k/(\rho_0+\omega_{\min}+\mu_k)$.}
+\MPCchanged{The direction is then computed from the raw curvature pairs using the standard two-loop recursion~\citep{liuLimitedMemoryBFGS1989,nocedal1999numerical}.}
+\MPCchanged{When the memory is empty, the implementation uses $d_k=-g_k/(\rho_0+\omega_{\min}+\mu_k)$.}
 Although this approximation is inexact, it has been reported to yield nearly identical practical performance while remaining comparatively simple to implement~\citep{kanzowRegularizationLimitedMemory2023}.
 We adopt this approximation in our numerical experiments.
 
@@ -790,12 +808,15 @@ Hence \(\mu_k=\theta_kG_k\) with \(\theta_k\in[10^{-2},1]\), exactly as required
 We set \(\varsigma=10^{-20}\), so that its square root, the initial scale \(G_{-1}\), equals \(10^{-10}\).
 The primary implementation sets the permitted number of restarts to zero and therefore coincides exactly with the analyzed accumulator.
 The restart was originally intended only as a practical heuristic rather than as an essential part of the proposed algorithm.
+The heuristic is motivated by the observation that continued growth of $G_k$ can over-regularize later steps after the method has again obtained clear progress in the objective value.
+Resetting the accumulator after such progress is intended to reduce the effective regularization and recover faster quasi-Newton behavior.
 For the optional heuristic, a fixed threshold $\tau>0$ resets only the accumulator in \cref{eq:offo_based_update} when the method returns from $K^+$ to $K^0$ and
 \begin{equation}\label{eq:restart_condition}
     \min_{j \in K^0,\,j<k} \qty(\overline{f}(x_j)-\Delta_j)-\overline{f}(x_k) \geq \tau.
 \end{equation}
 The sets $K^0$ and $K^+$ and the reference values in \cref{eq:restart_condition} are not reset.
-Because this optional rule is heuristic, all primary experiments use the analyzed no-restart method; the variant with at most ten restarts is reserved for the separate appendix ablation in \cref{app:restart_experiment}.
+Because this optional rule is heuristic, all primary experiments use the analyzed no-restart method.
+The variant with at most ten restarts is reserved for the separate appendix ablation in \cref{app:restart_experiment}.
 \end{MPCchange}
 
 \section{Numerical Experiments}\label{sec:experiments}
@@ -838,14 +859,19 @@ We compared the following methods in our experiments.
           \begin{itemize}
               \item A method designed to accommodate inexact gradient information, as mentioned in \cref{sec:problem_setting}.
               \begin{MPCchange}
-              \item We report both the original wrapper setting and the authors' recommended termination mode (\texttt{terminate=3}).
-              \item For the latter, the external solver controls termination; the common gradient-tolerance criterion is used only when constructing performance profiles and is not injected into the solver.
-              \item The recommended mode may appear worse under a common-tolerance performance profile because it can terminate appropriately at its estimated noise neighborhood before reaching the profile's scoring tolerance; this reflects a difference in stopping objectives rather than necessarily worse iterates.
+              \item The primary comparison uses the wrapper's common gradient-tolerance stopping rule.
+              \item We also run the authors' recommended termination mode (\texttt{terminate=3}) with the wrapper's gradient-tolerance stop disabled.
+              \item For the latter, the external solver controls termination.
+              \item The common gradient tolerance is used only to score its recorded trajectory and is not injected into the solver.
+              \item The recommended mode may appear worse under this metric because it can terminate appropriately at its estimated noise neighborhood before reaching the common scoring tolerance.
+              \item This reflects a difference in stopping objectives rather than necessarily worse iterates.
               \item We therefore report both solver-declared termination and attainment of the common scoring tolerance and interpret any early truncation separately from oracle efficiency.
               \end{MPCchange}
           \end{itemize}
 
-    \MPCchanged{\item (\texttt{ASTR1-Adagrad}): The purely first-order \texttt{adagrad} variant of ASTR1 reported by Gratton et al.~\citep[Table~1]{Gratton08022024}, using $B_k = 0$, $\gamma_k = 1$, $\mu = 1/2$, $\varsigma = 1/100$, and $\vartheta = \theta = 1$. Its steps and stopping decision use only gradients; the shared callback records the initial objective value solely for diagnostics and does not expose it to the method.}
+    \MPCchanged{\item (\texttt{ASTR1-Adagrad}): The purely first-order \texttt{adagrad} variant of ASTR1 reported by Gratton et al.~\citep[Table~1]{Gratton08022024}, using $B_k = 0$, $\gamma_k = 1$, $\mu = 1/2$, $\varsigma = 1/100$, and $\vartheta = \theta = 1$.
+    Its steps and stopping decision use only gradients.
+    The shared callback records the initial objective value solely for diagnostics and does not expose it to the method.}
 \end{itemize}
 
 In the following, each method is referred to by the name given in parentheses.
@@ -863,20 +889,24 @@ All problems were initialized with the default starting points provided by the l
 \begin{MPCchange}
 The 64- and 32-bit collections contain 220 problems with dimensions from \(2\) to \(123{,}200\), and the 16-bit collection contains 152 problems over the same dimension range.
 The supplied error rates are \(2.22\times10^{-9}\), \(1.19\times10^{-3}\), and \(9.77\times10^{-2}\) for the 64-, 32-, and 16-bit experiments, respectively.
-The 64-bit value equals SciPy's default heuristic $10^7\epsilon_{\mathrm{mach}}$; at lower precisions we reduce the multiplier to $10^4$ and $10^2$, respectively, because retaining $10^7$ would violate the required range $\feps<1$ and yield an uninformative error allowance.
+The 64-bit value equals SciPy's default heuristic $10^7\epsilon_{\mathrm{mach}}$.
+At lower precisions we reduce the multiplier to $10^4$ and $10^2$, respectively, because retaining $10^7$ would violate the required range $\feps<1$ and yield an uninformative error allowance.
 These multipliers are practical safety margins rather than estimates supplied by the theory, which motivates the misspecification study below.
 In addition to these precision experiments, we distinguish two additive-noise experiments on the 64-bit collection:
 \begin{enumerate}
-    \item a theory-aligned setting with \(\overline f(x)=f(x)+\xi_f\), \(\xi_f\sim\operatorname{unif}(-10^{-3},10^{-3})\), and exact gradients; and
+    \item a theory-aligned setting with \(\overline f(x)=f(x)+\xi_f\), \(\xi_f\sim\operatorname{unif}(-10^{-3},10^{-3})\), and exact gradients, and
     \item an adverse stress test with the same function perturbation and independent componentwise gradient perturbations \(\xi_g^{(i)}\sim\operatorname{unif}(-10^{-3},10^{-3})\).
 \end{enumerate}
 We supply \(\feps=10^{-2}\) in both settings and additionally test \(10^{-4}\) and \(10^{-1}\) to assess under- and overestimation of this error parameter.
 Underestimating $\feps$ makes $\Delta_k$ too small to absorb the actual function error, makes the $K^0$ test easier to satisfy, and can therefore cause the method to trust unreliable comparisons and take more unregularized steps outside the theorem's error model.
-Overestimating $\feps$ has two competing effects: it relaxes Armijo acceptance through a larger $\Delta_k$, but it lowers every reference value $\overline f(x_j)-\Delta_j$ and thereby makes subsequent entry into $K^0$ harder.
-The latter effect can keep the method in $K^+$, where the accumulated scale $G_k$ is nondecreasing and can produce increasingly damped steps; meanwhile, the relaxed Armijo test may accept steps on the basis of an allowance far larger than the actual $10^{-3}$ perturbation.
-The sensitivity experiment tests these two qualitatively different failure modes rather than treating misspecification as a purely numerical parameter sweep.
+Overestimating $\feps$ preserves the error model and hence is safe from the viewpoint of the convergence theory, provided that $\feps<1$.
+It relaxes Armijo acceptance through a larger $\Delta_k$, but it also lowers every reference value $\overline f(x_j)-\Delta_j$ and thereby makes subsequent entry into $K^0$ harder.
+The latter effect can keep the method in $K^+$, where the nondecreasing scale $G_k$ produces more conservative OFFO-type steps.
+Thus overestimation is expected to preserve stability but can reduce practical efficiency, whereas underestimation can place the computation outside the assumed error model.
+The sensitivity experiment examines this distinction.
 Each noisy experiment uses the five seeds $0, 1, 2, 3, 4$, records the seed, and supplies the same seed to all solvers for a given problem and scenario.
-The joint-noise setting deliberately violates \cref{eq:exact_gradient_assumption}; it is included to test performance under an unfavorable perturbation, not to validate the exact-gradient theorem.
+The joint-noise setting deliberately violates \cref{eq:exact_gradient_assumption}.
+It is included to test performance under an unfavorable perturbation, not to validate the exact-gradient theorem.
 This setting is particularly adverse for our method because its theory and regularization logic rely on accurate gradient information, whereas NTQN was designed specifically to accommodate bounded gradient errors.
 \end{MPCchange}
 
@@ -884,7 +914,8 @@ Each setting uses a different error rate $\feps$ in the error model (\cref{eq:er
 The table relates the machine epsilon (maximum relative rounding error) for each floating-point precision to the $\feps$ value used in our experiments.
 The relatively large $\feps$ values are chosen to account for the cumulative errors that may arise during optimization.
 \MPCchanged{We first run \texttt{SciPy} with a limit of $15{,}000$ iterations on each problem.}
-\MPCchanged{If it attains the scenario's gradient tolerance after $k_{\mathrm{SciPy}}$ iterations, every other method is limited to $\min\{15{,}000,15k_{\mathrm{SciPy}}\}$ iterations; otherwise, the limit is $15{,}000$.}
+\MPCchanged{If it attains the scenario's gradient tolerance after $k_{\mathrm{SciPy}}$ iterations, every other method is limited to $\min\{15{,}000,15k_{\mathrm{SciPy}}\}$ iterations.}
+\MPCchanged{Otherwise, the limit is $15{,}000$.}
 We timed out runs exceeding 10 minutes per problem.
 
 \input{check/machine_epsilon_table}
@@ -907,23 +938,32 @@ For a given threshold $\tau \geq 1$ and solver $s$, the performance profile plot
 \end{equation*}
 A curve that lies above others indicates better performance.
 Following standard implementations~\citep{2020SciPy-NMeth}, we used the infinity norm for the gradient, though other norms may equally be employed.
-\MPCchanged{All reported success percentages use the same common gradient tolerance as the corresponding profiles; a run that terminates without attaining that tolerance is counted as unsolved for this metric.}
+\MPCchanged{All reported success percentages use the same common gradient tolerance as the corresponding profiles.}
+\MPCchanged{A run that terminates without attaining that tolerance is counted as unsolved for this metric.}
 
 \subsubsection{Results with Artificial Noise}\label{sssec:noise_results}
 
 \begin{MPCchange}
 We first separate the theory-aligned function-noise experiment from the joint-noise stress test described in \cref{sssec:problems}.
-The former tests the assumptions of \cref{sec:analysis}; the latter asks whether the implementation remains useful when both available quantities are perturbed.
+The former tests the assumptions of \cref{sec:analysis}.
+The latter asks whether the implementation remains useful when both available quantities are perturbed.
 Therefore, success in the joint-noise experiment is evidence that the method can remain effective even in a setting that is theoretically unfavorable to it, but it is not presented as validation of the exact-gradient complexity result.
 The experiment notebook compares the hybrid method with the first-order \texttt{ASTR1-Adagrad} baseline of Gratton et al.~\citep{Gratton08022024} and varies the supplied \(\feps\) over two orders of magnitude around its nominal value.
-All main-text profiles use the analyzed no-restart method; the earlier accumulator-restart heuristic is evaluated separately in the appendix.
-Across the $220$ problems and five paired seeds, \texttt{Ours} and \texttt{Ours-MS} attain \(\gtol = 10^{-2}\) on $83.9\%$ and $84.8\%$, respectively, of the $1{,}100$ function-noise instances; their seed-to-seed standard deviations in the solved fraction are only $0.52$ and $0.83$ percentage points.
+All main-text profiles use the analyzed no-restart method.
+The earlier accumulator-restart heuristic is evaluated separately in the appendix.
+Across the $220$ problems and five paired seeds, \texttt{Ours} and \texttt{Ours-MS} attain \(\gtol = 10^{-2}\) on $83.9\%$ and $84.8\%$, respectively, of the $1{,}100$ function-noise instances.
+Their seed-to-seed standard deviations in the solved fraction are only $0.52$ and $0.83$ percentage points.
 The corresponding rates for \texttt{NTQN}, \texttt{Reg}, \texttt{Reg-Sec}, and \texttt{ASTR1-Adagrad} are $81.2\%$, $77.8\%$, $74.0\%$, and $41.5\%$.
-Among successful runs, the median oracle-call counts are $62$ for \texttt{Ours}, $71$ for \texttt{Ours-MS}, $64$ for \texttt{NTQN}, and $131$ for \texttt{ASTR1-Adagrad}; the complete distributions, including failures, are represented by the profiles in \cref{fig:results_function_noise}.
+Among successful runs, the median oracle-call counts are $62$ for \texttt{Ours}, $71$ for \texttt{Ours-MS}, $64$ for \texttt{NTQN}, and $131$ for \texttt{ASTR1-Adagrad}.
+The complete distributions, including failures, are represented by the profiles in \cref{fig:results_function_noise}.
 Both proposed variants solve at least one instance of dimension $123{,}200$, the largest dimension in the retained collection.
-In the joint-noise stress test, \texttt{Ours} and \texttt{Ours-MS} solve $80.7\%$ and $83.1\%$ of the instances, compared with $71.9\%$ for \texttt{NTQN}, $73.5\%$ for \texttt{Reg}, and $42.8\%$ for \texttt{ASTR1-Adagrad}; the two proposed rates have seed-to-seed standard deviations of $0.61$ and $0.75$ percentage points.
+In the joint-noise stress test, \texttt{Ours} and \texttt{Ours-MS} solve $80.7\%$ and $83.1\%$ of the instances, compared with $71.9\%$ for \texttt{NTQN}, $73.5\%$ for \texttt{Reg}, and $42.8\%$ for \texttt{ASTR1-Adagrad}.
+The two proposed rates have seed-to-seed standard deviations of $0.61$ and $0.75$ percentage points.
 Here the componentwise gradient perturbation $10^{-3}$ is one order below the common scoring tolerance, and the regularized $K^+$ steps damp the effect of an inaccurate gradient when function comparisons cease to certify progress.
 This offers a plausible explanation for the strong empirical result, including the higher solved fraction than NTQN under the common stopping criterion, but it does not establish gradient-noise tolerance or extend the exact-gradient theorem.
+Under NTQN's recommended termination mode, $50.1\%$ of the same function-noise instances attain the common tolerance, compared with $81.2\%$ under the wrapper's common-tolerance stop.
+All recommended-mode runs terminate without timeout or exception, and $619$ of them return flag~4.
+The lower scored fraction therefore mainly reflects NTQN's noise-dependent stopping rule rather than failed execution.
 \end{MPCchange}
 
 \begin{MPCchange}
@@ -952,7 +992,8 @@ This offers a plausible explanation for the strong empirical result, including t
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_legend_noise.pdf}
     \end{subfigure}
-    \caption{Performance profile for \MPCchanged{the deliberately adverse joint function-and-gradient} noise setting \MPCchanged{(componentwise level \(10^{-3}\))} and $\gtol=10^{-2}$\MPCchanged{; this experiment lies outside the exact-gradient theory}.}
+    \caption{Performance profile for \MPCchanged{the deliberately adverse joint function-and-gradient} noise setting \MPCchanged{(componentwise level \(10^{-3}\))} and $\gtol=10^{-2}$\MPCchanged{.
+    This experiment lies outside the exact-gradient theory}.}
     \label{fig:results_noise}
 \end{figure}
 
@@ -960,9 +1001,10 @@ This offers a plausible explanation for the strong empirical result, including t
 For the error-bound sensitivity study, underestimating \(\feps\) as $10^{-4}$ gives solved fractions of $85.5\%$ for \texttt{Ours} and $75.3\%$ for \texttt{Ours-MS}, whereas the nominal $10^{-2}$ gives $83.9\%$ and $84.8\%$, and overestimating it as $10^{-1}$ gives $72.5\%$ and $71.5\%$.
 Thus, underestimation happens to improve the aggregate success rate of the unmodified variant but substantially harms the modified-secant variant, while the tenfold overestimate reduces both rates by about $12$--$13$ percentage points relative to the nominal setting.
 For $\feps=10^{-1}$, the multiplier $2\feps/(1-\feps)$ in $\Delta_k$ equals approximately $0.222$, more than one hundred times the actual additive-noise level.
-The resulting reference shift can force prolonged $K^+$ use and an overly large accumulated regularization scale, while the simultaneously loosened Armijo test no longer discriminates well between genuine decrease and an allowed increase.
-This explains why overestimation is not simply ``safer'': both parts of the hybrid decision become poorly calibrated, yielding conservative steps without a commensurate gain in noise protection.
-This asymmetric response supports treating \(\feps\) as a practically consequential error bound rather than as a tuning parameter for which either systematic under- or overestimation is uniformly safe.
+The resulting reference shift keeps the method in $K^+$ more often and produces conservative steps through the accumulated regularization scale.
+Although this behavior does not invalidate the theory, the results show that a safety margin that is much larger than the actual error can reduce practical efficiency.
+By contrast, underestimation can violate the assumed error bound even though it happens to improve the aggregate success rate of the unmodified variant in this experiment.
+This asymmetric response supports treating \(\feps\) as a practically consequential error allowance rather than as a parameter for which either direction of misspecification is uniformly advantageous.
 
 \begin{figure}[t]
     \centering
