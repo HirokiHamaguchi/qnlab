@@ -7,7 +7,7 @@ class BaseParameter:
     """Shared parameters across solvers."""
 
     def __init__(
-        self, n: int, options: dict[str, np.float64 | int] | None = None
+        self, n: int, options: dict[str, np.float64 | int | str] | None = None
     ) -> None:
         # Universal parameters
         self.m: int = 10
@@ -24,7 +24,7 @@ class BaseParameter:
     def __str__(self) -> str:  # pragma: no cover - readability helper
         return f"BaseParameter(m={self.m}, gtol={self.gtol})"
 
-    def _apply_options(self, options: dict[str, np.float64 | int]) -> None:
+    def _apply_options(self, options: dict[str, np.float64 | int | str]) -> None:
         for key, value in options.items():
             if hasattr(self, key):
                 setattr(self, key, value)

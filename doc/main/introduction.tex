@@ -26,7 +26,8 @@ In this work, we propose a noise-tolerant regularized quasi-Newton method that a
 Our approach combines \MPCchanged{a relaxed Armijo} line \MPCchanged{search,} quadratic \MPCchanged{regularization \citep{uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023},} and \MPCchanged{an OFFO-inspired} strategy~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
 \begin{MPCchange}
 The closest regularized L-BFGS result is Theorem~1 of Kanzow and Steck~\citep{kanzowRegularizationLimitedMemory2023}.
-Under bounded quasi-Newton matrices and a lower-bounded objective, it proves that the gradient norm has limit inferior zero, but assumes reliable function values and gives no iteration-complexity bound.
+Under bounded quasi-Newton matrices and a lower-bounded objective, it proves that the gradient norm has limit inferior zero.
+It assumes reliable function values and gives no complexity bound.
 Our result instead gives the order-optimal \(\order{1/\varepsilon^2}\) bound for smooth nonconvex optimization under persistent bounded relative-or-absolute function errors~\citep{carmonLowerBoundsFinding2020}.
 Rather than merely relaxing the line search, our method uses noisy function values only while they certify a reference decrease and otherwise switches to an objective-function-free regularization scale.
 It thereby retains useful line-search behavior without making continued progress depend on unreliable comparisons.
@@ -37,6 +38,8 @@ Its stationarity radius contains a function-error contribution proportional to \
 In particular, even when \(\epsilon_g=0\), their bound retains a threshold proportional to \(\sqrt{M\epsilon_f}\), whereas a fixed \(0\leq\epsilon_f<1\) changes the constants in our bound but imposes no stationarity floor.
 This distinction follows from our adaptively recomputed error allowance and the $K^0/K^+$ switch, which stops relying on function comparisons when they cease to certify progress.
 Shi et al. cover bounded gradient errors and protect curvature pairs by lengthening, whereas our arbitrary-accuracy and complexity guarantees require exact gradients.
+Our relaxed Armijo condition is also directly related to the noise-tolerant relaxation in Section~4 of Shi et al.~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
+When the relevant function values are small enough that the constant branch of the relative-or-absolute error model is active, our adaptive allowance reduces to $\Delta_k=2\feps/(1-\feps)$ and directly parallels their constant error allowance.
 \end{MPCchange}
 
 \begin{table*}[t]
@@ -56,7 +59,7 @@ Shi et al. cover bounded gradient errors and protect curvature pairs by lengthen
         \begin{tabular}{@{}>{\centering\arraybackslash}p{0.18\linewidth}cccc>{\centering\arraybackslash}p{0.25\linewidth}@{}}
             \toprule
             Algorithm
-             & \makecell[c]{Utilize\\Function\\values}
+             & \makecell[c]{Uses\\function\\values}
              & \makecell[c]{Tolerant to\\Function\\noise}
              & \makecell[c]{Gradient\\noise\\allowed}
              & Nonconvex

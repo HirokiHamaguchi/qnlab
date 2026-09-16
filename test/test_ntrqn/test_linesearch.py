@@ -12,6 +12,7 @@ from qnlab.problem import ZakharovProblem
 from qnlab.problem.base import BaseProblem
 from qnlab.solver.qn_ntrqn import line_search_relaxed_armijo, qn_ntrqn
 from qnlab.util.callback import Callback
+from qnlab.util.memory_interface import QuasiNewtonMemory
 from qnlab.util.method import Method
 from qnlab.util.ret_values import RetCode
 
@@ -210,6 +211,39 @@ def test_fixed_initial_scale_converges_on_zakharov():
     assert code == RetCode.SUCCESS
     assert callback.gnorms[-1] <= 1e-5
     assert callback.others["skip by cautious update"] == 0
+
+
+def test_compact_regularization_uses_zero_memory_fallback(monkeypatch):
+    gradient = np.array([3.0, 4.0])
+    method = Method("NTRQN", "cautious", "damped", "bfgs")
+    memory = QuasiNewtonMemory(
+        gradient,
+        maxlen=3,
+        method=method,
+        zero_regularized_hessian_scale=np.float64(5.0),
+    )
+    callback = Callback()
+
+    def fail_compact_solve(*args, **kwargs):
+        raise np.linalg.LinAlgError("forced test failure")
+
+    monkeypatch.setattr(
+        ntrqn_module,
+        "get_direction_additive_reg",
+        fail_compact_solve,
+    )
+    direction = ntrqn_module._compute_regularized_direction(
+        method,
+        np.zeros(2),
+        gradient,
+        memory,
+        np.float64(2.0),
+        "compact",
+        callback,
+    )
+
+    np.testing.assert_allclose(direction, -gradient / 7.0)
+    assert callback.others["compact regularization fallback"] == 1
 
 
 def run_ls(

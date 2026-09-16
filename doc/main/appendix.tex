@@ -1,22 +1,23 @@
 \section{Proof of \texorpdfstring{\cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}}{Lemma \ref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}}}\label{sec:proof_of_sum_norm_g_over_mu_geq_2sqrt_leq_log}
 
-The proof of \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} is similar to existing results~\citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020},~\citep[Lemma~3.1]{Gratton08022024}.
+The proof of \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} is \MPCchanged{similar to Lemma~3.2 of Ward et al.~\citep{wardAdaGradStepsizesSharp2020} and Lemma~3.1 of Gratton et al.~\citep{Gratton08022024}}.
 \begin{proof}
     Recall that \cref{eq:offo_based_update} defines $\mu_k$ as $\theta_k \sqrt{\varsigma + \sum_{j \in K^+, \, j \leq k} \norm{g_j}^2}$, and \refLine{line:update_theta} of \cref{alg:regularized_qn} asserts $\theta_k \in [\theta_{\min}, \theta_{\max}]$.
     Let $k_i \in K^+$ be the $i$-th element of $K^+$.
+    \MPCchanged{Define $S_{-1} \coloneqq \varsigma$ and $S_i \coloneqq \varsigma + \sum_{\ell=0}^{i} \norm{g_{k_\ell}}^2$ for $i \geq 0$.}
     For any $0 < x < y$, $x/y \le -\ln(1-x/y) = \ln y - \ln(y-x)$ holds.
     Thus, we have
     \begin{align*}
         \frac{\norm{g_{k_i}}^2}{\mu_{k_i}^2}
-         & \leq \frac{1}{\theta_{\min}^2} \frac{\norm{g_{k_i}}^2}{\varsigma+\sum_{\ell=0}^{i} \norm{g_{k_\ell}}^2}                                                    &  & (\text{definition})        \\
-         & \le \frac{1}{\theta_{\min}^2} \qty(\ln\qty(\varsigma+\sum_{\ell=0}^{i} \norm{g_{k_\ell}}^2) - \ln\qty(\varsigma+\sum_{\ell=0}^{i-1} \norm{g_{k_\ell}}^2)). &  & (x/y \le \ln y - \ln(y-x))
+         & \MPCchanged{\leq \frac{1}{\theta_{\min}^2} \frac{\norm{g_{k_i}}^2}{S_i}} &  & (\text{definition}) \\
+         & \MPCchanged{\leq \frac{1}{\theta_{\min}^2} \qty(\ln S_i - \ln S_{i-1})}.  &  & (x/y \leq \ln y - \ln(y-x))
     \end{align*}
     Similarly, $x/\sqrt{y} \ge x/(\sqrt{y}+\sqrt{y-x}) = \sqrt{y}-\sqrt{y-x}$ holds.
     Thus, we have
     \begin{align*}
         \frac{\norm{g_{k_i}}^2}{\mu_{k_i}}
-         & \ge \frac{1}{\theta_{\max}} \frac{\norm{g_{k_i}}^2}{\sqrt{\varsigma + \sum_{\ell=0}^{i} \MPCchanged{\norm{g_{k_\ell}}^2}}}                                                      &  & (\text{definition})                  \\
-         & \ge \frac{1}{\theta_{\max}} \qty(\sqrt{\varsigma+\sum_{\ell=0}^{i\vphantom{i-1}} \norm{g_{k_\ell}}^2} - \sqrt{\varsigma+\sum_{\ell=0}^{i-1} \norm{g_{k_\ell}}^2}). &  & (x/\sqrt{y} \ge \sqrt{y}-\sqrt{y-x})
+         & \MPCchanged{\geq \frac{1}{\theta_{\max}} \frac{\norm{g_{k_i}}^2}{\sqrt{S_i}}} &  & (\text{definition}) \\
+         & \MPCchanged{\geq \frac{1}{\theta_{\max}} \qty(\sqrt{S_i} - \sqrt{S_{i-1}})}. &  & (x/\sqrt{y} \geq \sqrt{y} - \sqrt{y-x})
     \end{align*}
     Summing these inequalities over $0 \le i < \abs{K^+}$ yields the claim.
     \myQED

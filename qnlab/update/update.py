@@ -49,6 +49,21 @@ def get_direction_reg(
         raise ValueError(f"Unknown reg update method: {method.update}")
 
 
+def get_direction_additive_reg(
+    method: Method,
+    x: npt.NDArray[np.float64],
+    g: npt.NDArray[np.float64],
+    lm: QuasiNewtonMemory,
+    mu: np.float64,
+) -> npt.NDArray[np.float64]:
+    """Compute ``-(B + mu*I)^{-1} g`` for the raw L-BFGS matrix ``B``."""
+    if len(lm) == 0:
+        return lm.zero_memory_direction(g, mu)
+    if method.update != "bfgs":
+        raise ValueError("Exact additive regularization is implemented only for BFGS.")
+    return BFGSUpdateRule.compute_dir_additive_reg(x, g, lm, mu)
+
+
 def get_direction_scaled_reg(
     method: Method,
     x: npt.NDArray[np.float64],

@@ -1,3 +1,5 @@
+from typing import Literal
+
 import numpy as np
 
 from qnlab.parameter.param import BaseParameter
@@ -8,7 +10,7 @@ class NTRQNParameter(BaseParameter):
     """Parameters for NTRQN relaxed Armijo solver."""
 
     def __init__(
-        self, n: int, options: dict[str, np.float64 | int] | None = None
+        self, n: int, options: dict[str, np.float64 | int | str] | None = None
     ) -> None:
         super().__init__(n, options=None)
 
@@ -23,6 +25,7 @@ class NTRQNParameter(BaseParameter):
         self.offo_squared_offset: np.float64 = np.float64(1e-20)
         self.restart_threshold: np.float64 = np.float64(np.inf)
         self.max_restarts: int = 0
+        self.regularization_solver: Literal["compact", "shifted_pair"] = "compact"
 
         if options:
             self._apply_options(options)
@@ -59,5 +62,7 @@ class NTRQNParameter(BaseParameter):
         if self.restart_threshold <= 0.0:
             return RetCode.ERR_INVALIDPARAMETERS
         if self.max_restarts < 0:
+            return RetCode.ERR_INVALIDPARAMETERS
+        if self.regularization_solver not in ("compact", "shifted_pair"):
             return RetCode.ERR_INVALIDPARAMETERS
         return RetCode.SUCCESS

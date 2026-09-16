@@ -24,7 +24,7 @@ from qnlab.util.method import Method
 def qn(
     prob: BaseProblem,
     method: Method,
-    options: dict[str, np.float64 | int] | None = None,
+    options: dict[str, np.float64 | int | str] | None = None,
     callback: Callback | None = None,
     verbose: bool = False,
     bounds: BoundsInput | None = None,

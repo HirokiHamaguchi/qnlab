@@ -7,12 +7,43 @@ from scipy.optimize._linesearch import _cubicmin, _quadmin  # type: ignore
 
 from qnlab.parameter import NTRQNParameter
 from qnlab.problem.base import BaseProblem
-from qnlab.update.update import get_direction_reg
+from qnlab.update.update import get_direction_additive_reg, get_direction_reg
 from qnlab.util.callback import Callback
 from qnlab.util.check_termination import check_termination
 from qnlab.util.memory_interface import QuasiNewtonMemory
 from qnlab.util.method import Method
 from qnlab.util.ret_values import RetCode
+
+
+def _compute_regularized_direction(
+    method: Method,
+    x: npt.NDArray[np.float64],
+    g: npt.NDArray[np.float64],
+    lm: QuasiNewtonMemory,
+    regularization: np.float64,
+    solver: str,
+    callback: Callback | None,
+) -> npt.NDArray[np.float64]:
+    """Compute an exact compact or shifted-pair regularized direction."""
+    if solver == "shifted_pair":
+        return get_direction_reg(method, x, g, lm, regularization)
+
+    try:
+        direction = get_direction_additive_reg(
+            method,
+            x,
+            g,
+            lm,
+            regularization,
+        )
+        if np.all(np.isfinite(direction)) and np.dot(g, direction) < 0.0:
+            return direction
+    except np.linalg.LinAlgError:
+        pass
+
+    if callback is not None:
+        callback.others["compact regularization fallback"] += 1
+    return lm.zero_memory_direction(g, regularization)
 
 
 def line_search_relaxed_armijo(
@@ -220,7 +251,16 @@ def qn_ntrqn(
             mu = gnorm * param.mu_scale
             mu = np.clip(mu, param.mu_min_fraction * offo_scale, offo_scale)
 
-        d = get_direction_reg(method, x, g, lm, mu + omega_min)
+        regularization = mu + omega_min
+        d = _compute_regularized_direction(
+            method,
+            x,
+            g,
+            lm,
+            regularization,
+            param.regularization_solver,
+            callback,
+        )
 
         ref_fx = max(pf2) if len(pf2) > 0 else fx  # type: ignore[type-var]
         ls_res, new_x, new_f, new_g, delta, rejection_counter = (

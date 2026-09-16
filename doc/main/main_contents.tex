@@ -186,7 +186,8 @@ We set $\mu_k=0$ if and only if the following condition is satisfied:
 \end{equation}
 Note that $k=0$ satisfies \cref{eq:mu_0_condition} since $K^0$ is empty.
 This condition restricts $\mu_k=0$ to iterations for which a sufficient decrease in $\overline f$ has been observed.
-\MPCchanged{Thus, although $\overline{f}$ can temporarily increase, this condition ensures that $\overline{f}$ does not grow without bound or oscillate indefinitely.}
+\MPCchanged{Thus, although $\overline{f}$ can temporarily increase, every iteration in $K^0$ must improve the previous error-adjusted reference value.}
+\MPCchanged{When this test fails, the method instead enters $K^+$ and uses the OFFO-based regularization update below.}
 Otherwise, to ensure convergence to first-order stationary points, we apply an OFFO-based update
 \begin{equation}\label{eq:offo_based_update}
     \mu_k = \theta_k \sqrt{\varsigma+\sum_{j \in K^+, \, j \leq k}\norm{g_j}^2},
@@ -473,7 +474,7 @@ We now bound the sum of $\delta_k = f(x_k) - f(x_{k+1})$ over $k \in K^0$ with $
 Next, we show that the sum of $\delta_{k}$ over $k \in K^+$ is lower bounded.
 Recall that $K^+$ \MPCchanged{is the} set of iteration indices $k$ such that $\mu_k > 0$ as defined in \cref{eq:def_K0_Kplus}, and that $\mu_k$ is defined as $\theta_k \sqrt{\varsigma + \sum_{j \in K^+,\ j \MPCchanged{\leq} k} \norm{g_{j}}^2}$ with $\theta_k \in [\theta_{\min}, \theta_{\max}]$ in \refLine{line:update_theta} of \cref{alg:regularized_qn}.
 
-Before proceeding to the main proof, we present \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}, providing standard inequalities in the AdaGrad-Norm algorithm analysis~\citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020},~\citep[Lemma~3.1]{Gratton08022024}.
+Before proceeding to the main proof, we present \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}, \MPCchanged{which collects standard inequalities from the AdaGrad-Norm analysis of Ward et al.~\citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020} and Gratton et al.~\citep[Lemma~3.1]{Gratton08022024}}.
 Its proof is deferred to \cref{sec:proof_of_sum_norm_g_over_mu_geq_2sqrt_leq_log}.
 \begin{lemma}\label{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}
     In \cref{alg:regularized_qn}, we have
@@ -861,6 +862,8 @@ We compared the following methods in our experiments.
               \begin{MPCchange}
               \item The primary comparison uses the wrapper's common gradient-tolerance stopping rule.
               \item We also run the authors' recommended termination mode (\texttt{terminate=3}) with the wrapper's gradient-tolerance stop disabled.
+              \item In the function-noise experiment, the additive perturbation is bounded by $10^{-3}$, and NTQN receives the conservative function-noise bound $\texttt{eps\_f}=10^{-2}$ used numerically as $\feps$ by the proposed method.
+              \item NTQN uses this supplied bound in both its noise-tolerant line search and its recommended termination test.
               \item For the latter, the external solver controls termination.
               \item The common gradient tolerance is used only to score its recorded trajectory and is not injected into the solver.
               \item The recommended mode may appear worse under this metric because it can terminate appropriately at its estimated noise neighborhood before reaching the common scoring tolerance.
@@ -913,6 +916,7 @@ This setting is particularly adverse for our method because its theory and regul
 Each setting uses a different error rate $\feps$ in the error model (\cref{eq:error_model}), as summarized in \cref{tab:machine_epsilon}.
 The table relates the machine epsilon (maximum relative rounding error) for each floating-point precision to the $\feps$ value used in our experiments.
 The relatively large $\feps$ values are chosen to account for the cumulative errors that may arise during optimization.
+% The plotted performance profiles have a finite ratio range.  If SciPy succeeds in k iterations, a run exceeding 15k cannot enter that plotted range because the best solver uses at most k iterations.  The factor 15 therefore avoids computation that cannot affect the displayed profile while leaving a generous margin.
 \MPCchanged{We first run \texttt{SciPy} with a limit of $15{,}000$ iterations on each problem.}
 \MPCchanged{If it attains the scenario's gradient tolerance after $k_{\mathrm{SciPy}}$ iterations, every other method is limited to $\min\{15{,}000,15k_{\mathrm{SciPy}}\}$ iterations.}
 \MPCchanged{Otherwise, the limit is $15{,}000$.}
@@ -953,7 +957,8 @@ All main-text profiles use the analyzed no-restart method.
 The earlier accumulator-restart heuristic is evaluated separately in the appendix.
 Across the $220$ problems and five paired seeds, \texttt{Ours} and \texttt{Ours-MS} attain \(\gtol = 10^{-2}\) on $83.9\%$ and $84.8\%$, respectively, of the $1{,}100$ function-noise instances.
 Their seed-to-seed standard deviations in the solved fraction are only $0.52$ and $0.83$ percentage points.
-The corresponding rates for \texttt{NTQN}, \texttt{Reg}, \texttt{Reg-Sec}, and \texttt{ASTR1-Adagrad} are $81.2\%$, $77.8\%$, $74.0\%$, and $41.5\%$.
+The corresponding rates are $81.2\%$ for \texttt{NTQN} and $77.8\%$ for \texttt{Reg}.
+They are $74.0\%$ for \texttt{Reg-Sec} and $41.5\%$ for \texttt{ASTR1-Adagrad}.
 Among successful runs, the median oracle-call counts are $62$ for \texttt{Ours}, $71$ for \texttt{Ours-MS}, $64$ for \texttt{NTQN}, and $131$ for \texttt{ASTR1-Adagrad}.
 The complete distributions, including failures, are represented by the profiles in \cref{fig:results_function_noise}.
 Both proposed variants solve at least one instance of dimension $123{,}200$, the largest dimension in the retained collection.

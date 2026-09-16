@@ -1,9 +1,11 @@
 import numpy as np
 import numpy.typing as npt
 
+from qnlab.update.bfgs import compute_BH
 from qnlab.update.update import (
     check_direction,
     get_direction,
+    get_direction_additive_reg,
     get_direction_reg,
     get_direction_scaled_reg,
 )
@@ -238,6 +240,49 @@ def test_workspace_two_loop_matches_pairwise_reference():
         np.testing.assert_allclose(
             get_direction_reg(method, point, gradient, memory, mu), direction
         )
+
+
+def test_compact_additive_regularization_matches_dense_system():
+    rng = np.random.default_rng(31)
+    n = 9
+    matrix = rng.normal(size=(n, n))
+    matrix = matrix.T @ matrix + np.eye(n)
+    method = Method("NTRQN", "raw", "raw", "bfgs")
+    point = np.zeros(n)
+    memory = QuasiNewtonMemory(matrix @ point, maxlen=4, method=method)
+    for _ in range(6):
+        new_point = point + rng.normal(size=n)
+        memory.add_new_data(
+            new_point,
+            np.float64(0.0),
+            matrix @ new_point,
+            point,
+            np.float64(0.0),
+            matrix @ point,
+            None,
+            np.float64(0.0),
+        )
+        point = new_point
+
+    raw_bfgs, _ = compute_BH(n, memory)
+    gradient = rng.normal(size=n)
+    for regularization in (
+        np.float64(1e-10),
+        np.float64(0.7),
+        np.float64(100.0),
+    ):
+        expected = np.linalg.solve(
+            raw_bfgs + regularization * np.eye(n),
+            -gradient,
+        )
+        actual = get_direction_additive_reg(
+            method,
+            point,
+            gradient,
+            memory,
+            regularization,
+        )
+        np.testing.assert_allclose(actual, expected, rtol=1e-9, atol=1e-10)
 
 
 def test_scaled_regularized_direction_reuses_two_loop():

@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.typing as npt
+import scipy.linalg
 from scipy.linalg.blas import daxpy
 
 from qnlab.update.base import BaseUpdateRule
@@ -92,9 +93,112 @@ class BFGSUpdateRule(BaseUpdateRule):
 
     @staticmethod
     def compute_dir_reg(x, g, lm, mu) -> npt.NDArray[np.float64]:
-        """Uses new_y = y + mu * s in the update."""
+        """Use the shifted-pair approximation ``new_y = y + mu * s``."""
         assert len(lm) > 0
         return BFGSUpdateRule._compute_dir_reg(g, lm, mu)
+
+    @staticmethod
+    def compute_dir_additive_reg(x, g, lm, mu) -> npt.NDArray[np.float64]:
+        """Solve ``(B + mu*I) d = -g`` using a compact L-BFGS formula.
+
+        Here ``B`` is the raw L-BFGS Hessian obtained from the stored pairs.
+        The normalized compact factorization follows Kanzow and Steck's
+        regularized L-BFGS implementation.
+        """
+        del x
+        assert len(lm) > 0
+        if mu < 0.0:
+            raise ValueError("The additive regularization must be non-negative.")
+        if mu == 0.0:
+            return BFGSUpdateRule.compute_dir(None, g, lm)
+
+        workspace = lm.workspace
+        steps = workspace.steps
+        gradients = workspace.gradients
+        step_norms = workspace.step_norms
+        pair_products = workspace.pair_products
+        gradient_norms = workspace.gradient_norms
+
+        step_scales = np.sqrt(step_norms)
+        gradient_scales = np.sqrt(gradient_norms)
+        if (
+            np.any(step_scales <= 0.0)
+            or np.any(gradient_scales <= 0.0)
+            or np.any(pair_products <= 0.0)
+        ):
+            raise np.linalg.LinAlgError("Invalid L-BFGS curvature pair.")
+
+        normalized_steps = steps / step_scales
+        normalized_gradients = gradients / gradient_scales
+        step_products = workspace.step_products / np.outer(step_scales, step_scales)
+        step_gradient = workspace.step_gradient / np.outer(
+            step_scales, gradient_scales
+        )
+        gradient_products = workspace.gradient_products / np.outer(
+            gradient_scales, gradient_scales
+        )
+
+        gamma = gradient_norms[-1] / pair_products[-1]
+        shifted_gamma = gamma + mu
+        q11 = shifted_gamma * np.diag(pair_products / gradient_norms)
+        q11 += gradient_products
+        q21 = np.triu(step_gradient)
+        q21 -= (mu / gamma) * np.tril(step_gradient, k=-1)
+        q22 = -(mu / gamma) * step_products
+
+        chol_q11 = np.linalg.cholesky(q11)
+        q11_inv_q21_t = scipy.linalg.solve_triangular(
+            chol_q11,
+            q21.T,
+            lower=True,
+            check_finite=False,
+        )
+        schur_complement = q22 - q21 @ scipy.linalg.solve_triangular(
+            chol_q11.T,
+            q11_inv_q21_t,
+            lower=False,
+            check_finite=False,
+        )
+        chol_negative_schur = np.linalg.cholesky(-schur_complement)
+
+        zeros = np.zeros_like(chol_q11)
+        factor_lower = np.block(
+            [
+                [chol_q11, zeros],
+                [q11_inv_q21_t.T, -chol_negative_schur],
+            ]
+        )
+        factor_upper = np.block(
+            [
+                [chol_q11.T, q11_inv_q21_t],
+                [zeros, chol_negative_schur.T],
+            ]
+        )
+        projected_gradient = np.concatenate(
+            (normalized_gradients.T @ g, normalized_steps.T @ g)
+        )
+        compact_solution = scipy.linalg.solve_triangular(
+            factor_lower,
+            projected_gradient,
+            lower=True,
+            check_finite=False,
+        )
+        compact_solution = scipy.linalg.solve_triangular(
+            factor_upper,
+            compact_solution,
+            lower=False,
+            check_finite=False,
+        )
+        correction = (
+            normalized_gradients @ compact_solution[: len(lm)]
+            + normalized_steps @ compact_solution[len(lm) :]
+        )
+        direction = (correction - g) / shifted_gamma
+        if not np.all(np.isfinite(direction)):
+            raise np.linalg.LinAlgError(
+                "The compact regularized L-BFGS solve produced non-finite values."
+            )
+        return direction.astype(np.float64, copy=False)
 
     @staticmethod
     def check(n, g, d, lm) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
