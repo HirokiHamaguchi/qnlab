@@ -757,24 +757,27 @@ We begin by describing how to compute the search direction
     d_k=-(B_k+\mu_k I)^{-1}g_k
 \end{equation*}
 with $B_k$ in \cref{eq:proposed_choice_of_Bk}.
-\MPCchanged{Regularized limited-memory schemes may be employed to account for the diagonal shift~\citep{kanzowRegularizationLimitedMemory2023}.}
-\MPCchanged{We use the simple approximation mentioned in the same reference,}
 \begin{MPCchange}
+We use a compact representation of the raw L-BFGS matrix to solve the regularized system exactly~\citep{kanzowRegularizationLimitedMemory2023}.
+In particular, the implementation computes $d_k=-(B_k+\mu_k I)^{-1}g_k$ for the matrix $B_k$ defined in \cref{eq:proposed_choice_of_Bk}, without replacing the additive diagonal regularization by modified curvature pairs.
+We adopted this exact compact solve to align the implemented direction directly with the direction analyzed in \cref{sec:analysis}.
+When the memory is empty, the same definition reduces to $d_k=-g_k/(\rho_0+\omega_{\min}+\mu_k)$.
+If the compact factorization fails numerically or does not produce a finite descent direction, the implementation uses this zero-memory direction, which also corresponds to a matrix satisfying \cref{ass:BBounds}.
+For comparison, the implementation retains the simpler shifted-pair approximation
 \begin{equation}\label{eq:approx_computation_of_regularized_quasi_Newton}
     B_k+\mu_k I
     \approx\mathrm{BFGS}(\{s_{k_i},\overline y_{k_i}+(\mu_k+\omega_{\min})s_{k_i}\}_{i=0}^{p-1}).
 \end{equation}
+The variants using this approximation are denoted by the suffix \texttt{-SP} and are treated as heuristic variants rather than as the implementations covered directly by the analysis.
+They retain the standard two-loop recursion and are included as lower-overhead practical alternatives to the exact compact solve.
 \end{MPCchange}
-\MPCchanged{The direction is then computed from the raw curvature pairs using the standard two-loop recursion~\citep{liuLimitedMemoryBFGS1989,nocedal1999numerical}.}
-\MPCchanged{When the memory is empty, the implementation uses $d_k=-g_k/(\rho_0+\omega_{\min}+\mu_k)$.}
-Although this approximation is inexact, it has been reported to yield nearly identical practical performance while remaining comparatively simple to implement~\citep{kanzowRegularizationLimitedMemory2023}.
-We adopt this approximation in our numerical experiments.
 
 Separately, there exist function-based modified secant conditions~\citep{zhangPropertiesNumericalPerformance2001,babaie-kafakiTwoNewConjugate2010,yabeLocalSuperlinearConvergence2007,hassanModifiedSecantEquation2023} that adjust the secant equation using available function values when those quantities are reliable.
 Such adjustments aim to improve practical convergence behavior.
 We partially adopt these function-based modifications following prior work~\citep{zhangNewQuasiNewtonEquation1999,yuanConvergenceAnalysisModified2010}.
 The suffix \texttt{-MS} in \cref{sec:experiments} indicates the use of this technique.
 Because these modifications are well established, we omit low-level implementation details here.
+\MPCchanged{For the proposed \texttt{-MS} variants, a scale-aware safeguard sets the function-based correction $\sigma_i$ to zero whenever $\abs{\sigma_i}>\sqrt{\norm{y_{k_i}}^2/\norm{s_{k_i}}^2}$, preventing the correction from dominating the raw gradient difference.}
 Further specifics are available in the cited references and in our open-source implementation.
 
 \subsection{Step Size \texorpdfstring{$\alpha_k$}{alpha k}}\label{sec:proposed_choice_alpha}
@@ -833,6 +836,7 @@ We compared the following methods in our experiments.
           \begin{itemize}
               \item We used \cref{alg:regularized_qn,alg:backtracking_linesearch} with the details in \cref{sec:proposed_choice}.
               \item (\texttt{Ours-MS}) means the variant incorporating the modified secant condition described in \cref{sec:proposed_choice_Bk}.
+              \MPCchanged{\item The suffix \texttt{-SP} denotes the corresponding heuristic variant that replaces the exact compact solve by the shifted-pair approximation in \cref{eq:approx_computation_of_regularized_quasi_Newton}.}
           \end{itemize}
 
     \item (\texttt{Line}): Line search L-BFGS method

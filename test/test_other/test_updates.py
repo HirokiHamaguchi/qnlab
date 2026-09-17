@@ -215,6 +215,23 @@ def test_modified_secant_skips_correction_above_scale_aware_limit():
     np.testing.assert_allclose(data.y, np.array([1.0]))
 
 
+def test_modified_secant_uses_error_allowance_with_one_minus_eps_denominator():
+    data = IterationData()
+    is_valid, message = data.set(
+        np.array([1.0]),
+        np.float64(4.0),
+        np.array([1.0]),
+        np.array([0.0]),
+        np.float64(10.0),
+        np.array([0.0]),
+        Method("NTRQN", "raw", "modified", "bfgs"),
+        np.float64(0.5),
+    )
+
+    assert is_valid, message
+    np.testing.assert_allclose(data.y, np.array([1.0]))
+
+
 def test_workspace_two_loop_matches_pairwise_reference():
     rng = np.random.default_rng(21)
     n = 8

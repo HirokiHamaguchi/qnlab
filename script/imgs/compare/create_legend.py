@@ -9,6 +9,8 @@ LEGENDS = {
     "_legend.pdf": [
         ("NTRQN", "Ours"),
         ("NTRQN-MS", "Ours-MS"),
+        ("NTRQN-SP", "Ours-SP"),
+        ("NTRQN-MS-SP", "Ours-MS-SP"),
         ("Line", "Line"),
         ("Line-MS", "Line-MS"),
         ("Reg", "Reg"),
@@ -19,6 +21,8 @@ LEGENDS = {
     "_legend_noise.pdf": [
         ("NTRQN", "Ours"),
         ("NTRQN-MS", "Ours-MS"),
+        ("NTRQN-SP", "Ours-SP"),
+        ("NTRQN-MS-SP", "Ours-MS-SP"),
         ("Line", "Line"),
         ("Line-MS", "Line-MS"),
         ("Reg", "Reg"),
@@ -34,6 +38,8 @@ LEGENDS = {
     "_legend_precision.pdf": [
         ("NTRQN", "Ours"),
         ("NTRQN-MS", "Ours-MS"),
+        ("NTRQN-SP", "Ours-SP"),
+        ("NTRQN-MS-SP", "Ours-MS-SP"),
         ("Line", "Line"),
         ("Line-MS", "Line-MS"),
         ("Reg", "Reg"),
@@ -45,6 +51,8 @@ LEGENDS = {
     "_legend_sensitivity.pdf": [
         ("NTRQN", "Ours"),
         ("NTRQN-MS", "Ours-MS"),
+        ("NTRQN-SP", "Ours-SP"),
+        ("NTRQN-MS-SP", "Ours-MS-SP"),
         ("NTRQN-Restart", "Ours-R"),
         ("NTRQN-MS-Restart", "Ours-MS-R"),
     ],

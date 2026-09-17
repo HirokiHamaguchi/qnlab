@@ -38,6 +38,7 @@ TAB20 = plt.colormaps.get_cmap("tab20")
 COLORS = {
     "NTRQN": TAB20(0),
     "NTRQN-MS": TAB20(1),
+    "NTRQN-SP": "#4477AA",
     "NTRQN-MS-SP": "#66AADD",
     "Line": TAB20(2),
     "Line-MS": TAB20(3),
@@ -60,6 +61,7 @@ COLORS.update(
 LINE_STYLES = {
     "NTRQN": "o-",
     "NTRQN-MS": "o--",
+    "NTRQN-SP": "s-",
     "NTRQN-MS-SP": "s--",
     "Line": "^--",
     "Line-MS": "^-.",
@@ -188,6 +190,29 @@ def get_methods(
                 "m": m,
                 "max_iterations": MI,
                 "regularization_solver": "compact",
+                "modified_secant_max_ratio": 1.0,
+            },
+        ),
+        (
+            Method("NTRQN", "cautious", "damped", "bfgs", label="NTRQN-SP"),
+            {
+                "m": m,
+                "max_iterations": MI,
+                "regularization_solver": "shifted_pair",
+            },
+        ),
+        (
+            Method(
+                "NTRQN",
+                "cautious",
+                "damped_modified",
+                "bfgs",
+                label="NTRQN-MS-SP",
+            ),
+            {
+                "m": m,
+                "max_iterations": MI,
+                "regularization_solver": "shifted_pair",
                 "modified_secant_max_ratio": 1.0,
             },
         ),
