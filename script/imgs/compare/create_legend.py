@@ -1,9 +1,9 @@
+import shutil
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 
 from qnlab.util.method import COLORS, LINE_STYLES
-
 
 LEGENDS = {
     "_legend.pdf": [
@@ -45,10 +45,14 @@ LEGENDS = {
     "_legend_sensitivity.pdf": [
         ("NTRQN", "Ours"),
         ("NTRQN-MS", "Ours-MS"),
+        ("NTRQN-Restart", "Ours-R"),
+        ("NTRQN-MS-Restart", "Ours-MS-R"),
     ],
     "_legend_restart.pdf": [
         ("NTRQN", "Ours (no restart)"),
+        ("NTRQN-MS", "Ours-MS (no restart)"),
         ("NTRQN-Restart", "Ours-R (restart)"),
+        ("NTRQN-MS-Restart", "Ours-MS-R (restart)"),
     ],
 }
 
@@ -59,7 +63,7 @@ def create_legend(filename, entries):
     plt.style.use("seaborn-v0_8-whitegrid")
     plt.rcParams.update(
         {
-            "text.usetex": True,
+            "text.usetex": shutil.which("latex") is not None,
             "font.family": "serif",
             "font.size": 20,
             "figure.dpi": 300,
@@ -67,16 +71,14 @@ def create_legend(filename, entries):
         }
     )
 
-    ncol = 5 if len(entries) > 5 else len(entries)
+    ncol = min(len(entries), 5)
     fig_width = 11 if len(entries) > 5 else max(4, 2.6 * len(entries))
     fig, ax = plt.subplots(figsize=(fig_width, 1.45))
     handles = []
     for name in alg_names:
         color = COLORS[name]
         linestyle = LINE_STYLES[name]
-        (handle,) = ax.plot(
-            [], [], linestyle, color=color, linewidth=2.5, markersize=8
-        )
+        (handle,) = ax.plot([], [], linestyle, color=color, linewidth=2.5, markersize=8)
         handles.append(handle)
 
     legend_names = [display_name for _, display_name in entries]

@@ -492,11 +492,15 @@ def qn_ntrqnb(
     if np.linalg.norm(pg, ord=np.inf) <= param.gtol:
         return RetCode.ALREADY_MINIMIZED, fx, x
 
+    initial_scale = max(np.float64(1.0), pg_norm)
+    omega_min = min(np.float64(1.0), np.sqrt(param.offo_squared_offset))
     memory = QuasiNewtonMemory(
         pg,
         param.m,
         method,
-        zero_regularized_hessian_scale=param.offo_squared_offset,
+        zero_regularized_hessian_scale=initial_scale,
+        curvature_scale=initial_scale,
+        modified_secant_max_ratio=param.modified_secant_max_ratio,
     )
     box_workspace = _BoxWorkspace.create(prob.n)
     past_fx: deque[np.float64] = deque([], maxlen=param.past)
@@ -539,7 +543,10 @@ def qn_ntrqnb(
             mu = pg_norm * param.mu_scale
             mu = np.clip(mu, param.mu_min_fraction * offo_scale, offo_scale)
 
-        direction = _box_quasi_newton_direction(x, g, memory, mu, lb, ub, box_workspace)
+        regularization = mu + omega_min
+        direction = _box_quasi_newton_direction(
+            x, g, memory, regularization, lb, ub, box_workspace
+        )
 
         ref_fx = (
             max(reference_values)  # type: ignore[type-var]

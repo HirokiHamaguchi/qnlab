@@ -210,6 +210,7 @@ def qn_ntrqn(
         method,
         zero_regularized_hessian_scale=initial_scale,
         curvature_scale=initial_scale,
+        modified_secant_max_ratio=param.modified_secant_max_ratio,
     )
     pf: deque[np.float64] = deque([], maxlen=param.past)
     pf2: deque[np.float64] = deque([fx], maxlen=param.non_monotone)

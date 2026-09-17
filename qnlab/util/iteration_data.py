@@ -6,6 +6,7 @@ from qnlab.util.method import Method
 CAUTIOUS_CURVATURE_LOWER = np.float64(1e-8)
 CAUTIOUS_CURVATURE_UPPER = np.float64(1e8)
 CAUTIOUS_ABSOLUTE_FLOOR = np.float64(1e-16)
+UNBOUNDED_MODIFIED_SECANT_RATIO = np.float64(np.inf)
 
 
 class IterationData:
@@ -46,6 +47,7 @@ class IterationData:
         method: Method,
         eps: np.float64,
         curvature_scale: np.float64 | None = None,
+        modified_secant_max_ratio: np.float64 = UNBOUNDED_MODIFIED_SECANT_RATIO,
     ) -> tuple[bool, str]:
         self.s = x - xp
         self.y = g - gp
@@ -62,6 +64,14 @@ class IterationData:
         )
         if is_reliable and method.secant in ("modified", "damped_modified"):
             sigma = self.compute_sigma(self.s, self.ss, g, gp, fx, fp)
+
+            # Keep the function-value correction from dominating the raw
+            # gradient difference. This scale-aware guard is invariant to
+            # simultaneous rescaling of the objective and its gradient.
+            sigma_scale = np.sqrt(self.yy / self.ss)
+            sigma_limit = modified_secant_max_ratio * sigma_scale
+            if np.abs(sigma) > sigma_limit:
+                sigma = np.float64(0.0)
 
             # ensure y^T s > 0 for line search methods
             if method.base == "Line":

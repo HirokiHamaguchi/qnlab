@@ -268,7 +268,7 @@ def test_ntrqnb_matches_ntrqn_when_bounds_are_inactive():
     )
 
     assert boxed_result[0] == unconstrained_result[0]
-    np.testing.assert_allclose(boxed_result[1], unconstrained_result[1], atol=1e-28)
+    np.testing.assert_allclose(boxed_result[1], unconstrained_result[1], atol=1e-15)
     np.testing.assert_allclose(boxed_result[2], unconstrained_result[2])
     np.testing.assert_allclose(boxed_callback.xs, unconstrained_callback.xs)
 

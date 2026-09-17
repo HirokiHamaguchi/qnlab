@@ -197,6 +197,24 @@ def test_scalar_damping_matches_documented_rule():
     np.testing.assert_allclose(data.ys, np.float64(0.2))
 
 
+def test_modified_secant_skips_correction_above_scale_aware_limit():
+    data = IterationData()
+    is_valid, message = data.set(
+        np.array([1.0]),
+        np.float64(0.0),
+        np.array([1.0]),
+        np.array([0.0]),
+        np.float64(10.0),
+        np.array([0.0]),
+        Method("NTRQN", "raw", "damped_modified", "bfgs"),
+        np.float64(0.0),
+        modified_secant_max_ratio=np.float64(1.0),
+    )
+
+    assert is_valid, message
+    np.testing.assert_allclose(data.y, np.array([1.0]))
+
+
 def test_workspace_two_loop_matches_pairwise_reference():
     rng = np.random.default_rng(21)
     n = 8

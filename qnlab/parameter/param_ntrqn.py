@@ -26,6 +26,7 @@ class NTRQNParameter(BaseParameter):
         self.restart_threshold: np.float64 = np.float64(np.inf)
         self.max_restarts: int = 0
         self.regularization_solver: Literal["compact", "shifted_pair"] = "compact"
+        self.modified_secant_max_ratio: np.float64 = np.float64(1.0)
 
         if options:
             self._apply_options(options)
@@ -64,5 +65,9 @@ class NTRQNParameter(BaseParameter):
         if self.max_restarts < 0:
             return RetCode.ERR_INVALIDPARAMETERS
         if self.regularization_solver not in ("compact", "shifted_pair"):
+            return RetCode.ERR_INVALIDPARAMETERS
+        if np.isnan(self.modified_secant_max_ratio) or (
+            self.modified_secant_max_ratio <= 0.0
+        ):
             return RetCode.ERR_INVALIDPARAMETERS
         return RetCode.SUCCESS

@@ -5,7 +5,10 @@ import numpy as np
 import numpy.typing as npt
 
 from qnlab.util.callback import Callback
-from qnlab.util.iteration_data import IterationData
+from qnlab.util.iteration_data import (
+    UNBOUNDED_MODIFIED_SECANT_RATIO,
+    IterationData,
+)
 from qnlab.util.method import Method
 
 
@@ -165,11 +168,13 @@ class QuasiNewtonMemory:
         method: Method,
         zero_regularized_hessian_scale: np.float64 | None = None,
         curvature_scale: np.float64 | None = None,
+        modified_secant_max_ratio: np.float64 = UNBOUNDED_MODIFIED_SECANT_RATIO,
     ) -> None:
         self._deque: deque[IterationData] = deque(maxlen=maxlen)
         self._maxlen = maxlen
         self._method = method
         self.curvature_scale = curvature_scale
+        self.modified_secant_max_ratio = modified_secant_max_ratio
         self.workspace = LBFGSWorkspace(g.size, maxlen)
         gnorm = np.linalg.norm(g)
         self.zero_hessian_scale = np.float64(gnorm if gnorm > 0 else 1.0)
@@ -212,6 +217,7 @@ class QuasiNewtonMemory:
             self._method,
             eps,
             self.curvature_scale,
+            self.modified_secant_max_ratio,
         )
         if not is_valid:
             if callback is not None:

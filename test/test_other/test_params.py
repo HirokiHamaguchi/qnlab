@@ -44,6 +44,7 @@ def test_ntrqn_uses_shared_eps():
     assert param.max_restarts == 0
     assert param.offo_squared_offset == np.float64(1e-20)
     assert param.regularization_solver == "compact"
+    assert param.modified_secant_max_ratio == np.float64(1.0)
 
 
 def test_ntqn_default_termination_can_disable_wrapper_stop():
@@ -59,6 +60,8 @@ def test_ntrqn_rejects_invalid_algorithm_options():
         NTRQNParameter(2, {"max_restarts": -1})
     with pytest.raises(ValueError):
         NTRQNParameter(2, {"regularization_solver": "invalid"})
+    with pytest.raises(ValueError):
+        NTRQNParameter(2, {"modified_secant_max_ratio": np.float64(0.0)})
 
 
 if __name__ == "__main__":

@@ -188,6 +188,7 @@ def get_methods(
                 "m": m,
                 "max_iterations": MI,
                 "regularization_solver": "compact",
+                "modified_secant_max_ratio": 1.0,
             },
         ),
         (
@@ -237,7 +238,7 @@ def get_box_methods(
                 "bfgs",
                 label="NTRQNB-MS",
             ),
-            {"m": m, "max_iterations": MI},
+            {"m": m, "max_iterations": MI, "modified_secant_max_ratio": 1.0},
         ),
         (
             Method(base="SciPy", scipy_method="L-BFGS-B", label="SciPy"),
