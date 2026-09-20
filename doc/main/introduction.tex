@@ -71,6 +71,12 @@ When the relevant function values are small enough that the constant branch of t
              & --
              & \ding{51}
              & \makecell[c]{R-linear\\objective gap} \\
+            \makecell[c]{L-BFGS-type\\line search\\[-0.4em]\scalebox{0.8}{\citep{cartisWorstcaseEvaluationComplexity2015}}}
+             & \ding{51}
+             & --
+             & --
+             & \ding{51}
+             & \makecell[c]{\(\order{\varepsilon^{-2}}\) evaluations to\\\(\norm{\nabla f}\leq\varepsilon\)} \\
             \makecell[c]{\textbf{\texttt{Reg}}\\[-0.4em]\scalebox{0.8}{\citep{kanzowRegularizationLimitedMemory2023}}}
              & \ding{51}
              & --
@@ -104,6 +110,8 @@ When the relevant function values are small enough that the constant branch of t
 \begin{MPCchange}
 The rates in \cref{tab:related_work_comparison} have different targets and assumptions.
 For line-search L-BFGS with exact evaluations, Theorem~7.1 of Liu and Nocedal~\citep{liuLimitedMemoryBFGS1989} proves R-linear convergence of the objective gap under uniform convexity and bounded initial scaling matrices.
+Theorem~3.4 of Cartis et al.~\citep{cartisWorstcaseEvaluationComplexity2015} gives an \(\order{1/\varepsilon^2}\) function- and gradient-evaluation bound for smooth nonconvex optimization when the line-search direction is uniformly gradient-related.
+This result covers L-BFGS-type variable-metric directions when their matrices are uniformly well conditioned, but it assumes exact function values and gradients.
 For NTQN, Theorem~3.5 of Shi et al.~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022} proves \(\phi(x_k)-\phi^*\leq\rho^k(\phi(x_0)-\phi^*)+2\epsilon_f\), where \(0<\rho<1\), until the iterates enter a noise-dependent neighborhood.
 Thus NTQN has an order-level linear rate under strong convexity, but does not guarantee an arbitrary smaller stationarity tolerance.
 By contrast, OFFO and our method have \(\order{1/\varepsilon^2}\) worst-case complexity for first-order stationarity on smooth nonconvex objectives, and our result additionally permits persistent bounded function errors.

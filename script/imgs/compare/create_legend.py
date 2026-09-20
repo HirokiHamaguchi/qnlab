@@ -1,5 +1,12 @@
+import os
 import shutil
+import math
+import tempfile
 from pathlib import Path
+
+os.environ.setdefault(
+    "MPLCONFIGDIR", str(Path(tempfile.gettempdir()) / "qnlab-matplotlib")
+)
 
 import matplotlib.pyplot as plt
 
@@ -10,7 +17,6 @@ LEGENDS = {
         ("NTRQN", "Ours"),
         ("NTRQN-MS", "Ours-MS"),
         ("NTRQN-SP", "Ours-SP"),
-        ("NTRQN-MS-SP", "Ours-MS-SP"),
         ("Line", "Line"),
         ("Line-MS", "Line-MS"),
         ("Reg", "Reg"),
@@ -22,7 +28,6 @@ LEGENDS = {
         ("NTRQN", "Ours"),
         ("NTRQN-MS", "Ours-MS"),
         ("NTRQN-SP", "Ours-SP"),
-        ("NTRQN-MS-SP", "Ours-MS-SP"),
         ("Line", "Line"),
         ("Line-MS", "Line-MS"),
         ("Reg", "Reg"),
@@ -39,7 +44,6 @@ LEGENDS = {
         ("NTRQN", "Ours"),
         ("NTRQN-MS", "Ours-MS"),
         ("NTRQN-SP", "Ours-SP"),
-        ("NTRQN-MS-SP", "Ours-MS-SP"),
         ("Line", "Line"),
         ("Line-MS", "Line-MS"),
         ("Reg", "Reg"),
@@ -52,7 +56,6 @@ LEGENDS = {
         ("NTRQN", "Ours"),
         ("NTRQN-MS", "Ours-MS"),
         ("NTRQN-SP", "Ours-SP"),
-        ("NTRQN-MS-SP", "Ours-MS-SP"),
         ("NTRQN-Restart", "Ours-R"),
         ("NTRQN-MS-Restart", "Ours-MS-R"),
     ],
@@ -66,8 +69,6 @@ LEGENDS = {
 
 
 def create_legend(filename, entries):
-    alg_names = [name for name, _ in entries]
-
     plt.style.use("seaborn-v0_8-whitegrid")
     plt.rcParams.update(
         {
@@ -80,8 +81,20 @@ def create_legend(filename, entries):
     )
 
     ncol = min(len(entries), 5)
-    fig_width = 11 if len(entries) > 5 else max(4, 2.6 * len(entries))
-    fig, ax = plt.subplots(figsize=(fig_width, 1.45))
+    nrows = math.ceil(len(entries) / ncol)
+    if nrows > 1:
+        # Matplotlib fills legend columns first; interleave the rows so that
+        # the displayed entries instead follow the input order from left to right.
+        entries = [
+            entries[row * ncol + col]
+            for col in range(ncol)
+            for row in range(nrows)
+            if row * ncol + col < len(entries)
+        ]
+    alg_names = [name for name, _ in entries]
+
+    fig_width = 13.5 if len(entries) > 4 else max(5, 3.0 * len(entries))
+    fig, ax = plt.subplots(figsize=(fig_width, 0.8 + 0.7 * nrows))
     handles = []
     for name in alg_names:
         color = COLORS[name]
@@ -97,7 +110,7 @@ def create_legend(filename, entries):
         framealpha=0.98,
         edgecolor="black",
         fancybox=True,
-        fontsize=14,
+        fontsize=17,
         ncol=ncol,
         frameon=True,
     )

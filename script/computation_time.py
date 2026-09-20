@@ -1,14 +1,19 @@
+import os
+import tempfile
 import time
 from pathlib import Path
+
+os.environ.setdefault(
+    "MPLCONFIGDIR", str(Path(tempfile.gettempdir()) / "qnlab-matplotlib")
+)
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import seaborn as sns
 
 from qnlab.problem.ill_quadratic import IllQuadraticProblem
 from qnlab.solver.qn import qn
-from qnlab.util.method import get_methods
+from qnlab.util.method import COLORS, get_methods
 
 # Configuration
 n = 10000
@@ -17,6 +22,7 @@ MI = 100
 num_runs = 100
 
 (methods, *_) = get_methods(m=m, MI=MI)
+methods = [entry for entry in methods if entry[0].label != "NTRQN-MS-SP"]
 
 
 def run_benchmark():
@@ -92,19 +98,19 @@ def run_benchmark():
 
 def vis_benchmark(stats: pd.DataFrame):
     # Set style for publication
-    sns.set_style("whitegrid")
+    plt.style.use("seaborn-v0_8-whitegrid")
     plt.rcParams.update(
         {
             "text.usetex": True,
             "font.family": "serif",
-            "font.size": 10,
-            "axes.labelsize": 11,
-            "axes.titlesize": 12,
+            "font.size": 12,
+            "axes.labelsize": 13,
+            "axes.titlesize": 14,
             "figure.dpi": 300,
         }
     )
 
-    fig, ax = plt.subplots(figsize=(5.5, 3.5))
+    fig, ax = plt.subplots(figsize=(7.5, 4.5))
 
     methods_list = stats["Method"].tolist()
     methods_list = [m.replace("NTRQN", "Ours") for m in methods_list]
@@ -112,7 +118,7 @@ def vis_benchmark(stats: pd.DataFrame):
     stds = stats["Std Dev (s)"].tolist()
 
     x_pos = np.arange(len(methods_list))
-    colors = sns.color_palette("viridis", len(methods_list))
+    colors = [COLORS[name.replace("Ours", "NTRQN")] for name in methods_list]
 
     bars = ax.bar(
         x_pos,
@@ -126,10 +132,10 @@ def vis_benchmark(stats: pd.DataFrame):
         error_kw={"elinewidth": 1.5, "capthick": 1.5},
     )
 
-    ax.set_ylabel(r"Execution Time (seconds)", fontsize=11, fontweight="normal")
+    ax.set_ylabel(r"Execution Time (seconds)", fontsize=13, fontweight="normal")
     ax.set_title(
         rf"Execution Time Comparison $(n={n})$, {num_runs} Runs",
-        fontsize=12,
+        fontsize=14,
         fontweight="normal",
         pad=12,
     )
@@ -147,7 +153,7 @@ def vis_benchmark(stats: pd.DataFrame):
             f"${mean:.3f}$",
             ha="center",
             va="bottom",
-            fontsize=9,
+            fontsize=11,
         )
 
     plt.ylim(0, max(bar.get_height() + std * 1.2 for bar, std in zip(bars, stds)) * 1.1)
@@ -162,6 +168,8 @@ def generate_latex_table(methods_list: list[str], table_data: pd.DataFrame):
     latex_table = (
         r"""\begin{table}[t]
     \centering
+    \small
+    \setlength{\tabcolsep}{3.5pt}
     \caption{The number of oracle calls and final observed objective values for the experiment in \cref{sec:comp_time}.}
     \label{tab:time_results}
     \begin{tabular}{l"""
@@ -202,7 +210,7 @@ def main():
     pdf_path = repo_root / "doc" / "imgs" / "for_paper" / "time.pdf"
     fig.savefig(pdf_path, format="pdf", bbox_inches="tight", dpi=300)
     print(f"Saved figure to {pdf_path}")
-    plt.show()
+    plt.close(fig)
 
     latex_table = generate_latex_table(methods_list, table_data)
     table_path = repo_root / "doc" / "main" / "check" / "time_results_table.tex"

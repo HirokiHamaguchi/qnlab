@@ -863,23 +863,21 @@ We compared the following methods in our experiments.
     \item (\texttt{NTQN}): Noise-tolerant quasi-Newton method~\MPCchanged{\citep{xieAnalysisBFGSMethod2020,shiNoiseTolerantQuasiNewtonAlgorithm2022}}
           \begin{itemize}
               \item A method designed to accommodate inexact gradient information, as mentioned in \cref{sec:problem_setting}.
-              \begin{MPCchange}
-              \item The primary comparison uses the wrapper's common gradient-tolerance stopping rule.
-              \item We also run the authors' recommended termination mode (\texttt{terminate=3}) with the wrapper's gradient-tolerance stop disabled.
-              \item In the function-noise experiment, the additive perturbation is bounded by $10^{-3}$, and NTQN receives the conservative function-noise bound $\texttt{eps\_f}=10^{-2}$ used numerically as $\feps$ by the proposed method.
-              \item NTQN uses this supplied bound in both its noise-tolerant line search and its recommended termination test.
-              \item For the latter, the external solver controls termination.
-              \item The common gradient tolerance is used only to score its recorded trajectory and is not injected into the solver.
-              \item The recommended mode may appear worse under this metric because it can terminate appropriately at its estimated noise neighborhood before reaching the common scoring tolerance.
-              \item This reflects a difference in stopping objectives rather than necessarily worse iterates.
-              \item We therefore report both solver-declared termination and attainment of the common scoring tolerance and interpret any early truncation separately from oracle efficiency.
-              \end{MPCchange}
           \end{itemize}
 
     \MPCchanged{\item (\texttt{ASTR1-Adagrad}): The purely first-order \texttt{adagrad} variant of ASTR1 reported by Gratton et al.~\citep[Table~1]{Gratton08022024}, using $B_k = 0$, $\gamma_k = 1$, $\mu = 1/2$, $\varsigma = 1/100$, and $\vartheta = \theta = 1$.
     Its steps and stopping decision use only gradients.
     The shared callback records the initial objective value solely for diagnostics and does not expose it to the method.}
 \end{itemize}
+
+\begin{MPCchange}
+For the primary NTQN comparison, we use the wrapper's common gradient-tolerance stopping rule.
+We additionally run the authors' recommended termination mode (\texttt{terminate=3}) with that wrapper-level stop disabled.
+In the function-noise experiment, NTQN receives the conservative bound $\texttt{eps\_f}=10^{-2}$ for perturbations bounded by $10^{-3}$, matching the value of $\feps$ supplied to the proposed method.
+NTQN uses this bound in both its noise-tolerant line search and its recommended termination test.
+In the recommended mode, termination is controlled by NTQN itself, while the common gradient tolerance is applied only afterward to its recorded trajectory for uniform scoring.
+Because NTQN may appropriately stop at its estimated noise neighborhood before attaining that tolerance, we report both solver-declared termination and attainment of the common scoring tolerance and distinguish such early termination from poor oracle efficiency.
+\end{MPCchange}
 
 In the following, each method is referred to by the name given in parentheses.
 \MPCchanged{Except for the first-order \texttt{ASTR1-Adagrad} baseline,} all these methods are L-BFGS-based, and we set the number of stored curvature pairs to $10$, the default value in SciPy's L-BFGS-B implementation.
@@ -959,15 +957,17 @@ Therefore, success in the joint-noise experiment is evidence that the method can
 The experiment notebook compares the hybrid method with the first-order \texttt{ASTR1-Adagrad} baseline of Gratton et al.~\citep{Gratton08022024} and varies the supplied \(\feps\) over two orders of magnitude around its nominal value.
 All main-text profiles use the analyzed no-restart method.
 The earlier accumulator-restart heuristic is evaluated separately in the appendix.
-Across the $220$ problems and five paired seeds, \texttt{Ours} and \texttt{Ours-MS} attain \(\gtol = 10^{-2}\) on $83.9\%$ and $84.8\%$, respectively, of the $1{,}100$ function-noise instances.
-Their seed-to-seed standard deviations in the solved fraction are only $0.52$ and $0.83$ percentage points.
+Across the $220$ problems and five paired seeds, \texttt{Ours} and \texttt{Ours-MS} attain \(\gtol = 10^{-2}\) on $85.1\%$ and $85.5\%$, respectively, of the $1{,}100$ function-noise instances.
+Their seed-to-seed standard deviations in the solved fraction are only $0.60$ and $0.18$ percentage points.
 The corresponding rates are $81.2\%$ for \texttt{NTQN} and $77.8\%$ for \texttt{Reg}.
 They are $74.0\%$ for \texttt{Reg-Sec} and $41.5\%$ for \texttt{ASTR1-Adagrad}.
-Among successful runs, the median oracle-call counts are $62$ for \texttt{Ours}, $71$ for \texttt{Ours-MS}, $64$ for \texttt{NTQN}, and $131$ for \texttt{ASTR1-Adagrad}.
+Among successful runs, the median oracle-call counts are $62$ for \texttt{Ours}, $67$ for \texttt{Ours-MS}, $64$ for \texttt{NTQN}, and $131$ for \texttt{ASTR1-Adagrad}.
+The shifted-pair variant \texttt{Ours-SP} solves $83.9\%$, while the compact solver records no fallback for \texttt{Ours} and nine fallbacks in total for \texttt{Ours-MS} across these instances.
 The complete distributions, including failures, are represented by the profiles in \cref{fig:results_function_noise}.
 Both proposed variants solve at least one instance of dimension $123{,}200$, the largest dimension in the retained collection.
-In the joint-noise stress test, \texttt{Ours} and \texttt{Ours-MS} solve $80.7\%$ and $83.1\%$ of the instances, compared with $71.9\%$ for \texttt{NTQN}, $73.5\%$ for \texttt{Reg}, and $42.8\%$ for \texttt{ASTR1-Adagrad}.
-The two proposed rates have seed-to-seed standard deviations of $0.61$ and $0.75$ percentage points.
+In the joint-noise stress test, \texttt{Ours} and \texttt{Ours-MS} solve $83.6\%$ and $84.8\%$ of the instances, compared with $71.9\%$ for \texttt{NTQN}, $73.5\%$ for \texttt{Reg}, and $42.8\%$ for \texttt{ASTR1-Adagrad}.
+The two proposed rates have seed-to-seed standard deviations of $0.64$ and $0.22$ percentage points.
+The corresponding \texttt{Ours-SP} rate is $80.6\%$, and the compact solver records two and one fallbacks for \texttt{Ours} and \texttt{Ours-MS}, respectively.
 Here the componentwise gradient perturbation $10^{-3}$ is one order below the common scoring tolerance, and the regularized $K^+$ steps damp the effect of an inaccurate gradient when function comparisons cease to certify progress.
 This offers a plausible explanation for the strong empirical result, including the higher solved fraction than NTQN under the common stopping criterion, but it does not establish gradient-noise tolerance or extend the exact-gradient theorem.
 Under NTQN's recommended termination mode, $50.1\%$ of the same function-noise instances attain the common tolerance, compared with $81.2\%$ under the wrapper's common-tolerance stop.
@@ -986,7 +986,7 @@ The lower scored fraction therefore mainly reflects NTQN's noise-dependent stopp
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_legend_noise.pdf}
     \end{subfigure}
-    \caption{\MPCchanged{Theory-aligned function-value-noise results at noise level $10^{-3}$, supplied error bound \(\feps = 10^{-2}\), and \(\gtol = 10^{-2}\).}}
+    \caption{Theory-aligned function-value-noise results at noise level $10^{-3}$, supplied error bound \(\feps = 10^{-2}\), and \(\gtol = 10^{-2}\).}
     \label{fig:results_function_noise}
 \end{figure}
 \end{MPCchange}
@@ -1007,8 +1007,9 @@ The lower scored fraction therefore mainly reflects NTQN's noise-dependent stopp
 \end{figure}
 
 \begin{MPCchange}
-For the error-bound sensitivity study, underestimating \(\feps\) as $10^{-4}$ gives solved fractions of $85.5\%$ for \texttt{Ours} and $75.3\%$ for \texttt{Ours-MS}, whereas the nominal $10^{-2}$ gives $83.9\%$ and $84.8\%$, and overestimating it as $10^{-1}$ gives $72.5\%$ and $71.5\%$.
-Thus, underestimation happens to improve the aggregate success rate of the unmodified variant but substantially harms the modified-secant variant, while the tenfold overestimate reduces both rates by about $12$--$13$ percentage points relative to the nominal setting.
+For the error-bound sensitivity study, underestimating \(\feps\) as $10^{-4}$ gives solved fractions of $87.1\%$ for \texttt{Ours} and $81.9\%$ for \texttt{Ours-MS}, whereas the nominal $10^{-2}$ gives $85.1\%$ and $85.5\%$, and overestimating it as $10^{-1}$ gives $75.5\%$ and $74.7\%$.
+Thus, underestimation happens to improve the aggregate success rate of the unmodified variant but harms the modified-secant variant, while the tenfold overestimate reduces the rates by $9.6$ and $10.8$ percentage points, respectively, relative to the nominal setting.
+The relatively high solved fractions remain plausible because this experiment uses exact gradients, its termination tolerance $\gtol = 10^{-2}$ exceeds the function-noise level by one order of magnitude, and function-value comparisons remain informative when the actual decrease dominates the noise.
 For $\feps=10^{-1}$, the multiplier $2\feps/(1-\feps)$ in $\Delta_k$ equals approximately $0.222$, more than one hundred times the actual additive-noise level.
 The resulting reference shift keeps the method in $K^+$ more often and produces conservative steps through the accumulated regularization scale.
 Although this behavior does not invalidate the theory, the results show that a safety margin that is much larger than the actual error can reduce practical efficiency.
@@ -1020,25 +1021,25 @@ This asymmetric response supports treating \(\feps\) as a practically consequent
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_pp_eps_under_gtol1e-02.pdf}
-        \caption{\MPCchanged{\(\feps = 10^{-4}\).}}
+        \caption{\(\feps = 10^{-4}\).}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_pp_eps_nominal_gtol1e-02.pdf}
-        \caption{\MPCchanged{\(\feps = 10^{-2}\).}}
+        \caption{\(\feps = 10^{-2}\).}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_pp_eps_over_gtol1e-02.pdf}
-        \caption{\MPCchanged{\(\feps = 10^{-1}\).}}
+        \caption{\(\feps = 10^{-1}\).}
     \end{subfigure}
-    \begin{subfigure}[b]{0.45\textwidth}
+    \begin{subfigure}[b]{0.98\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_legend_sensitivity.pdf}
     \end{subfigure}
-    \caption{\MPCchanged{Performance profiles for error-bound misspecification under function-value-only noise of level $10^{-3}$ and \(\gtol = 10^{-2}\).}}
+    \caption{Performance profiles for error-bound misspecification under function-value-only noise of level $10^{-3}$ and \(\gtol = 10^{-2}\).}
     \label{fig:results_error_bound_sensitivity}
 \end{figure}
 \end{MPCchange}
@@ -1050,7 +1051,7 @@ We evaluated each method at three gradient norm tolerance levels, i.e., $\gtol \
 These tolerance levels represent different optimization regimes, from moderate accuracy to high precision requirements.
 \Cref{fig:results_all_precisions} shows the comprehensive performance profiles across all three precision levels.
 \begin{MPCchange}
-At the strictest tolerance \(\gtol = 10^{-5}\), \texttt{Ours} and \texttt{Ours-MS} solve $85.5\%$ and $86.4\%$ of the 64-bit problems, $52.7\%$ and $52.3\%$ of the 32-bit problems, and $28.9\%$ and $28.9\%$ of the 16-bit problems.
+At the strictest tolerance \(\gtol = 10^{-5}\), \texttt{Ours} and \texttt{Ours-MS} solve $84.5\%$ and $85.5\%$ of the 64-bit problems, $52.3\%$ and $52.7\%$ of the 32-bit problems, and $28.9\%$ and $28.9\%$ of the 16-bit problems.
 The decreasing rates quantify the expected loss of attainable accuracy as arithmetic precision is reduced, while both variants remain among the most robust methods in the profiles.
 Their relative ranking depends on the tolerance and precision, so we avoid claiming uniform superiority and report both the fraction solved and the performance ratios in \cref{fig:results_all_precisions}.
 \end{MPCchange}
@@ -1121,7 +1122,7 @@ Their relative ranking depends on the tolerance and precision, so we avoid claim
     \vspace{0.5em}
 
     % Legend
-    \begin{subfigure}[b]{0.8\textwidth}
+    \begin{subfigure}[b]{0.98\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_legend_precision.pdf}
     \end{subfigure}
@@ -1153,7 +1154,7 @@ The simplicity of the optimization problem and the small value of $k_{\max}$ are
 Timing data were collected after three warm-up runs, followed by $100$ recorded trials.
 
 \begin{MPCchange}
-In \cref{fig:exec_time}, we report the execution time statistics, which show that the per-iteration times of \texttt{Ours} and \texttt{Ours-MS} are of the same order as those of the other Python implementations in this isolated test.
+In \cref{fig:exec_time}, we report the execution time statistics: the shifted-pair \texttt{Ours-SP} has per-iteration cost close to the least expensive Python implementations, whereas the exact compact solves in \texttt{Ours} and \texttt{Ours-MS} incur visibly greater overhead in this isolated test.
 This timing experiment measures algorithmic overhead under deliberately inexpensive objective and gradient evaluations and does not by itself establish end-to-end robustness or superiority in oracle cost.
 Because wall-clock time depends strongly on implementation details and the computing environment, we restrict its interpretation to this isolated experiment and do not draw broader conclusions from the timing results.
 For a fairer comparison of algorithmic efficiency, we place greater emphasis on oracle-call counts and success profiles.

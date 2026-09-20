@@ -54,10 +54,10 @@ This point is important because the convergence theorem permits nonconvex object
 This appendix isolates the earlier accumulator-restart heuristic from the primary no-restart experiments that match \cref{alg:regularized_qn} and the analysis in \cref{sec:analysis}.
 The restart variant applies the condition in \cref{eq:restart_condition} only when returning from $K^+$ to $K^0$, permits at most ten restarts, and otherwise uses the same problems, seeds, stopping rules, and parameter values as the corresponding no-restart method.
 For each setting, the comparison records oracle calls, failures, the distribution of the number of restarts, and whether the cap is reached.
-Over the $1{,}100$ function-noise instances, the no-restart and restart variants attain \(\gtol = 10^{-2}\) on $83.9\%$ and $84.8\%$, respectively, corresponding to $177$ and $167$ instances that do not attain the tolerance.
-Among the $916$ instances solved by both variants, restart uses fewer oracle calls on $139$, the same number on $652$, and more on $125$.
-The median call ratio is $1.00$, and its geometric mean is $0.938$.
-The restart count has mean $1.53$, median zero, and maximum ten, with the cap reached on $65$ instances.
+Over the $1{,}100$ function-noise instances, the no-restart and restart variants attain \(\gtol = 10^{-2}\) on $85.1\%$ and $87.6\%$, respectively, corresponding to $164$ and $136$ instances that do not attain the tolerance.
+Among the $928$ instances solved by both variants, restart uses fewer oracle calls on $185$, the same number on $654$, and more on $89$.
+The median call ratio is $1.00$, and its geometric mean is $0.895$.
+The restart count has mean $1.48$, median zero, and maximum ten, with the cap reached on $62$ instances.
 Hence the heuristic gives a small aggregate improvement but is inactive on at least half of the instances and reaches its imposed cap often enough that these results do not justify incorporating it into the theoretical algorithm.
 
 \begin{figure}[t]
@@ -70,10 +70,10 @@ Hence the heuristic gives a small aggregate improvement but is inactive on at le
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_legend_restart.pdf}
     \end{subfigure}
-    \caption{\MPCchanged{Performance profile for the restart ablation on the same $1{,}100$ paired function-noise instances as the primary experiment.
+    \caption{Performance profile for the restart ablation on the same $1{,}100$ paired function-noise instances as the primary experiment.
     Ours is the analyzed method with no accumulator restart.
     Ours-R applies the optional rule in \cref{eq:restart_condition} with at most ten restarts.
-    The close curves agree with the paired call counts: restart changes aggregate success only slightly and is not uniformly faster.}}
+    The close curves agree with the paired call counts: restart changes aggregate success only slightly and is not uniformly faster.}
     \label{fig:restart_ablation}
 \end{figure}
 \end{MPCchange}
