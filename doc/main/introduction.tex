@@ -42,7 +42,8 @@ Extensive numerical experiments on the CUTEst benchmark collection, across vario
         OFFO is included as the first-order source of the fallback scaling.
         A \ding{51} denotes theoretical coverage and ``--'' its absence.
         The ``Noisy $f$'' and ``Noisy $g$'' columns indicate whether the corresponding errors are allowed.
-        The asterisk of our method indicates that gradient noise is outside the current analysis and is considered only in joint-noise stress tests.
+        The asterisk indicates that gradient noise is outside our analysis and is considered only in joint-noise stress tests.
+        Still, unlike a Wolfe line search, the proposed sufficient-decrease test does not require a exact gradient evaluation at each trial point.
     }
     \label{tab:related_work_comparison}
         \begin{tabular}{@{}>{\centering\arraybackslash}p{0.20\linewidth}cccc>{\centering\arraybackslash}p{0.25\linewidth}@{}}
@@ -110,7 +111,7 @@ Their analysis establishes linear convergence to a noise-dependent neighborhood 
 Our relaxed Armijo test is related to their noise-tolerant test~\citep[Section~4]{shiNoiseTolerantQuasiNewtonAlgorithm2022}, but our adaptive error allowance and fallback play a different role.
 Function values are used only while they provide a reliable decrease certificate.
 This design targets smooth nonconvex problems with accurate gradients and persistent function-value errors, and retains an \(\order{1/\varepsilon^2}\) guarantee for arbitrarily small first-order tolerances.
-NTQN instead has the complementary advantage of accommodating bounded gradient errors, which our theory does not cover.
+NTQN instead has the complementary advantage of accommodating bounded gradient errors.
 In the function-noise experiments, the proposed variants attain the common gradient tolerance on a larger fraction of instances than NTQN, while the joint-noise results are reported only as stress tests beyond our theory.
 
 The guarantees in \cref{tab:related_work_comparison} have different targets and assumptions.
