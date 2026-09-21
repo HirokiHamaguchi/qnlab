@@ -113,8 +113,7 @@ class BFGSUpdateRule(BaseUpdateRule):
             return BFGSUpdateRule.compute_dir(None, g, lm)
 
         workspace = lm.workspace
-        steps = workspace.steps
-        gradients = workspace.gradients
+        indices = workspace.indices
         step_norms = workspace.step_norms
         pair_products = workspace.pair_products
         gradient_norms = workspace.gradient_norms
@@ -128,8 +127,7 @@ class BFGSUpdateRule(BaseUpdateRule):
         ):
             raise np.linalg.LinAlgError("Invalid L-BFGS curvature pair.")
 
-        normalized_steps = steps / step_scales
-        normalized_gradients = gradients / gradient_scales
+        normalized_steps, normalized_gradients = workspace.normalized_vectors
         step_products = workspace.step_products / np.outer(step_scales, step_scales)
         step_gradient = workspace.step_gradient / np.outer(
             step_scales, gradient_scales
@@ -175,7 +173,10 @@ class BFGSUpdateRule(BaseUpdateRule):
             ]
         )
         projected_gradient = np.concatenate(
-            (normalized_gradients.T @ g, normalized_steps.T @ g)
+            (
+                (normalized_gradients.T @ g)[indices],
+                (normalized_steps.T @ g)[indices],
+            )
         )
         compact_solution = scipy.linalg.solve_triangular(
             factor_lower,
@@ -189,9 +190,13 @@ class BFGSUpdateRule(BaseUpdateRule):
             lower=False,
             check_finite=False,
         )
+        gradient_coefficients = np.empty(len(lm), dtype=np.float64)
+        step_coefficients = np.empty(len(lm), dtype=np.float64)
+        gradient_coefficients[indices] = compact_solution[: len(lm)]
+        step_coefficients[indices] = compact_solution[len(lm) :]
         correction = (
-            normalized_gradients @ compact_solution[: len(lm)]
-            + normalized_steps @ compact_solution[len(lm) :]
+            normalized_gradients @ gradient_coefficients
+            + normalized_steps @ step_coefficients
         )
         direction = (correction - g) / shifted_gamma
         if not np.all(np.isfinite(direction)):

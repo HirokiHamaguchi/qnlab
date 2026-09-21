@@ -214,7 +214,7 @@ def main():
 
     latex_table = generate_latex_table(methods_list, table_data)
     table_path = repo_root / "doc" / "main" / "check" / "time_results_table.tex"
-    table_path.write_text(latex_table + "\n", encoding="utf-8")
+    table_path.write_text(latex_table + "\n", encoding="utf-8", newline="\n")
     print(f"Saved LaTeX table to {table_path.relative_to(repo_root)}")
 
 

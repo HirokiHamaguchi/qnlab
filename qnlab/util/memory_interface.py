@@ -22,6 +22,11 @@ class LBFGSWorkspace:
         # Columns are traversed repeatedly by the L-BFGS two-loop recursion.
         self._steps = np.empty((n, capacity), dtype=np.float64, order="F")
         self._gradients = np.empty((n, capacity), dtype=np.float64, order="F")
+        self._normalized_steps = np.empty((n, capacity), dtype=np.float64, order="F")
+        self._normalized_gradients = np.empty(
+            (n, capacity), dtype=np.float64, order="F"
+        )
+        self._normalized_initialized = False
         self._step_products = np.empty((capacity, capacity), dtype=np.float64)
         self._step_gradient = np.empty((capacity, capacity), dtype=np.float64)
         self._gradient_products = np.empty((capacity, capacity), dtype=np.float64)
@@ -71,6 +76,16 @@ class LBFGSWorkspace:
         return self._gradient_norms[self.indices]
 
     @property
+    def normalized_vectors(
+        self,
+    ) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+        self._ensure_normalized()
+        return (
+            self._normalized_steps[:, : self.size],
+            self._normalized_gradients[:, : self.size],
+        )
+
+    @property
     def indices(self) -> npt.NDArray[np.intp]:
         """Physical column indices in oldest-to-newest order."""
         if self.capacity == 0:
@@ -102,6 +117,22 @@ class LBFGSWorkspace:
         self._gradient_products[: self.size, : self.size] = gradients.T @ gradients
         self._grams_initialized = True
 
+    def _ensure_normalized(self) -> None:
+        if self._normalized_initialized:
+            return
+        for index in self.indices:
+            np.divide(
+                self._steps[:, index],
+                np.sqrt(self._step_norms[index]),
+                out=self._normalized_steps[:, index],
+            )
+            np.divide(
+                self._gradients[:, index],
+                np.sqrt(self._gradient_norms[index]),
+                out=self._normalized_gradients[:, index],
+            )
+        self._normalized_initialized = True
+
     def append(
         self,
         step: npt.NDArray[np.float64],
@@ -121,15 +152,24 @@ class LBFGSWorkspace:
             index = (self._start + self.size) % self.capacity
             self.size += 1
 
-        self._steps[:, index] = step
-        self._gradients[:, index] = gradient_difference
-        self._step_norms[index] = np.dot(step, step) if ss is None else ss
-        self._pair_products[index] = (
-            np.dot(step, gradient_difference) if ys is None else ys
-        )
-        self._gradient_norms[index] = (
+        step_norm = np.dot(step, step) if ss is None else ss
+        pair_product = np.dot(step, gradient_difference) if ys is None else ys
+        gradient_norm = (
             np.dot(gradient_difference, gradient_difference) if yy is None else yy
         )
+        self._steps[:, index] = step
+        self._gradients[:, index] = gradient_difference
+        self._step_norms[index] = step_norm
+        self._pair_products[index] = pair_product
+        self._gradient_norms[index] = gradient_norm
+        if self._normalized_initialized and step_norm > 0.0:
+            np.divide(step, np.sqrt(step_norm), out=self._normalized_steps[:, index])
+        if self._normalized_initialized and gradient_norm > 0.0:
+            np.divide(
+                gradient_difference,
+                np.sqrt(gradient_norm),
+                out=self._normalized_gradients[:, index],
+            )
         if not self._grams_initialized:
             return
 
@@ -154,6 +194,7 @@ class LBFGSWorkspace:
         self.size = 0
         self._start = 0
         self._grams_initialized = False
+        self._normalized_initialized = False
         for item in items:
             self.append(item.s, item.y, item.ss, item.ys, item.yy)
 

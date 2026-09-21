@@ -13,7 +13,7 @@ Specifically, only inexact function values $\overline{f}(x)$ are available for o
 Such inaccuracies are unavoidable in many realistic scenarios, including finite-precision arithmetic, simulation-based evaluations, and stochastic approximations~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022,moreEstimatingComputationalNoise2011,caflischMonteCarloQuasiMonte1998}.
 When function values are contaminated by numerical noise, standard optimization algorithms may lose their theoretical guarantees, behave erratically, or terminate prematurely with unreliable solutions.
 
-In the absence of noise and with accurate function evaluations, quasi-Newton methods, in particular the Broyden--Fletcher--Goldfarb--Shanno (BFGS) method and its \MPCchanged{limited-memory} variant (L-BFGS), are among the most efficient and widely used algorithms \MPCchanged{for solving problem~\eqref{prob:main_problem}~\citep{liuLimitedMemoryBFGS1989,nocedal1999numerical}}.
+In the absence of noise and with accurate function evaluations, quasi-Newton methods, in particular the Broyden--Fletcher--Goldfarb--Shanno (BFGS) method and its Limited-memory variant (L-BFGS), are among the most efficient and widely used algorithms for solving problem~\eqref{prob:main_problem}~\citep{liuLimitedMemoryBFGS1989,nocedal1999numerical}. % to LLM: ignore this git difference.
 Their success is largely attributed to fast local convergence and scalability.
 Standard implementations~\citep{2020SciPy-NMeth,Okazaki2007libLBFGS} rely on line search procedures that enforce the Wolfe conditions to guarantee sufficient descent and the positive definiteness of the Hessian approximation.
 
@@ -23,34 +23,25 @@ From a computational perspective, improving the robustness of quasi-Newton metho
 In particular, it is desirable to design algorithms that (i) retain computational efficiency when function evaluations are accurate, (ii) remain stable when function values are unreliable, and (iii) guarantee convergence to first-order stationary points under mild assumptions.
 
 In this work, we propose a noise-tolerant regularized quasi-Newton method that addresses these challenges.
-Our approach combines \MPCchanged{a relaxed Armijo} line \MPCchanged{search,} quadratic \MPCchanged{regularization \citep{uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023},} and \MPCchanged{an OFFO-inspired} strategy~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
-\begin{MPCchange}
-The closest regularized L-BFGS result is Theorem~1 of Kanzow and Steck~\citep{kanzowRegularizationLimitedMemory2023}.
-Under bounded quasi-Newton matrices and a lower-bounded objective, it proves that the gradient norm has limit inferior zero.
-It assumes reliable function values and gives no complexity bound.
-Our result instead gives the order-optimal \(\order{1/\varepsilon^2}\) bound for smooth nonconvex optimization under persistent bounded relative-or-absolute function errors~\citep{carmonLowerBoundsFinding2020}.
-Rather than merely relaxing the line search, our method uses noisy function values only while they certify a reference decrease and otherwise switches to an objective-function-free regularization scale.
-It thereby retains useful line-search behavior without making continued progress depend on unreliable comparisons.
+Our approach combines an Armijo line search, quadratic regularization \citep{uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023}, and an Objective-Function-Free Optimization (OFFO) inspired strategy~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}. % to LLM: ignore this git difference.
+When a sufficient decrease in function value is observed, the method behaves similarly to standard quasi-Newton methods with line search, preserving its practical efficiency.
+When numerical noise dominates, we introduce regularization on the approximate Hessian to ensure numerical stability, which yields convergence properties similar to those of OFFO methods, particularly AdaGrad-Norm~\citep{wardAdaGradStepsizesSharp2020}.
+The resulting algorithm is particularly well-suited for low-precision or noisy environments.
 
-OFFO methods avoid unreliable function values altogether~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}, whereas our method uses them selectively.
-The noise-tolerant quasi-Newton analysis of Shi et al.~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022} permits both function and gradient errors but assumes strong convexity and converges linearly only to a noise-dependent neighborhood.
-Its stationarity radius contains a function-error contribution proportional to \(\sqrt{M\epsilon_f}\) and a gradient-error contribution proportional to \(\epsilon_g\), so keeping the former below the latter requires \(\epsilon_f=\order{\epsilon_g^2/M}\) up to problem-dependent constants.
-In particular, even when \(\epsilon_g=0\), their bound retains a threshold proportional to \(\sqrt{M\epsilon_f}\), whereas a fixed \(0\leq\epsilon_f<1\) changes the constants in our bound but imposes no stationarity floor.
-This distinction follows from our adaptively recomputed error allowance and the $K^0/K^+$ switch, which stops relying on function comparisons when they cease to certify progress.
-Shi et al. cover bounded gradient errors and protect curvature pairs by lengthening, whereas our arbitrary-accuracy and complexity guarantees require exact gradients.
-Our relaxed Armijo condition is also directly related to the noise-tolerant relaxation in Section~4 of Shi et al.~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
-When the relevant function values are small enough that the constant branch of the relative-or-absolute error model is active, our adaptive allowance reduces to $\Delta_k=2\feps/(1-\feps)$ and directly parallels their constant error allowance.
-\end{MPCchange}
+From a theoretical standpoint, we establish that the proposed method achieves the global convergence rate of $\order{1/\varepsilon^2}$ for smooth nonconvex optimization problems, \MPCchanged{which is the optimal rate of first-order methods for gradient smooth nonconvex optimization~\citep{carmonLowerBoundsFinding2020}}, even when objective function values are corrupted by noise.
+Extensive numerical experiments on the CUTEst benchmark collection, across various floating-point precisions and artificial noise settings, demonstrate that the proposed method is significantly more stable than standard methods with line search in the presence of significant numerical noise, \MPCchanged{while drastically improving the practical convergence speed compared to our base algorithms, including AdaGrad-Norm~\citep{wardAdaGradStepsizesSharp2020} and the regularized L-BFGS method~\citep{kanzowRegularizationLimitedMemory2023}.}
+
+\subsection{Comparison With Related Work}
 
 \begin{table*}[t]
     \begin{MPCchange}
     \ifdefined\MPCRevision\captionsetup{font={color=red}}\fi
     \centering
     \caption{
-        Quasi-Newton-focused comparison of the proposed method and its baselines.
+        Theoretical comparison of the proposed method and its quasi-Newton and OFFO competitors.
         OFFO is included as the first-order source of the fallback scaling.
         A \ding{51} denotes theoretical coverage and ``--'' its absence.
-        The asterisk marks empirical robustness outside our gradient-noise theory.
+        The asterisk of our method indicates that gradient noise is not allowed in the current analysis, but its practical performance is more robust than the existing noise-tolerant methods under our numerical experiments.
     }
     \label{tab:related_work_comparison}
     {\scriptsize
@@ -106,6 +97,25 @@ When the relevant function values are small enough that the constant branch of t
     }
     \end{MPCchange}
 \end{table*}
+
+\begin{MPCchange}
+We now compare our method with related work on quasi-Newton methods and OFFO methods especially from the theoretical perspective.
+
+The closest research is about regularized L-BFGS methods~\citep{kanzowRegularizationLimitedMemory2023,cartisWorstcaseEvaluationComplexity2015}.
+These methods assume reliable function values, while we analyze the behavior of our method under persistent bounded relative-or-absolute function errors and give the order-optimal \(\order{1/\varepsilon^2}\) bound for smooth nonconvex optimization, which coincides or improves the bounds of the existing regularized L-BFGS methods.
+Rather than merely relaxing the line search of their method, our method uses noisy function values only while they certify a reference decrease and otherwise switches to an objective-function-free regularization scale.
+It thereby retains useful line-search behavior without making continued progress depend on unreliable comparisons.
+
+Another related research is about OFFO methods~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023} and noise-tolerant quasi-Newton methods~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
+OFFO methods avoid unreliable function values altogether~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}, whereas our method uses them selectively.
+The noise-tolerant quasi-Newton~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022} permits both function and gradient errors but assumes strong convexity and converges linearly only to a noise-dependent neighborhood.
+Its stationarity radius contains a function-error contribution proportional to \(\sqrt{M\epsilon_f}\) and a gradient-error contribution proportional to \(\epsilon_g\), so keeping the former below the latter requires \(\epsilon_f=\order{\epsilon_g^2/M}\) up to problem-dependent constants.
+In particular, even when \(\epsilon_g=0\), their bound retains a threshold proportional to \(\sqrt{M\epsilon_f}\), whereas a fixed \(0\leq\epsilon_f<1\) changes the constants in our bound but imposes no stationarity floor.
+This distinction follows from our adaptively recomputed error allowance and the $K^0/K^+$ switch, which stops relying on function comparisons when they cease to certify progress.
+Shi et al. cover bounded gradient errors and protect curvature pairs by lengthening, whereas our arbitrary-accuracy and complexity guarantees require exact gradients.
+Our relaxed Armijo condition is also directly related to the noise-tolerant relaxation in Section~4 of Shi et al.~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
+When the relevant function values are small enough that the constant branch of the relative-or-absolute error model is active, our adaptive allowance reduces to $\Delta_k=2\feps/(1-\feps)$ and directly parallels their constant error allowance.
+\end{MPCchange}
 
 \begin{MPCchange}
 The rates in \cref{tab:related_work_comparison} have different targets and assumptions.
