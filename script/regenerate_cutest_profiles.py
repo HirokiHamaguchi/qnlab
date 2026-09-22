@@ -36,6 +36,7 @@ STANDARD_METHODS = (
     "NTQN",
     "ASTR1-Adagrad",
 )
+
 SCENARIOS = {
     "float64": (64, (0,), (1e-1, 1e-3, 1e-5), STANDARD_METHODS),
     "float32": (32, (0,), (1e-1, 1e-3, 1e-5), STANDARD_METHODS),
@@ -61,6 +62,7 @@ SCENARIOS = {
         ("NTRQN", "NTRQN-MS", "NTRQN-SP", "NTRQN-Restart", "NTRQN-MS-Restart"),
     ),
 }
+
 SCENARIO_ALIASES = {"eps_nominal": "function_only"}
 
 
@@ -76,21 +78,44 @@ def first_successful_call(path: Path, tolerance: float) -> float:
     with np.load(path) as data:
         calls = np.asarray(data["calls"], dtype=int)
         gnorms = np.asarray(data["gnorms"], dtype=float)
+
     reached = np.flatnonzero(gnorms <= tolerance)
     return float(max(1, int(calls[reached[0]]))) if reached.size else np.inf
 
+def first_successful_time(path: Path, tolerance: float) -> float:
+    with np.load(path) as data:
+        times = np.asarray(data["times"], dtype=float)
+        gnorms = np.asarray(data["gnorms"], dtype=float)
 
-def load_calls(
+    reached = np.flatnonzero(gnorms <= tolerance)
+    return float(times[reached[0]]) if reached.size else np.inf
+
+def time_bucket_masks(times: np.ndarray) -> dict[str, np.ndarray]:
+    """Split instances by the best runtime attained by any method."""
+    best_times = np.min(times, axis=0)
+
+    finite = np.isfinite(best_times)
+
+    return {
+        "lt1s": finite & (best_times < 1.0),
+        "1-10s": finite & (best_times >= 1.0) & (best_times < 10.0),
+        "ge10s": finite & (best_times >= 10.0),
+    }
+
+def load_metric(
     scenario: str,
     precision: int,
     seeds: tuple[int, ...],
     tolerance: float,
     methods: tuple[str, ...],
     problem_sets: dict[int, tuple[str, ...]],
+    metric: str,
 ) -> np.ndarray:
     source_scenario = SCENARIO_ALIASES.get(scenario, scenario)
     instances = [(seed, problem) for seed in seeds for problem in problem_sets[precision]]
-    calls = np.full((len(methods), len(instances)), np.inf)
+
+    values = np.full((len(methods), len(instances)), np.inf)
+
     for method_index, method in enumerate(methods):
         for instance_index, (seed, problem) in enumerate(instances):
             path = (
@@ -100,26 +125,47 @@ def load_calls(
                 / problem
                 / f"{method}.npz"
             )
+
             if not path.is_file():
                 raise FileNotFoundError(path)
-            calls[method_index, instance_index] = first_successful_call(
-                path, tolerance
-            )
-    return calls
+
+            if metric == "calls":
+                value = first_successful_call(path, tolerance)
+            elif metric == "time":
+                value = first_successful_time(path, tolerance)
+            else:
+                raise ValueError(f"Unknown metric: {metric}")
+
+            values[method_index, instance_index] = value
+
+    return values
 
 
-def output_path(scenario: str, precision: int, tolerance: float) -> Path:
+def output_path(
+    scenario: str,
+    precision: int,
+    tolerance: float,
+    metric: str = "calls",
+) -> Path:
     tolerance_name = f"{tolerance:.0e}".replace("+", "")
+
     if scenario.startswith("float"):
         stem = f"precision{precision}"
     elif scenario == "joint_noise":
         stem = "noise0.001"
     else:
         stem = scenario
-    return OUTPUT_ROOT / f"_pp_{stem}_gtol{tolerance_name}.pdf"
+
+    metric_suffix = "" if metric == "calls" else "_time"
+
+    return OUTPUT_ROOT / f"_pp_{stem}_gtol{tolerance_name}{metric_suffix}.pdf"
 
 
-def draw_profile(methods: tuple[str, ...], calls: np.ndarray, target: Path) -> None:
+def draw_profile(
+    methods: tuple[str, ...],
+    values: np.ndarray,
+    target: Path,
+) -> None:
     plt.style.use("seaborn-v0_8-whitegrid")
     plt.rcParams.update(
         {
@@ -130,9 +176,11 @@ def draw_profile(methods: tuple[str, ...], calls: np.ndarray, target: Path) -> N
             "lines.linewidth": 2.0,
         }
     )
+
     fig, ax = plt.subplots(figsize=(7, 5.5))
+
     performance_profile(
-        calls.T,
+        values.T,
         linestyle=[LINE_STYLES[name] for name in methods],
         colors=[COLORS[name] for name in methods],
         thetaMax=10.0,
@@ -140,29 +188,103 @@ def draw_profile(methods: tuple[str, ...], calls: np.ndarray, target: Path) -> N
         markevery=[0],
         linewidth=2.2,
     )
+
     ax.set_xlabel(r"Performance Ratio $\tau$", fontsize=18)
-    ax.set_ylabel(r"Proportion of Test Instances Solved $\rho_s(\tau)$", fontsize=18)
+    ax.set_ylabel(
+        r"Proportion of Test Instances Solved $\rho_s(\tau)$",
+        fontsize=18,
+    )
     ax.set_xticks([2, 4, 6, 8, 10])
     ax.grid(True, alpha=0.35, linestyle="-", linewidth=0.6, color="gray")
     ax.set_axisbelow(True)
+
     for spine in ax.spines.values():
         spine.set_edgecolor("black")
         spine.set_linewidth(1.0)
+
     fig.tight_layout()
+
     target.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(target, format="pdf", bbox_inches="tight", dpi=300)
     plt.close(fig)
+
     print(f"Saved figure to {target}")
 
 
 def main() -> None:
     problem_sets = load_problem_sets()
+
     for scenario, (precision, seeds, tolerances, methods) in SCENARIOS.items():
         for tolerance in tolerances:
-            calls = load_calls(
-                scenario, precision, seeds, tolerance, methods, problem_sets
+            # Function-call performance profile
+            calls = load_metric(
+                scenario,
+                precision,
+                seeds,
+                tolerance,
+                methods,
+                problem_sets,
+                metric="calls",
             )
-            draw_profile(methods, calls, output_path(scenario, precision, tolerance))
+            draw_profile(
+                methods,
+                calls,
+                output_path(
+                    scenario,
+                    precision,
+                    tolerance,
+                    metric="calls",
+                ),
+            )
+
+            if not (precision==64 and len(seeds)==1):
+                continue
+
+            # Runtime performance profile
+            times = load_metric(
+                scenario,
+                precision,
+                seeds,
+                tolerance,
+                methods,
+                problem_sets,
+                metric="time",
+            )
+
+            time_target = output_path(
+                scenario,
+                precision,
+                tolerance,
+                metric="time",
+            )
+
+            draw_profile(
+                methods,
+                times,
+                time_target,
+            )
+
+            # Runtime performance profiles stratified by absolute difficulty.
+            for bucket_name, mask in time_bucket_masks(times).items():
+                n_instances = int(mask.sum())
+
+                # Very small buckets are not informative.
+                if n_instances < 5:
+                    print(
+                        f"Skipping {scenario} {tolerance:g} {bucket_name}: "
+                        f"only {n_instances} instances"
+                    )
+                    continue
+
+                bucket_target = time_target.with_name(
+                    f"{time_target.stem}_{bucket_name}{time_target.suffix}"
+                )
+
+                draw_profile(
+                    methods,
+                    times[:, mask],
+                    bucket_target,
+                )
 
     diagnostic_profiles = (
         (
@@ -174,11 +296,37 @@ def main() -> None:
             ("NTQN", "NTQN-Default-Termination"),
         ),
     )
+
     for stem, methods in diagnostic_profiles:
-        calls = load_calls(
-            "function_only", 64, tuple(range(5)), 1e-2, methods, problem_sets
+        calls = load_metric(
+            "function_only",
+            64,
+            tuple(range(5)),
+            1e-2,
+            methods,
+            problem_sets,
+            metric="calls",
         )
-        draw_profile(methods, calls, OUTPUT_ROOT / f"_pp_{stem}_gtol1e-02.pdf")
+        draw_profile(
+            methods,
+            calls,
+            OUTPUT_ROOT / f"_pp_{stem}_gtol1e-02.pdf",
+        )
+
+        times = load_metric(
+            "function_only",
+            64,
+            tuple(range(5)),
+            1e-2,
+            methods,
+            problem_sets,
+            metric="time",
+        )
+        draw_profile(
+            methods,
+            times,
+            OUTPUT_ROOT / f"_pp_{stem}_gtol1e-02_time.pdf",
+        )
 
 
 if __name__ == "__main__":
