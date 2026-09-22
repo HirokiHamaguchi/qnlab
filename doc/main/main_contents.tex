@@ -886,7 +886,7 @@ Because NTQN may appropriately stop at its estimated noise neighborhood before a
 
 In the following, each method is referred to by the name given in parentheses.
 \MPCchanged{Except for the first-order \texttt{ASTR1-Adagrad} baseline,} all these methods are L-BFGS-based, and we set the number of stored curvature pairs to $10$, the default value in SciPy's L-BFGS-B implementation.
-All experiments were conducted on a Microsoft Windows 11 Home system (version~10.0, build~26100) equipped with a 13th Gen Intel\textsuperscript{\textregistered} Core\textsuperscript{\texttrademark} i7-1360P CPU, featuring 12 physical cores and 16 logical processors.
+\MPCchanged{All experiments were conducted on an Apple Mac Pro (Late 2013).}
 All computations were performed using the CPU only.
 
 \subsection{Experimental Results}\label{sec:results}
@@ -959,33 +959,70 @@ Following standard implementations~\citep{2020SciPy-NMeth}, we used the infinity
 \subsubsection{Results with Artificial Noise}\label{sssec:noise_results}
 
 \begin{MPCchange}
-We first separate the theory-aligned function-noise experiment from the joint-noise stress test described in \cref{sssec:problems}.
-The former tests the assumptions of \cref{sec:analysis}.
-The latter asks whether the implementation remains useful when both available quantities are perturbed.
-Therefore, success in the joint-noise experiment is evidence that the method can remain effective even in a setting that is theoretically unfavorable to it, but it is not presented as validation of the exact-gradient complexity result.
-The experiment notebook compares the hybrid method with the first-order \texttt{ASTR1-Adagrad} baseline of Gratton et al.~\citep{Gratton08022024} and varies the supplied \(\feps\) over two orders of magnitude around its nominal value.
-All main-text profiles use the analyzed no-restart method.
-The earlier accumulator-restart heuristic is evaluated separately in the appendix.
-Across the $220$ problems and five paired seeds, \texttt{Ours} and \texttt{Ours-MS} attain \(\gtol = 10^{-2}\) on $85.1\%$ and $85.5\%$, respectively, of the $1{,}100$ function-noise instances.
-Their seed-to-seed standard deviations in the solved fraction are only $0.60$ and $0.18$ percentage points.
-The corresponding rates are $81.2\%$ for \texttt{NTQN} and $77.8\%$ for \texttt{Reg}.
-They are $74.0\%$ for \texttt{Reg-Sec} and $41.5\%$ for \texttt{ASTR1-Adagrad}.
-Among successful runs, the median oracle-call counts are $62$ for \texttt{Ours}, $67$ for \texttt{Ours-MS}, $64$ for \texttt{NTQN}, and $131$ for \texttt{ASTR1-Adagrad}.
-The shifted-pair variant \texttt{Ours-SP} solves $83.9\%$, while the compact solver never uses its zero-memory fallback direction for \texttt{Ours} and uses it nine times in total for \texttt{Ours-MS} across these instances.
-The complete distributions, including failures, are represented by the profiles in \cref{fig:results_function_noise}.
+We report separately the function-value noise experiment and the joint noise experiment described in \cref{sssec:problems}.
+The former satisfies the assumptions of \cref{sec:analysis}, whereas the latter tests empirical robustness beyond the exact-gradient theory.
+All profiles in the main text use the analyzed method without restarts.
+The earlier accumulator restart heuristic is evaluated separately in the appendix.
+
+\begin{table}[h!]
+    \begin{MPCchange}
+    \ifdefined\MPCRevision\captionsetup{font={color=red}}\fi
+    \centering
+    \caption{Success rates and conditional median oracle calls at $\gtol = 10^{-2}$ in the additive-noise experiments.
+    Each setting contains $1{,}100$ problem--seed instances.
+    Parentheses give the standard deviation of the solved percentage over the five seeds, and oracle-call medians are computed over successful runs.}
+    \label{tab:noise_results_summary}
+    \begin{tabular}{lrrrr}
+        \toprule
+        & \multicolumn{2}{c}{Function-value noise} & \multicolumn{2}{c}{Joint noise} \\
+        \cmidrule(lr){2-3}\cmidrule(lr){4-5}
+        Method & Solved (\%) & Calls & Solved (\%) & Calls \\
+        \midrule
+        \texttt{Ours}            & $85.1\ (0.60)$ & $62$  & $83.6\ (0.64)$ & $63$  \\
+        \texttt{Ours-MS}         & $85.5\ (0.18)$ & $67$  & $84.8\ (0.22)$ & $71$  \\
+        \texttt{Ours-SP}         & $83.9\ (0.46)$ & $62$  & $80.6\ (0.62)$ & $62$  \\
+        \texttt{NTQN}            & $81.2\ (1.34)$ & $64$  & $71.9\ (0.34)$ & $62$  \\
+        \texttt{Reg}             & $77.8\ (1.01)$ & $60$  & $73.5\ (1.21)$ & $56$  \\
+        \texttt{Reg-Sec}         & $74.0\ (0.78)$ & $54$  & $73.0\ (1.21)$ & $62$  \\
+        \texttt{ASTR1-Adagrad}   & $41.5\ (1.13)$ & $131$ & $42.8\ (0.83)$ & $150$ \\
+        \bottomrule
+    \end{tabular}
+    \end{MPCchange}
+\end{table}
+
 Both proposed variants solve at least one instance of dimension $123{,}200$, the largest dimension in the retained collection.
-In the joint-noise stress test, \texttt{Ours} and \texttt{Ours-MS} solve $83.6\%$ and $84.8\%$ of the instances, compared with $71.9\%$ for \texttt{NTQN}, $73.5\%$ for \texttt{Reg}, and $42.8\%$ for \texttt{ASTR1-Adagrad}.
-The two proposed rates have seed-to-seed standard deviations of $0.64$ and $0.22$ percentage points.
-The corresponding \texttt{Ours-SP} rate is $80.6\%$, and the compact solver uses its zero-memory fallback direction twice for \texttt{Ours} and once for \texttt{Ours-MS}.
-Here the componentwise gradient perturbation $10^{-3}$ is one order below the common scoring tolerance, and the regularized $K^+$ steps damp the effect of an inaccurate gradient when function comparisons cease to certify progress.
-This offers a plausible explanation for the strong empirical result, including the higher solved fraction than NTQN under the common stopping criterion, but it does not establish gradient-noise tolerance or extend the exact-gradient theorem.
+The joint-noise results suggest empirical robustness beyond the theory, but they do not establish gradient-noise tolerance or extend the exact-gradient result.
 Under NTQN's recommended termination mode, $50.1\%$ of the same function-noise instances attain the common tolerance, compared with $81.2\%$ when the external common-tolerance stop is used.
 All recommended-mode runs terminate without timeout or exception, and $619$ of them stop because NTQN detects that function-value changes have reached its estimated function-noise level (flag~4).
 The lower scored fraction therefore mainly reflects NTQN's noise-dependent stopping rule rather than failed execution.
 \end{MPCchange}
 
 \begin{MPCchange}
+Underestimating \(\feps\) can violate the assumed error bound and does not uniformly improve performance across the two variants.
+Overestimating it preserves the error model, but the results show that an excessively large allowance can reduce practical efficiency by keeping the method in the conservative $K^+$ regime more often.
+
+\begin{table}[h!]
+    \begin{MPCchange}
+    \ifdefined\MPCRevision\captionsetup{font={color=red}}\fi
+    \centering
+    \caption{Solved percentages in the error-bound sensitivity experiment with function-value noise of level $10^{-3}$ and $\gtol = 10^{-2}$.}
+    \label{tab:error_bound_sensitivity}
+    \begin{tabular}{lccc}
+        \toprule
+        Setting & Supplied $\feps$ & \texttt{Ours} & \texttt{Ours-MS} \\
+        \midrule
+        Underestimated & $10^{-4}$ & $87.1$ & $81.9$ \\
+        Nominal        & $10^{-2}$ & $85.1$ & $85.5$ \\
+        Overestimated  & $10^{-1}$ & $75.5$ & $74.7$ \\
+        \bottomrule
+    \end{tabular}
+    \end{MPCchange}
+\end{table}
+\end{MPCchange}
+
+\begin{MPCchange}
 \begin{figure}[t]
+    \ifdefined\MPCRevision\captionsetup{font={color=red}}\fi
     \centering
     \begin{subfigure}[b]{0.72\textwidth}
         \centering
@@ -1016,16 +1053,8 @@ The lower scored fraction therefore mainly reflects NTQN's noise-dependent stopp
 \end{figure}
 
 \begin{MPCchange}
-For the error-bound sensitivity study, underestimating \(\feps\) as $10^{-4}$ gives solved fractions of $87.1\%$ for \texttt{Ours} and $81.9\%$ for \texttt{Ours-MS}, whereas the nominal $10^{-2}$ gives $85.1\%$ and $85.5\%$, and overestimating it as $10^{-1}$ gives $75.5\%$ and $74.7\%$.
-Thus, underestimation happens to improve the aggregate success rate of the unmodified variant but harms the modified-secant variant, while the tenfold overestimate reduces the rates by $9.6$ and $10.8$ percentage points, respectively, relative to the nominal setting.
-The relatively high solved fractions remain plausible because this experiment uses exact gradients, its termination tolerance $\gtol = 10^{-2}$ exceeds the function-noise level by one order of magnitude, and function-value comparisons remain informative when the actual decrease dominates the noise.
-For $\feps=10^{-1}$, the multiplier $2\feps/(1-\feps)$ in $\Delta_k$ equals approximately $0.222$, more than one hundred times the actual additive-noise level.
-The resulting reference shift keeps the method in $K^+$ more often and produces conservative steps through the accumulated regularization scale.
-Although this behavior does not invalidate the theory, the results show that a safety margin that is much larger than the actual error can reduce practical efficiency.
-By contrast, underestimation can violate the assumed error bound even though it happens to improve the aggregate success rate of the unmodified variant in this experiment.
-This asymmetric response supports treating \(\feps\) as a practically consequential error allowance rather than as a parameter for which either direction of misspecification is uniformly advantageous.
-
 \begin{figure}[t]
+    \ifdefined\MPCRevision\captionsetup{font={color=red}}\fi
     \centering
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
@@ -1051,6 +1080,7 @@ This asymmetric response supports treating \(\feps\) as a practically consequent
     \caption{Performance profiles for error-bound misspecification under function-value-only noise of level $10^{-3}$ and \(\gtol = 10^{-2}\).}
     \label{fig:results_error_bound_sensitivity}
 \end{figure}
+\clearpage
 \end{MPCchange}
 
 \subsubsection{Results at Different Precision Levels}\label{sssec:exact_results}
