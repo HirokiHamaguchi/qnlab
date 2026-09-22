@@ -840,7 +840,8 @@ We compared the following methods in our experiments.
           \begin{itemize}
               \item We used \cref{alg:regularized_qn,alg:backtracking_linesearch} with the details in \cref{sec:proposed_choice}.
               \item (\texttt{Ours-MS}) means the variant incorporating the modified secant condition described in \cref{sec:proposed_choice_Bk}.
-              \MPCchanged{\item The suffix \texttt{-SP} denotes the corresponding heuristic variant that replaces the exact compact solve by the shifted-pair approximation in \cref{eq:approx_computation_of_regularized_quasi_Newton}.}
+              \MPCchanged{\item (\texttt{Ours-SP}) means the heuristic variant replacing the exact compact solve with the shifted-pair approximation in \cref{eq:approx_computation_of_regularized_quasi_Newton}.}
+              \MPCchanged{\item (\texttt{Ours-R}) means the variant incorporating the optional accumulator restart described in \cref{sec:proposed_choice_mu} and evaluated in \cref{app:restart_experiment}.}
           \end{itemize}
 
     \item (\texttt{Line}): Line search L-BFGS method
@@ -867,26 +868,18 @@ We compared the following methods in our experiments.
     \item (\texttt{NTQN}): Noise-tolerant quasi-Newton method~\MPCchanged{\citep{xieAnalysisBFGSMethod2020,shiNoiseTolerantQuasiNewtonAlgorithm2022}}
           \begin{itemize}
               \item A method designed to accommodate inexact gradient information, as mentioned in \cref{sec:problem_setting}.
+              \MPCchanged{\item We used the common gradient-tolerance stopping rule rather than NTQN's recommended termination mode, which yielded a substantially lower attainment rate under the common tolerance.}
           \end{itemize}
 
-    \MPCchanged{\item (\texttt{ASTR1-Adagrad}): The purely first-order \texttt{adagrad} variant of ASTR1 with the parameter setting reported by Gratton et al.~\citep[Table~1]{Gratton08022024}.
-    Its steps and stopping decision use only gradients.
-    The experimental logging code records the initial objective value solely for diagnostics and does not pass it to the method.}
+    \MPCchanged{\item (\texttt{ASTR1-Adagrad}): The purely first-order \texttt{adagrad} variant of ASTR1.
+    \begin{itemize}
+        \item The parameter setting is the same as reported by Gratton et al.~\citep[Table~1]{Gratton08022024}.
+    \end{itemize}}
 \end{itemize}
-
-\begin{MPCchange}
-For the primary NTQN comparison, the experimental driver stops NTQN when it attains the same gradient tolerance used to score every method.
-We additionally use the authors' recommended termination mode (the option \texttt{terminate=3}) with this external stop disabled.
-In the function-noise experiment, NTQN receives the conservative bound $\texttt{eps\_f}=10^{-2}$ for perturbations bounded by $10^{-3}$, matching the value of $\feps$ supplied to the proposed method.
-NTQN uses this bound in both its noise-tolerant line search and its recommended termination test.
-In the recommended mode, NTQN can stop upon attaining its gradient tolerance, reaching an estimated function- or gradient-noise level, or detecting stagnation.
-The common gradient tolerance is applied only afterward to its recorded trajectory for uniform scoring.
-Because NTQN may appropriately stop at its estimated noise neighborhood before attaining that tolerance, we report both solver-declared termination and attainment of the common scoring tolerance and distinguish such early termination from poor oracle efficiency.
-\end{MPCchange}
 
 In the following, each method is referred to by the name given in parentheses.
 \MPCchanged{Except for the first-order \texttt{ASTR1-Adagrad} baseline,} all these methods are L-BFGS-based, and we set the number of stored curvature pairs to $10$, the default value in SciPy's L-BFGS-B implementation.
-\MPCchanged{All experiments were conducted on an Apple Mac Pro (Late 2013).}
+\MPCchanged{All experiments were conducted on an Apple Mac Pro (Late 2013) with a 3.7~GHz quad-core Intel Xeon E5 processor and 12~GB of 1866~MHz DDR3 ECC memory.}
 All computations were performed using the CPU only.
 
 \subsection{Experimental Results}\label{sec:results}
@@ -896,42 +889,49 @@ All computations were performed using the CPU only.
 We evaluated all algorithms on unconstrained problems from the CUTEst benchmark collection~\citep{gouldCUTEstConstrainedUnconstrained2015}, implemented in Python using the PyCUTEst interface~\citep{PyCUTEst2022}.
 All problems were initialized with the default starting points provided by the library.
 \MPCchanged{Following previous work~\citep{kanzowRegularizationLimitedMemory2023}, we excluded problems whose initial points were already stationary or whose function values or gradients contained \texttt{NaN} or \texttt{INF}.}
+
 \begin{MPCchange}
-We consider the following five primary experimental settings:
+We organize the CUTEst experiments into the following two groups according to where their results are reported:
 \begin{itemize}
-    \item \emph{Function-value noise}: 64-bit arithmetic on 220 problems, with $\overline f(x) = f(x) + \xi_f$, $\xi_f \sim \operatorname{unif}(-10^{-3}, 10^{-3})$, exact gradients, and the nominal allowance $\feps = 10^{-2}$.
-    \item \emph{Joint function-and-gradient noise}: 64-bit arithmetic on the same 220 problems, with the preceding function perturbation, independent componentwise gradient perturbations $\xi_g^{(i)} \sim \operatorname{unif}(-10^{-3}, 10^{-3})$, and $\feps = 10^{-2}$.
-    \item \emph{64-bit arithmetic}: 220 problems with $\feps = 2.22 \times 10^{-9}$.
-    \item \emph{32-bit arithmetic}: 220 problems with $\feps = 1.19 \times 10^{-3}$.
-    \item \emph{16-bit arithmetic}: 152 problems with $\feps = 9.77 \times 10^{-2}$.
+    \item \emph{Artificial-noise experiments} on 220 problems using 64-bit arithmetic (results in \cref{sssec:noise_results})
+          \begin{itemize}
+              \item \emph{Function-value noise}: We add independent noise $\xi_f \sim \operatorname{unif}(-10^{-3}, 10^{-3})$ to each function evaluation while retaining exact gradients.
+              We set the nominal error allowance to $\feps = 10^{-2}$.
+              \item \emph{Joint function-and-gradient noise}: We use the same function perturbation and additionally perturb each gradient component independently by $\xi_g^{(i)} \sim \operatorname{unif}(-10^{-3}, 10^{-3})$.
+              We again set $\feps = 10^{-2}$.
+              \item \emph{Error-bound sensitivity}: Using the function-value-noise setting, we compare the underestimated allowance $\feps = 10^{-4}$, the nominal allowance $\feps = 10^{-2}$, and the overestimated allowance $\feps = 10^{-1}$.
+          \end{itemize}
+
+    \item \emph{Floating-point-precision experiments} (results in \cref{sssec:exact_results})
+          \begin{itemize}
+              \item \emph{64-bit arithmetic}: 220 problems with $\feps = 2.22 \times 10^{-9}$.
+              \item \emph{32-bit arithmetic}: 220 problems with $\feps = 1.19 \times 10^{-3}$.
+              \item \emph{16-bit arithmetic}: 152 problems with $\feps = 9.77 \times 10^{-2}$.
+          \end{itemize}
 \end{itemize}
-Here, $\operatorname{unif}(a,b)$ denotes the uniform distribution on $[a,b]$, and all function and gradient perturbations are sampled independently.
-The retained problems have dimensions from $2$ to $123{,}200$ in every collection.
+\end{MPCchange}
+\MPCchanged{Here,} $\mathrm{unif}(a,b)$ denotes a uniform random variable in the interval $[a,b]$.
+This setting is the same as the one in~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
+\MPCchanged{Each artificial-noise setting uses the five seeds $0, 1, 2, 3, 4$.
+For NTQN in the function-value-noise and joint-noise experiments, we supplied the conservative absolute noise bound $\texttt{eps\_f} = 10^{-2}$ because each function perturbation is bounded in magnitude by $10^{-3}$.
+The optional accumulator-restart variants are evaluated separately under the function-value-noise setting in \cref{app:restart_experiment}.}
 
-For the reduced-precision settings, the input vector is rounded to the target precision before each CUTEst evaluation, and the returned function value and gradient are rounded to the same precision.
-CUTEst performs its internal calculations in 64-bit arithmetic, so these experiments simulate the effect of lower-precision inputs and oracle outputs rather than fully lower-precision internal evaluation.
+In the reduced precision settings, to simulate lower numerical precision, we first cast the input vector $x$ to the target lower precision, then computed $\overline{f}(x)$ and $\nabla \overline{f}(x)$ using the lower-precision input.
+Although the internal computations of CUTEst remain in 64-bit precision, the casting of the input vector effectively simulated the impact of reduced precision on function and gradient evaluations.
 
+\begin{MPCchange}
 The error allowances for the three precision settings are summarized in \cref{tab:machine_epsilon}.
 The 64-bit value follows SciPy's default heuristic of $10^7\epsilon_{\mathrm{mach}}$.
 For 32- and 16-bit arithmetic, we use the smaller multipliers $10^4$ and $10^2$, respectively, because $10^7\epsilon_{\mathrm{mach}}$ would violate $\feps<1$ and provide no informative allowance.
 These values are practical safety margins for accumulated floating-point errors rather than estimates supplied by the theory.
 
-To examine misspecification of the error allowance, the function-value-noise experiment additionally uses $\feps=10^{-4}$ and $10^{-1}$.
-Underestimating $\feps$ makes $\Delta_k$ too small to absorb the actual function error, makes the $K^0$ test easier to satisfy, and can therefore cause the method to trust unreliable comparisons and take more unregularized steps outside the theorem's error model.
-Overestimating $\feps$ preserves the error model and hence is safe from the viewpoint of the convergence theory, provided that $\feps<1$.
-It relaxes Armijo acceptance through a larger $\Delta_k$, but it also lowers every reference value $\overline f(x_j)-\Delta_j$ and thereby makes subsequent entry into $K^0$ harder.
-The latter effect can keep the method in $K^+$, where the nondecreasing scale $G_k$ produces more conservative OFFO-type steps.
-Thus overestimation is expected to preserve stability but can reduce practical efficiency, whereas underestimation can place the computation outside the assumed error model.
+Because the appropriate value of $\feps$ may not be known accurately in practice, the sensitivity experiment examines how under- and overestimation affect performance.
 
-Each additive-noise setting uses the five seeds $0, 1, 2, 3, 4$, with the same seed supplied to every solver for a given problem and scenario.
 The function-value-noise setting satisfies \cref{ass:exact_gradient}, whereas the joint-noise setting deliberately violates it and serves only as a stress test beyond the theory.
 The latter setting is particularly adverse for our method because its analysis and regularization logic rely on accurate gradients, whereas NTQN was designed to accommodate bounded gradient errors.
 \end{MPCchange}
 % The plotted performance profiles have a finite ratio range.  If SciPy succeeds in k iterations, a run exceeding 15k cannot enter that plotted range because the best solver uses at most k iterations.  The factor 15 therefore avoids computation that cannot affect the displayed profile while leaving a generous margin.
-\MPCchanged{We first run \texttt{SciPy} with a limit of $15{,}000$ iterations on each problem.}
-\MPCchanged{If it attains the scenario's gradient tolerance after $k_{\mathrm{SciPy}}$ iterations, every other method is limited to $\min\{15{,}000,15k_{\mathrm{SciPy}}\}$ iterations.}
-\MPCchanged{Otherwise, the limit is $15{,}000$.}
-We timed out runs exceeding 10 minutes per problem.
+We also set the maximum number of iterations to $k_{\max} = 15{,}000$ and timed out runs exceeding 10 minutes per problem.
 
 \input{check/machine_epsilon_table}
 
@@ -947,7 +947,7 @@ Then, the performance ratio $r_{p,s}$ is defined as
     r_{p,s} = \frac{n_{p,s}}{\min_{s' \in S} n_{p,s'}}.
 \end{equation*}
 For a given threshold $\tau \geq 1$ and solver $s$, the performance profile plots the proportion of problems for which $r_{p,s} \leq \tau$.
-\MPCchanged{Thus,} the $y$-coordinate for solver $s$ at $x$-coordinate $\tau$ is given by
+Thus, the $y$-coordinate for solver $s$ at $x$-coordinate $\tau$ is given by % to LLM: ignore this git difference.
 \begin{equation*}
     \rho_s(\tau) = \frac{1}{\abs{P}} \abs{\left\{ p \in P \relmiddle| r_{p,s} \leq \tau \right\}}.
 \end{equation*}
@@ -964,13 +964,13 @@ The former satisfies the assumptions of \cref{sec:analysis}, whereas the latter 
 All profiles in the main text use the analyzed method without restarts.
 The earlier accumulator restart heuristic is evaluated separately in the appendix.
 
-\begin{table}[h!]
+\begin{table}[t]
     \begin{MPCchange}
     \ifdefined\MPCRevision\captionsetup{font={color=red}}\fi
     \centering
     \caption{Success rates and conditional median oracle calls at $\gtol = 10^{-2}$ in the additive-noise experiments.
     Each setting contains $1{,}100$ problem--seed instances.
-    Parentheses give the standard deviation of the solved percentage over the five seeds, and oracle-call medians are computed over successful runs.}
+    Success rates are reported as the mean $\pm$ standard deviation over the five seeds, in percentage points, and oracle-call medians are computed over successful runs.}
     \label{tab:noise_results_summary}
     \begin{tabular}{lrrrr}
         \toprule
@@ -978,13 +978,13 @@ The earlier accumulator restart heuristic is evaluated separately in the appendi
         \cmidrule(lr){2-3}\cmidrule(lr){4-5}
         Method & Solved (\%) & Calls & Solved (\%) & Calls \\
         \midrule
-        \texttt{Ours}            & $85.1\ (0.60)$ & $62$  & $83.6\ (0.64)$ & $63$  \\
-        \texttt{Ours-MS}         & $85.5\ (0.18)$ & $67$  & $84.8\ (0.22)$ & $71$  \\
-        \texttt{Ours-SP}         & $83.9\ (0.46)$ & $62$  & $80.6\ (0.62)$ & $62$  \\
-        \texttt{NTQN}            & $81.2\ (1.34)$ & $64$  & $71.9\ (0.34)$ & $62$  \\
-        \texttt{Reg}             & $77.8\ (1.01)$ & $60$  & $73.5\ (1.21)$ & $56$  \\
-        \texttt{Reg-Sec}         & $74.0\ (0.78)$ & $54$  & $73.0\ (1.21)$ & $62$  \\
-        \texttt{ASTR1-Adagrad}   & $41.5\ (1.13)$ & $131$ & $42.8\ (0.83)$ & $150$ \\
+        \texttt{Ours}            & $85.1 \pm 0.60$ & $62$  & $83.6 \pm 0.64$ & $63$  \\
+        \texttt{Ours-MS}         & $85.5 \pm 0.18$ & $67$  & $84.8 \pm 0.22$ & $71$  \\
+        \texttt{Ours-SP}         & $83.9 \pm 0.46$ & $62$  & $80.6 \pm 0.62$ & $62$  \\
+        \texttt{NTQN}            & $81.2 \pm 1.34$ & $64$  & $71.9 \pm 0.34$ & $62$  \\
+        \texttt{Reg}             & $77.8 \pm 1.01$ & $60$  & $73.5 \pm 1.21$ & $56$  \\
+        \texttt{Reg-Sec}         & $74.0 \pm 0.78$ & $54$  & $73.0 \pm 1.21$ & $62$  \\
+        \texttt{ASTR1-Adagrad}   & $41.5 \pm 1.13$ & $131$ & $42.8 \pm 0.83$ & $150$ \\
         \bottomrule
     \end{tabular}
     \end{MPCchange}
@@ -998,10 +998,10 @@ The lower scored fraction therefore mainly reflects NTQN's noise-dependent stopp
 \end{MPCchange}
 
 \begin{MPCchange}
-Underestimating \(\feps\) can violate the assumed error bound and does not uniformly improve performance across the two variants.
-Overestimating it preserves the error model, but the results show that an excessively large allowance can reduce practical efficiency by keeping the method in the conservative $K^+$ regime more often.
+The sensitivity results show that underestimation improves \texttt{Ours} but degrades \texttt{Ours-MS}, whereas overestimation lowers the solved percentage of both variants.
+Because underestimation can violate the assumed error bound, the improvement for \texttt{Ours} should not be interpreted as evidence that a smaller allowance is generally preferable.
 
-\begin{table}[h!]
+\begin{table}[t]
     \begin{MPCchange}
     \ifdefined\MPCRevision\captionsetup{font={color=red}}\fi
     \centering
@@ -1180,8 +1180,8 @@ Their relative ranking depends on the tolerance and precision, so we avoid claim
     \label{fig:exec_time}
 \end{figure}
 
-\MPCchanged{In this subsection, we present an experiment comparing the per-iteration computational cost of each method.}
-\MPCchanged{Here, we measure total execution time rather than the number of oracle calls.}
+In this subsection, we present an experiment comparing the per-iteration computational cost of each method. % to LLM: ignore this git difference.
+Here, we measure total execution time rather than the number of oracle calls. % to LLM: ignore this git difference.
 We conducted experiments on the ill-conditioned quadratic problem
 \begin{equation*}
     \underset{x \in \bbR^n}{\mathrm{minimize}} \quad \frac{1}{2} \sum_{i=1}^n i x_i^2
