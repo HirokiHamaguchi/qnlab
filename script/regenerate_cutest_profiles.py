@@ -141,7 +141,7 @@ def draw_profile(methods: tuple[str, ...], calls: np.ndarray, target: Path) -> N
         linewidth=2.2,
     )
     ax.set_xlabel(r"Performance Ratio $\tau$", fontsize=18)
-    ax.set_ylabel(r"Proportion of Problems Solved $\rho_s(\tau)$", fontsize=18)
+    ax.set_ylabel(r"Proportion of Test Instances Solved $\rho_s(\tau)$", fontsize=18)
     ax.set_xticks([2, 4, 6, 8, 10])
     ax.grid(True, alpha=0.35, linestyle="-", linewidth=0.6, color="gray")
     ax.set_axisbelow(True)

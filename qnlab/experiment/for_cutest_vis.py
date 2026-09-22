@@ -166,7 +166,7 @@ def draw_pp(
     ax = plt.gca()
     ax.set_xlabel(r"Performance Ratio $\tau$", fontsize=18, fontweight="normal")
     ax.set_ylabel(
-        r"Proportion of Problems Solved $\rho_s(\tau)$",
+        r"Proportion of Test Instances Solved $\rho_s(\tau)$",
         fontsize=18,
         fontweight="normal",
     )

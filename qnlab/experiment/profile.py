@@ -22,7 +22,7 @@ def _compute_theta_max(data, minVals):
 def _compute_theta(col, minVals):
     """
     Performance ratios for an individual solver against the vector of minimum values.
-    Problems that are not solved by any algorithm have their ratios set to Inf.
+    Test instances that are not solved by any algorithm have their ratios set to Inf.
     """
     assert np.all(minVals > 0)
     th = np.full(np.shape(col), np.inf)
@@ -35,7 +35,7 @@ def _make_staircase(col, m, thetaMax, tol):
     """
     Assemble staircase (x, y) pairs.
     col : "column" of theta values
-    m : number of problems
+    m : number of test instances
     thetaMax : maximum value of theta for endpoint clamping
     tol : theta tolerance for endpoint clamping
     """
@@ -68,7 +68,7 @@ def performance_profile(
     ----------
     data : Array of timings/errors to plot.
            M-by-N matrix where data[i, j] > 0 measures the performance of the
-           j-th solver on the i-th problem, with smaller values denoting "better".
+           j-th solver on the i-th test instance, with smaller values denoting "better".
 
     linestyle : List of line specs, e.g., ['o-r', '-.g']
 
@@ -89,7 +89,7 @@ def performance_profile(
     """
 
     data = np.asarray(data, dtype=np.double)
-    m, n = data.shape  # `m` problems, `n` solvers
+    m, n = data.shape  # `m` test instances, `n` solvers
 
     # Check input
     if len(linestyle) < n:
@@ -130,6 +130,6 @@ def performance_profile(
     plt.xlim([1, thetaMax])
     plt.ylim([0, 1.01])
     plt.xlabel(r"performance ratio")
-    plt.ylabel(r"Proportion of problems")
+    plt.ylabel(r"Proportion of test instances")
 
     return thetaMax, h

@@ -227,8 +227,10 @@ def summarize_results(
                         else None
                     ),
                     "seed_solved_percent": seed_percentages,
-                    "seed_solved_percent_std": float(
-                        np.std(list(seed_percentages.values()))
+                    "seed_solved_percent_std": (
+                        float(np.std(list(seed_percentages.values()), ddof=1))
+                        if len(seed_percentages) > 1
+                        else None
                     ),
                     "status_counts": dict(sorted(status_counts.items())),
                     "diagnostics": dict(sorted(diagnostics.items())),

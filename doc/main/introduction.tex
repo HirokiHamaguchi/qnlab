@@ -43,7 +43,7 @@ Extensive numerical experiments on the CUTEst benchmark collection, across vario
         A \ding{51} denotes theoretical coverage and ``--'' its absence.
         The ``Noisy $f$'' and ``Noisy $g$'' columns indicate whether the corresponding errors are allowed.
         The asterisk indicates that gradient noise is outside our analysis and is considered only in joint-noise stress tests.
-        Still, unlike a Wolfe line search, the proposed sufficient-decrease test does not require a exact gradient evaluation at each trial point.
+        Still, unlike a Wolfe line search, the proposed sufficient-decrease test does not require an exact gradient evaluation at each trial point.
     }
     \label{tab:related_work_comparison}
         \begin{tabular}{@{}>{\centering\arraybackslash}p{0.20\linewidth}cccc>{\centering\arraybackslash}p{0.25\linewidth}@{}}
@@ -60,7 +60,7 @@ Extensive numerical experiments on the CUTEst benchmark collection, across vario
              & --
              & --
              & \ding{51}
-             & R-linear objective gap \\
+             & R-linear under uniform convexity \\
             \makecell[c]{Regularized Newton\\[-0.4em]\scalebox{0.8}{\citep{uedaConvergencePropertiesRegularized2010}}}
              & \ding{51}
              & --
@@ -104,7 +104,7 @@ These methods assume reliable function values, while we analyze the behavior of 
 Rather than relying throughout on exact-value acceptance tests, our method uses noisy function values only while they certify a reference decrease and otherwise switches to an objective-function-free regularization scale.
 It thereby retains useful line-search behavior without making continued progress depend on unreliable comparisons.
 
-The another closely related methods are OFFO~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023} and Noise Tolerant Quasi-Newton (NTQN) methods~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
+Other closely related methods are OFFO~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023} and Noise Tolerant Quasi-Newton (NTQN) methods~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
 OFFO methods avoid objective-function values altogether, whereas our method retains their use whenever they provide a reliable decrease certificate.
 Shi et al.~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022} develop NTQN for bounded errors in both function and gradient evaluations, using a noise-tolerant line search and a lengthening procedure to stabilize the quasi-Newton updates.
 Their analysis establishes linear convergence to a noise-dependent neighborhood for strongly convex objectives while continuing to base step acceptance on noisy function comparisons~\citep[Theorem~3.5]{shiNoiseTolerantQuasiNewtonAlgorithm2022}.

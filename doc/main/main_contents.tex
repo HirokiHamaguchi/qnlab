@@ -28,7 +28,7 @@ with a regularization parameter $\mu_k \ge 0$.
 Combining regularization with line search is also possible and has been explored~\citep{uedaConvergencePropertiesRegularized2010}.
 Several strategies for choosing $\mu_k$ in nonconvex optimization have been proposed~\citep{uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,shengNewAdaptiveTrust2018}, and one of them is given by % to LLM: ignore this git difference.
 \begin{equation*}
-    \mu_k = c_1 \max(0, -\lambda_{\min}(B_k)) + c_2 \norm{\nabla f(x_k)}^\delta, \label{eq:ueda_mu}
+    \mu_k = c_1 \max(0, -\lambda_{\min}(B_k)) + c_2 \norm{\nabla f(x_k)}^\delta,
 \end{equation*}
 where $c_1 > 1$, $c_2 > 0$, $\delta \ge 0$, and $\lambda_{\min}(B_k)$ denotes the smallest eigenvalue of $B_k$.
 This choice guarantees that $B_k + \mu_k I$ is positive definite, ensuring that $d_k$ is a descent direction.
@@ -149,7 +149,7 @@ In the following, we explain the three main components of \cref{alg:regularized_
         $\alpha_k \leftarrow \beta \alpha_k$ with $\beta \in [\beta_{\min},\beta_{\max}]$ ~ (see \cref{sec:proposed_choice_alpha}). \; \label{line:ls_backtracking}
         $\Delta_k \gets \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_k), -\overline{f}(x_k+\alpha_k d_k))$\;
     }
-    \Return{$\alpha_k$}\;
+    \Return{$\alpha_k\MPCchanged{, \Delta_k}$}\;
     \caption{Backtracking Line Search with Relaxed Armijo Condition}
     \label{alg:backtracking_linesearch}
 \end{algorithm}
@@ -241,11 +241,11 @@ The second assumption ensures smoothness of the objective function.
 The third assumption requires the matrices $\{B_k\}_{k=0}^{k_{\mathrm{max}}-1}$ to be uniformly positive definite and bounded.
 \begin{assumption}\label{ass:BBounds}
     There exist constants $0 < m \leq M$ such that all $B_k$ satisfy
-    \begin{equation*}\label{eq:BBounds}
+    \begin{equation*}
         mI \preceq B_k \preceq MI.
     \end{equation*}
 \end{assumption}
-As we will discuss in \cref{sec:proposed_choice}, the standard BFGS update with a slight modification guarantees \cref{ass:BBounds} in practice.
+\MPCchanged{As discussed in \cref{sec:proposed_choice}, the shifted raw L-BFGS construction with selected curvature pairs guarantees \cref{ass:BBounds}.}
 By \cref{ass:BBounds}, we can derive useful bounds involving $g_k$ and $d_k$.
 Using $d_k=-(B_k+\mu_k I)^{-1} g_k$ (\refLine{line:d_k}) and \cref{ass:BBounds} asserting $(m + \mu_k)I \preceq B_k + \mu_k I \preceq (M + \mu_k)I$, we obtain the following bounds:
 \begin{align}
@@ -384,7 +384,7 @@ Recall that the parameter $c$ in \cref{alg:backtracking_linesearch} satisfies $0
 Now, let us analyze \cref{alg:backtracking_linesearch} using \cref{lem:backtracking_finite}.
 Define
 \begin{equation*}
-    \overline{\alpha}\defeq \min\qty(\beta_{\min} \frac{2(1-c)m}{L},1)>0.
+    \overline{\alpha}\defeq \MPCchanged{\beta_{\min}\min\qty(\frac{2(1-c)m}{L},1)}>0.
 \end{equation*}
 The following states the key property of the backtracking procedure.
 
@@ -677,8 +677,8 @@ For an iteration $k$, we define
 \end{equation*}
 where $g_k$ and $g_{k+1}$ are the gradients at $x_k$ and $x_{k+1}$, respectively.
 Starting from an initial matrix, an approximate Hessian is obtained by successively applying BFGS updates to a sequence of curvature pairs.
-Let $\{(s_{k_i},y_{k_i})\}_{i=0}^{p-1}$ be a collection of curvature pairs, where $k_i$ denotes the iteration index at which the $i$-th pair was generated.
-Starting from the initial matrix $B^{(0)} = \gamma I$ with $\gamma=\norm{y_{k_0}}^2 / y_{k_0}^\top s_{k_0}$, we define $\mathrm{BFGS}(\{(s_{k_i},y_{k_i})\}_{i=0}^{p-1})$ as the matrix $B^{(p)}$ obtained by sequentially applying the BFGS update as
+Let $\{(s_{k_i},y_{k_i})\}_{i=0}^{p-1}$ be a collection of curvature pairs \MPCchanged{ordered so that $k_0<\cdots<k_{p-1}$}.
+Starting from the initial matrix $B^{(0)} = \gamma I$ with \MPCchanged{$\gamma=\norm{y_{k_{p-1}}}^2 / y_{k_{p-1}}^\top s_{k_{p-1}}$}, we define $\mathrm{BFGS}(\{(s_{k_i},y_{k_i})\}_{i=0}^{p-1})$ as the matrix $B^{(p)}$ obtained by sequentially applying the BFGS update as
 \begin{equation*}
     B^{(j+1)} = B^{(j)} - \frac{B^{(j)} s_{k_j} s_{k_j}^\top B^{(j)}}{s_{k_j}^\top B^{(j)} s_{k_j}} + \frac{y_{k_j} y_{k_j}^\top}{y_{k_j}^\top s_{k_j}}
 \end{equation*}
@@ -795,7 +795,8 @@ If the directional derivative along $d_k$ changes sign, $d_k^\top g_k<0$ and $d_
 \end{equation*}
 where $\mathrm{clip}(x,a,b) \defeq \min(\max(x,a),b)$ is a clipping function.
 When objective values are unreliable and backtracking and interpolation do not occur, this correction effectively refines the step size.
-Since this adjustment is at most once per iteration, the theoretical results in \cref{sec:analysis} remain valid.
+\MPCchanged{After the adjustment, the relaxed Armijo condition is evaluated again, and ordinary backtracking continues if necessary.}
+\MPCchanged{The clipping interval gives $\alpha_k\geq\beta_{\min}$ whenever this adjustment is applied, so the conservative lower bound $\overline\alpha$ in \cref{prop:backtracking_summary} and the subsequent convergence analysis remain valid.}
 
 \subsection{Regularization Parameter \texorpdfstring{$\mu_k$}{mu k}}\label{sec:proposed_choice_mu}
 
@@ -889,6 +890,7 @@ All computations were performed using the CPU only.
 We evaluated all algorithms on unconstrained problems from the CUTEst benchmark collection~\citep{gouldCUTEstConstrainedUnconstrained2015}, implemented in Python using the PyCUTEst interface~\citep{PyCUTEst2022}.
 All problems were initialized with the default starting points provided by the library.
 \MPCchanged{Following previous work~\citep{kanzowRegularizationLimitedMemory2023}, we excluded problems whose initial points were already stationary or whose function values or gradients contained \texttt{NaN} or \texttt{INF}.}
+\MPCchanged{The retained problems have dimensions ranging from $2$ to $123{,}200$.}
 
 \begin{MPCchange}
 We organize the CUTEst experiments into the following two groups according to where their results are reported:
@@ -911,7 +913,7 @@ We organize the CUTEst experiments into the following two groups according to wh
 \end{itemize}
 \end{MPCchange}
 \MPCchanged{Here,} $\mathrm{unif}(a,b)$ denotes a uniform random variable in the interval $[a,b]$.
-This setting is the same as the one in~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
+\MPCchanged{The additive uniform-noise model follows the model used by Shi et al.~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.}
 \MPCchanged{Each artificial-noise setting uses the five seeds $0, 1, 2, 3, 4$.
 For NTQN in the function-value-noise and joint-noise experiments, we supplied the conservative absolute noise bound $\texttt{eps\_f} = 10^{-2}$ because each function perturbation is bounded in magnitude by $10^{-3}$.
 The optional accumulator-restart variants are evaluated separately under the function-value-noise setting in \cref{app:restart_experiment}.}
@@ -938,15 +940,15 @@ We also set the maximum number of iterations to $k_{\max} = 15{,}000$ and timed 
 \subsubsection{Performance Profiles}\label{sssec:metrics}
 
 We used performance profiles~\citep{dolanBenchmarkingOptimizationSoftware2002} to compare the algorithms.
-Let $P$ denote the set of test problems and $S$ the set of solvers.
-For each problem $p \in P$ and solver $s \in S$, let $n_{p,s} > 0$ denote the number of oracle calls (i.e., function and gradient evaluations) required to reach a specified gradient norm tolerance $\gtol$.
+Let $P$ denote the set of test \MPCchanged{instances} and $S$ the set of solvers.
+For each \MPCchanged{instance} $p \in P$ and solver $s \in S$, let $n_{p,s} > 0$ denote the number of oracle calls (i.e., function and gradient evaluations) required to reach a specified gradient norm tolerance $\gtol$.
 In this experiment, we use the number of oracle calls rather than clock time to avoid the influence of algorithmic overhead and to focus on the intrinsic optimization efficiency.
 When a solver fails to converge within the gradient tolerance or exceeds a maximum number of oracle calls, we set $n_{p,s} = +\infty$.
 Then, the performance ratio $r_{p,s}$ is defined as
 \begin{equation*}
     r_{p,s} = \frac{n_{p,s}}{\min_{s' \in S} n_{p,s'}}.
 \end{equation*}
-For a given threshold $\tau \geq 1$ and solver $s$, the performance profile plots the proportion of problems for which $r_{p,s} \leq \tau$.
+For a given threshold $\tau \geq 1$ and solver $s$, the performance profile plots the proportion of \MPCchanged{test instances} for which $r_{p,s} \leq \tau$.
 Thus, the $y$-coordinate for solver $s$ at $x$-coordinate $\tau$ is given by % to LLM: ignore this git difference.
 \begin{equation*}
     \rho_s(\tau) = \frac{1}{\abs{P}} \abs{\left\{ p \in P \relmiddle| r_{p,s} \leq \tau \right\}}.
@@ -970,7 +972,7 @@ The earlier accumulator restart heuristic is evaluated separately in the appendi
     \centering
     \caption{Success rates and conditional median oracle calls at $\gtol = 10^{-2}$ in the additive-noise experiments.
     Each setting contains $1{,}100$ problem--seed instances.
-    Success rates are reported as the mean $\pm$ standard deviation over the five seeds, in percentage points, and oracle-call medians are computed over successful runs.}
+    Success rates are reported as the mean $\pm$ \MPCchanged{sample} standard deviation over the five seeds, in percentage points, and oracle-call medians are computed over successful runs.}
     \label{tab:noise_results_summary}
     \begin{tabular}{lrrrr}
         \toprule
@@ -978,19 +980,19 @@ The earlier accumulator restart heuristic is evaluated separately in the appendi
         \cmidrule(lr){2-3}\cmidrule(lr){4-5}
         Method & Solved (\%) & Calls & Solved (\%) & Calls \\
         \midrule
-        \texttt{Ours}            & $85.1 \pm 0.60$ & $62$  & $83.6 \pm 0.64$ & $63$  \\
-        \texttt{Ours-MS}         & $85.5 \pm 0.18$ & $67$  & $84.8 \pm 0.22$ & $71$  \\
-        \texttt{Ours-SP}         & $83.9 \pm 0.46$ & $62$  & $80.6 \pm 0.62$ & $62$  \\
-        \texttt{NTQN}            & $81.2 \pm 1.34$ & $64$  & $71.9 \pm 0.34$ & $62$  \\
-        \texttt{Reg}             & $77.8 \pm 1.01$ & $60$  & $73.5 \pm 1.21$ & $56$  \\
-        \texttt{Reg-Sec}         & $74.0 \pm 0.78$ & $54$  & $73.0 \pm 1.21$ & $62$  \\
-        \texttt{ASTR1-Adagrad}   & $41.5 \pm 1.13$ & $131$ & $42.8 \pm 0.83$ & $150$ \\
+        \texttt{Ours}            & $85.1 \pm 0.67$ & $62$  & $83.6 \pm 0.72$ & $63$  \\
+        \texttt{Ours-MS}         & $85.5 \pm 0.20$ & $67$  & $84.8 \pm 0.25$ & $71$  \\
+        \texttt{Ours-SP}         & $83.9 \pm 0.52$ & $62$  & $80.6 \pm 0.69$ & $62$  \\
+        \texttt{NTQN}            & $81.2 \pm 1.49$ & $64$  & $71.9 \pm 0.38$ & $62$  \\
+        \texttt{Reg}             & $77.8 \pm 1.13$ & $60$  & $73.5 \pm 1.35$ & $56$  \\
+        \texttt{Reg-Sec}         & $74.0 \pm 0.87$ & $54$  & $73.0 \pm 1.35$ & $62$  \\
+        \texttt{ASTR1-Adagrad}   & $41.5 \pm 1.26$ & $131$ & $42.8 \pm 0.93$ & $150$ \\
         \bottomrule
     \end{tabular}
     \end{MPCchange}
 \end{table}
 
-Both proposed variants solve at least one instance of dimension $123{,}200$, the largest dimension in the retained collection.
+Both analyzed variants solve at least one instance of dimension $123{,}200$, the largest dimension in the retained collection.
 The joint-noise results suggest empirical robustness beyond the theory, but they do not establish gradient-noise tolerance or extend the exact-gradient result.
 Under NTQN's recommended termination mode, $50.1\%$ of the same function-noise instances attain the common tolerance, compared with $81.2\%$ when the external common-tolerance stop is used.
 All recommended-mode runs terminate without timeout or exception, and $619$ of them stop because NTQN detects that function-value changes have reached its estimated function-noise level (flag~4).
@@ -1188,7 +1190,7 @@ We conducted experiments on the ill-conditioned quadratic problem
 \end{equation*}
 with $n=10{,}000$.
 The initial point $x_0$ was chosen as the all-ones vector.
-We used memory size $m=10$ and maximum iterations $k_{\max}=100$, and we did not set any stopping criteria other than reaching $k_{\max}$.
+We used memory size \MPCchanged{$p=10$} and maximum iterations $k_{\max}=100$, and we did not set any stopping criteria other than reaching $k_{\max}$.
 The simplicity of the optimization problem and the small value of $k_{\max}$ are well suited to the purpose of this experiment, as they ensure that the total runtime is dominated by algorithmic overhead rather than function or gradient computation.
 Timing data were collected after three warm-up runs, followed by $100$ recorded trials.
 
@@ -1209,8 +1211,8 @@ In \cref{tab:time_results}, we report the total number of oracle calls (calls of
 
 \MPCchanged{We proposed a hybrid regularized quasi-Newton method for smooth nonconvex optimization with bounded errors in objective-function values.
 The method retains the order-optimal \(\order{1/\varepsilon^2}\) first-order iteration complexity of the $L$-smooth nonconvex setting while selectively using noisy function values.}
-We demonstrated the method's effectiveness through numerical experiments on standard benchmark problems under various noise levels and precision settings.
-The results indicate that our methods are robust and effective, particularly in noisy or low-precision environments where traditional line search methods may struggle.
+\MPCchanged{On the tested CUTEst problems, the proposed variants attained the common gradient tolerances across the reported function-noise, joint-noise, and reduced-precision settings.}
+\MPCchanged{These results provide empirical evidence for the method under the stated benchmark protocol.}
 
 Future work includes the investigation of local convergence properties, the extension to constrained optimization, and the applications to practical problems in machine learning and scientific computing. Additionally, exploring adaptive strategies for selecting algorithmic parameters based on problem characteristics could further enhance the method's performance.
 An explicit analysis of the effect of inexact gradient evaluations would also provide valuable insight into the method's robustness and guide further enhancements.

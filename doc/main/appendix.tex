@@ -1,6 +1,6 @@
 \section{Proof of \texorpdfstring{\cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}}{Lemma \ref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}}}\label{sec:proof_of_sum_norm_g_over_mu_geq_2sqrt_leq_log}
 
-The proof of \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} is \MPCchanged{similar to Lemma~3.2 of Ward et al.~\citep{wardAdaGradStepsizesSharp2020} and Lemma~3.1 of Gratton et al.~\citep{Gratton08022024}}.
+The proof of \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} is \MPCchanged{similar to previous arguments~\citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020} and \citep[Lemma~3.1]{Gratton08022024}}.
 \begin{proof}
     Recall that \cref{eq:offo_based_update} defines $\mu_k$ as $\theta_k \sqrt{\varsigma + \sum_{j \in K^+, \, j \leq k} \norm{g_j}^2}$, and \refLine{line:update_theta} of \cref{alg:regularized_qn} asserts $\theta_k \in [\theta_{\min}, \theta_{\max}]$.
     Let $k_i \in K^+$ be the $i$-th element of $K^+$.
@@ -27,7 +27,7 @@ The proof of \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} is \MPCchanged{simi
 
 \MPCchanged{The proof of \cref{prop:bounded_BFGS} uses the standard BFGS update.}
 \begin{proof}
-    \MPCchanged{From \cref{eq:curvature_conditions1}, the initial scalar satisfies $0<\gamma=\norm{y_{k_0}}^2/(y_{k_0}^\top s_{k_0})\leq\Lambda$.}
+    \MPCchanged{From \cref{eq:curvature_conditions1}, the initial scalar satisfies $0<\gamma=\norm{y_{k_{p-1}}}^2/(y_{k_{p-1}}^\top s_{k_{p-1}})\leq\Lambda$.}
     \MPCchanged{Let $B$ and $B_+$ denote the positive definite Hessian approximations before and after one update.}
     The BFGS update rule is
     \begin{equation*}
