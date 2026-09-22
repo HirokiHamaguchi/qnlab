@@ -1,8 +1,10 @@
-Many practical optimization problems involve objective function values that are corrupted by \MPCchanged{bounded, nonvanishing} numerical errors.
-\MPCchanged{We} propose a noise-tolerant regularized quasi-Newton method \MPCchanged{that uses a relaxed Armijo line search when observed function values certify progress and switches to OFFO regularization otherwise}.
-\MPCchanged{With exact gradients and uniform spectral bounds on the quasi-Newton matrices, we prove an order-optimal \(\order{1/\varepsilon^2}\) complexity bound under bounded relative-or-absolute errors in function values.}
-\MPCchanged{Although the method uses persistently noisy function values when they certify progress, it retains the optimal worst-case dependence on the stationarity tolerance for the noise-free $L$-smooth nonconvex setting.}
-\MPCchanged{The exact-gradient qualification is essential to the stated theorem.}
-\MPCchanged{Experiments with perturbed gradients are reported separately as deliberately adverse robustness tests beyond its scope.}
-\MPCchanged{Experiments on CUTEst include function-value-only noise, joint function-and-gradient noise, and 64-, 32-, and 16-bit arithmetic.}
-\MPCchanged{They evaluate both robustness and the sensitivity to the supplied function-error bound.}
+Many practical optimization problems involve objective function values that are corrupted by unavoidable numerical errors.
+In smooth nonconvex optimization, quasi-Newton methods combined with line search are widely used due to their efficiency and scalability.
+These methods implicitly assume accurate function evaluations and thus may fail to converge in noisy settings.
+Developing fast and robust quasi-Newton methods for such scenarios is therefore crucial.
+
+To address this issue, we propose a noise-tolerant regularized quasi-Newton method equipped with a relaxed Armijo-type line search, designed to remain stable under inaccurate function evaluations.
+By combining a regularization parameter update rule inspired by Objective-Function-Free Optimization and the AdaGrad-Norm method, \MPCchanged{we prove an order-optimal \(\order{1/\varepsilon^2}\) complexity bound under errors in function values.}
+
+We performed extensive experiments on the CUTEst benchmark collection with artificially noisy objective function evaluations, as well as with low-precision floating-point arithmetic (64-, 32-, and 16-bit).
+The results demonstrate that the proposed method is substantially more robust than several existing methods, while maintaining competitive practical convergence speed and computational cost.

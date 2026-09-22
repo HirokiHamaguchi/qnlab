@@ -825,7 +825,7 @@ For a fixed threshold $\tau>0$, the heuristic resets only the accumulator when t
     \min_{j \in K^0,\,j<k} \qty(\overline{f}(x_j)-\Delta_j)-\overline{f}(x_k) \geq \tau.
 \end{equation}
 The sets $K^0$ and $K^+$ and the reference values in \cref{eq:restart_condition} are not reset.
-All primary experiments disable this heuristic and therefore coincide with the analyzed accumulator, while the appendix ablation in \cref{app:restart_experiment} permits at most ten restarts.
+All primary experiments disable this heuristic and therefore coincide with the analyzed accumulator, while the error-bound sensitivity profiles in \cref{fig:results_error_bound_sensitivity} include the restart variants only as an ancillary comparison.
 \end{MPCchange}
 
 \section{Numerical Experiments}\label{sec:experiments}
@@ -842,7 +842,7 @@ We compared the following methods in our experiments.
               \item We used \cref{alg:regularized_qn,alg:backtracking_linesearch} with the details in \cref{sec:proposed_choice}.
               \item (\texttt{Ours-MS}) means the variant incorporating the modified secant condition described in \cref{sec:proposed_choice_Bk}.
               \MPCchanged{\item (\texttt{Ours-SP}) means the heuristic variant replacing the exact compact solve with the shifted-pair approximation in \cref{eq:approx_computation_of_regularized_quasi_Newton}.}
-              \MPCchanged{\item (\texttt{Ours-R}) means the variant incorporating the optional accumulator restart described in \cref{sec:proposed_choice_mu} and evaluated in \cref{app:restart_experiment}.}
+              \MPCchanged{\item (\texttt{Ours-R}) means the variant incorporating the optional accumulator restart described in \cref{sec:proposed_choice_mu} and shown in \cref{fig:results_error_bound_sensitivity}.}
           \end{itemize}
 
     \item (\texttt{Line}): Line search L-BFGS method
@@ -916,7 +916,7 @@ We organize the CUTEst experiments into the following two groups according to wh
 \MPCchanged{The additive uniform-noise model follows the model used by Shi et al.~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.}
 \MPCchanged{Each artificial-noise setting uses the five seeds $0, 1, 2, 3, 4$.
 For NTQN in the function-value-noise and joint-noise experiments, we supplied the conservative absolute noise bound $\texttt{eps\_f} = 10^{-2}$ because each function perturbation is bounded in magnitude by $10^{-3}$.
-The optional accumulator-restart variants are evaluated separately under the function-value-noise setting in \cref{app:restart_experiment}.}
+The optional accumulator-restart variants are included only in the error-bound sensitivity profiles in \cref{fig:results_error_bound_sensitivity}.}
 
 In the reduced precision settings, to simulate lower numerical precision, we first cast the input vector $x$ to the target lower precision, then computed $\overline{f}(x)$ and $\nabla \overline{f}(x)$ using the lower-precision input.
 Although the internal computations of CUTEst remain in 64-bit precision, the casting of the input vector effectively simulated the impact of reduced precision on function and gradient evaluations.
@@ -926,7 +926,6 @@ The error allowances for the three precision settings are summarized in \cref{ta
 The 64-bit value follows SciPy's default heuristic of $10^7\epsilon_{\mathrm{mach}}$.
 For 32- and 16-bit arithmetic, we use the smaller multipliers $10^4$ and $10^2$, respectively, because $10^7\epsilon_{\mathrm{mach}}$ would violate $\feps<1$ and provide no informative allowance.
 These values are practical safety margins for accumulated floating-point errors rather than estimates supplied by the theory.
-
 Because the appropriate value of $\feps$ may not be known accurately in practice, the sensitivity experiment examines how under- and overestimation affect performance.
 
 The function-value-noise setting satisfies \cref{ass:exact_gradient}, whereas the joint-noise setting deliberately violates it and serves only as a stress test beyond the theory.
@@ -961,10 +960,8 @@ Following standard implementations~\citep{2020SciPy-NMeth}, we used the infinity
 \subsubsection{Results with Artificial Noise}\label{sssec:noise_results}
 
 \begin{MPCchange}
-We report separately the function-value noise experiment and the joint noise experiment described in \cref{sssec:problems}.
+\Cref{tab:noise_results_summary} summarizes the function-value noise experiment and the joint noise experiment described in \cref{sssec:problems}, and \cref{fig:results_function_noise,fig:results_noise} shows their performance profiles.
 The former satisfies the assumptions of \cref{sec:analysis}, whereas the latter tests empirical robustness beyond the exact-gradient theory.
-All profiles in the main text use the analyzed method without restarts.
-The earlier accumulator restart heuristic is evaluated separately in the appendix.
 
 \begin{table}[t]
     \begin{MPCchange}
@@ -1000,8 +997,10 @@ The lower scored fraction therefore mainly reflects NTQN's noise-dependent stopp
 \end{MPCchange}
 
 \begin{MPCchange}
+\Cref{tab:error_bound_sensitivity} summarizes the solved percentages in the error-bound sensitivity experiment, and \cref{fig:results_error_bound_sensitivity} shows the corresponding performance profiles.
 The sensitivity results show that underestimation improves \texttt{Ours} but degrades \texttt{Ours-MS}, whereas overestimation lowers the solved percentage of both variants.
 Because underestimation can violate the assumed error bound, the improvement for \texttt{Ours} should not be interpreted as evidence that a smaller allowance is generally preferable.
+The optional restart curves permit a direct comparison with this heuristic, but the theoretical and primary empirical claims rely on the no-restart variants.
 
 \begin{table}[t]
     \begin{MPCchange}
@@ -1082,7 +1081,6 @@ Because underestimation can violate the assumed error bound, the improvement for
     \caption{Performance profiles for error-bound misspecification under function-value-only noise of level $10^{-3}$ and \(\gtol = 10^{-2}\).}
     \label{fig:results_error_bound_sensitivity}
 \end{figure}
-\clearpage
 \end{MPCchange}
 
 \subsubsection{Results at Different Precision Levels}\label{sssec:exact_results}
@@ -1202,6 +1200,41 @@ For a fairer comparison of algorithmic efficiency, we place greater emphasis on 
 
 In \cref{tab:time_results}, we report the total number of oracle calls (calls of $\overline{f}$ and $g$) and final objective values $\overline{f}(x_{k_{\max}})$.
 \end{MPCchange}
+\MPCchanged{To further check that the timing comparison is not driven only by a small fixed overhead or by fluctuations in very short runs, we report the 64-bit performance profile at $\gtol = 10^{-3}$ separately for three runtime ranges.}
+\MPCchanged{In \cref{fig:time_ranges}, problem instances are grouped according to the best runtime attained by any method: less than $1$~s, between $1$ and $10$~s, and at least $10$~s.}
+\MPCchanged{The three panels show the same overall tendency as the existing experiments and indicate that the reported per-iteration timing is not merely an artifact of short-run overhead.}
+\MPCchanged{The other parameter settings exhibit qualitatively similar behavior.}
+
+\begin{MPCchange}
+\begin{figure}[t]
+    \ifdefined\MPCRevision\captionsetup{font={color=red}}\fi
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision64_gtol1e-03_time_lt1s.pdf}
+        \caption{Less than $1$~s.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision64_gtol1e-03_time_1-10s.pdf}
+        \caption{Between $1$ and $10$~s.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_pp_precision64_gtol1e-03_time_ge10s.pdf}
+        \caption{At least $10$~s.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.98\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../imgs/compare/_legend_precision.pdf}
+    \end{subfigure}
+    \caption{Performance profiles for the 64-bit setting at $\gtol = 10^{-3}$, grouped by the best runtime attained by any method on each problem instance.}
+    \label{fig:time_ranges}
+\end{figure}
+\end{MPCchange}
+
 \MPCchanged{The purpose of this table is to check whether the methods achieved similar convergence behavior within the limited number of iterations.}
 \MPCchanged{Comparable values would indicate that differences in convergence behavior do not dominate the execution-time comparison.}
 

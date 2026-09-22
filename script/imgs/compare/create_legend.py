@@ -93,13 +93,12 @@ def create_legend(filename, entries):
         ]
     alg_names = [name for name, _ in entries]
 
-    fig_width = 13.5 if len(entries) > 4 else max(5, 3.0 * len(entries))
-    fig, ax = plt.subplots(figsize=(fig_width, 0.8 + 0.7 * nrows))
+    fig, ax = plt.subplots(figsize=(13.5, 0.8 + 0.7 * nrows))
     handles = []
     for name in alg_names:
         color = COLORS[name]
         linestyle = LINE_STYLES[name]
-        (handle,) = ax.plot([], [], linestyle, color=color, linewidth=2.5, markersize=8)
+        (handle,) = ax.plot([], [], linestyle, color=color, linewidth=3.0, markersize=10)
         handles.append(handle)
 
     legend_names = [display_name for _, display_name in entries]
@@ -107,20 +106,29 @@ def create_legend(filename, entries):
         handles,
         legend_names,
         loc="center",
+        bbox_to_anchor=(0, 0, 1, 1),
+        mode="expand",
+        borderaxespad=0.05,
         framealpha=0.98,
         edgecolor="black",
         fancybox=True,
-        fontsize=17,
+        fontsize=22,
         ncol=ncol,
         frameon=True,
     )
     ax.axis("off")
-    plt.tight_layout()
+    fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
 
     out_dir = Path(__file__).parent.parent.parent.parent / "doc" / "imgs" / "compare"
     out_dir.mkdir(parents=True, exist_ok=True)
     legend_path = out_dir / filename
-    fig.savefig(legend_path, format="pdf", bbox_inches="tight", dpi=300)
+    fig.savefig(
+        legend_path,
+        format="pdf",
+        bbox_inches="tight",
+        pad_inches=0.02,
+        dpi=300,
+    )
     plt.close(fig)
     print(f"Saved legend to {legend_path}")
 
