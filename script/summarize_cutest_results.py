@@ -21,8 +21,8 @@ STANDARD_METHODS = {
     "NTRQN-MS",
     "NTRQN-SP",
     "NTRQN-MS-SP",
+    "NTRQN-Restart",
     "Line",
-    "Line-MS",
     "ASTR1-Adagrad",
     "Reg",
     "Reg-Sec",
@@ -35,7 +35,6 @@ PROPOSED_METHODS = {
     "NTRQN-SP",
     "NTRQN-MS-SP",
     "NTRQN-Restart",
-    "NTRQN-MS-Restart",
 }
 SCENARIOS = {
     "float64": (64, (0,), (1e-1, 1e-3, 1e-5), STANDARD_METHODS),
@@ -45,8 +44,7 @@ SCENARIOS = {
         64,
         tuple(range(5)),
         (1e-2,),
-        STANDARD_METHODS
-        | {"NTRQN-Restart", "NTRQN-MS-Restart", "NTQN-Default-Termination"},
+        STANDARD_METHODS | {"NTQN-Default-Termination"},
     ),
     "joint_noise": (64, tuple(range(5)), (1e-2,), STANDARD_METHODS),
     "eps_under": (64, tuple(range(5)), (1e-2,), PROPOSED_METHODS),
@@ -89,13 +87,13 @@ def load_problem_sets() -> dict[int, tuple[str, ...]]:
 
 
 def expected_option_subset(method: str) -> dict[str, object]:
-    if method in {"NTRQN", "NTRQN-MS", "NTRQN-Restart", "NTRQN-MS-Restart"}:
+    if method in {"NTRQN", "NTRQN-MS", "NTRQN-Restart"}:
         expected: dict[str, object] = {"regularization_solver": "compact"}
     elif method in {"NTRQN-SP", "NTRQN-MS-SP"}:
         expected = {"regularization_solver": "shifted_pair"}
     else:
         return {}
-    if method in {"NTRQN-MS", "NTRQN-MS-SP", "NTRQN-MS-Restart"}:
+    if method in {"NTRQN-MS", "NTRQN-MS-SP"}:
         expected["modified_secant_max_ratio"] = 1.0
     return expected
 

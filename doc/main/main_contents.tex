@@ -825,7 +825,8 @@ For a fixed threshold $\tau>0$, the heuristic resets only the accumulator when t
     \min_{j \in K^0,\,j<k} \qty(\overline{f}(x_j)-\Delta_j)-\overline{f}(x_k) \geq \tau.
 \end{equation}
 The sets $K^0$ and $K^+$ and the reference values in \cref{eq:restart_condition} are not reset.
-All primary experiments disable this heuristic and therefore coincide with the analyzed accumulator, while the error-bound sensitivity profiles in \cref{fig:results_error_bound_sensitivity} include the restart variants only as an ancillary comparison.
+The numerical experiments distinguish the no-restart and restarted variants.
+The former coincides with the analyzed accumulator, whereas the latter uses $\tau=1$ and at most $10$ restarts.
 \end{MPCchange}
 
 \section{Numerical Experiments}\label{sec:experiments}
@@ -842,14 +843,13 @@ We compared the following methods in our experiments.
               \item We used \cref{alg:regularized_qn,alg:backtracking_linesearch} with the details in \cref{sec:proposed_choice}.
               \item (\texttt{Ours-MS}) means the variant incorporating the modified secant condition described in \cref{sec:proposed_choice_Bk}.
               \MPCchanged{\item (\texttt{Ours-SP}) means the heuristic variant replacing the exact compact solve with the shifted-pair approximation in \cref{eq:approx_computation_of_regularized_quasi_Newton}.}
-              \MPCchanged{\item (\texttt{Ours-R}) means the variant incorporating the optional accumulator restart described in \cref{sec:proposed_choice_mu} and shown in \cref{fig:results_error_bound_sensitivity}.}
+              \MPCchanged{\item (\texttt{Ours-R}) means the heuristic variant incorporating the optional accumulator restart described in \cref{sec:proposed_choice_mu}.}
           \end{itemize}
 
     \item (\texttt{Line}): Line search L-BFGS method
           \begin{itemize}
               \item Our Python implementation ported from LBFGSpp~\citep{Okazaki2007libLBFGS}.
               \item The step size was determined using the Mor\'e--Thuente line search, closely resembling SciPy's implementation.
-              \item (\texttt{Line-MS}) means the same variant as \texttt{Ours-MS}.
           \end{itemize}
 
     \item (\texttt{Reg}): Regularized L-BFGS method~\citep{kanzowRegularizationLimitedMemory2023}
@@ -915,8 +915,7 @@ We organize the CUTEst experiments into the following two groups according to wh
 \MPCchanged{Here,} $\mathrm{unif}(a,b)$ denotes a uniform random variable in the interval $[a,b]$.
 \MPCchanged{The additive uniform-noise model follows the model used by Shi et al.~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.}
 \MPCchanged{Each artificial-noise setting uses the five seeds $0, 1, 2, 3, 4$.
-For NTQN in the function-value-noise and joint-noise experiments, we supplied the conservative absolute noise bound $\texttt{eps\_f} = 10^{-2}$ because each function perturbation is bounded in magnitude by $10^{-3}$.
-The optional accumulator-restart variants are included only in the error-bound sensitivity profiles in \cref{fig:results_error_bound_sensitivity}.}
+For NTQN in the function-value-noise and joint-noise experiments, we supplied the conservative absolute noise bound $\texttt{eps\_f} = 10^{-2}$ because each function perturbation is bounded in magnitude by $10^{-3}$.}
 
 In the reduced precision settings, to simulate lower numerical precision, we first cast the input vector $x$ to the target lower precision, then computed $\overline{f}(x)$ and $\nabla \overline{f}(x)$ using the lower-precision input.
 Although the internal computations of CUTEst remain in 64-bit precision, the casting of the input vector effectively simulated the impact of reduced precision on function and gradient evaluations.
@@ -978,6 +977,7 @@ The former satisfies the assumptions of \cref{sec:analysis}, whereas the latter 
         Method & Solved (\%) & Calls & Solved (\%) & Calls \\
         \midrule
         \texttt{Ours}            & $85.1 \pm 0.67$ & $62$  & $83.6 \pm 0.72$ & $63$  \\
+        \texttt{Ours-R}          & $87.6 \pm 0.81$ & $60$  & --                & --    \\
         \texttt{Ours-MS}         & $85.5 \pm 0.20$ & $67$  & $84.8 \pm 0.25$ & $71$  \\
         \texttt{Ours-SP}         & $83.9 \pm 0.52$ & $62$  & $80.6 \pm 0.69$ & $62$  \\
         \texttt{NTQN}            & $81.2 \pm 1.49$ & $64$  & $71.9 \pm 0.38$ & $62$  \\
@@ -990,6 +990,7 @@ The former satisfies the assumptions of \cref{sec:analysis}, whereas the latter 
 \end{table}
 
 Both analyzed variants solve at least one instance of dimension $123{,}200$, the largest dimension in the retained collection.
+In the theory-aligned function-value-noise setting, \texttt{Ours-R} solves $87.6\%$ of the instances, compared with $85.1\%$ for \texttt{Ours}, and reduces the conditional median from $62$ to $60$ oracle calls.
 The joint-noise results suggest empirical robustness beyond the theory, but they do not establish gradient-noise tolerance or extend the exact-gradient result.
 Under NTQN's recommended termination mode, $50.1\%$ of the same function-noise instances attain the common tolerance, compared with $81.2\%$ when the external common-tolerance stop is used.
 All recommended-mode runs terminate without timeout or exception, and $619$ of them stop because NTQN detects that function-value changes have reached its estimated function-noise level (flag~4).
@@ -1000,7 +1001,7 @@ The lower scored fraction therefore mainly reflects NTQN's noise-dependent stopp
 \Cref{tab:error_bound_sensitivity} summarizes the solved percentages in the error-bound sensitivity experiment, and \cref{fig:results_error_bound_sensitivity} shows the corresponding performance profiles.
 The sensitivity results show that underestimation improves \texttt{Ours} but degrades \texttt{Ours-MS}, whereas overestimation lowers the solved percentage of both variants.
 Because underestimation can violate the assumed error bound, the improvement for \texttt{Ours} should not be interpreted as evidence that a smaller allowance is generally preferable.
-The optional restart curves permit a direct comparison with this heuristic, but the theoretical and primary empirical claims rely on the no-restart variants.
+The optional restart curves permit a direct comparison with this heuristic.
 
 \begin{table}[t]
     \begin{MPCchange}

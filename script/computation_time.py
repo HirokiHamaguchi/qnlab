@@ -27,6 +27,18 @@ num_runs = 100
 methods = [entry for entry in methods if entry[0].label != "NTRQN-MS-SP"]
 
 
+def display_name(method_name: str) -> str:
+    if method_name == "NTRQN-Restart":
+        return "Ours-R"
+    return method_name.replace("NTRQN", "Ours")
+
+
+def internal_name(method_name: str) -> str:
+    if method_name == "Ours-R":
+        return "NTRQN-Restart"
+    return method_name.replace("Ours", "NTRQN")
+
+
 def run_benchmark() -> pd.DataFrame:
     results = {
         "method": [],
@@ -59,7 +71,7 @@ def run_benchmark() -> pd.DataFrame:
             if run_idx < warmup_count:
                 continue
 
-            results["method"].append(method_name.replace("NTRQN", "Ours"))
+            results["method"].append(display_name(method_name))
             results["run"].append(run_idx - warmup_count + 1)
             results["time"].append(elapsed_time)
             results["num_of_calls"].append(prob.count_calls())
@@ -119,12 +131,12 @@ def vis_benchmark(stats: pd.DataFrame):
     fig, ax = plt.subplots(figsize=(7.5, 4.5))
 
     methods_list = stats["Method"].tolist()
-    methods_list = [m.replace("NTRQN", "Ours") for m in methods_list]
+    methods_list = [display_name(name) for name in methods_list]
     means = stats["Mean Time (s)"].tolist()
     stds = stats["Std Dev (s)"].tolist()
 
     x_pos = np.arange(len(methods_list))
-    colors = [COLORS[name.replace("Ours", "NTRQN")] for name in methods_list]
+    colors = [COLORS[internal_name(name)] for name in methods_list]
 
     bars = ax.bar(
         x_pos,
@@ -223,6 +235,7 @@ def main():
 
     if args.plot_only:
         df = pd.read_csv(data_path)
+        df = df[df["method"] != "Line-MS"]
         print(f"Loaded timing data from {data_path.relative_to(repo_root)}")
     else:
         df = run_benchmark()

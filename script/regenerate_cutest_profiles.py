@@ -28,8 +28,8 @@ STANDARD_METHODS = (
     "NTRQN",
     "NTRQN-MS",
     "NTRQN-SP",
+    "NTRQN-Restart",
     "Line",
-    "Line-MS",
     "Reg",
     "Reg-Sec",
     "SciPy",
@@ -47,19 +47,19 @@ SCENARIOS = {
         64,
         tuple(range(5)),
         (1e-2,),
-        ("NTRQN", "NTRQN-MS", "NTRQN-SP", "NTRQN-Restart", "NTRQN-MS-Restart"),
+        ("NTRQN", "NTRQN-MS", "NTRQN-SP", "NTRQN-Restart"),
     ),
     "eps_nominal": (
         64,
         tuple(range(5)),
         (1e-2,),
-        ("NTRQN", "NTRQN-MS", "NTRQN-SP", "NTRQN-Restart", "NTRQN-MS-Restart"),
+        ("NTRQN", "NTRQN-MS", "NTRQN-SP", "NTRQN-Restart"),
     ),
     "eps_over": (
         64,
         tuple(range(5)),
         (1e-2,),
-        ("NTRQN", "NTRQN-MS", "NTRQN-SP", "NTRQN-Restart", "NTRQN-MS-Restart"),
+        ("NTRQN", "NTRQN-MS", "NTRQN-SP", "NTRQN-Restart"),
     ),
 }
 
@@ -289,7 +289,7 @@ def main() -> None:
     diagnostic_profiles = (
         (
             "function_only_restart",
-            ("NTRQN", "NTRQN-MS", "NTRQN-Restart", "NTRQN-MS-Restart"),
+            ("NTRQN", "NTRQN-MS", "NTRQN-Restart"),
         ),
         (
             "ntqn_termination",

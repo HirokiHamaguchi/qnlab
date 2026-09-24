@@ -38,7 +38,7 @@ TAB20 = plt.colormaps.get_cmap("tab20")
 COLORS = {
     "NTRQN": TAB20(0),
     "NTRQN-MS": TAB20(1),
-    "NTRQN-SP": "#4477AA",
+    "NTRQN-SP": "#00A6A6",
     "NTRQN-MS-SP": "#66AADD",
     "Line": TAB20(2),
     "Line-MS": TAB20(3),
@@ -47,8 +47,7 @@ COLORS = {
     "SciPy": TAB20(6),
     "NTQN": TAB20(8),
     "ASTR1-Adagrad": TAB20(10),
-    "NTRQN-Restart": "#882255",
-    "NTRQN-MS-Restart": "#CC6677",
+    "NTRQN-Restart": "#003366",
     "NTQN-Default-Termination": TAB20(9),
 }
 COLORS.update(
@@ -71,7 +70,6 @@ LINE_STYLES = {
     "NTQN": "s-.",
     "ASTR1-Adagrad": "P:",
     "NTRQN-Restart": "s--",
-    "NTRQN-MS-Restart": "D-.",
     "NTQN-Default-Termination": "s:",
 }
 LINE_STYLES.update(
@@ -202,6 +200,16 @@ def get_methods(
             },
         ),
         (
+            Method("NTRQN", "cautious", "damped", "bfgs", label="NTRQN-Restart"),
+            {
+                "m": m,
+                "max_iterations": MI,
+                "regularization_solver": "compact",
+                "restart_threshold": 1.0,
+                "max_restarts": 10,
+            },
+        ),
+        (
             Method(
                 "NTRQN",
                 "cautious",
@@ -218,10 +226,6 @@ def get_methods(
         ),
         (
             Method("Line", "raw", "raw", "bfgs", label="Line"),
-            {"m": m, "max_iterations": MI},
-        ),
-        (
-            Method("Line", "raw", "modified", "bfgs", label="Line-MS"),
             {"m": m, "max_iterations": MI},
         ),
         (
