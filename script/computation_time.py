@@ -1,4 +1,6 @@
+import argparse
 import os
+import shutil
 import tempfile
 import time
 from pathlib import Path
@@ -25,7 +27,7 @@ num_runs = 100
 methods = [entry for entry in methods if entry[0].label != "NTRQN-MS-SP"]
 
 
-def run_benchmark():
+def run_benchmark() -> pd.DataFrame:
     results = {
         "method": [],
         "run": [],
@@ -74,6 +76,10 @@ def run_benchmark():
     )
     assert len(set(results["fx"])) <= len(methods)
 
+    return df
+
+
+def summarize_results(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     stats = (
         df.groupby("method")["time"].agg(["mean", "std", "min", "max"]).reset_index()
     )
@@ -101,7 +107,7 @@ def vis_benchmark(stats: pd.DataFrame):
     plt.style.use("seaborn-v0_8-whitegrid")
     plt.rcParams.update(
         {
-            "text.usetex": True,
+            "text.usetex": shutil.which("latex") is not None,
             "font.family": "serif",
             "font.size": 12,
             "axes.labelsize": 13,
@@ -199,11 +205,31 @@ def generate_latex_table(methods_list: list[str], table_data: pd.DataFrame):
     return latex_table
 
 
+def parse_arguments() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--plot-only",
+        action="store_true",
+        help="Regenerate the figure and table from the saved timing data.",
+    )
+    return parser.parse_args()
+
+
 def main():
+    args = parse_arguments()
     repo_root = Path(__file__).parent.parent.resolve()
     assert (repo_root / "doc" / "main" / "check").exists()
+    data_path = repo_root / "data" / "computation_time.csv"
 
-    stats, table_data = run_benchmark()
+    if args.plot_only:
+        df = pd.read_csv(data_path)
+        print(f"Loaded timing data from {data_path.relative_to(repo_root)}")
+    else:
+        df = run_benchmark()
+        df.to_csv(data_path, index=False)
+        print(f"Saved timing data to {data_path.relative_to(repo_root)}")
+
+    stats, table_data = summarize_results(df)
     fig, methods_list = vis_benchmark(stats)
 
     # Save as PDF
