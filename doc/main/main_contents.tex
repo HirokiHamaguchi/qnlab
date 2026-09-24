@@ -880,7 +880,7 @@ We compared the following methods in our experiments.
 
 In the following, each method is referred to by the name given in parentheses.
 \MPCchanged{Except for the first-order \texttt{ASTR1-Adagrad} baseline,} all these methods are L-BFGS-based, and we set the number of stored curvature pairs to $10$, the default value in SciPy's L-BFGS-B implementation.
-\MPCchanged{All experiments were conducted on an Apple Mac Pro (Late 2013) with a 3.7~GHz quad-core Intel Xeon E5 processor and 12~GB of 1866~MHz DDR3 ECC memory.}
+\MPCchanged{All experiments were conducted on an Apple Mac Pro (Late 2013) with a 2.7~GHz 12-core Intel Xeon E5-2697 v2 processor and 64~GB of memory.}
 All computations were performed using the CPU only.
 
 \subsection{Experimental Results}\label{sec:results}
@@ -1193,7 +1193,7 @@ The simplicity of the optimization problem and the small value of $k_{\max}$ are
 Timing data were collected after three warm-up runs, followed by $100$ recorded trials.
 
 \begin{MPCchange}
-In \cref{fig:exec_time}, we report the execution time statistics: the shifted-pair \texttt{Ours-SP} has per-iteration cost close to the least expensive Python implementations, whereas the exact compact solves in \texttt{Ours} and \texttt{Ours-MS} take about $1.8$ times its runtime in this isolated test.
+In \cref{fig:exec_time}, we report the execution time statistics: the shifted-pair \texttt{Ours-SP} has per-iteration cost close to the least expensive Python implementations, whereas the exact compact solves in \texttt{Ours} and \texttt{Ours-MS} take about $1.4$ times its runtime in this isolated test.
 This timing experiment measures algorithmic overhead under deliberately inexpensive objective and gradient evaluations and does not by itself establish end-to-end robustness or superiority in oracle cost.
 Because wall-clock time depends strongly on implementation details and the computing environment, we restrict its interpretation to this isolated experiment and do not draw broader conclusions from the timing results.
 For a fairer comparison of algorithmic efficiency, we place greater emphasis on oracle-call counts and success profiles.
