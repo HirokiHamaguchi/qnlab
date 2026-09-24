@@ -686,7 +686,7 @@ for $j=0,1,\ldots,p-1$, where each curvature pair $(s_{k_j},y_{k_j})$ is applied
 Here, $p>0$ denotes the maximum number of stored curvature pairs and is a fixed small integer in the L-BFGS method.
 When fewer than $p$ curvature pairs are available, the BFGS update is applied using all currently available pairs.
 
-\MPCchanged{We now give a sufficient condition for the upper spectral bound in \cref{ass:BBounds}, based on variants of existing results~\citep[Theorem~5.5]{gaoQuasiNewtonMethodsSuperlinear2018} and \citep[Lemma~1]{gowerStochasticBlockBFGS2016}.}
+\MPCchanged{We now give a sufficient condition for the upper spectral bound in \cref{ass:BBounds}, based on variants of existing results~\citep[Theorem~5.5]{gaoQuasiNewtonMethodsSuperlinear2018} \citep[Lemma~1]{gowerStochasticBlockBFGS2016}.} % to LLM: do not insert `and' between the two citations.
 Its proof is deferred to \cref{app:proof_of_bounded_BFGS}. % to LLM: ignore this git difference.
 \begin{proposition}\label{prop:bounded_BFGS}
     Let $\{(s_{k_i},y_{k_i})\}_{i=0}^{p-1}$ be curvature pairs with $s_{k_i} \neq 0$.
@@ -998,28 +998,10 @@ The lower scored fraction therefore mainly reflects NTQN's noise-dependent stopp
 \end{MPCchange}
 
 \begin{MPCchange}
-\Cref{tab:error_bound_sensitivity} summarizes the solved percentages in the error-bound sensitivity experiment, and \cref{fig:results_error_bound_sensitivity} shows the corresponding performance profiles.
+\Cref{fig:results_error_bound_sensitivity} shows the performance profiles for the error-bound sensitivity experiment.
 The sensitivity results show that underestimation improves \texttt{Ours} but degrades \texttt{Ours-MS}, whereas overestimation lowers the solved percentage of both variants.
 Because underestimation can violate the assumed error bound, the improvement for \texttt{Ours} should not be interpreted as evidence that a smaller allowance is generally preferable.
 The optional restart curves permit a direct comparison with this heuristic.
-
-\begin{table}[t]
-    \begin{MPCchange}
-    \ifdefined\MPCRevision\captionsetup{font={color=red}}\fi
-    \centering
-    \caption{Solved percentages in the error-bound sensitivity experiment with function-value noise of level $10^{-3}$ and $\gtol = 10^{-2}$.}
-    \label{tab:error_bound_sensitivity}
-    \begin{tabular}{lccc}
-        \toprule
-        Setting & Supplied $\feps$ & \texttt{Ours} & \texttt{Ours-MS} \\
-        \midrule
-        Underestimated & $10^{-4}$ & $87.1$ & $81.9$ \\
-        Nominal        & $10^{-2}$ & $85.1$ & $85.5$ \\
-        Overestimated  & $10^{-1}$ & $75.5$ & $74.7$ \\
-        \bottomrule
-    \end{tabular}
-    \end{MPCchange}
-\end{table}
 \end{MPCchange}
 
 \begin{MPCchange}
