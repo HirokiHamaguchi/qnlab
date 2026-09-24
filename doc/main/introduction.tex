@@ -31,7 +31,7 @@ The resulting algorithm is particularly well-suited for low-precision or noisy e
 From a theoretical standpoint, we establish that the proposed method achieves the global convergence rate of $\order{1/\varepsilon^2}$ for smooth nonconvex optimization problems, \MPCchanged{which matches the optimal worst-case order for smooth nonconvex optimization with Lipschitz-continuous gradients~\citep{carmonLowerBoundsFinding2020}}, even when objective function values are corrupted by noise.
 Extensive numerical experiments on the CUTEst benchmark collection, across various floating-point precisions and artificial noise settings, \MPCchanged{show that the proposed method remains stable under function-value noise and performs favorably against baselines.}
 
-\subsection{Comparison With Related Work}
+\subsection{\MPCchanged{Comparison With Related Work}}
 
 \begin{table*}[t]
     \begin{MPCchange}
@@ -46,7 +46,8 @@ Extensive numerical experiments on the CUTEst benchmark collection, across vario
         Still, unlike a Wolfe line search, the proposed sufficient-decrease test does not require an exact gradient evaluation at each trial point.
     }
     \label{tab:related_work_comparison}
-        \begin{tabular}{@{}>{\centering\arraybackslash}p{0.20\linewidth}cccc>{\centering\arraybackslash}p{0.25\linewidth}@{}}
+    \setlength{\tabcolsep}{3pt}
+        \begin{tabular}{@{}>{\centering\arraybackslash}p{0.20\linewidth}cccc>{\centering\arraybackslash}p{0.35\linewidth}@{}}
             \toprule
             Algorithm
              & Uses $f$
