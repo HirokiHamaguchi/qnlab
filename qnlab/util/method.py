@@ -47,8 +47,8 @@ COLORS = {
     "SciPy": TAB20(6),
     "NTQN": TAB20(8),
     "ASTR1-Adagrad": TAB20(10),
-    "NTRQN-Restart": "#004488",
-    "NTRQN-MS-Restart": "#5B8DB8",
+    "NTRQN-Restart": "#882255",
+    "NTRQN-MS-Restart": "#CC6677",
     "NTQN-Default-Termination": TAB20(9),
 }
 COLORS.update(
