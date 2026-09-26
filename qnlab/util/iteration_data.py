@@ -60,8 +60,7 @@ class IterationData:
         is_reliable = (
             np.isfinite(fx)
             and np.isfinite(fp)
-            and fx
-            < fp - 2 * eps / (1 - eps) * max(1.0, np.abs(fp), np.abs(fx))
+            and fx < fp - 2 * eps / (1 - eps) * max(1.0, np.abs(fp), np.abs(fx))
         )
         if is_reliable and method.secant in ("modified", "damped_modified"):
             sigma = self.compute_sigma(self.s, self.ss, g, gp, fx, fp)

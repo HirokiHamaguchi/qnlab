@@ -125,9 +125,7 @@ def test_result_with_different_options_is_rerun(monkeypatch, tmp_path) -> None:
     )
     method = Mock(label="method")
     stored_task = _task(method)
-    requested_task = for_cutest_run.CUTEstTask(
-        "ARWHEAD", method, {"m": 10}, 64
-    )
+    requested_task = for_cutest_run.CUTEstTask("ARWHEAD", method, {"m": 10}, 64)
     for_cutest_run.save_npz(stored_task, Callback())
 
     solve = Mock()
@@ -146,9 +144,7 @@ def test_loading_result_with_different_options_fails(monkeypatch, tmp_path) -> N
     )
     method = Mock(label="method")
     for_cutest_run.save_npz(_task(method), Callback())
-    requested_task = for_cutest_run.CUTEstTask(
-        "ARWHEAD", method, {"m": 10}, 64
-    )
+    requested_task = for_cutest_run.CUTEstTask("ARWHEAD", method, {"m": 10}, 64)
 
     with np.testing.assert_raises(ValueError):
         for_cutest_run.load_npz_with_metadata(requested_task)
@@ -196,15 +192,11 @@ def test_scaled_iteration_limit_uses_first_successful_reference_iterate() -> Non
     callback = Callback()
     callback.gnorms = [1.0, 0.1, 0.01, 0.001]
 
-    assert for_cutest_run.scaled_iteration_limit(
-        callback, np.float64(0.01)
-    ) == 30
+    assert for_cutest_run.scaled_iteration_limit(callback, np.float64(0.01)) == 30
 
 
 def test_scaled_iteration_limit_uses_maximum_if_reference_does_not_solve() -> None:
     callback = Callback()
     callback.gnorms = [1.0, 0.1]
 
-    assert for_cutest_run.scaled_iteration_limit(
-        callback, np.float64(0.01)
-    ) == 15_000
+    assert for_cutest_run.scaled_iteration_limit(callback, np.float64(0.01)) == 15_000

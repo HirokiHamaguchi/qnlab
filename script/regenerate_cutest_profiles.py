@@ -18,7 +18,6 @@ import numpy as np
 from qnlab.experiment.profile import performance_profile
 from qnlab.util.method import COLORS, LINE_STYLES
 
-
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 RESULT_ROOT = REPOSITORY_ROOT / "data" / "temp"
 OUTPUT_ROOT = REPOSITORY_ROOT / "doc" / "imgs" / "compare"
@@ -69,8 +68,7 @@ SCENARIO_ALIASES = {"eps_nominal": "function_only"}
 def load_problem_sets() -> dict[int, tuple[str, ...]]:
     data = json.loads(PROBLEM_LIST.read_text(encoding="utf-8"))["valid_problems"]
     return {
-        precision: tuple(data[f"precision_{precision}"])
-        for precision in (16, 32, 64)
+        precision: tuple(data[f"precision_{precision}"]) for precision in (16, 32, 64)
     }
 
 
@@ -82,6 +80,7 @@ def first_successful_call(path: Path, tolerance: float) -> float:
     reached = np.flatnonzero(gnorms <= tolerance)
     return float(max(1, int(calls[reached[0]]))) if reached.size else np.inf
 
+
 def first_successful_time(path: Path, tolerance: float) -> float:
     with np.load(path) as data:
         times = np.asarray(data["times"], dtype=float)
@@ -89,6 +88,7 @@ def first_successful_time(path: Path, tolerance: float) -> float:
 
     reached = np.flatnonzero(gnorms <= tolerance)
     return float(times[reached[0]]) if reached.size else np.inf
+
 
 def time_bucket_masks(times: np.ndarray) -> dict[str, np.ndarray]:
     """Split instances by the best runtime attained by any method."""
@@ -102,6 +102,7 @@ def time_bucket_masks(times: np.ndarray) -> dict[str, np.ndarray]:
         "ge10s": finite & (best_times >= 10.0),
     }
 
+
 def load_metric(
     scenario: str,
     precision: int,
@@ -112,7 +113,9 @@ def load_metric(
     metric: str,
 ) -> np.ndarray:
     source_scenario = SCENARIO_ALIASES.get(scenario, scenario)
-    instances = [(seed, problem) for seed in seeds for problem in problem_sets[precision]]
+    instances = [
+        (seed, problem) for seed in seeds for problem in problem_sets[precision]
+    ]
 
     values = np.full((len(methods), len(instances)), np.inf)
 
@@ -237,7 +240,7 @@ def main() -> None:
                 ),
             )
 
-            if not (precision==64 and len(seeds)==1):
+            if not (precision == 64 and len(seeds) == 1):
                 continue
 
             # Runtime performance profile

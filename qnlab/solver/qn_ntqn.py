@@ -31,7 +31,9 @@ def qn_ntqn(
     final_fk = np.float64(np.nan)
     last_recorded_x = np.copy(prob.x0) if callback is not None else None
 
-    def _record_iterate(x: npt.NDArray[np.float64]) -> tuple[np.float64, npt.NDArray[np.float64]]:
+    def _record_iterate(
+        x: npt.NDArray[np.float64],
+    ) -> tuple[np.float64, npt.NDArray[np.float64]]:
         nonlocal last_recorded_x
         fx = prob.f(x, count=False)
         gx = prob.g(x, count=False)

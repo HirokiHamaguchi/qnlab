@@ -129,9 +129,7 @@ class BFGSUpdateRule(BaseUpdateRule):
 
         normalized_steps, normalized_gradients = workspace.normalized_vectors
         step_products = workspace.step_products / np.outer(step_scales, step_scales)
-        step_gradient = workspace.step_gradient / np.outer(
-            step_scales, gradient_scales
-        )
+        step_gradient = workspace.step_gradient / np.outer(step_scales, gradient_scales)
         gradient_products = workspace.gradient_products / np.outer(
             gradient_scales, gradient_scales
         )

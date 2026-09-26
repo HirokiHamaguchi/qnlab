@@ -1,6 +1,7 @@
 import copy
 
 import numpy as np
+
 from qnlab.problem.base import BaseProblem
 from qnlab.problem.cutest import CUTEstQNProblem
 from qnlab.problem.cutest_noised import CUTEstNoisedProblem

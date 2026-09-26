@@ -10,7 +10,6 @@ from pathlib import Path
 
 import numpy as np
 
-
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 RESULT_ROOT = REPOSITORY_ROOT / "data" / "temp"
 PROBLEM_LIST = REPOSITORY_ROOT / "data" / "CUTEst" / "valid_problems.json"
@@ -81,8 +80,7 @@ def parse_arguments() -> argparse.Namespace:
 def load_problem_sets() -> dict[int, tuple[str, ...]]:
     data = json.loads(PROBLEM_LIST.read_text(encoding="utf-8"))["valid_problems"]
     return {
-        precision: tuple(data[f"precision_{precision}"])
-        for precision in (16, 32, 64)
+        precision: tuple(data[f"precision_{precision}"]) for precision in (16, 32, 64)
     }
 
 
@@ -220,9 +218,7 @@ def summarize_results(
                     "failed_common_tolerance": total - solved,
                     "solved_percent": float(percentage),
                     "median_calls_when_solved": (
-                        float(np.median(successful_calls))
-                        if successful_calls
-                        else None
+                        float(np.median(successful_calls)) if successful_calls else None
                     ),
                     "seed_solved_percent": seed_percentages,
                     "seed_solved_percent_std": (
@@ -263,9 +259,7 @@ def main() -> int:
     )
     computed_percentages = set(percentage_sources)
     latex_percentages, latex_sources = extract_latex_percentages()
-    missing_percentages = sorted(
-        latex_percentages - computed_percentages, key=float
-    )
+    missing_percentages = sorted(latex_percentages - computed_percentages, key=float)
     if latex_percentages == computed_percentages:
         relation = "equal"
     elif latex_percentages < computed_percentages:

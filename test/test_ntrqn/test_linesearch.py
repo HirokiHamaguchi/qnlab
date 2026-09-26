@@ -173,9 +173,7 @@ def test_restart_occurs_only_when_returning_from_offo(monkeypatch):
             0,
         )
 
-    monkeypatch.setattr(
-        ntrqn_module, "line_search_relaxed_armijo", fake_line_search
-    )
+    monkeypatch.setattr(ntrqn_module, "line_search_relaxed_armijo", fake_line_search)
     problem = ConvexEvenPolynomialProblem(degree=2)
     callback = Callback()
     parameter = NTRQNParameter(

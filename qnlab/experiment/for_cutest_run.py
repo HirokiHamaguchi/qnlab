@@ -129,9 +129,7 @@ def metadata_matches_task(metadata: dict, task: CUTEstTask) -> bool:
     return all(metadata.get(key) == value for key, value in expected.items())
 
 
-def result_matches_task(
-    task: CUTEstTask, result_subdir: str | None = None
-) -> bool:
+def result_matches_task(task: CUTEstTask, result_subdir: str | None = None) -> bool:
     """Return whether a readable stored result belongs to the requested task."""
     file_path = Path(get_file_path(task, result_subdir))
     if not file_path.exists():

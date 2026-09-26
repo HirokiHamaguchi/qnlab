@@ -1,6 +1,6 @@
+import math
 import os
 import shutil
-import math
 import tempfile
 from pathlib import Path
 
@@ -96,7 +96,9 @@ def create_legend(filename, entries):
     for name in alg_names:
         color = COLORS[name]
         linestyle = LINE_STYLES[name]
-        (handle,) = ax.plot([], [], linestyle, color=color, linewidth=3.0, markersize=10)
+        (handle,) = ax.plot(
+            [], [], linestyle, color=color, linewidth=3.0, markersize=10
+        )
         handles.append(handle)
 
     legend_names = [display_name for _, display_name in entries]
