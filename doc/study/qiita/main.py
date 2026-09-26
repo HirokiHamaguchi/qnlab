@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 LaTeX to Markdown converter for study documents.
 Processes the numbered .tex files in doc/study and combines them into one Markdown file.

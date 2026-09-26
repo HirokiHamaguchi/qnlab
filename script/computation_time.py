@@ -4,6 +4,7 @@ import shutil
 import tempfile
 import time
 from pathlib import Path
+from typing import TypedDict
 
 os.environ.setdefault(
     "MPLCONFIGDIR", str(Path(tempfile.gettempdir()) / "qnlab-matplotlib")
@@ -27,6 +28,14 @@ num_runs = 100
 methods = [entry for entry in methods if entry[0].label != "NTRQN-MS-SP"]
 
 
+class BenchmarkResults(TypedDict):
+    method: list[str]
+    run: list[int]
+    time: list[float]
+    num_of_calls: list[int]
+    fx: list[float]
+
+
 def display_name(method_name: str) -> str:
     if method_name == "NTRQN-Restart":
         return "Ours-R"
@@ -40,7 +49,7 @@ def internal_name(method_name: str) -> str:
 
 
 def run_benchmark() -> pd.DataFrame:
-    results = {
+    results: BenchmarkResults = {
         "method": [],
         "run": [],
         "time": [],

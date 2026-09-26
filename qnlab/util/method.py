@@ -173,7 +173,7 @@ def get_methods(
         List of tuples containing (Method, options_dict)
     """
 
-    methods = [
+    methods: list[tuple[Method, dict]] = [
         (
             Method("NTRQN", "cautious", "damped", "bfgs", label="NTRQN"),
             {
@@ -254,7 +254,7 @@ def get_box_methods(
     m: int = 10, MI: int = 15000
 ) -> tuple[list[tuple[Method, dict]], dict, dict]:
     """Get the standard methods for box-constrained CUTEst benchmarks."""
-    methods = [
+    methods: list[tuple[Method, dict]] = [
         (
             Method("NTRQNB", "cautious", "damped", "bfgs", label="NTRQNB"),
             {"m": m, "max_iterations": MI},

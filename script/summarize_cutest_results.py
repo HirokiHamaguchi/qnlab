@@ -156,7 +156,7 @@ def summarize_results(
             for method in sorted(methods):
                 successful_calls: list[int] = []
                 status_counts: Counter[str] = Counter()
-                diagnostics: Counter[str] = Counter()
+                diagnostics: defaultdict[str, int | float] = defaultdict(int)
                 missing = 0
                 invalid = 0
                 seed_successes: dict[str, int] = {str(seed): 0 for seed in seeds}
