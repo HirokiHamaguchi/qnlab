@@ -24,10 +24,8 @@ OUTPUT_ROOT = REPOSITORY_ROOT / "doc" / "imgs" / "compare"
 PROBLEM_LIST = REPOSITORY_ROOT / "data" / "CUTEst" / "valid_problems.json"
 
 STANDARD_METHODS = (
-    "NTRQN",
-    "NTRQN-MS",
-    "NTRQN-SP",
-    "NTRQN-Restart",
+    "Ours",
+    "Ours-Heuristic",
     "Line",
     "Reg",
     "Reg-Sec",
@@ -46,23 +44,32 @@ SCENARIOS = {
         64,
         tuple(range(5)),
         (1e-2,),
-        ("NTRQN", "NTRQN-MS", "NTRQN-SP", "NTRQN-Restart"),
+        ("Ours", "Ours-Heuristic"),
     ),
     "eps_nominal": (
         64,
         tuple(range(5)),
         (1e-2,),
-        ("NTRQN", "NTRQN-MS", "NTRQN-SP", "NTRQN-Restart"),
+        ("Ours", "Ours-Heuristic"),
     ),
     "eps_over": (
         64,
         tuple(range(5)),
         (1e-2,),
-        ("NTRQN", "NTRQN-MS", "NTRQN-SP", "NTRQN-Restart"),
+        ("Ours", "Ours-Heuristic"),
     ),
 }
 
 SCENARIO_ALIASES = {"eps_nominal": "function_only"}
+
+PLOT_COLORS = COLORS | {
+    "Ours": COLORS["NTRQN-MS"],
+    "Ours-Heuristic": COLORS["NTRQN-Restart"],
+}
+PLOT_LINE_STYLES = LINE_STYLES | {
+    "Ours": LINE_STYLES["NTRQN-MS"],
+    "Ours-Heuristic": LINE_STYLES["NTRQN-Restart"],
+}
 
 
 def load_problem_sets() -> dict[int, tuple[str, ...]]:
@@ -88,19 +95,6 @@ def first_successful_time(path: Path, tolerance: float) -> float:
 
     reached = np.flatnonzero(gnorms <= tolerance)
     return float(times[reached[0]]) if reached.size else np.inf
-
-
-def time_bucket_masks(times: np.ndarray) -> dict[str, np.ndarray]:
-    """Split instances by the best runtime attained by any method."""
-    best_times = np.min(times, axis=0)
-
-    finite = np.isfinite(best_times)
-
-    return {
-        "lt1s": finite & (best_times < 1.0),
-        "1-10s": finite & (best_times >= 1.0) & (best_times < 10.0),
-        "ge10s": finite & (best_times >= 10.0),
-    }
 
 
 def load_metric(
@@ -168,6 +162,8 @@ def draw_profile(
     methods: tuple[str, ...],
     values: np.ndarray,
     target: Path,
+    colors: dict[str, object] = PLOT_COLORS,
+    line_styles: dict[str, str] = PLOT_LINE_STYLES,
 ) -> None:
     plt.style.use("seaborn-v0_8-whitegrid")
     plt.rcParams.update(
@@ -184,8 +180,8 @@ def draw_profile(
 
     performance_profile(
         values.T,
-        linestyle=[LINE_STYLES[name] for name in methods],
-        colors=[COLORS[name] for name in methods],
+        linestyle=[line_styles[name] for name in methods],
+        colors=[colors[name] for name in methods],
         thetaMax=10.0,
         markersize=6,
         markevery=[0],
@@ -211,6 +207,59 @@ def draw_profile(
     fig.savefig(target, format="pdf", bbox_inches="tight", dpi=300)
     plt.close(fig)
 
+    print(f"Saved figure to {target}")
+
+
+def draw_time_to_solution(
+    methods: tuple[str, ...],
+    times: np.ndarray,
+    target: Path,
+) -> None:
+    """Plot the fraction attaining the tolerance against absolute runtime."""
+    plt.style.use("seaborn-v0_8-whitegrid")
+    plt.rcParams.update(
+        {
+            "text.usetex": shutil.which("latex") is not None,
+            "font.family": "serif",
+            "font.size": 20,
+            "figure.dpi": 300,
+            "lines.linewidth": 2.0,
+        }
+    )
+    fig, ax = plt.subplots(figsize=(7, 5.5))
+    instance_count = times.shape[1]
+    positive_times = times[np.isfinite(times) & (times > 0)]
+    if positive_times.size == 0:
+        raise ValueError("No positive finite runtimes to plot")
+    left = positive_times.min() * 0.95
+    right = positive_times.max() * 1.05
+    for method, method_times in zip(methods, times, strict=True):
+        finite = np.sort(method_times[np.isfinite(method_times)])
+        fractions = np.arange(1, finite.size + 1) / instance_count
+        ax.step(
+            np.r_[left, np.maximum(finite, left), right],
+            np.r_[0.0, fractions, finite.size / instance_count],
+            PLOT_LINE_STYLES[method],
+            color=PLOT_COLORS[method],
+            where="post",
+            markersize=6,
+            markevery=[1] if finite.size else [],
+            linewidth=2.2,
+        )
+    ax.set_xscale("log")
+    ax.set_xlim(left, right)
+    ax.set_ylim(0, 1.01)
+    ax.set_xlabel(r"Runtime (s)", fontsize=18)
+    ax.set_ylabel(r"Proportion of Test Problems Solved", fontsize=18)
+    ax.grid(True, alpha=0.35, linestyle="-", linewidth=0.6, color="gray")
+    ax.set_axisbelow(True)
+    for spine in ax.spines.values():
+        spine.set_edgecolor("black")
+        spine.set_linewidth(1.0)
+    fig.tight_layout()
+    target.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(target, format="pdf", bbox_inches="tight", dpi=300)
+    plt.close(fig)
     print(f"Saved figure to {target}")
 
 
@@ -240,59 +289,61 @@ def main() -> None:
                 ),
             )
 
-            if not (precision == 64 and len(seeds) == 1):
-                continue
-
-            # Runtime performance profile
-            times = load_metric(
-                scenario,
-                precision,
-                seeds,
-                tolerance,
-                methods,
-                problem_sets,
-                metric="time",
-            )
-
-            time_target = output_path(
-                scenario,
-                precision,
-                tolerance,
-                metric="time",
-            )
-
-            draw_profile(
-                methods,
-                times,
-                time_target,
-            )
-
-            # Runtime performance profiles stratified by absolute difficulty.
-            for bucket_name, mask in time_bucket_masks(times).items():
-                n_instances = int(mask.sum())
-
-                # Very small buckets are not informative.
-                if n_instances < 5:
-                    print(
-                        f"Skipping {scenario} {tolerance:g} {bucket_name}: "
-                        f"only {n_instances} instances"
-                    )
-                    continue
-
-                bucket_target = time_target.with_name(
-                    f"{time_target.stem}_{bucket_name}{time_target.suffix}"
-                )
-
-                draw_profile(
+            if scenario == "float32" and tolerance == 1e-3:
+                times = load_metric(
+                    scenario,
+                    precision,
+                    seeds,
+                    tolerance,
                     methods,
-                    times[:, mask],
-                    bucket_target,
+                    problem_sets,
+                    metric="time",
                 )
+                draw_time_to_solution(
+                    methods,
+                    times,
+                    OUTPUT_ROOT / "_time_precision32_gtol1e-03.pdf",
+                )
+
+    sensitivity_methods: list[str] = []
+    sensitivity_values: list[np.ndarray] = []
+    sensitivity_colors: dict[str, object] = {}
+    sensitivity_line_styles: dict[str, str] = {}
+    setting_styles = {
+        "eps_under": ("underestimated", "--"),
+        "eps_nominal": ("nominal", "-"),
+        "eps_over": ("overestimated", ":"),
+    }
+    for scenario, (setting, style) in setting_styles.items():
+        precision, seeds, tolerances, methods = SCENARIOS[scenario]
+        values = load_metric(
+            scenario,
+            precision,
+            seeds,
+            tolerances[0],
+            methods,
+            problem_sets,
+            metric="calls",
+        )
+        for method, method_values in zip(methods, values, strict=True):
+            label = f"{method} ({setting})"
+            marker = "o" if method == "Ours" else "s"
+            sensitivity_methods.append(label)
+            sensitivity_values.append(method_values)
+            sensitivity_colors[label] = PLOT_COLORS[method]
+            sensitivity_line_styles[label] = marker + style
+    draw_profile(
+        tuple(sensitivity_methods),
+        np.asarray(sensitivity_values),
+        OUTPUT_ROOT / "_pp_error_bound_sensitivity_gtol1e-02.pdf",
+        sensitivity_colors,
+        sensitivity_line_styles,
+    )
 
     diagnostic_profiles = (
         (
             "function_only_restart",
-            ("NTRQN", "NTRQN-MS", "NTRQN-Restart"),
+            ("Ours", "Ours-Heuristic"),
         ),
         (
             "ntqn_termination",

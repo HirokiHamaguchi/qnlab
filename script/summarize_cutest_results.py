@@ -16,11 +16,8 @@ PROBLEM_LIST = REPOSITORY_ROOT / "data" / "CUTEst" / "valid_problems.json"
 PRIVATE_ROOT = REPOSITORY_ROOT.parent / "qnlab_private"
 
 STANDARD_METHODS = {
-    "NTRQN",
-    "NTRQN-MS",
-    "NTRQN-SP",
-    "NTRQN-MS-SP",
-    "NTRQN-Restart",
+    "Ours",
+    "Ours-Heuristic",
     "Line",
     "ASTR1-Adagrad",
     "Reg",
@@ -29,11 +26,8 @@ STANDARD_METHODS = {
     "NTQN",
 }
 PROPOSED_METHODS = {
-    "NTRQN",
-    "NTRQN-MS",
-    "NTRQN-SP",
-    "NTRQN-MS-SP",
-    "NTRQN-Restart",
+    "Ours",
+    "Ours-Heuristic",
 }
 SCENARIOS = {
     "float64": (64, (0,), (1e-1, 1e-3, 1e-5), STANDARD_METHODS),
@@ -85,13 +79,13 @@ def load_problem_sets() -> dict[int, tuple[str, ...]]:
 
 
 def expected_option_subset(method: str) -> dict[str, object]:
-    if method in {"NTRQN", "NTRQN-MS", "NTRQN-Restart"}:
+    if method == "Ours":
         expected: dict[str, object] = {"regularization_solver": "compact"}
-    elif method in {"NTRQN-SP", "NTRQN-MS-SP"}:
+    elif method == "Ours-Heuristic":
         expected = {"regularization_solver": "shifted_pair"}
     else:
         return {}
-    if method in {"NTRQN-MS", "NTRQN-MS-SP"}:
+    if method in {"Ours", "Ours-Heuristic"}:
         expected["modified_secant_max_ratio"] = 1.0
     return expected
 

@@ -14,10 +14,8 @@ from qnlab.util.method import COLORS, LINE_STYLES
 
 LEGENDS = {
     "_legend.pdf": [
-        ("NTRQN", "Ours"),
-        ("NTRQN-MS", "Ours-MS"),
-        ("NTRQN-SP", "Ours-SP"),
-        ("NTRQN-Restart", "Ours-R"),
+        ("NTRQN-MS", "Ours"),
+        ("NTRQN-Restart", "Ours-AR"),
         ("Line", "Line"),
         ("Reg", "Reg"),
         ("Reg-Sec", "Reg-Sec"),
@@ -25,10 +23,8 @@ LEGENDS = {
         ("NTQN", "NTQN"),
     ],
     "_legend_noise.pdf": [
-        ("NTRQN", "Ours"),
-        ("NTRQN-MS", "Ours-MS"),
-        ("NTRQN-SP", "Ours-SP"),
-        ("NTRQN-Restart", "Ours-R"),
+        ("NTRQN-MS", "Ours"),
+        ("NTRQN-Restart", "Ours-AR"),
         ("Line", "Line"),
         ("Reg", "Reg"),
         ("Reg-Sec", "Reg-Sec"),
@@ -41,10 +37,8 @@ LEGENDS = {
         ("NTQN-Default-Termination", "NTQN (recommended stop)"),
     ],
     "_legend_precision.pdf": [
-        ("NTRQN", "Ours"),
-        ("NTRQN-MS", "Ours-MS"),
-        ("NTRQN-SP", "Ours-SP"),
-        ("NTRQN-Restart", "Ours-R"),
+        ("NTRQN-MS", "Ours"),
+        ("NTRQN-Restart", "Ours-AR"),
         ("Line", "Line"),
         ("Reg", "Reg"),
         ("Reg-Sec", "Reg-Sec"),
@@ -52,21 +46,28 @@ LEGENDS = {
         ("NTQN", "NTQN"),
         ("ASTR1-Adagrad", "ASTR1-Adagrad"),
     ],
-    "_legend_sensitivity.pdf": [
-        ("NTRQN", "Ours"),
-        ("NTRQN-MS", "Ours-MS"),
-        ("NTRQN-SP", "Ours-SP"),
-        ("NTRQN-Restart", "Ours-R"),
-    ],
     "_legend_restart.pdf": [
-        ("NTRQN", "Ours (no restart)"),
-        ("NTRQN-MS", "Ours-MS (no restart)"),
-        ("NTRQN-Restart", "Ours-R (restart)"),
+        ("NTRQN-MS", "Ours"),
+        ("NTRQN-Restart", "Ours-AR"),
     ],
 }
 
 
-def create_legend(filename, entries):
+def column_major_entries(entries, ncol):
+    """Convert left-to-right row order to Matplotlib's column-first order."""
+    if not entries or not 1 <= ncol <= len(entries):
+        raise ValueError("Legend requires entries and a valid column count")
+    nrows = math.ceil(len(entries) / ncol)
+    return [
+        entries[row * ncol + col]
+        for col in range(ncol)
+        for row in range(nrows)
+        if row * ncol + col < len(entries)
+    ]
+
+
+def draw_legend(filename, entries, ncol, fontsize=22):
+    """Draw (label, color, line style) entries supplied in row order."""
     plt.style.use("seaborn-v0_8-whitegrid")
     plt.rcParams.update(
         {
@@ -78,30 +79,18 @@ def create_legend(filename, entries):
         }
     )
 
-    ncol = min(len(entries), 5)
     nrows = math.ceil(len(entries) / ncol)
-    if nrows > 1:
-        # Matplotlib fills legend columns first; interleave the rows so that
-        # the displayed entries instead follow the input order from left to right.
-        entries = [
-            entries[row * ncol + col]
-            for col in range(ncol)
-            for row in range(nrows)
-            if row * ncol + col < len(entries)
-        ]
-    alg_names = [name for name, _ in entries]
+    entries = column_major_entries(entries, ncol)
 
     fig, ax = plt.subplots(figsize=(13.5, 0.8 + 0.7 * nrows))
     handles = []
-    for name in alg_names:
-        color = COLORS[name]
-        linestyle = LINE_STYLES[name]
+    for _, color, linestyle in entries:
         (handle,) = ax.plot(
             [], [], linestyle, color=color, linewidth=3.0, markersize=10
         )
         handles.append(handle)
 
-    legend_names = [display_name for _, display_name in entries]
+    legend_names = [label for label, _, _ in entries]
     ax.legend(
         handles,
         legend_names,
@@ -112,7 +101,7 @@ def create_legend(filename, entries):
         framealpha=0.98,
         edgecolor="black",
         fancybox=True,
-        fontsize=22,
+        fontsize=fontsize,
         ncol=ncol,
         frameon=True,
     )
@@ -133,6 +122,38 @@ def create_legend(filename, entries):
     print(f"Saved legend to {legend_path}")
 
 
+def create_legend(filename, entries):
+    # Eight-method comparisons use two complete rows of four.
+    draw_legend(
+        filename,
+        [(label, COLORS[name], LINE_STYLES[name]) for name, label in entries],
+        ncol=min(len(entries), 4),
+    )
+
+
+def create_sensitivity_legend():
+    entries = []
+    # One method per row, with error settings ordered left to right.
+    for method, source, marker in (
+        ("Ours", "NTRQN-MS", "o"),
+        ("Ours-AR", "NTRQN-Restart", "s"),
+    ):
+        for setting, setting_style in (
+            ("underestimated", "--"),
+            ("nominal", "-"),
+            ("overestimated", ":"),
+        ):
+            entries.append(
+                (
+                    f"{method} ({setting})",
+                    COLORS[source],
+                    marker + setting_style,
+                )
+            )
+    draw_legend("_legend_sensitivity.pdf", entries, ncol=3, fontsize=20)
+
+
 if __name__ == "__main__":
     for filename, entries in LEGENDS.items():
         create_legend(filename, entries)
+    create_sensitivity_legend()

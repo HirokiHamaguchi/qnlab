@@ -19,17 +19,23 @@ Standard implementations~\citep{2020SciPy-NMeth,Okazaki2007libLBFGS} rely on lin
 
 In the presence of numerical noise, these line search conditions may become unreliable.
 Differences in function values or directional derivatives can be dominated by numerical errors, leading to unstable step sizes, ill-conditioned Hessian approximations, or abnormal termination~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022,paquetteStochasticLineSearch2020}.
-From a computational perspective, improving the robustness of quasi-Newton methods in noisy environments is therefore crucial.
+From a computational perspective, improving the stability of quasi-Newton methods in noisy environments is therefore crucial.
 In particular, it is desirable to design algorithms that (i) retain computational efficiency when function evaluations are accurate, (ii) remain stable when function values are unreliable, and (iii) guarantee convergence to first-order stationary points under mild assumptions.
 
 In this work, we propose a noise-tolerant regularized quasi-Newton method that addresses these challenges.
 Our approach combines an Armijo line search, quadratic regularization \citep{uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023}, and an Objective-Function-Free Optimization (OFFO) inspired strategy~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}. % to LLM: ignore this git difference.
-When a sufficient decrease in function value is observed, the method behaves similarly to standard quasi-Newton methods with line search, preserving its practical efficiency.
-When numerical noise dominates, we introduce regularization on the approximate Hessian to ensure numerical stability, which yields convergence properties similar to those of OFFO methods, particularly AdaGrad-Norm~\citep{wardAdaGradStepsizesSharp2020}.
-The resulting algorithm is particularly well-suited for low-precision or noisy environments.
+\begin{MPCchange}
+Relaxing the line search alone is not enough to guarantee convergence under persistent function-value errors.
+Without regularization, the relaxed acceptance condition can permit a cycle with nonzero gradients, even on a one-dimensional quadratic, as shown in \cref{sec:unregularized_bound}.
+Using an OFFO-based scale at every iteration avoids relying on measured function decreases to control regularization, but can slow down quasi-Newton steps when function values are sufficiently accurate.
+The key step in our method is therefore the test in \refLine{line:mu_0_condition} of \cref{alg:regularized_qn}, which permits an unregularized step when error-adjusted function values certify progress and otherwise activates the OFFO-based scale.
+The allowance in this test is derived from the function-decrease error bound in \cref{lem:error_bound_on_function_evaluations}.
+The test bounds the accumulated allowances over unregularized iterations, while the cumulative-gradient scale controls the remaining iterations without requiring a measured function decrease at each step.
+These two bounds allow us to retain unregularized quasi-Newton steps without losing the convergence guarantee under persistent errors.
+\end{MPCchange}
 
 From a theoretical standpoint, we establish that the proposed method achieves the global convergence rate of $\order{1/\varepsilon^2}$ for smooth nonconvex optimization problems, \MPCchanged{which matches the optimal worst-case order for smooth nonconvex optimization with Lipschitz-continuous gradients~\citep{carmonLowerBoundsFinding2020}}, even when objective function values are corrupted by noise.
-Extensive numerical experiments on the CUTEst benchmark collection, across various floating-point precisions and artificial noise settings, \MPCchanged{show that the proposed method remains stable under function-value noise and performs favorably against baselines.}
+Extensive numerical experiments on the CUTEst benchmark collection, across various floating-point precisions and artificial noise settings, \MPCchanged{show stable performance under function-value noise and reduced precision.}
 
 \subsection{\MPCchanged{Comparison With Related Work}}
 
@@ -39,59 +45,57 @@ Extensive numerical experiments on the CUTEst benchmark collection, across vario
     \centering
     \caption{
         Theoretical comparison of the proposed method and its Newton-type, quasi-Newton, and OFFO competitors.
-        OFFO is included as the first-order source of the fallback scaling.
-        A \ding{51} denotes theoretical coverage and ``--'' its absence.
-        The ``Noisy $f$'' and ``Noisy $g$'' columns indicate whether the corresponding errors are allowed.
-        The asterisk indicates that gradient noise is outside our analysis and is considered only in joint-noise stress tests.
-        Still, unlike a Wolfe line search, the proposed sufficient-decrease test does not require an exact gradient evaluation at each trial point.
+        A checkmark (\ding{51}) denotes theoretical coverage and ``--'' its absence.
+        The ``Noisy $f$'' and ``Noisy $\nabla f$'' columns indicate whether the corresponding errors are allowed.
+        The asterisk indicates that gradient noise is considered in numerical stress tests, but its analysis is outside the scope of this paper.
     }
     \label{tab:related_work_comparison}
     \setlength{\tabcolsep}{3pt}
-        \begin{tabular}{@{}>{\centering\arraybackslash}p{0.20\linewidth}cccc>{\centering\arraybackslash}p{0.35\linewidth}@{}}
+        \begin{tabular}{@{}>{\centering\arraybackslash}p{0.34\linewidth}ccccc@{}}
             \toprule
             Algorithm
              & Uses $f$
              & Noisy $f$
-             & Noisy $g$
+             & Noisy $\nabla f$
              & Nonconvex
-             & Guarantee \\
+             & $\order{\varepsilon^{-2}}$ guarantee \\
             \midrule
-            \makecell[c]{\textbf{\texttt{Line}} / \textbf{\texttt{SciPy}} \\[-0.4em]\scalebox{0.8}{\citep{liuLimitedMemoryBFGS1989,Okazaki2007libLBFGS,2020SciPy-NMeth}}}
+            \makecell[c]{L-BFGS\\[-0.4em]\scalebox{0.8}{\citep{liuLimitedMemoryBFGS1989,Okazaki2007libLBFGS,2020SciPy-NMeth}}}
              & \ding{51}
              & --
              & --
              & \ding{51}
-             & R-linear under uniform convexity \\
-            \makecell[c]{Regularized Newton\\[-0.4em]\scalebox{0.8}{\citep{uedaConvergencePropertiesRegularized2010}}}
+             & -- \\
+            \makecell[c]{Regularized\\Newton method\\[-0.4em]\scalebox{0.8}{\citep{uedaConvergencePropertiesRegularized2010}}}
              & \ding{51}
              & --
              & --
              & \ding{51}
-             & \(\order{\varepsilon^{-2}}\) to \(\norm{\nabla f}\leq\varepsilon\) \\
-            \makecell[c]{\textbf{\texttt{Reg}}\\[-0.4em]\scalebox{0.8}{\citep{kanzowRegularizationLimitedMemory2023}}}
+             & \ding{51} \\
+            \makecell[c]{Regularized\\L-BFGS method\\[-0.4em]\scalebox{0.8}{\citep{kanzowRegularizationLimitedMemory2023}}}
              & \ding{51}
              & --
              & --
              & \ding{51}
-             & Global stationarity \\
-            \makecell[c]{\textbf{\texttt{NTQN}}\\[-0.4em]\scalebox{0.8}{\citep{xieAnalysisBFGSMethod2020,shiNoiseTolerantQuasiNewtonAlgorithm2022}}}
+             & -- \\
+            \makecell[c]{Noise-tolerant\\quasi-Newton method\\[-0.4em]\scalebox{0.8}{\citep{xieAnalysisBFGSMethod2020,shiNoiseTolerantQuasiNewtonAlgorithm2022}}}
              & \ding{51}
              & \ding{51}
              & \ding{51}
              & --
-             & R-linear to the noise floor \\
-            \makecell[c]{\textbf{\texttt{OFFO}}\\[-0.4em]\scalebox{0.8}{\citep{Gratton08022024}}}
+             & -- \\
+            \makecell[c]{OFFO method\\[-0.4em]\scalebox{0.8}{\citep{Gratton08022024}}}
              & --
              & \ding{51}
              & --
              & \ding{51}
-             & \(\order{\varepsilon^{-2}}\) to \(\|\nabla f\|\leq\varepsilon\) \\
-            \makecell[c]{\textbf{\texttt{Ours}}\\[-0.4em]\scalebox{0.8}{\cref{alg:regularized_qn}}}
+             & \ding{51} \\
+            \makecell[c]{Proposed method\\[-0.4em]\scalebox{0.8}{\cref{alg:regularized_qn}}}
              & \ding{51}
              & \ding{51}
              & --\rlap{\raisebox{0.3ex}{\large *}}
              & \ding{51}
-             & \(\order{\varepsilon^{-2}}\) to \(\|\nabla f\|\leq\varepsilon\) \\
+             & \ding{51} \\
             \bottomrule
         \end{tabular}
     \end{MPCchange}
@@ -102,21 +106,17 @@ We next compare our method with related quasi-Newton and OFFO methods, whose the
 
 The closest methods are regularized Newton and quasi-Newton methods~\citep{uedaConvergencePropertiesRegularized2010,kanzowRegularizationLimitedMemory2023}.
 These methods assume reliable function values, while we analyze the behavior of our method under persistent bounded relative-or-absolute function errors and give the order-optimal \(\order{1/\varepsilon^2}\) bound for smooth nonconvex optimization, matching the exact-evaluation complexity of regularized Newton methods.
-Rather than relying throughout on exact-value acceptance tests, our method uses noisy function values only while they certify a reference decrease and otherwise switches to an objective-function-free regularization scale.
-It thereby retains useful line-search behavior without making continued progress depend on unreliable comparisons.
+Unlike function-value-based regularization updates, our cumulative-gradient scale controls regularized iterations without requiring a measured function decrease at each such iteration.
 
 Other closely related methods are OFFO~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023} and Noise Tolerant Quasi-Newton (NTQN) methods~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
-OFFO methods avoid objective-function values altogether, whereas our method retains their use whenever they provide a reliable decrease certificate.
+OFFO methods avoid objective-function values altogether, whereas our method uses them in the line search and to determine when an unregularized step is allowed.
 Shi et al.~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022} develop NTQN for bounded errors in both function and gradient evaluations, using a noise-tolerant line search and a lengthening procedure to stabilize the quasi-Newton updates.
-Their analysis establishes linear convergence to a noise-dependent neighborhood for strongly convex objectives while continuing to base step acceptance on noisy function comparisons~\citep[Theorem~3.5]{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
+Their analysis targets a noise-dependent neighborhood for strongly convex objectives while continuing to base step acceptance on noisy function comparisons~\citep[Theorem~3.5]{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
 Our relaxed Armijo test is related to their noise-tolerant test~\citep[Section~4]{shiNoiseTolerantQuasiNewtonAlgorithm2022}, but our adaptive error allowance and fallback play a different role.
-Function values are used only while they provide a reliable decrease certificate.
 This design targets smooth nonconvex problems with accurate gradients and persistent function-value errors, and retains an \(\order{1/\varepsilon^2}\) guarantee for arbitrarily small first-order tolerances.
-NTQN instead has the complementary advantage of accommodating bounded gradient errors.
-In the function-noise experiments, the proposed variants attain the common gradient tolerance on a larger fraction of instances than NTQN, while the joint-noise results are reported only as stress tests beyond our theory.
+Unlike ours, the NTQN analysis allows bounded gradient errors.
 
 The guarantees in \cref{tab:related_work_comparison} have different targets and assumptions.
-For line-search L-BFGS with exact evaluations, R-linear convergence of the objective gap holds under uniform convexity and bounded initial scaling matrices~\citep[Theorem~7.1]{liuLimitedMemoryBFGS1989}.
 For a regularized Newton method with an Armijo line search, an \(\order{1/\varepsilon^2}\) iteration bound and a uniform bound on the backtracking steps hold under compact-level-set and Lipschitz-Hessian assumptions~\citep[Theorems~4.1 and~4.2]{uedaConvergencePropertiesRegularized2010}.
 Kanzow and Steck establish global convergence of regularized L-BFGS to first-order stationarity under mild continuity and boundedness assumptions, but do not give a worst-case rate~\citep[Theorem~2]{kanzowRegularizationLimitedMemory2023}.
 By contrast, OFFO and our method have \(\order{1/\varepsilon^2}\) worst-case complexity for first-order stationarity on smooth nonconvex objectives, and our result additionally permits persistent bounded function errors.

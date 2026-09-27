@@ -70,13 +70,11 @@ latex_output = f"""% !!! Auto-generated table by {script_path}
 \\begin{{table}}[t]
     \\centering
     \\caption{{
-        The ``min abs value'' is the smallest positive normalized number,
-        the ``relative error'' is the maximum relative rounding error,
-        and $\\feps$ is the parameter in \\eqref{{eq:error_model}} used in our experiments.
+        The ``min abs value'' is the smallest positive normalized number, ``machine epsilon'' is the spacing from $1$ to the next larger representable number, and $\\feps$ is the parameter in \\eqref{{eq:error_model}} used in our experiments.
     }}
     \\begin{{tabular}}{{l|ccc}}
         \\toprule
-        explanation             & min abs value           & relative error                         & $\\feps$                  \\\\
+        explanation             & min abs value           & machine epsilon                        & $\\feps$                  \\\\
         \\midrule
 {chr(10).join(table_rows)}
         \\bottomrule
