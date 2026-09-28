@@ -185,7 +185,7 @@ as described in \cref{sec:prel_offo}.
 Since OFFO schemes do not rely on function values, this update is robust to numerical errors in $\overline{f}$.
 
 \begin{MPCchange}
-To explain why a purely regularized quasi-Newton strategy is inadequate for our convergence goal, and hence why the additional OFFO-inspired fallback mechanism is needed, consider the following example.
+The rationale for why a purely regularized quasi-Newton method is inadequate, thus necessitating the additional OFFO-inspired fallback mechanism, is that noisy function-value comparisons cannot reliably determine when regularization is needed.
 The underlying issue is the standard globalization problem that a full Newton-type step based on an inaccurate Hessian approximation can be too long and is normally safeguarded by a line search~\citep[Section~3.1]{nocedal1999numerical}.
 Let $f(x) = \overline f(x) = x^2/2$, $B_k = 1/2$, and $x_0 = a > 0$.
 The unregularized full step maps $a$ to $-a$, so repeated full steps cycle between these two points without reducing the function value or the nonzero gradient norm.
