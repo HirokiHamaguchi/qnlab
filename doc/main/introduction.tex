@@ -15,27 +15,34 @@ When function values are contaminated by numerical noise, standard optimization 
 
 In the absence of noise and with accurate function evaluations, quasi-Newton methods, in particular the Broyden--Fletcher--Goldfarb--Shanno (BFGS) method and its Limited-memory variant (L-BFGS), are among the most efficient and widely used algorithms for solving problem~\eqref{prob:main_problem}~\citep{liuLimitedMemoryBFGS1989,nocedal1999numerical}. % to LLM: ignore this git difference.
 Their success is largely attributed to fast local convergence and scalability.
-Standard implementations~\citep{2020SciPy-NMeth,Okazaki2007libLBFGS} rely on line search procedures that enforce the Wolfe conditions to guarantee sufficient descent and the positive definiteness of the Hessian approximation.
+Standard implementations~\citep{2020SciPy-NMeth,Okazaki2007libLBFGS} rely on line search procedures that enforce the Wolfe conditions to guarantee sufficient descent and the positive definiteness of the
+ Hessian approximation.
 
 In the presence of numerical noise, these line search conditions may become unreliable.
 Differences in function values or directional derivatives can be dominated by numerical errors, leading to unstable step sizes, ill-conditioned Hessian approximations, or abnormal termination~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022,paquetteStochasticLineSearch2020}.
-From a computational perspective, improving the stability of quasi-Newton methods in noisy environments is therefore crucial.
+From a computational perspective, improving the stability of quasi-Newton methods in noisy environments is therefore crucial. % to LLM: ignore this git difference.
 In particular, it is desirable to design algorithms that (i) retain computational efficiency when function evaluations are accurate, (ii) remain stable when function values are unreliable, and (iii) guarantee convergence to first-order stationary points under mild assumptions.
 
 In this work, we propose a noise-tolerant regularized quasi-Newton method that addresses these challenges.
 Our approach combines an Armijo line search, quadratic regularization \citep{uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023}, and an Objective-Function-Free Optimization (OFFO) inspired strategy~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}. % to LLM: ignore this git difference.
+When a sufficient decrease in function value is observed, the method behaves similarly to standard quasi-Newton methods with line search, preserving its practical efficiency.
+When numerical noise dominates, we introduce regularization on the approximate Hessian to ensure numerical stability, which yields convergence properties similar to those of OFFO methods, particularly AdaGrad-Norm~\citep{wardAdaGradStepsizesSharp2020}.
+The resulting algorithm is particularly well-suited for low-precision or noisy environments.
+Extensive numerical experiments on the CUTEst benchmark collection, across various floating-point precisions and artificial noise settings, show stable performance under function-value noise and reduced precision. % to LLM: ignore this git difference.
+
 \begin{MPCchange}
-Relaxing the line search alone is not enough to guarantee convergence under persistent function-value errors.
-Without regularization, the relaxed acceptance condition can permit a cycle with nonzero gradients, even on a one-dimensional quadratic, as shown in \cref{sec:unregularized_bound}.
-Using an OFFO-based scale at every iteration avoids relying on measured function decreases to control regularization, but can slow down quasi-Newton steps when function values are sufficiently accurate.
-The key step in our method is therefore the test in \refLine{line:mu_0_condition} of \cref{alg:regularized_qn}, which permits an unregularized step when error-adjusted function values certify progress and otherwise activates the OFFO-based scale.
-The allowance in this test is derived from the function-decrease error bound in \cref{lem:error_bound_on_function_evaluations}.
+Here, the key methodological advance is the carefully controlled switching between unregularized quasi-Newton steps and regularized steps using an OFFO-based cumulative-gradient scale.
+Using the OFFO-based scale at every iteration provides a convergence guarantee without relying on measured function decreases to control regularization, but can be overly conservative when function values are sufficiently accurate.
+The relatively slow performance of the purely first-order OFFO baseline in \cref{sec:experiments} is consistent with this practical concern.
+Conversely, simply adding an error-absorbing allowance to a line search does not generally guarantee convergence to arbitrarily small first-order tolerances under persistent function-value errors.
+Because these allowances need not vanish or be summable, a standard descent argument retains an accumulated error term. See also \cref{sec:unregularized_bound}.
+An additional mechanism is therefore needed either to control the accumulated error or to provide a regularization scale independent of function values.
+Our method addresses this challenge through the test permitting an unregularized step when error-adjusted function values certify progress and otherwise activates the OFFO-based scale.
+The allowance used in this test is derived from the function-decrease error bound in \cref{lem:error_bound_on_function_evaluations}.
 The test bounds the accumulated allowances over unregularized iterations, while the cumulative-gradient scale controls the remaining iterations without requiring a measured function decrease at each step.
 These two bounds allow us to retain unregularized quasi-Newton steps without losing the convergence guarantee under persistent errors.
+This enables us to establish a worst-case iteration complexity of $\order{1/\varepsilon^2}$ for smooth nonconvex optimization, which matches the optimal worst-case order for problems with Lipschitz-continuous gradients~\citep{carmonLowerBoundsFinding2020}, even when objective function values are corrupted by noise.
 \end{MPCchange}
-
-From a theoretical standpoint, we establish that the proposed method achieves the global convergence rate of $\order{1/\varepsilon^2}$ for smooth nonconvex optimization problems, \MPCchanged{which matches the optimal worst-case order for smooth nonconvex optimization with Lipschitz-continuous gradients~\citep{carmonLowerBoundsFinding2020}}, even when objective function values are corrupted by noise.
-Extensive numerical experiments on the CUTEst benchmark collection, across various floating-point precisions and artificial noise settings, \MPCchanged{show stable performance under function-value noise and reduced precision.}
 
 \subsection{\MPCchanged{Comparison With Related Work}}
 
