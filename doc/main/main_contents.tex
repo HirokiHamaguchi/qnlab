@@ -68,12 +68,14 @@ We assume that only an error-contaminated function value $\overline{f}(x)$ is ac
 where $0 \le \feps < 1$ is an error rate.
 The error is predominantly relative when $\abs{f(x)}$ is large and effectively absolute when $\abs{f(x)}$ is small, capturing the typical behavior of rounding errors in IEEE~754 floating-point arithmetic~\citep{highamAccuracyStabilityNumerical2002}.
 \MPCchanged{The value of $\feps$ is a supplied safety margin for errors in the computed function values, with its practical specification and sensitivity to misspecification discussed in \cref{sec:experiments}.}
+Closely related error models are also used in practical stopping criteria~\citep{2020SciPy-NMeth}. % to LLM: ignore this git difference.
 
 We next specify the assumption on gradient evaluations. % to LLM: ignore this git difference.
 Let $g(x)$ be the gradient returned by the available gradient oracle at $x$. % to LLM: ignore this git difference.
 In practice, termination is typically based on a gradient tolerance $\gtol$, and $\norm{g(x)}\leq\gtol$ is used as a stopping criterion. % to LLM: ignore this git difference.
+Reliable termination at the tolerance $\gtol$ requires gradient errors to be sufficiently small relative to $\gtol$. % to LLM: ignore this git difference.
+We therefore adopt the following exact-gradient assumption as a modeling simplification that keeps the analysis focused on function-value errors, rather than as a claim that practical gradient evaluations are exact. % to LLM: ignore this git difference.
 \begin{MPCchange}
-The convergence analysis adopts the following exact-gradient assumption.
 \begin{assumption}[Exact gradient]\label{ass:exact_gradient}
     The algorithm has access to a gradient oracle $g$ such that, for every evaluated point $x$,
     \begin{equation}\label{eq:exact_gradient_assumption}
@@ -708,7 +710,7 @@ For a parameter $\eta_{\mathrm{damp}}\in(0,1)$, let $b_i=\norm{y_{k_i}}^2/\abs{y
 If $y_{k_i}^{\top}s_{k_i}\geq0$, we set $\overline y_{k_i}=y_{k_i}$.
 Candidate pairs proceed to cautious selection only when the damping can be computed safely.
 
-We then select the damped pairs using a cautious update in the spirit of~\citep{liGlobalConvergenceBFGS2001,mannelStructuredLBFGSMethod2024,mannelGlobalizationLBFGSBarzilai2025a}.
+We then select the damped pairs using a cautious update in the spirit of~\citep{liGlobalConvergenceBFGS2001,mannelStructuredLBFGSMethod2024,mannelGlobalizationLBFGSBarzilai2025}.
 Define the fixed initial scale and diagonal shift by
 \begin{equation*}
     \rho_0\defeq\max\{1,\norm{g_0}\},
@@ -1124,9 +1126,49 @@ The relative ranking of the methods varies with the tolerance and precision.
 
 \subsection{Computational Time}\label{sec:comp_time}
 
-\MPCchanged{Here, runtime means the elapsed time until the first iterate attaining the common gradient tolerance.
-A run that does not attain the tolerance is counted as unsolved.}
-\MPCchanged{To assess end-to-end computational cost together with reduced-precision stability, \cref{fig:time_to_solution} plots the fraction of 32-bit problems attaining $\gtol=10^{-3}$ directly against runtime.}
+\subsubsection{Per-Iteration Computational Cost}
+
+% to LLM: This pre-revision experiment is intentionally retained alongside the end-to-end time-to-solution comparison and should remain black.
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../imgs/for_paper/time.pdf}
+    \caption{Mean execution times for the experiment in \cref{sec:comp_time}.
+        This plot roughly indicates the extra computational overhead of each method.
+        Error bars represent one standard deviation over $100$ runs.}
+    \label{fig:exec_time}
+\end{figure}
+
+In this subsection, we present an experiment comparing the per-iteration computational cost of each method. % to LLM: ignore this git difference.
+Here, we measure total execution time rather than the number of oracle calls. % to LLM: ignore this git difference.
+We conducted experiments on the ill-conditioned quadratic problem
+\begin{equation*}
+    \underset{x \in \bbR^n}{\mathrm{minimize}} \quad \frac{1}{2} \sum_{i=1}^n i x_i^2
+\end{equation*}
+with $n=10{,}000$.
+The initial point $x_0$ was chosen as the all-ones vector.
+We used memory size \MPCchanged{$p=10$} and maximum iterations $k_{\max}=100$, and we did not set any stopping criteria other than reaching $k_{\max}$.
+The simplicity of the optimization problem and the small value of $k_{\max}$ are well suited to the purpose of this experiment, as they ensure that the total runtime is dominated by algorithmic overhead rather than function or gradient computation.
+Timing data were collected after three warm-up runs, followed by $100$ recorded trials.
+
+\begin{MPCchange}
+In \cref{fig:exec_time}, we report the execution time statistics: the shifted-pair \texttt{Ours-SP} has per-iteration cost close to the least expensive Python implementations, whereas the exact compact solves in \texttt{Ours} and \texttt{Ours-MS} take about $1.4$ times its runtime in this isolated test.
+This timing experiment measures algorithmic overhead under deliberately inexpensive objective and gradient evaluations and does not by itself establish end-to-end efficiency or superiority in oracle cost.
+Because wall-clock time depends strongly on implementation details and the computing environment, we restrict its interpretation to this isolated experiment and do not draw broader conclusions from the timing results.
+For a fairer comparison of algorithmic efficiency, we place greater emphasis on oracle-call counts and success profiles.
+
+In \cref{tab:time_results}, we report the total number of oracle calls (calls of $\overline{f}$ and $g$) and final objective values $\overline{f}(x_{k_{\max}})$.
+\end{MPCchange}
+
+\MPCchanged{The purpose of this table is to check whether the methods achieved similar convergence behavior within the limited number of iterations.}
+\MPCchanged{Comparable values would indicate that differences in convergence behavior do not dominate the execution-time comparison.}
+
+\input{check/time_results_table}
+
+\subsubsection{End-to-End Time to Solution}
+
+\MPCchanged{We next assess whether the methods combine stable performance in reduced precision with competitive end-to-end runtime.}
+\MPCchanged{For this comparison, time to solution is the elapsed time until the first iterate attaining the common gradient tolerance, and a run that does not attain the tolerance is counted as unsolved.}
+\MPCchanged{\Cref{fig:time_to_solution} plots the fraction of 32-bit problems attaining $\gtol=10^{-3}$ as a function of time to solution.}
 \MPCchanged{At this tolerance, \texttt{Ours} solves $74.5\%$ of the problems and \texttt{Ours-AR} solves $73.6\%$, compared with $63.6\%$ for the best existing baseline.}
 
 \begin{MPCchange}
