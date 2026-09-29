@@ -185,14 +185,12 @@ as described in \cref{sec:prel_offo}.
 Since OFFO schemes do not rely on function values, this update is robust to numerical errors in $\overline{f}$.
 
 \begin{MPCchange}
-The rationale for why a purely regularized quasi-Newton method is inadequate, thus necessitating the additional OFFO-inspired fallback mechanism, is that noisy function-value comparisons cannot reliably determine when regularization is needed.
-The underlying issue is the standard globalization problem that a full Newton-type step based on an inaccurate Hessian approximation can be too long and is normally safeguarded by a line search~\citep[Section~3.1]{nocedal1999numerical}.
-Let $f(x) = \overline f(x) = x^2/2$, $B_k = 1/2$, and $x_0 = a > 0$.
-The unregularized full step maps $a$ to $-a$, so repeated full steps cycle between these two points without reducing the function value or the nonzero gradient norm.
-An ordinary Armijo line search with accurate function values rejects this step because it produces no decrease.
-With a positive supplied error allowance, however, the relaxed Armijo condition accepts the step for sufficiently small $a > 0$ because $\Delta_k$ masks the zero decrease.
-At the following iteration, the switch in \cref{eq:mu_0_condition} detects that no error-adjusted progress has been certified and activates the OFFO-inspired scale before a second unregularized step is taken.
-Thus, the fallback provides function-value-independent regularization precisely when the relaxed line search cannot distinguish progress from evaluation error.
+The rationale for why a purely regularized quasi-Newton method is inadequate, thus necessitating the additional OFFO-inspired fallback mechanism, is that existing regularized Newton-type methods still rely on reliable function values: line-search variants use them in sufficient-decrease tests, while adaptive regularization methods use the actual objective-function reduction to control step acceptance and the regularization parameter~\citep{uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023}.
+With inexact function values, neither comparison can be evaluated reliably, while the relaxed Armijo condition required to make our line search well-defined permits a persistent error allowance.
+Although the relaxed line search ensures that a step can be computed, relying on its decrease estimate at every iteration would not control the accumulated error and therefore would not support convergence to arbitrarily small first-order tolerances.
+Our switch therefore restricts unregularized steps to iterations for which error-adjusted function values certify progress and invokes the OFFO-inspired cumulative-gradient scale otherwise.
+Thus, a regularization mechanism driven solely by function-value comparisons is insufficient for our convergence goal.
+The OFFO-inspired fallback is needed to provide function-value-independent control when measured decreases cannot be trusted.
 \end{MPCchange}
 
 \section{Theoretical Analysis}\label{sec:analysis}
