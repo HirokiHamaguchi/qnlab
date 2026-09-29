@@ -1021,6 +1021,8 @@ We evaluated each method at three gradient norm tolerance levels, i.e., $\gtol \
 These tolerance levels represent different optimization regimes, from moderate accuracy to high precision requirements.
 \Cref{fig:results_all_precisions} shows the performance profiles across all three precision levels.
 These performance profiles quantify how attained accuracy changes as oracle precision is reduced, while both proposed variants attain higher solved percentages than all existing quasi-Newton baselines at 16- and 32-bit precision. % to LLM: ignore this git difference.
+\MPCchanged{Across the artificial-noise and reduced-precision experiments, the purely first-order \texttt{ASTR1-Adagrad} baseline solves fewer instances and generally requires more oracle calls than the proposed variants.}
+\MPCchanged{These results illustrate the practical motivation for invoking the OFFO-based scale only when error-adjusted function-value certification fails, while retaining quasi-Newton steps whenever they can be used safely.}
 
 \begin{figure}[t]
     \centering
