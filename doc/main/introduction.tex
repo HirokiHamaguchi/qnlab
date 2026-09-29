@@ -9,7 +9,7 @@ We consider the unconstrained optimization problem
 \end{equation}
 where $f\colon \mathbb{R}^n \to \mathbb{R}$ is a continuously differentiable nonconvex function, and $x \in \mathbb{R}^n$ is the optimization variable.
 We focus on settings where objective function evaluations are contaminated by bounded and non-diminishing numerical noise~\citep{sunTrustRegionMethod2023}.
-Specifically, only inexact function values $\overline{f}(x)$ are available for optimization.
+Specifically, function values are available only through inexact evaluations $\overline{f}(x)$, while gradients are assumed accurate in our analysis. % to LLM: ignore this git difference.
 Such inaccuracies are unavoidable in many realistic scenarios, including finite-precision arithmetic, simulation-based evaluations, and stochastic approximations~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022,moreEstimatingComputationalNoise2011,caflischMonteCarloQuasiMonte1998}.
 When function values are contaminated by numerical noise, standard optimization algorithms may lose their theoretical guarantees, behave erratically, or terminate prematurely with unreliable solutions.
 
@@ -25,16 +25,16 @@ In particular, it is desirable to design algorithms that (i) retain computationa
 In this work, we propose a noise-tolerant regularized quasi-Newton method that addresses these challenges.
 Our approach combines an Armijo line search, quadratic regularization \citep{uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023}, and an Objective-Function-Free Optimization (OFFO) inspired strategy~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}. % to LLM: ignore this git difference.
 When a sufficient decrease in function value is observed, the method behaves similarly to standard quasi-Newton methods with line search, preserving its practical efficiency.
-When numerical noise dominates, we introduce regularization on the approximate Hessian to ensure numerical stability, which yields convergence properties similar to those of OFFO methods, particularly AdaGrad-Norm~\citep{wardAdaGradStepsizesSharp2020}.
+When numerical noise dominates, we introduce regularization on the approximate Hessian to improve stability, which yields convergence properties similar to those of OFFO methods, particularly AdaGrad-Norm~\citep{wardAdaGradStepsizesSharp2020}. % to LLM: ignore this git difference.
 The resulting algorithm is particularly well-suited for low-precision or noisy environments.
 Extensive numerical experiments on the CUTEst benchmark collection, across various floating-point precisions and artificial noise settings, show stable performance under function-value noise and reduced precision. % to LLM: ignore this git difference.
 
 \begin{MPCchange}
 % to LLM: DO NOT rephrase or remove ``The key methodological advance''; this wording directly answers Referee 2's request to identify the distinct methodological advance.
-The key methodological advance is to switch between unregularized quasi-Newton steps and regularized steps using an OFFO-based cumulative-gradient scale.
+The key methodological advance is a carefully designed, error-model-based switch that uses unregularized quasi-Newton steps whenever progress can be certified and otherwise invokes regularized steps with an OFFO-based cumulative-gradient scale.
 Using this scale at every iteration avoids reliance on measured function decreases when controlling regularization but can be unnecessarily conservative when function values are reliable.
-Conversely, merely adding a nonvanishing error allowance to a line search does not guarantee convergence to arbitrarily small first-order tolerances because its accumulated contribution need not be bounded.
-Our test permits an unregularized step only when error-adjusted function values certify progress and otherwise activates the OFFO-based scale.
+A simple switch based on a relaxed Armijo test with a nonvanishing error allowance does not guarantee convergence to arbitrarily small first-order tolerances because its accumulated contribution need not be bounded.
+Our test instead permits an unregularized step only when error-adjusted function values certify progress and activates the OFFO-based scale otherwise.
 The test bounds the accumulated allowances over unregularized iterations, while the cumulative-gradient scale controls the remaining iterations without requiring measured function decreases.
 This combination retains unregularized quasi-Newton steps and establishes an $\order{1/\varepsilon^2}$ worst-case iteration complexity under persistent function-value errors, matching the optimal worst-case order for smooth nonconvex problems with Lipschitz-continuous gradients~\citep{carmonLowerBoundsFinding2020}.
 \end{MPCchange}
@@ -47,9 +47,9 @@ This combination retains unregularized quasi-Newton steps and establishes an $\o
     \centering
     \caption{
         Theoretical comparison of the proposed method and related Newton-type, quasi-Newton, and OFFO methods.
-        A checkmark (\ding{51}) denotes theoretical coverage and ``--'' its absence.
+        A checkmark (\ding{51}) denotes that the corresponding property holds or is covered by the theory, and ``--'' denotes its absence.
         The ``Noisy $f$,'' ``Noisy $\nabla f$,'' and ``Nonconvex'' columns indicate whether the corresponding convergence theory allows function-value errors, allows gradient errors, and covers nonconvex objectives, respectively.
-        The asterisk indicates that gradient noise is considered in numerical stress tests, but its analysis is outside the scope of this paper.
+        The asterisk indicates that gradient noise is considered in the algorithm design and numerical stress tests, but its analysis is outside the scope of this paper.
     }
     \label{tab:related_work_comparison}
     \setlength{\tabcolsep}{3pt}
@@ -105,7 +105,6 @@ This combination retains unregularized quasi-Newton steps and establishes an $\o
 
 \begin{MPCchange}
 We next compare our method with related quasi-Newton and OFFO methods, whose theoretical guarantees are summarized in \cref{tab:related_work_comparison}.
-
 The closest methods are the regularized L-BFGS method~\citep{kanzowRegularizationLimitedMemory2023} and Noise Tolerant Quasi-Newton (NTQN)~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
 The regularized L-BFGS method assumes reliable function values and establishes global convergence to first-order stationarity~\citep[Theorem~2]{kanzowRegularizationLimitedMemory2023}.
 Shi et al.~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022} develop NTQN for bounded errors in both function and gradient evaluations, using a noise-tolerant line search and a lengthening procedure to stabilize the quasi-Newton updates.
