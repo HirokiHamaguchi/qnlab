@@ -861,7 +861,8 @@ We compared the following methods in our experiments.
     \item (\texttt{NTQN}): Noise-tolerant quasi-Newton method~\citep{xieAnalysisBFGSMethod2020,shiNoiseTolerantQuasiNewtonAlgorithm2022}
           \begin{itemize}
               \item A method designed to accommodate inexact gradient information, as mentioned in \cref{sec:problem_setting}.
-              \MPCchanged{\item We used the common gradient-tolerance stopping rule rather than NTQN's recommended termination mode, which yielded a substantially lower attainment rate under the common tolerance.}
+              \MPCchanged{\item For the primary comparison, we used the common gradient-tolerance stopping rule.
+              We also evaluated NTQN with its recommended termination mode in the function-value-noise experiment, as reported in \cref{sssec:noise_results}.}
           \end{itemize}
 
     \MPCchanged{\item (\texttt{ASTR1-Adagrad}): The purely first-order \texttt{adagrad} variant of ASTR1.
@@ -872,7 +873,7 @@ We compared the following methods in our experiments.
 
 In the following, each method is referred to by the name given in parentheses.
 Except for the first-order \texttt{ASTR1-Adagrad} baseline, all these methods are L-BFGS-based, and we set the number of stored curvature pairs to $10$, the default value in SciPy's L-BFGS-B implementation. % to LLM: ignore this git difference.
-All experiments were conducted on an Apple Mac Pro (Late 2013) with a 2.7~GHz 12-core Intel Xeon E5-2697 v2 processor and 64~GB of memory. % to LLM: ignore this git difference.
+All experiments were conducted on an Apple Mac Pro (Late 2013) with a 2.7~GHz 12-core Intel Xeon E5-2697 v2 processor and 64~GB of memory. % to LLM: ignore this git difference. % LLDisable: it is dangerous to include SI units in this project.
 All computations were performed using the CPU only.
 
 \subsection{Experimental Results}\label{sec:results}
@@ -884,14 +885,14 @@ All problems were initialized with the default starting points provided by the l
 Following previous work~\citep{kanzowRegularizationLimitedMemory2023}, we excluded problems whose initial points were already stationary or whose function values or gradients contained \texttt{NaN} or \texttt{INF}.
 \MPCchanged{The retained problems have dimensions ranging from $2$ to $123{,}200$.}
 
-We organize the CUTEst experiments into the following two groups according to where their results are reported:
+We organize the CUTEst experiments into the following two groups: % to LLM: ignore this git difference.
 \begin{itemize}
     \item \emph{Artificial-noise experiments} on 220 problems using 64-bit arithmetic (results in \cref{sssec:noise_results})
           \begin{itemize}
-              \MPCchanged{\item \emph{Function-value noise}: We add independent noise $\xi_f \sim \operatorname{unif}(-10^{-3}, 10^{-3})$ to each function evaluation while retaining exact gradients.
+              \MPCchanged{\item \emph{Function-value noise}: We add independent noise $\operatorname{unif}(-10^{-3}, 10^{-3})$ to each function evaluation while retaining exact gradients.
               We set the nominal error allowance to $\feps = 10^{-2}$.}
-              \item \emph{Joint function-and-gradient noise}: We use the same function perturbation and additionally perturb each gradient component independently by $\xi_g^{(i)} \sim \operatorname{unif}(-10^{-3}, 10^{-3})$.
-              We again set $\feps = 10^{-2}$.
+              \item \emph{Joint noise}: We additionally perturb each gradient component independently using the same distribution.
+              We set $\feps = 10^{-2}$.
               \MPCchanged{\item \emph{Error-bound sensitivity}: Using the function-value-noise setting, we compare the underestimated allowance $\feps = 10^{-4}$, the nominal allowance $\feps = 10^{-2}$, and the overestimated allowance $\feps = 10^{-1}$.}
           \end{itemize}
 
@@ -902,21 +903,21 @@ We organize the CUTEst experiments into the following two groups according to wh
               \item \emph{16-bit evaluations}: 152 problems with $\feps = 9.77 \times 10^{-2}$.
           \end{itemize}
 \end{itemize}
-Here, $\mathrm{unif}(a,b)$ denotes a uniform random variable in the interval $[a,b]$.
+Here, $\mathrm{unif}(a, b)$ denotes a uniform random variable in the interval $[a, b]$.
 The additive uniform-noise model follows the model used by Shi et al.~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
-Each artificial-noise setting uses the five seeds $0, 1, 2, 3, 4$.
-For NTQN in the function-value-noise and joint-noise experiments, we supplied the conservative absolute noise bound $\texttt{eps\_f} = 10^{-2}$ because each function perturbation is bounded in magnitude by $10^{-3}$.
+\MPCchanged{Each artificial-noise setting uses the five seeds $0, 1, 2, 3, 4$.}
+\MPCchanged{Each problem--seed pair is treated as a separate test instance in the performance profiles.}
+For NTQN in the function-value-noise and joint-noise experiments, we supplied the absolute noise bound $\texttt{eps\_f} = 10^{-2}$, which conservatively bounds function perturbations whose magnitude is at most $10^{-3}$.
 
 In the reduced precision settings, we first cast the input vector $x$ to the target precision, evaluate CUTEst in 64-bit precision at the rounded input, and then round the returned function value and gradient to the target precision.
 The solver receives these rounded quantities as 64-bit values, so this tests reduced-precision input and output rather than entirely low-precision arithmetic.
-Since the returned gradient $g(x)$ need not equal $\nabla f(x)$, the reduced-precision and joint-noise experiments complement the exact-gradient analysis by evaluating performance beyond its assumptions.
+\MPCchanged{Since the returned gradient $g(x)$ need not equal $\nabla f(x)$, the reduced-precision and joint-noise experiments complement the exact-gradient analysis by evaluating performance beyond its assumptions.}
 
 The error allowances for the three precision settings are summarized in \cref{tab:machine_epsilon}.
-These values are empirical safety margins for accumulated floating-point errors rather than certified bounds.
+\MPCchanged{These values are empirical safety margins for accumulated floating-point errors rather than certified bounds.
 The multipliers of machine epsilon are $10^7$, $10^4$, and $10^2$ for 64-, 32-, and 16-bit precision, respectively.
-We reduce the multiplier at lower precision to retain $\feps<1$ while allowing errors larger than a single rounding error.
-\MPCchanged{Because the appropriate value of $\feps$ may not be known accurately in practice, the sensitivity experiment examines how under- and overestimation affect performance.}
-% The plotted performance profiles have a finite ratio range.  If SciPy succeeds in k iterations, a run exceeding 15k cannot enter that plotted range because the best solver uses at most k iterations.  The factor 15 therefore avoids computation that cannot affect the displayed profile while leaving a generous margin.
+We reduce the multiplier at lower precision to retain $\feps < 1$ while allowing errors larger than a single rounding error.
+Because the appropriate value of $\feps$ may not be known accurately in practice, the sensitivity experiment examines how under- and overestimation affect performance.}
 We also set the maximum number of iterations to $k_{\max} = 15{,}000$ and timed out runs exceeding 10 minutes per problem.
 
 \input{check/machine_epsilon_table}
@@ -926,7 +927,7 @@ We also set the maximum number of iterations to $k_{\max} = 15{,}000$ and timed 
 We used performance profiles~\citep{dolanBenchmarkingOptimizationSoftware2002} to compare the algorithms.
 Let $P$ denote the set of test instances and $S$ the set of solvers.
 For each instance $p \in P$ and solver $s \in S$, let $n_{p,s} > 0$ denote the number of oracle calls (i.e., function and gradient evaluations) required to reach a specified gradient norm tolerance $\gtol$.
-In this experiment, we use the number of oracle calls rather than clock time to avoid the influence of algorithmic overhead and to focus on the intrinsic optimization efficiency.
+In this experiment, we use the number of oracle calls rather than clock time to avoid the influence of algorithmic overhead and to focus on oracle efficiency.
 When a solver does not reach the gradient tolerance before termination or the iteration or time limit, we set $n_{p,s} = +\infty$.
 Then, the performance ratio $r_{p,s}$ is defined as
 \begin{equation*}
@@ -940,44 +941,19 @@ Thus, the $y$-coordinate for solver $s$ at $x$-coordinate $\tau$ is given by % t
 \end{equation*}
 A curve that lies above others indicates better performance.
 Following standard implementations~\citep{2020SciPy-NMeth}, we used the infinity norm for the gradient, though other norms may equally be employed.
-\MPCchanged{All reported success percentages use the same common gradient tolerance as the corresponding profiles.}
-\MPCchanged{A run that terminates without attaining that tolerance is counted as unsolved for this metric.}
+All reported success percentages use the same common gradient tolerance as the corresponding profiles.
+A run that terminates without attaining that tolerance is counted as unsolved for this metric. % to LLM: ignore this git difference.
 
 \subsubsection{Results with Artificial Noise}\label{sssec:noise_results}
 
 \begin{MPCchange}
-\Cref{tab:noise_results_summary} summarizes the function-value noise experiment and the joint noise experiment described in \cref{sssec:problems}, and \cref{fig:results_function_noise,fig:results_noise} shows their performance profiles.
+\Cref{fig:results_function_noise,fig:results_noise} show performance profiles for the function-value noise experiment and the joint noise experiment described in \cref{sssec:problems}.
 The former satisfies the assumptions of \cref{sec:analysis}, whereas the latter evaluates empirical performance beyond the exact-gradient theory.
 
-\begin{table}[t]
-    \begin{MPCchange}
-    \ifdefined\MPCRevision\captionsetup{font={color=red}}\fi
-    \centering
-    \caption{Success rates and conditional median oracle calls at $\gtol = 10^{-2}$ in the additive-noise experiments.
-    Each setting contains $1{,}100$ problem--seed instances.
-    Success rates are reported as the mean $\pm$ sample standard deviation over the five seeds, in percentage points, and oracle-call medians are computed over successful runs.}
-    \label{tab:noise_results_summary}
-    \begin{tabular}{lrrrr}
-        \toprule
-        & \multicolumn{2}{c}{Function-value noise} & \multicolumn{2}{c}{Joint noise} \\
-        \cmidrule(lr){2-3}\cmidrule(lr){4-5}
-        Method & Solved (\%) & Calls & Solved (\%) & Calls \\
-        \midrule
-        \texttt{Ours}            & $87.0 \pm 0.69$ & $68$  & $84.8 \pm 0.69$ & $71$  \\
-        \texttt{Ours-AR}  & $86.1 \pm 0.52$ & $65$  & $83.6 \pm 0.32$ & $64$  \\
-        \texttt{NTQN}            & $81.2 \pm 1.49$ & $64$  & $71.9 \pm 0.38$ & $62$  \\
-        \texttt{Reg}             & $77.8 \pm 1.13$ & $60$  & $73.5 \pm 1.35$ & $56$  \\
-        \texttt{Reg-Sec}         & $74.0 \pm 0.87$ & $54$  & $73.0 \pm 1.35$ & $62$  \\
-        \texttt{ASTR1-Adagrad}   & $54.5 \pm 0.00$ & $300$ & $52.6 \pm 0.20$ & $295$ \\
-        \bottomrule
-    \end{tabular}
-    \end{MPCchange}
-\end{table}
-
 Both proposed variants solve at least one instance of dimension $123{,}200$, the largest dimension in the retained collection.
-In the theory-aligned function-value-noise setting, \texttt{Ours} and \texttt{Ours-AR} solve $87.0\%$ and $86.1\%$ of the instances, respectively, compared with $81.2\%$ for NTQN.
-The joint-noise results provide empirical evidence beyond the exact-gradient setting, while the convergence result remains specific to exact gradients.
-Under NTQN's recommended termination mode, $50.1\%$ of the same function-noise instances attain the common tolerance, compared with $81.2\%$ when the external common-tolerance stop is used.
+In the theory-aligned function-value-noise setting, both proposed variants attain higher solved percentages than the existing quasi-Newton baselines.
+The joint-noise results show the same overall tendency beyond the exact-gradient setting, while the convergence result remains specific to exact gradients.
+Under NTQN's recommended termination mode, $50.1\%$ of the same function-value-noise instances attain the common tolerance, compared with $81.2\%$ when the common gradient-tolerance stop is used.
 All recommended-mode runs terminate without timeout or exception, and $619$ of them stop because NTQN detects that function-value changes have reached its estimated function-noise level (flag~4).
 The lower scored fraction therefore mainly reflects NTQN's noise-dependent stopping rule rather than failed execution.
 \end{MPCchange}
@@ -1017,7 +993,7 @@ Underestimation need not satisfy the assumed error model, and the results show n
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_legend_noise.pdf}
     \end{subfigure}
-    \caption{Performance profile for the deliberately adverse joint function-and-gradient noise setting (componentwise level \(10^{-3}\)) and $\gtol=10^{-2}$.} % to LLM: ignore this git difference.
+    \caption{Performance profile for the joint function-and-gradient noise setting (componentwise level \(10^{-3}\)) and $\gtol = 10^{-2}$.} % to LLM: ignore this git difference.
     \label{fig:results_noise}
 \end{figure}
 
@@ -1044,11 +1020,7 @@ We next present performance profiles for each floating-point precision (64-, 32-
 We evaluated each method at three gradient norm tolerance levels, i.e., $\gtol \in \{10^{-1}, 10^{-3}, 10^{-5}\}$.
 These tolerance levels represent different optimization regimes, from moderate accuracy to high precision requirements.
 \Cref{fig:results_all_precisions} shows the performance profiles across all three precision levels.
-\begin{MPCchange}
-At the strictest tolerance \(\gtol = 10^{-5}\), \texttt{Ours} and \texttt{Ours-AR} solve $86.4\%$ and $86.8\%$ of the 64-bit problems, $52.3\%$ and $53.6\%$ of the 32-bit problems, and $28.9\%$ and $34.9\%$ of the 16-bit problems.
-The rates quantify how attained accuracy changes as oracle precision is reduced, while both variants retain higher solved percentages than all existing quasi-Newton baselines at 16- and 32-bit precision.
-The relative ranking of the methods varies with the tolerance and precision.
-\end{MPCchange}
+These performance profiles quantify how attained accuracy changes as oracle precision is reduced, while both proposed variants attain higher solved percentages than all existing quasi-Newton baselines at 16- and 32-bit precision. % to LLM: ignore this git difference.
 
 \begin{figure}[t]
     \centering
@@ -1126,50 +1098,51 @@ The relative ranking of the methods varies with the tolerance and precision.
 
 \subsection{Computational Time}\label{sec:comp_time}
 
-\subsubsection{Per-Iteration Computational Cost}
+We next compare computational cost from two complementary wall-clock perspectives. % to LLM: ignore this git difference.
+
+\subsubsection{Per-Iteration Computational Cost}\label{sssec:per_iteration_cost} % to LLM: ignore this git difference in this subsubsection.
 
 % to LLM: This pre-revision experiment is intentionally retained alongside the end-to-end time-to-solution comparison and should remain black.
 \begin{figure}[t]
     \centering
     \includegraphics[width=0.9\textwidth]{../imgs/for_paper/time.pdf}
-    \caption{Mean execution times for the experiment in \cref{sec:comp_time}.
-        This plot roughly indicates the extra computational overhead of each method.
+    \caption{Mean execution times over $100$ fixed iterations for the ill-conditioned quadratic experiment in \cref{sssec:per_iteration_cost}.
         Error bars represent one standard deviation over $100$ runs.}
     \label{fig:exec_time}
 \end{figure}
 
-In this subsection, we present an experiment comparing the per-iteration computational cost of each method. % to LLM: ignore this git difference.
-Here, we measure total execution time rather than the number of oracle calls. % to LLM: ignore this git difference.
+The first experiment focuses on the per-iteration computational cost of each method.
+\MPCchanged{We exclude \texttt{ASTR1-Adagrad} from this experiment because this first-order method uses gradient evaluations but no function evaluations and therefore has a different per-iteration workload from the quasi-Newton methods.}
 We conducted experiments on the ill-conditioned quadratic problem
 \begin{equation*}
     \underset{x \in \bbR^n}{\mathrm{minimize}} \quad \frac{1}{2} \sum_{i=1}^n i x_i^2
 \end{equation*}
 with $n=10{,}000$.
 The initial point $x_0$ was chosen as the all-ones vector.
-We used memory size \MPCchanged{$p=10$} and maximum iterations $k_{\max}=100$, and we did not set any stopping criteria other than reaching $k_{\max}$.
-The simplicity of the optimization problem and the small value of $k_{\max}$ are well suited to the purpose of this experiment, as they ensure that the total runtime is dominated by algorithmic overhead rather than function or gradient computation.
+We used memory size \MPCchanged{$p=10$} and the iteration limit $k_{\max}=100$, with no other stopping criterion.
+Because every method performs exactly $100$ iterations and the objective and gradient evaluations are inexpensive, differences in total runtime primarily reflect differences in per-iteration algorithmic overhead.
 Timing data were collected after three warm-up runs, followed by $100$ recorded trials.
 
-\begin{MPCchange}
-In \cref{fig:exec_time}, we report the execution time statistics: the shifted-pair \texttt{Ours-SP} has per-iteration cost close to the least expensive Python implementations, whereas the exact compact solves in \texttt{Ours} and \texttt{Ours-MS} take about $1.4$ times its runtime in this isolated test.
+In \cref{fig:exec_time}, we report the execution-time statistics.
+% to LLM: Recheck the ordering in the next sentence after rerunning this experiment in the final computing environment; the current timing results are provisional.
+\texttt{Line} has the lowest per-iteration cost among the quasi-Newton methods.
+\texttt{Ours-AR} is less expensive than \texttt{Ours}, while both proposed variants remain faster than the regularized L-BFGS baselines in this experiment.
 This timing experiment measures algorithmic overhead under deliberately inexpensive objective and gradient evaluations and does not by itself establish end-to-end efficiency or superiority in oracle cost.
-Because wall-clock time depends strongly on implementation details and the computing environment, we restrict its interpretation to this isolated experiment and do not draw broader conclusions from the timing results.
-For a fairer comparison of algorithmic efficiency, we place greater emphasis on oracle-call counts and success profiles.
 
-In \cref{tab:time_results}, we report the total number of oracle calls (calls of $\overline{f}$ and $g$) and final objective values $\overline{f}(x_{k_{\max}})$.
-\end{MPCchange}
-
-\MPCchanged{The purpose of this table is to check whether the methods achieved similar convergence behavior within the limited number of iterations.}
-\MPCchanged{Comparable values would indicate that differences in convergence behavior do not dominate the execution-time comparison.}
+In \cref{tab:time_results}, we report the total number of function and gradient evaluations and final objective values $\overline{f}(x_{k_{\max}})$.
+The comparable evaluation counts and final objective values indicate that differences in convergence behavior do not dominate the execution-time comparison.
 
 \input{check/time_results_table}
 
 \subsubsection{End-to-End Time to Solution}
 
-\MPCchanged{We next assess whether the methods combine stable performance in reduced precision with competitive end-to-end runtime.}
-\MPCchanged{For this comparison, time to solution is the elapsed time until the first iterate attaining the common gradient tolerance, and a run that does not attain the tolerance is counted as unsolved.}
-\MPCchanged{\Cref{fig:time_to_solution} plots the fraction of 32-bit problems attaining $\gtol=10^{-3}$ as a function of time to solution.}
-\MPCchanged{At this tolerance, \texttt{Ours} solves $74.5\%$ of the problems and \texttt{Ours-AR} solves $73.6\%$, compared with $63.6\%$ for the best existing baseline.}
+\begin{MPCchange}
+We next assess whether the higher solved percentages under reduced precision persist when performance is measured against elapsed time.
+For this comparison, time to solution is the elapsed time until the first iterate attaining the common gradient tolerance, and a run that does not attain the tolerance is counted as unsolved.
+\Cref{fig:time_to_solution} plots the fraction of 32-bit problems attaining $\gtol=10^{-3}$ as a function of time to solution.
+At this tolerance, \texttt{Ours} solves $74.5\%$ of the problems and \texttt{Ours-AR} solves $73.6\%$, compared with $63.6\%$ for the best existing baseline.
+The elapsed-time profiles therefore preserve the higher final solved fractions of the proposed variants observed in the oracle-call profiles.
+\end{MPCchange}
 
 \begin{MPCchange}
 \begin{figure}[t]
