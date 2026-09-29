@@ -20,8 +20,10 @@
   booktitle = {Proceedings of the 17th Conference on Formal Methods in Computer-Aided Design},
   author = {Izycheva, Anastasiia and Darulova, Eva},
   year = 2017,
+  pages = {15--22},
   publisher = {FMCAD Inc},
   address = {Austin, Texas},
+  doi = {10.23919/FMCAD.2017.8102236},
   abstract = {State-of-the-art static analysis tools for verifying finite-precision code compute worst-case absolute error bounds on numerical errors. These are, however, often not a good estimate of accuracy as they do not take into account the magnitude of the computed values. Relative errors, which compute errors relative to the value's magnitude, are thus preferable. While today's tools do report relative error bounds, these are merely computed via absolute errors and thus not necessarily tight or more informative. Furthermore, whenever the computed value is close to zero on part of the domain, the tools do not report any relative error estimate at all. Surprisingly, the quality of relative error bounds computed by today's tools has not been systematically studied or reported to date.In this paper, we investigate how state-of-the-art static techniques for computing sound absolute error bounds can be used, extended and combined for the computation of relative errors. Our experiments on a standard benchmark set show that computing relative errors directly, as opposed to via absolute errors, is often beneficial and can provide error estimates up to six orders of magnitude tighter, i.e. more accurate. We also show that interval subdivision, another commonly used technique to reduce over-approximations, has less benefit when computing relative errors directly, but it can help to alleviate the effects of the inherent issue of relative error estimates close to zero.},
   isbn = {978-0-9835678-7-5}
 }
@@ -589,20 +591,17 @@
 }
 
 @article{gaoQuasiNewtonMethodsSuperlinear2018,
-  title = {Quasi-{{Newton Methods}}: {{Superlinear Convergence Without Line Searches}} for {{Self-Concordant Functions}}},
-  shorttitle = {Quasi-{{Newton Methods}}},
+  title = {Quasi-{{Newton}} Methods: Superlinear Convergence without Line Searches for Self-Concordant Functions},
   author = {Gao, Wenbo and Goldfarb, Donald},
-  year = 2018,
-  journal = {arXiv preprint arXiv:1612.06965},
-  eprint = {1612.06965},
-  primaryclass = {math},
-  publisher = {arXiv},
-  doi = {10.48550/arXiv.1612.06965},
-  urldate = {2025-12-23},
-  abstract = {We consider the use of a curvature-adaptive step size in gradient-based iterative methods, including quasi-Newton methods, for minimizing self-concordant functions, extending an approach first proposed for Newton's method by Nesterov. This step size has a simple expression that can be computed analytically; hence, line searches are not needed. We show that using this step size in the BFGS method (and quasi-Newton methods in the Broyden convex class other than the DFP method) results in superlinear convergence for strongly convex self-concordant functions. We present numerical experiments comparing gradient descent and BFGS methods using the curvature-adaptive step size to traditional methods on deterministic logistic regression problems, and to versions of stochastic gradient descent on stochastic optimization problems.},
-  archiveprefix = {arXiv},
-  keywords = {Mathematics - Optimization and Control},
-  file = {C\:\\Users\\hirok\\Zotero\\storage\\E3H5DYJZ\\Gao and Goldfarb - 2018 - Quasi-Newton Methods Superlinear Convergence Without Line Searches for Self-Concordant Functions.pdf;C\:\\Users\\hirok\\Zotero\\storage\\S7R2STTF\\1612.html}
+  year = 2019,
+  journal = {Optimization Methods and Software},
+  volume = {34},
+  number = {1},
+  eprint = {https://doi.org/10.1080/10556788.2018.1510927},
+  pages = {194--217},
+  publisher = {Taylor \& Francis},
+  doi = {10.1080/10556788.2018.1510927},
+  abstract = {We consider the use of a curvature-adaptive step size in gradient-based iterative methods, including quasi-Newton methods, for minimizing self-concordant functions, extending an approach first proposed for Newton's method by Nesterov. This step size has a simple expression that can be computed analytically; hence, line searches are not needed. We show that using this step size in the BFGS method (and quasi-Newton methods in the Broyden convex class other than the DFP method) results in superlinear convergence for strongly convex self-concordant functions. We present numerical experiments comparing gradient descent and BFGS methods using the curvature-adaptive step size to traditional methods on deterministic logistic regression problems, and to versions of stochastic gradient descent on stochastic optimization problems.}
 }
 
 @article{gouldCUTEstConstrainedUnconstrained2015,
@@ -610,7 +609,7 @@
   shorttitle = {{{CUTEst}}},
   author = {Gould, Nicholas I. and Orban, Dominique and Toint, Philippe L.},
   year = 2015,
-  journal = {Comput. Optim. Appl.},
+  journal = {Computational Optimization and Applications},
   volume = {60},
   number = {3},
   pages = {545--557},
@@ -620,21 +619,21 @@
   abstract = {We describe the most recent evolution of our constrained and unconstrained testing environment and its accompanying SIF decoder. Code-named SIFDecode and CUTEst, these updated versions feature dynamic memory allocation, a modern thread-safe Fortran modular design, a new Matlab interface and a revised installation procedure integrated with GALAHAD.}
 }
 
-@article{gowerStochasticBlockBFGS2016,
+@inproceedings{gowerStochasticBlockBFGS2016,
   title = {Stochastic {{Block BFGS}}: {{Squeezing More Curvature}} out of {{Data}}},
   shorttitle = {Stochastic {{Block BFGS}}},
-  author = {Gower, Robert M. and Goldfarb, Donald and Richt{\'a}rik, Peter},
+  booktitle = {Proceedings of {{The}} 33rd {{International Conference}} on {{Machine Learning}}},
+  author = {Gower, Robert and Goldfarb, Donald and Richtarik, Peter},
   year = 2016,
-  journal = {arXiv preprint arXiv:1603.09649},
-  eprint = {1603.09649},
-  primaryclass = {math},
-  publisher = {arXiv},
-  doi = {10.48550/arXiv.1603.09649},
-  urldate = {2025-12-23},
+  month = jun,
+  pages = {1869--1878},
+  publisher = {PMLR},
+  issn = {1938-7228},
+  url = {https://proceedings.mlr.press/v48/gower16.html},
+  urldate = {2026-09-29},
   abstract = {We propose a novel limited-memory stochastic block BFGS update for incorporating enriched curvature information in stochastic approximation methods. In our method, the estimate of the inverse Hessian matrix that is maintained by it, is updated at each iteration using a sketch of the Hessian, i.e., a randomly generated compressed form of the Hessian. We propose several sketching strategies, present a new quasi-Newton method that uses stochastic block BFGS updates combined with the variance reduction approach SVRG to compute batch stochastic gradients, and prove linear convergence of the resulting method. Numerical tests on large-scale logistic regression problems reveal that our method is more robust and substantially outperforms current state-of-the-art methods.},
-  archiveprefix = {arXiv},
-  keywords = {Mathematics - Optimization and Control},
-  file = {C\:\\Users\\hirok\\Zotero\\storage\\L3D8QSNJ\\Gower et al. - 2016 - Stochastic Block BFGS Squeezing More Curvature out of Data.pdf;C\:\\Users\\hirok\\Zotero\\storage\\3RBXL6BG\\1603.html}
+  langid = {english},
+  file = {C:\Users\hirok\Zotero\storage\CZINN5JR\Gower et al. - 2016 - Stochastic Block BFGS Squeezing More Curvature out of Data.pdf}
 }
 
 @article{grapigliaAdaptiveTrustregionMethod2022,
@@ -762,6 +761,7 @@
   title = {Accuracy and {{Stability}} of {{Numerical Algorithms}}},
   author = {Higham, Nicholas J.},
   year = 2002,
+  edition = {2},
   publisher = {{Society for Industrial and Applied Mathematics}},
   doi = {10.1137/1.9780898718027},
   urldate = {2026-01-13},
@@ -1068,22 +1068,22 @@
   file = {C:\Users\hirok\Zotero\storage\VC2PE5H8\B9780125970501500063.html}
 }
 
-@article{mannelGlobalizationLBFGSBarzilai2025a,
-  title = {A {{Globalization}} of {{L-BFGS}} and the {{Barzilai}}--{{Borwein Method}} for {{Nonconvex Unconstrained Optimization}}},
+@article{mannelGlobalizationLBFGSBarzilai2025,
+  title = {A {{Globalization}} of {{L-BFGS}}~and the {{Barzilai}}--{{Borwein~Method}} for {{Nonconvex Unconstrained Optimization}}},
   author = {Mannel, Florian},
   year = 2025,
+  month = jan,
   journal = {Journal of Optimization Theory and Applications},
   volume = {204},
   number = {3},
-  pages = {1--34},
-  publisher = {Springer US},
+  pages = {47},
   issn = {1573-2878},
   doi = {10.1007/s10957-024-02565-5},
-  urldate = {2025-03-29},
-  abstract = {We present a modified limited memory BFGS (L-BFGS) method that converges globally and linearly for nonconvex objective functions. Its distinguishing feature is that it turns into L-BFGS if the iterates cluster at a point near which the objective is strongly convex with Lipschitz gradients, thereby inheriting the outstanding effectiveness of the classical method. These strong convergence guarantees are enabled by a novel form of cautious updating, where, among others, it is decided anew in each iteration which of the stored pairs are used for updating and which ones are skipped. In particular, this yields the first modification of cautious updating for which all cluster points are stationary while the spectrum of the L-BFGS operator is not permanently restricted, and this holds without Lipschitz continuity of the gradient. In fact, for Wolfe--Powell line searches we show that continuity of the gradient is sufficient for global convergence, which extends to other descent methods. Since we allow the memory size to be zero in the globalized L-BFGS method, we also obtain a new globalization of the Barzilai--Borwein spectral gradient (BB) method. The convergence analysis is developed in Hilbert space under comparably weak assumptions and covers Armijo and Wolfe--Powell line searches. We illustrate the theoretical findings with numerical experiments. The experiments indicate that if one of the parameters of the cautious updating is chosen sufficiently small, then the modified method agrees entirely with L-BFGS/BB. We also discuss this in the theoretical part. An implementation of the new method is available on arXiv.},
-  copyright = {2025 The Author(s)},
+  urldate = {2026-09-29},
+  abstract = {We present a modified limited memory BFGS (L-BFGS) method that converges globally and linearly for nonconvex objective functions. Its distinguishing feature is that it turns into L-BFGS~if the iterates cluster at a point near which the objective is strongly convex with Lipschitz gradients, thereby inheriting the outstanding effectiveness of the classical method. These strong convergence guarantees are enabled by a novel form of cautious updating, where, among others, it is decided anew in each iteration which of the stored pairs are used for updating and which ones are skipped. In particular, this yields the first modification of cautious updating for which all cluster points are stationary while the spectrum of the L-BFGS operator is not permanently restricted, and this holds without Lipschitz continuity of the gradient. In fact, for Wolfe--Powell~line searches we show that continuity of the gradient is sufficient for global convergence, which extends to other descent methods. Since we allow the memory size to be zero in the globalized L-BFGS~method, we also obtain a new globalization of the Barzilai--Borwein~spectral gradient~(BB) method. The convergence analysis is developed in Hilbert space under comparably weak assumptions and covers Armijo and Wolfe--Powell~line searches. We illustrate the theoretical findings with numerical experiments. The experiments indicate that if one of the parameters of the cautious updating is chosen sufficiently small, then the modified method agrees entirely with L-BFGS/BB. We also discuss this in the theoretical part. An implementation of the new method is available on arXiv.},
   langid = {english},
-  file = {C:\Users\hirok\Zotero\storage\YV8P8CFH\Mannel - 2025 - A Globalization of L-BFGS and the Barzilai–Borwein.pdf}
+  keywords = {65K05,65K10,90C06,90C26,90C30,90C48,90C53,Barzilai-Borwein methods,Cautious updates,Global convergence,Hilbert space,L-BFGS,Linear convergence,Nonconvex optimization},
+  file = {C:\Users\hirok\Zotero\storage\8RIEXXE8\Mannel - 2025 - A Globalization of L-BFGS and the Barzilai–Borwein Method for Nonconvex Unconstrained Optimization.pdf}
 }
 
 @article{mannelStructuredLBFGSMethod2024,
