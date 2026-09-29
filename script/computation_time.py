@@ -16,7 +16,7 @@ import pandas as pd
 
 from qnlab.problem.ill_quadratic import IllQuadraticProblem
 from qnlab.solver.qn import qn
-from qnlab.util.method import COLORS, get_methods
+from qnlab.util.method import COLORS, Method, get_methods
 
 # Configuration
 n = 10000
@@ -24,8 +24,34 @@ m = 10
 MI = 100
 num_runs = 100
 
-(methods, *_) = get_methods(m=m, MI=MI)
-methods = [entry for entry in methods if entry[0].label != "NTRQN-MS-SP"]
+standard_methods, *_ = get_methods(m=m, MI=MI)
+methods_by_label = {
+    method.label: (method, option) for method, option in standard_methods
+}
+methods = [
+    methods_by_label["NTRQN-MS"],
+    (
+        Method(
+            "NTRQN",
+            "cautious",
+            "damped_modified",
+            "bfgs",
+            label="NTRQN-Restart",
+        ),
+        {
+            "m": m,
+            "max_iterations": MI,
+            "regularization_solver": "shifted_pair",
+            "modified_secant_max_ratio": 1.0,
+            "restart_threshold": 1.0,
+            "max_restarts": 10,
+        },
+    ),
+    *(
+        methods_by_label[label]
+        for label in ("Line", "Reg", "Reg-Sec", "SciPy", "NTQN")
+    ),
+]
 
 
 class BenchmarkResults(TypedDict):
@@ -37,13 +63,17 @@ class BenchmarkResults(TypedDict):
 
 
 def display_name(method_name: str) -> str:
+    if method_name == "NTRQN-MS":
+        return "Ours"
     if method_name == "NTRQN-Restart":
-        return "Ours-R"
+        return "Ours-AR"
     return method_name.replace("NTRQN", "Ours")
 
 
 def internal_name(method_name: str) -> str:
-    if method_name == "Ours-R":
+    if method_name == "Ours":
+        return "NTRQN-MS"
+    if method_name == "Ours-AR":
         return "NTRQN-Restart"
     return method_name.replace("Ours", "NTRQN")
 
@@ -197,7 +227,7 @@ def generate_latex_table(methods_list: list[str], table_data: pd.DataFrame):
     \centering
     \small
     \setlength{\tabcolsep}{3.5pt}
-    \caption{The number of oracle calls and final observed objective values for the experiment in \cref{sec:comp_time}.}
+    \caption{The number of oracle calls and final observed objective values for the ill-conditioned quadratic experiment in \cref{sssec:per_iteration_cost}.}
     \label{tab:time_results}
     \begin{tabular}{l"""
         + "r" * num_methods
@@ -248,7 +278,7 @@ def main():
         print(f"Loaded timing data from {data_path.relative_to(repo_root)}")
     else:
         df = run_benchmark()
-        df.to_csv(data_path, index=False)
+        df.to_csv(data_path, index=False, lineterminator="\n")
         print(f"Saved timing data to {data_path.relative_to(repo_root)}")
 
     stats, table_data = summarize_results(df)
