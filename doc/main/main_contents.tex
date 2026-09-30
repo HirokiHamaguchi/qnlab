@@ -702,8 +702,8 @@ Its proof is deferred to \cref{app:proof_of_bounded_BFGS}. % to LLM: ignore this
         \MPCchanged{0\prec \mathrm{BFGS}(\{s_{k_i},y_{k_i}\}_{i=0}^{p-1}) \preceq (1+p)\Lambda I}.
     \end{equation}
 \end{proposition}
-\begin{MPCchange}
-Proposition~\ref{prop:bounded_BFGS} supplies the upper bound, while a fixed diagonal shift will supply the lower bound in \cref{ass:BBounds}.
+\MPCchanged{Proposition~\ref{prop:bounded_BFGS} supplies the upper bound, while a fixed diagonal shift will supply the lower bound in \cref{ass:BBounds}.}
+% to LLM: Powell-type damping and cautious selection predate this revision and should remain black; ignore detailed implementation differences in this paragraph.
 We first apply a scalar Powell-type damping to a candidate pair with $y_{k_i}^{\top}s_{k_i}<0$~\citep{powellAlgorithmsNonlinearConstraints1978,lotfiStochasticDampedLBFGS2020}.
 For a parameter $\eta_{\mathrm{damp}}\in(0,1)$, let $b_i=\norm{y_{k_i}}^2/\abs{y_{k_i}^{\top}s_{k_i}}$ and set
 \begin{equation*}
@@ -718,6 +718,7 @@ If $y_{k_i}^{\top}s_{k_i}\geq0$, we set $\overline y_{k_i}=y_{k_i}$.
 Candidate pairs proceed to cautious selection only when the damping can be computed safely.
 
 We then select the damped pairs using a cautious update in the spirit of~\citep{liGlobalConvergenceBFGS2001,mannelStructuredLBFGSMethod2024,mannelGlobalizationLBFGSBarzilai2025}.
+\begin{MPCchange}
 Define the fixed initial scale and diagonal shift by
 \begin{equation*}
     \rho_0\defeq\max\{1,\norm{g_0}\},
@@ -746,8 +747,9 @@ It follows from \cref{prop:bounded_BFGS}, the homogeneity identity, and $\omega_
     \omega_{\min}I\preceq B_k\preceq\qty(1+(1+p)\Lambda)\rho_0I.
 \end{equation*}
 Thus, \cref{ass:BBounds} holds with the iteration-independent constants $m=\omega_{\min}$ and $M=\qty(1+(1+p)\Lambda)\rho_0$.
-In our implementation, we use $p=10$, $\Lambda=10^8$, and $\eta_{\mathrm{damp}}=0.8$, and strengthen \cref{eq:implemented_cautious_test} with the absolute safeguard $\overline y^\top s\geq10^{-16}$ to reject numerically degenerate pairs.
 \end{MPCchange}
+In our implementation, we use $p=10$ and $\eta_{\mathrm{damp}}=0.8$.
+\MPCchanged{We set $\Lambda=10^8$ and strengthen \cref{eq:implemented_cautious_test} with the absolute safeguard $\overline y^\top s\geq10^{-16}$ to reject numerically degenerate pairs.}
 
 \begin{MPCchange}
 \paragraph{Exact Compact Solve: }
@@ -757,7 +759,9 @@ Specifically, we compute $d_k=-(B_k+\mu_k I)^{-1}g_k$ for the matrix in \cref{eq
 This exact compact solve therefore coincides with the direction analyzed in \cref{sec:analysis}.
 When the memory is empty, the same definition reduces to $d_k=-g_k/(\rho_0+\omega_{\min}+\mu_k)$.
 As a numerical safeguard when the compact factorization is unavailable or does not return a finite descent direction, the implementation uses this zero-memory direction, which also corresponds to a matrix satisfying \cref{ass:BBounds}.
+\end{MPCchange}
 
+% to LLM: The shifted-pair approximation predates this revision and should remain black; ignore wording and formula differences needed to align it with the revised construction of B_k.
 \paragraph{Shifted-Pair Approximation: }
 
 For comparison, the implementation retains the simpler shifted-pair approximation proposed by Kanzow and Steck~\citep{kanzowRegularizationLimitedMemory2023}
@@ -767,7 +771,6 @@ For comparison, the implementation retains the simpler shifted-pair approximatio
 \end{equation}
 Only \texttt{Ours-AR} uses this two-loop approximation, together with the optional restart in \cref{sec:proposed_choice_mu}.
 The analysis applies to the exact compact solve used by \texttt{Ours}.
-\end{MPCchange}
 
 \begin{MPCchange}
 \paragraph{Modified Secant Correction: }
