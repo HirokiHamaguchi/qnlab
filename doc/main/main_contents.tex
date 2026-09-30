@@ -108,7 +108,7 @@ In the following, we explain the three main components of \cref{alg:regularized_
     \KwIn{$x_0$, $0 < k_{\max}$, $0 \le \feps < 1$, $0 < \theta_{\min} \leq \theta_{\max}$ and $0 < \varsigma < 1$}
     $k \gets 0$, $g_0 \gets g(x_0)$, $K^0 \gets \emptyset$, $K^+ \gets \emptyset$ \label{line:init}\; % to LLM: ignore this git difference.
     \For{$k=0,1,2,\ldots, k_{\max}-1$}{
-        \uIf{$\min_{j \in K^0} (\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k)$\label{line:mu_0_condition}}{
+        \uIf{$\min_{j \in K^0\MPCchanged{,\,j < k}} (\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k)$\label{line:mu_0_condition}}{
             $K^0 \gets K^0 \cup \{k\}$ \label{line:update_K_0}\;
             $\mu_k \gets 0$ \label{line:update_mu_0}\;
         }
@@ -175,7 +175,6 @@ We set $\mu_k=0$ if and only if the following condition is satisfied:
 \begin{equation}\label{eq:mu_0_condition}
     \min_{j \in K^0, \, j < k} \qty(\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k).
 \end{equation}
-\MPCchanged{In \cref{alg:regularized_qn}, $K^0$ is updated incrementally and therefore contains only indices $j < k$ when the test in \refLine{line:mu_0_condition} is evaluated, making the notation in that line consistent with \cref{eq:mu_0_condition}.}
 Note that $k=0$ satisfies \cref{eq:mu_0_condition} since $K^0$ is empty.
 This condition restricts $\mu_k=0$ to iterations for which a sufficient decrease in $\overline f$ has been observed.
 Thus, although $\overline{f}$ can temporarily increase, every iteration in $K^0$ must improve the previous error-adjusted reference value. % to LLM: ignore this git difference.
@@ -374,9 +373,9 @@ Recall that the parameter $c$ in \cref{alg:backtracking_linesearch} satisfies $0
 
 Now, let us analyze \cref{alg:backtracking_linesearch} using \cref{lem:backtracking_finite}.
 Define
-\begin{equation*}
+\begin{equation}\label{eq:def_alpha_bar}
     \overline{\alpha}\defeq \beta_{\min}\min\qty(\frac{2(1-c)m}{L},1)>0. % to LLM: ignore this git difference.
-\end{equation*}
+\end{equation}
 The following states the key property of the backtracking procedure.
 
 \begin{proposition}\label{prop:backtracking_summary}
@@ -406,9 +405,9 @@ In this subsection, we lower bound the sum of actual function decreases $\delta_
 Recall that $K^0$ denotes the set of iteration indices $k$ such that $\mu_k = 0$, as in \cref{eq:def_K0_Kplus}.
 To this end, we establish that the sum of $\Delta_k$ over $k \in K^0$ is upper bounded, where $\Delta_k$ is the error-absorbing term in the relaxed Armijo condition (\cref{eq:relaxed_Armijo_condition}).
 We introduce the following constant $\Delta_{\max}$, which serves as an upper bound for $\Delta_k$ of $k \in K^0$. % to LLM: ignore this git difference.
-\begin{equation*}
+\begin{equation}\label{eq:def_Delta_max}
     \Delta_{\max} \defeq \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{0}), -\overline{f}^*).
-\end{equation*}
+\end{equation}
 
 \begin{lemma}\label{lem:delta_bound_and_sum}
     Under \cref{ass:bounded,ass:LSmooth,ass:BBounds}, the sum of $\Delta_k$ over $k \in K^0$ satisfies
@@ -485,10 +484,10 @@ Its proof is deferred to \cref{sec:proof_of_sum_norm_g_over_mu_geq_2sqrt_leq_log
 
 We now lower bound the sum of $\delta_k$ over $k \in K^+$ with $\norm{g_{k}}^2$.
 We define the following constants for later use:
-\begin{equation*}
+\begin{equation}\label{eq:def_C1_C2}
     C_1 \defeq \frac{\overline{\alpha}}{\theta_{\max}}, \qquad
     C_2 \defeq \frac{M\overline{\alpha}+L/2}{\theta_{\min}^2}.
-\end{equation*}
+\end{equation}
 \begin{lemma}\label{lem:sum_small_delta_k_bound_Kplus}
     Under \cref{ass:LSmooth,ass:BBounds}, the sum of $\delta_k$ over $k \in K^+$ satisfies
     \begin{equation*}
@@ -590,10 +589,10 @@ Now, we establish the following convergence rate for \cref{alg:regularized_qn}.
         0 \leq \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \norm{g_{k}}^2 + \frac{C_1}{2} \sqrt{\sum_{k \in K^+} \norm{g_{k}}^2} \leq F'
     \end{equation}
     where
-    \begin{align*}
+    \begin{align}
         F' & \defeq F - \phi(G^\ast)                                                                                                                                                              \\
-           & = f(x_0) - f^* + \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}) + C_1 \sqrt{\varsigma} - C_2 \ln(\varsigma) - 2C_2 \ln\qty(\frac{\mathrm{e} C_1}{4C_2}).
-    \end{align*}
+           & = f(x_0) - f^* + \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}) + C_1 \sqrt{\varsigma} - C_2 \ln(\varsigma) - 2C_2 \ln\qty(\frac{\mathrm{e} C_1}{4C_2}). \label{eq:def_F_prime}
+    \end{align}
 
     It remains to bound $\sum_{k\in K}\norm{g_k}^2 = \sum_{k\in K^0}\norm{g_k}^2 + \sum_{k\in K^+}\norm{g_k}^2$ given the constraint in \cref{eq:final_inequality_for_gc}.
     More generally, let $a,b>0$, $c\ge 0$ and $x,y\ge 0$, and consider the maximization problem $x+y$ subject to $a x + b\sqrt{y} \le c$.
@@ -634,22 +633,30 @@ More explicitly, \cref{eq:gc_result} gives the sufficient bound
     k_{\max}\geq \frac{1}{\gtol^2}
     \max\left\{\frac{MF'}{c\overline\alpha},\frac{4(F')^2}{C_1^2}\right\}.
 \end{equation*}
-For fixed algorithmic parameters, define $A\coloneqq\max\{1,L/m\}$.
-Then,
+We treat $c$, $\beta_{\min}$, $\theta_{\min}$, $\theta_{\max}$, and $\varsigma$ as fixed algorithmic parameters.
+For the proposed construction of $B_k$ (described in \cref{sec:proposed_choice_Bk}), let the memory size $p$ and pair-selection parameter $\Lambda$ also be fixed.
+The spectral constants are then
 \begin{equation*}
-    \overline\alpha^{-1}=\order{A},\qquad
-    C_1^{-1}=\order{A},\qquad
-    C_2=\order{M/A+L}.
+    m   = \min\{1,\sqrt{\varsigma}\}>0, \quad
+    M   = \qty(1+(1+p)\Lambda)\max\{1,\norm{g_0}\}.
 \end{equation*}
-Substituting these bounds and the definition of $\Delta_{\max}$ into $F'$ gives
+Define the line-search conditioning factor $\kappa_{\mathrm{ls}}\coloneqq\max\{1,L/m\}$.
+Using \cref{eq:def_alpha_bar,eq:def_C1_C2,eq:def_Delta_max}, we obtain
+\begin{align*}
+    \overline\alpha^{-1} & = \order{\kappa_{\mathrm{ls}}}, \qquad
+    C_1^{-1} = \order{\kappa_{\mathrm{ls}}}, \qquad
+    C_2 = \order{M/\kappa_{\mathrm{ls}}+L}, \\
+    \Delta_{\max}        & = \order{\frac{\feps}{1-\feps}\max\{1,\overline f(x_0),-\overline f^*\}}.
+\end{align*}
+Substituting these relations into \cref{eq:def_F_prime} gives
 \begin{align*}
     F' = \mathcal{O}\bigg(&f(x_0)-f^*+\frac{\overline f(x_0)-\overline f^*}{1-\feps}
-    +\frac{\feps\max\{1,\overline f(x_0),-\overline f^*\}}{(1-\feps)^2}\\
-    &+1+(M/A+L)\ln(2+M+LA)\bigg).
+    +\frac{\feps\max\{1,\overline f(x_0),-\overline f^*\}}{(1-\feps)^2} \\
+    &{}+(M/\kappa_{\mathrm{ls}}+L)\ln(2+M+L\kappa_{\mathrm{ls}})\bigg).
 \end{align*}
-Consequently, the sufficient iteration bound is $\order{\gtol^{-2}\max\{MAF',A^2(F')^2\}}$.
-For the construction in \cref{sec:proposed_choice_Bk}, fixed algorithmic parameters give fixed $m>0$ and $M=\order{\max\{1,\norm{g_0}\}}$.
-Thus, $m$, $M$, and $F'$ are independent of the target accuracy $\gtol$, while $\feps$, the initial gaps, and the smoothness and spectral bounds affect the prefactor.
+Hence, the sufficient iteration bound is $\order{\gtol^{-2}\max\{M\kappa_{\mathrm{ls}}F',\kappa_{\mathrm{ls}}^2(F')^2\}}$.
+Here, $L$, $\feps$, $g_0$, and the initial function-value gaps are problem and oracle quantities whose dependence is displayed explicitly.
+Therefore, for fixed algorithmic parameters, problem data, and oracle model, the sufficient iteration bound retains its $\order{\gtol^{-2}}$ dependence on the target accuracy, while conditioning and noise affect only the prefactor.
 \end{MPCchange}
 
 \section{Practical Choices of Algorithmic Variables}\label{sec:proposed_choice}
