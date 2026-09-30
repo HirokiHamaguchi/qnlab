@@ -1128,7 +1128,6 @@ Because every method performs exactly $100$ iterations and the objective and gra
 Timing data were collected after three warm-up runs, followed by $100$ recorded trials.
 
 In \cref{fig:exec_time}, we report the execution-time statistics.
-% to LLM: Recheck the ordering in the next sentence after rerunning this experiment in the final computing environment; the current timing results are provisional.
 \texttt{Line} has the lowest per-iteration cost among the quasi-Newton methods.
 \texttt{Ours-AR} is less expensive than \texttt{Ours}, while both proposed variants remain faster than the regularized L-BFGS baselines in this experiment.
 This timing experiment measures algorithmic overhead under deliberately inexpensive objective and gradient evaluations and does not by itself establish end-to-end efficiency or superiority in oracle cost.
