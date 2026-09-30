@@ -947,23 +947,24 @@ A run that terminates without attaining that tolerance is counted as unsolved fo
 
 \subsubsection{Results with Artificial Noise}\label{sssec:noise_results}
 
-\begin{MPCchange}
-\Cref{fig:results_function_noise,fig:results_noise} show performance profiles for the function-value noise experiment and the joint noise experiment described in \cref{sssec:problems}.
-The former satisfies the assumptions of \cref{sec:analysis}, whereas the latter evaluates empirical performance beyond the exact-gradient theory.
+We first present results for the artificial-noise settings described in \cref{sssec:problems}. % to LLM: ignore this git difference.
+\MPCchanged{\Cref{fig:results_function_noise} shows the performance profile for the function-value-noise experiment, which satisfies the assumptions of \cref{sec:analysis}.}
+\Cref{fig:results_noise} shows the performance profile for the joint-noise experiment. % to LLM: ignore this git difference.
+\MPCchanged{In the theory-aligned function-value-noise setting, both proposed variants attain higher solved percentages than the existing quasi-Newton baselines.}
+The same overall tendency holds in the joint-noise setting. % to LLM: ignore this git difference.
+Both proposed variants solve at least one instance of dimension $123{,}200$, the largest dimension in the retained collection. % to LLM: ignore this git difference.
+\MPCchanged{The joint-noise result provides complementary empirical evidence beyond the exact-gradient setting.}
 
-Both proposed variants solve at least one instance of dimension $123{,}200$, the largest dimension in the retained collection.
-In the theory-aligned function-value-noise setting, both proposed variants attain higher solved percentages than the existing quasi-Newton baselines.
-The joint-noise results show the same overall tendency beyond the exact-gradient setting, while the convergence result remains specific to exact gradients.
-Under NTQN's recommended termination mode, $50.1\%$ of the same function-value-noise instances attain the common tolerance, compared with $81.2\%$ when the common gradient-tolerance stop is used.
+\begin{MPCchange}
+We also examine how NTQN's recommended noise-dependent termination rule affects the comparison in the function-value-noise experiment.
+Under this termination mode, $50.1\%$ of the instances attain the common tolerance, compared with $81.2\%$ when the common gradient-tolerance stop is used.
 All recommended-mode runs terminate without timeout or exception, and $619$ of them stop because NTQN detects that function-value changes have reached its estimated function-noise level (flag~4).
 The lower scored fraction therefore mainly reflects NTQN's noise-dependent stopping rule rather than failed execution.
 \end{MPCchange}
 
 \begin{MPCchange}
-\Cref{fig:results_error_bound_sensitivity} shows the performance profiles for the error-bound sensitivity experiment.
-The combined profiles compare both variants under all three supplied bounds.
-The nominal bound gives the highest solved percentage for \texttt{Ours}.
-\texttt{Ours-AR} is less sensitive to overestimation.
+\Cref{fig:results_error_bound_sensitivity} examines sensitivity to the supplied error bound by comparing both variants under all three tested bounds.
+The nominal bound gives the highest solved percentage for \texttt{Ours}, whereas \texttt{Ours-AR} is less sensitive to overestimation.
 Underestimation need not satisfy the assumed error model, and the results show no consistent performance benefit from it.
 \end{MPCchange}
 
