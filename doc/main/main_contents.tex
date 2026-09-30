@@ -16,7 +16,7 @@ We begin by reviewing relevant background and formalizing the problem setting.
 \subsection{Regularized Quasi-Newton Method}
 \label{sec:prel_rqn}
 
-A regularized quasi-Newton method is a variant of quasi-Newton methods that does not rely heavily on line-search techniques. % to LLM: ignore this git difference.
+A regularized quasi-Newton method is a variant of quasi-Newton methods that does not rely heavily on linesearch techniques. % to LLM: ignore this git difference.
 This property is important for optimization in noisy evaluation environments.
 There has been renewed interest in regularized Newton-type methods, including cubic-regularization schemes~\citep{nesterovCubicRegularizationNewton2006,ranganathSymmetricRankOneQuasiNewton2025,wangConvergenceRatesRegularized2025}, and we focus on quadratic regularization~\citep{kanzowRegularizationLimitedMemory2023,doikovSuperUniversalRegularizedNewton2024,liTruncatedRegularizedNewton2009,zhangNewRegularizedQuasiNewton2018,uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,shengNewAdaptiveTrust2018} for simplicity of analysis and implementation. % to LLM: ignore this git difference.
 
@@ -67,8 +67,8 @@ We assume that only an error-contaminated function value $\overline{f}(x)$ is ac
 \end{equation}
 where $0 \le \feps < 1$ is an error rate.
 The error is predominantly relative when $\abs{f(x)}$ is large and effectively absolute when $\abs{f(x)}$ is small, capturing the typical behavior of rounding errors in IEEE~754 floating-point arithmetic~\citep{highamAccuracyStabilityNumerical2002}.
-\MPCchanged{The value of $\feps$ is a supplied safety margin for errors in the computed function values, with its practical specification and sensitivity to misspecification discussed in \cref{sec:experiments}.}
-Closely related error models are also used in practical stopping criteria~\citep{2020SciPy-NMeth}. % to LLM: ignore this git difference.
+\MPCchanged{In the numerical experiments, $\feps$ is supplied as a safety margin for accumulated errors in the computed function values, with its practical specification and sensitivity to misspecification discussed in \cref{sec:experiments}.}
+Closely related models are also employed in practical stopping criteria~\citep{2020SciPy-NMeth}.
 
 We next specify the assumption on gradient evaluations. % to LLM: ignore this git difference.
 Let $g(x)$ be the gradient returned by the available gradient oracle at $x$. % to LLM: ignore this git difference.
@@ -93,11 +93,11 @@ Experiments with joint noise or reduced precision complement the theory by evalu
 We propose a new algorithm for the problem setting stated in \cref{sec:problem_setting}.
 We draw inspiration from the OFFO framework to design regularization and scaling strategies for inexact function values. % to LLM: ignore this git difference.
 Unlike purely OFFO methods, our algorithm exploits function values when they are numerically reliable and switches to gradient-based control otherwise.
+The pseudo-code of our algorithm is given in \cref{alg:regularized_qn}.
 \begin{MPCchange}
 The test in \refLine{line:mu_0_condition} permits an unregularized quasi-Newton step when the error-adjusted function values certify progress and otherwise invokes the OFFO-based scale.
 Function values are used in the line search in both modes, whereas the OFFO-based regularization scale depends only on gradient information.
 \end{MPCchange}
-The pseudocode of our algorithm is given in \cref{alg:regularized_qn}. % to LLM: ignore this git difference.
 The minimum of the empty set is defined as $+\infty$ in \refLine{line:mu_0_condition}.
 \Cref{alg:backtracking_linesearch} is an auxiliary line search algorithm called in \cref{alg:regularized_qn}.
 In the following, we explain the three main components of \cref{alg:regularized_qn}.
@@ -121,7 +121,7 @@ In the following, we explain the three main components of \cref{alg:regularized_
         $x_{k+1} \gets x_k + \alpha_k d_k$,\,
         $g_{k+1} \gets g(x_{k+1})$ \label{line:update}\; % to LLM: ignore this git difference.
     }
-    \caption{Noise Tolerant Regularized Quasi-Newton Method}
+    \caption{Noise-Tolerant Regularized Quasi-Newton Method}
     \label{alg:regularized_qn}
 \end{algorithm}
 
@@ -187,7 +187,7 @@ as described in \cref{sec:prel_offo}.
 Since OFFO schemes do not rely on function values, this update is independent of numerical errors in $\overline{f}$. % to LLM: ignore this git difference.
 
 \begin{MPCchange}
-The rationale for why a purely regularized quasi-Newton method is inadequate, thus necessitating the additional OFFO-inspired fallback mechanism, is that existing regularized Newton-type methods still rely on reliable function values: line-search variants use them in sufficient-decrease tests, while adaptive regularization methods use the actual objective-function reduction to control step acceptance and the regularization parameter~\citep{uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023}.
+The rationale for why a purely regularized quasi-Newton method is inadequate, thus necessitating the additional OFFO-inspired fallback mechanism, is that existing regularized Newton-type methods still rely on reliable function values: line search variants use them in sufficient-decrease tests, while adaptive regularization methods use the actual objective-function reduction to control step acceptance and the regularization parameter~\citep{uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023}.
 With inexact function values, neither comparison can be evaluated reliably, while the relaxed Armijo condition required to make our line search well-defined permits a persistent error allowance.
 Although the relaxed line search ensures that a step can be computed, relying on its decrease estimate at every iteration would not control the accumulated error and therefore would not support convergence to arbitrarily small first-order tolerances.
 Our switch therefore restricts unregularized steps to iterations for which error-adjusted function values certify progress and invokes the OFFO-inspired cumulative-gradient scale otherwise.
@@ -596,15 +596,15 @@ Now, we establish the following convergence rate for \cref{alg:regularized_qn}.
     \end{align*}
 
     It remains to bound $\sum_{k\in K}\norm{g_k}^2 = \sum_{k\in K^0}\norm{g_k}^2 + \sum_{k\in K^+}\norm{g_k}^2$ given the constraint in \cref{eq:final_inequality_for_gc}.
-    More generally, let $a,b>0$, $c\ge 0$, and $x,y\ge 0$, and consider maximizing $x+y$ subject to $a x + b\sqrt{y} \le c$.
+    More generally, let $a,b>0$, $c\ge 0$ and $x,y\ge 0$, and consider the maximization problem $x+y$ subject to $a x + b\sqrt{y} \le c$.
     The maximum is achieved on the boundary $a x + b\sqrt{y}=c$ since $x+y$ is increasing in both variables.
-    On this boundary, $y=((c-a x)/b)^2$, and thus $x+y$ is convex on $0\le x\le c/a$, attaining its maximum at an endpoint.
-    Evaluating the endpoints yields $x+y\leq\max\{c/a,(c/b)^2\}$.
+    On this boundary, we can write $y=\left(\frac{c-a x}{b}\right)^2$, and thus $x+y$ is convex on an interval $0\le x\le c/a$, attaining its maximum at one of the endpoints.
+    Evaluating at the endpoints yields the candidates $(x,y)=(c/a,0)$ and $(x,y)=(0,(c/b)^2)$, and therefore the maximum of $x+y$ is $\max\qty(c/a, (c/b)^2)$.
     Applying this result to \cref{eq:final_inequality_for_gc} gives
     \begin{align}
         \frac{1}{k_{\max}} \sum_{k=0}^{k_{\max}-1} \norm{g_k}^2
-         & = \frac{1}{k_{\max}} \qty(\sum_{k \in K^0} \norm{g_k}^2 + \sum_{k \in K^+} \norm{g_k}^2) &  & (K=K^0 \cup K^+) \notag \\
-         & \leq \frac{1}{k_{\max}} \max\qty(\frac{M F'}{c \overline{\alpha}}, \frac{4 F'^2}{C_1^2}), \label{eq:gc_result}
+         & = \frac{1}{k_{\max}} \qty(\sum_{{k} \in K^0} \norm{g_{k}}^2 + \sum_{k \in K^+} \norm{g_{k}}^2)                    &  & (K=K^0 \cup K^+) \notag \\
+         & \leq \frac{1}{k_{\max}} \max\qty(\frac{M F'}{c \overline{\alpha}}, \, \frac{4 F'^2}{C_1^2}), \label{eq:gc_result}
     \end{align}
     which completes the proof.
     \myQED
@@ -697,7 +697,7 @@ Its proof is deferred to \cref{app:proof_of_bounded_BFGS}. % to LLM: ignore this
 \end{proposition}
 \begin{MPCchange}
 Proposition~\ref{prop:bounded_BFGS} supplies the upper bound, while a fixed diagonal shift will supply the lower bound in \cref{ass:BBounds}.
-We first apply a scalar Powell-type damping to a candidate pair with $y_{k_i}^{\top}s_{k_i}<0$.
+We first apply a scalar Powell-type damping to a candidate pair with $y_{k_i}^{\top}s_{k_i}<0$~\citep{powellAlgorithmsNonlinearConstraints1978,lotfiStochasticDampedLBFGS2020}.
 For a parameter $\eta_{\mathrm{damp}}\in(0,1)$, let $b_i=\norm{y_{k_i}}^2/\abs{y_{k_i}^{\top}s_{k_i}}$ and set
 \begin{equation*}
     \overline y_{k_i}
@@ -739,7 +739,6 @@ It follows from \cref{prop:bounded_BFGS}, the homogeneity identity, and $\omega_
     \omega_{\min}I\preceq B_k\preceq\qty(1+(1+p)\Lambda)\rho_0I.
 \end{equation*}
 Thus, \cref{ass:BBounds} holds with the iteration-independent constants $m=\omega_{\min}$ and $M=\qty(1+(1+p)\Lambda)\rho_0$.
-This argument uses neither convexity nor cocoercivity of $\nabla f$.
 In our implementation, we use $p=10$, $\Lambda=10^8$, and $\eta_{\mathrm{damp}}=0.8$, and strengthen \cref{eq:implemented_cautious_test} with the absolute safeguard $\overline y^\top s\geq10^{-16}$ to reject numerically degenerate pairs.
 \end{MPCchange}
 
@@ -754,7 +753,7 @@ As a numerical safeguard when the compact factorization is unavailable or does n
 
 \paragraph{Shifted-Pair Approximation: }
 
-For comparison, the implementation retains the simpler shifted-pair approximation
+For comparison, the implementation retains the simpler shifted-pair approximation proposed by Kanzow and Steck~\citep{kanzowRegularizationLimitedMemory2023}
 \begin{equation}\label{eq:approx_computation_of_regularized_quasi_Newton}
     B_k+\mu_k I
     \approx\mathrm{BFGS}(\{s_{k_i},\overline y_{k_i}+(\mu_k+\omega_{\min})s_{k_i}\}_{i=0}^{p-1}).
@@ -813,11 +812,13 @@ In our implementation, $\eta_\mu=1/10$, $\theta_{\min}=1/100$, $\theta_{\max}=1$
 
 The optional restart is a practical heuristic intended to reduce over-regularization after clear progress in the objective value. % to LLM: ignore this git difference.
 \begin{MPCchange}
-For a fixed threshold $\tau>0$, the heuristic resets only the accumulator when the method returns from $K^+$ to $K^0$ and
+For a fixed threshold $\tau>0$, the heuristic restarts the accumulator when the method returns from $K^+$ to $K^0$ and
 \begin{equation}\label{eq:restart_condition}
     \min_{j \in K^0,\,j<k} \qty(\overline{f}(x_j)-\Delta_j)-\overline{f}(x_k) \geq \tau.
 \end{equation}
-The sets $K^0$ and $K^+$ and the reference values in \cref{eq:restart_condition} are not reset.
+At a restart in iteration $k$, the accumulator is reset to $\varsigma$, discarding all gradient-norm contributions from regularized iterations before $k$.
+Subsequent regularized iterations accumulate only gradient norms generated after $k$.
+The global classification sets $K^0$ and $K^+$ and the reference values in \cref{eq:restart_condition} are retained.
 The numerical experiments distinguish the no-restart and restarted variants.
 The former coincides with the analyzed accumulator, whereas the latter uses $\tau=1$ and at most $10$ restarts.
 \end{MPCchange}
