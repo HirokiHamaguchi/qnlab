@@ -9,7 +9,7 @@ We consider the unconstrained optimization problem
 \end{equation}
 where $f\colon \mathbb{R}^n \to \mathbb{R}$ is a continuously differentiable nonconvex function, and $x \in \mathbb{R}^n$ is the optimization variable.
 We focus on settings where objective function evaluations are contaminated by bounded and non-diminishing numerical noise~\citep{sunTrustRegionMethod2023}.
-Specifically, function values are available only through inexact evaluations $\overline{f}(x)$, while gradients are assumed accurate in our analysis. % to LLM: ignore this git difference.
+Specifically, only inexact function values $\overline{f}(x)$ are available for optimization.
 Such inaccuracies are unavoidable in many realistic scenarios, including finite-precision arithmetic, simulation-based evaluations, and stochastic approximations~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022,moreEstimatingComputationalNoise2011,caflischMonteCarloQuasiMonte1998}.
 When function values are contaminated by numerical noise, standard optimization algorithms may lose their theoretical guarantees, behave erratically, or terminate prematurely with unreliable solutions.
 
@@ -23,7 +23,7 @@ From a computational perspective, improving the stability of quasi-Newton method
 In particular, it is desirable to design algorithms that (i) retain computational efficiency when function evaluations are accurate, (ii) remain stable when function values are unreliable, and (iii) guarantee convergence to first-order stationary points.
 
 In this work, we propose a noise-tolerant regularized quasi-Newton method that addresses these challenges.
-Our approach combines an Armijo line search, quadratic regularization \citep{uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023}, and an Objective-Function-Free Optimization (OFFO) inspired strategy~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}. % to LLM: ignore this git difference.
+Our approach combines an Armijo line search, quadratic regularization \citep{uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023}, and a strategy inspired by Objective-Function-Free Optimization (OFFO)~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}. % to LLM: ignore this git difference.
 When a sufficient decrease in function value is observed, the method behaves similarly to standard quasi-Newton methods with line search, preserving its practical efficiency.
 When numerical noise dominates, we introduce regularization on the approximate Hessian to improve stability, which yields convergence properties similar to those of OFFO methods, particularly AdaGrad-Norm~\citep{wardAdaGradStepsizesSharp2020}. % to LLM: ignore this git difference.
 The resulting algorithm is particularly well-suited for low-precision or noisy environments.
@@ -32,7 +32,7 @@ Extensive numerical experiments on the CUTEst benchmark collection, across vario
 \begin{MPCchange}
 % to LLM: DO NOT rephrase or remove ``The key methodological advance''; this wording directly answers Referee 2's request to identify the distinct methodological advance.
 The key methodological advance is a carefully designed, error-model-based switch that uses unregularized quasi-Newton steps whenever progress can be certified and otherwise invokes regularized steps with an OFFO-based cumulative-gradient scale.
-Using this scale at every iteration avoids reliance on measured function decreases when controlling regularization but can be unnecessarily conservative when function values are reliable.
+Applying this scale at every iteration avoids reliance on measured function decreases to control regularization, but doing so can be unnecessarily conservative when function values are reliable.
 A simple switch based on a relaxed Armijo test with a nonvanishing error allowance does not guarantee convergence to arbitrarily small first-order tolerances because its accumulated contribution need not be bounded.
 Our test instead permits an unregularized step only when error-adjusted function values certify progress and activates the OFFO-based scale otherwise.
 The test bounds the accumulated allowances over unregularized iterations, while the cumulative-gradient scale controls the remaining iterations without requiring measured function decreases.
