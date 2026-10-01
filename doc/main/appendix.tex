@@ -1,23 +1,23 @@
 \section{Proof of \texorpdfstring{\cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}}{Lemma \ref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}}}\label{sec:proof_of_sum_norm_g_over_mu_geq_2sqrt_leq_log}
 
-The proof of \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} is \MPCchanged{similar to previous arguments~\citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020} and \citep[Lemma~3.1]{Gratton08022024}}.
+The proof of \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} is similar to previous arguments~\citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020} and \citep[Lemma~3.1]{Gratton08022024}.
 \begin{proof}
     Recall that \cref{eq:offo_based_update} defines $\mu_k$ as $\theta_k \sqrt{\varsigma + \sum_{j \in K^+, \, j \leq k} \norm{g_j}^2}$, and \refLine{line:update_theta} of \cref{alg:regularized_qn} asserts $\theta_k \in [\theta_{\min}, \theta_{\max}]$.
     Let $k_i \in K^+$ be the $i$-th element of $K^+$.
-    \MPCchanged{Define $S_{-1} \coloneqq \varsigma$ and $S_i \coloneqq \varsigma + \sum_{\ell=0}^{i} \norm{g_{k_\ell}}^2$ for $i \geq 0$.}
+    Define $S_{-1} \coloneqq \varsigma$ and $S_i \coloneqq \varsigma + \sum_{\ell=0}^{i} \norm{g_{k_\ell}}^2$ for $i \geq 0$.
     For any $0 < x < y$, $x/y \le -\ln(1-x/y) = \ln y - \ln(y-x)$ holds.
     Thus, we have
     \begin{align*}
         \frac{\norm{g_{k_i}}^2}{\mu_{k_i}^2}
-         & \MPCchanged{\leq \frac{1}{\theta_{\min}^2} \frac{\norm{g_{k_i}}^2}{S_i}} &  & (\text{definition}) \\
-         & \MPCchanged{\leq \frac{1}{\theta_{\min}^2} \qty(\ln S_i - \ln S_{i-1})}.  &  & (x/y \leq \ln y - \ln(y-x))
+         & \leq \frac{1}{\theta_{\min}^2} \frac{\norm{g_{k_i}}^2}{S_i} &  & (\text{definition}) \\
+         & \leq \frac{1}{\theta_{\min}^2} \qty(\ln S_i - \ln S_{i-1}).  &  & (x/y \leq \ln y - \ln(y-x))
     \end{align*}
     Similarly, $x/\sqrt{y} \ge x/(\sqrt{y}+\sqrt{y-x}) = \sqrt{y}-\sqrt{y-x}$ holds.
     Thus, we have
     \begin{align*}
         \frac{\norm{g_{k_i}}^2}{\mu_{k_i}}
-         & \MPCchanged{\geq \frac{1}{\theta_{\max}} \frac{\norm{g_{k_i}}^2}{\sqrt{S_i}}} &  & (\text{definition}) \\
-         & \MPCchanged{\geq \frac{1}{\theta_{\max}} \qty(\sqrt{S_i} - \sqrt{S_{i-1}})}. &  & (x/\sqrt{y} \geq \sqrt{y} - \sqrt{y-x})
+         & \geq \frac{1}{\theta_{\max}} \frac{\norm{g_{k_i}}^2}{\sqrt{S_i}} &  & (\text{definition}) \\
+         & \geq \frac{1}{\theta_{\max}} \qty(\sqrt{S_i} - \sqrt{S_{i-1}}). &  & (x/\sqrt{y} \geq \sqrt{y} - \sqrt{y-x})
     \end{align*}
     Summing these inequalities over $0 \le i < \abs{K^+}$ yields the claim.
     \myQED
@@ -25,20 +25,20 @@ The proof of \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log} is \MPCchanged{simi
 
 \section{Proof of \texorpdfstring{\cref{prop:bounded_BFGS}}{Proposition \ref{prop:bounded_BFGS}}}\label{app:proof_of_bounded_BFGS}
 
-\MPCchanged{The proof of \cref{prop:bounded_BFGS} uses the standard BFGS update.}
+The proof of \cref{prop:bounded_BFGS} uses the standard BFGS update.
 \begin{proof}
-    \MPCchanged{From \cref{eq:curvature_conditions1}, the initial scalar satisfies $0<\gamma=\norm{y_{k_{p-1}}}^2/(y_{k_{p-1}}^\top s_{k_{p-1}})\leq\Lambda$.}
-    \MPCchanged{Let $B$ and $B_+$ denote the positive definite Hessian approximations before and after one update.}
+    From \cref{eq:curvature_conditions1}, the initial scalar satisfies $0<\gamma=\norm{y_{k_{p-1}}}^2/(y_{k_{p-1}}^\top s_{k_{p-1}})\leq\Lambda$.
+    Let $B$ and $B_+$ denote the positive definite Hessian approximations before and after one update.
     The BFGS update rule is
     \begin{equation*}
-        \MPCchanged{B_+=B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}}.
+        B_+=B - \frac{Bss^\top B}{s^\top Bs} + \frac{yy^\top}{y^\top s}.
     \end{equation*}
-    \MPCchanged{Positive definiteness follows from $B\succ0$, $s\neq0$, and $y^\top s>0$.}
-    \MPCchanged{Moreover, \cref{eq:curvature_conditions1} and the fact that $Bss^\top B/(s^\top Bs)$ is positive semidefinite give}
+    Positive definiteness follows from $B\succ0$, $s\neq0$, and $y^\top s>0$.
+    Moreover, \cref{eq:curvature_conditions1} and the fact that $Bss^\top B/(s^\top Bs)$ is positive semidefinite give
     \begin{equation*}
-        \MPCchanged{B_+\preceq B+\frac{yy^\top}{y^\top s}\preceq B+\Lambda I}.
+        B_+\preceq B+\frac{yy^\top}{y^\top s}\preceq B+\Lambda I.
     \end{equation*}
-    \MPCchanged{Applying this inequality recursively over $p$ updates from $B^{(0)}=\gamma I\preceq\Lambda I$ proves \cref{eq:bounded_BFGS_mM}.}
+    Applying this inequality recursively over $p$ updates from $B^{(0)}=\gamma I\preceq\Lambda I$ proves \cref{eq:bounded_BFGS_mM}.
     \myQED
 \end{proof}
 

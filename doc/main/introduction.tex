@@ -105,9 +105,9 @@ This combination retains unregularized quasi-Newton steps and establishes an $\o
 
 \begin{MPCchange}
 We next compare our method with related quasi-Newton and OFFO methods, whose theoretical guarantees are summarized in \cref{tab:related_work_comparison}.
-The closest methods are the regularized L-BFGS method~\citep{kanzowRegularizationLimitedMemory2023} and Noise Tolerant Quasi-Newton (NTQN)~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
+Theoretically closest methods are the regularized L-BFGS method~\citep{kanzowRegularizationLimitedMemory2023} and Noise Tolerant Quasi-Newton (NTQN)~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
 The regularized L-BFGS method assumes reliable function values and establishes global convergence to first-order stationarity~\citep[Theorem~2]{kanzowRegularizationLimitedMemory2023}.
-Shi et al.~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022} develop NTQN for bounded errors in both function and gradient evaluations, using a noise-tolerant line search and a lengthening procedure to stabilize the quasi-Newton updates.
+Shi et al.~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022} develop NTQN for strongly convex objectives with bounded errors in both function and gradient evaluations, using a noise-tolerant line search and a lengthening procedure to stabilize the quasi-Newton updates.
 Their analysis allows bounded gradient errors and establishes convergence to a noise-dependent neighborhood for strongly convex objectives~\citep[Theorem~3.5]{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
 Our relaxed Armijo test is related to their noise-tolerant test~\citep[Section~4]{shiNoiseTolerantQuasiNewtonAlgorithm2022}, whereas our switch controls the accumulated error allowances and yields an \(\order{1/\varepsilon^2}\) bound for arbitrarily small first-order tolerances on smooth nonconvex objectives with accurate gradients.
 

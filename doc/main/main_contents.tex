@@ -668,7 +668,7 @@ The quantities to be discussed here are the matrices $B_k$, the step sizes $\alp
 \subsection{Approximate Hessian \texorpdfstring{$B_k$}{B k}}\label{sec:proposed_choice_Bk}
 
 We first discuss the construction of the matrices $B_k$ used in \refLine{line:d_k} of \cref{alg:regularized_qn}.
-\MPCchanged{We show that the shifted L-BFGS construction with the curvature-pair selection rule below satisfies \cref{ass:BBounds}.}
+We show that the shifted L-BFGS construction with the curvature-pair selection rule below satisfies \cref{ass:BBounds}.
 
 \paragraph{Construction of $B_k$: }
 
@@ -689,7 +689,7 @@ for $j=0,1,\ldots,p-1$, where each curvature pair $(s_{k_j},y_{k_j})$ is applied
 Here, $p>0$ denotes the maximum number of stored curvature pairs and is a fixed small integer in the L-BFGS method.
 When fewer than $p$ curvature pairs are available, the BFGS update is applied using all currently available pairs.
 
-\MPCchanged{We now give a sufficient condition for the upper spectral bound in \cref{ass:BBounds}, based on variants of existing results~\citep[Theorem~5.5]{gaoQuasiNewtonMethodsSuperlinear2018} \citep[Lemma~1]{gowerStochasticBlockBFGS2016}.} % to LLM: do not insert `and' between the two citations.
+We now give a sufficient condition for the upper spectral bound in \cref{ass:BBounds}, based on variants of existing results~\citep[Theorem~5.5]{gaoQuasiNewtonMethodsSuperlinear2018} \citep[Lemma~1]{gowerStochasticBlockBFGS2016}. % to LLM: do not insert `and' between the two citations.
 Its proof is deferred to \cref{app:proof_of_bounded_BFGS}. % to LLM: ignore this git difference.
 \begin{proposition}\label{prop:bounded_BFGS}
     Let $\{(s_{k_i},y_{k_i})\}_{i=0}^{p-1}$ be curvature pairs with $s_{k_i} \neq 0$.
@@ -805,12 +805,10 @@ The clipping interval gives $\alpha_k\geq\beta_{\min}$ whenever this adjustment 
 We finally discuss the adjustment of the regularization parameter $\mu_k$ in \refLine{line:update_theta} of \cref{alg:regularized_qn}.
 \paragraph{Regularization Update: } % to LLM: ignore this git difference.
 
-\begin{MPCchange}
 The OFFO accumulator contains exactly the gradient norms generated during regularized iterations:
 \begin{equation*}
     G_k^2=\varsigma+\sum_{j\in K^+,\,j\leq k}\norm{g_j}^2.
 \end{equation*}
-\end{MPCchange}
 For a parameter $\eta_\mu>0$, we set % to LLM: ignore this git difference.
 \begin{equation*}
     \mu_k=\mathrm{clip}\left(\eta_\mu\norm{g_k},\theta_{\min}G_k,\theta_{\max}G_k\right).
@@ -821,7 +819,6 @@ In our implementation, $\eta_\mu=1/10$, $\theta_{\min}=1/100$, $\theta_{\max}=1$
 \paragraph{Optional Accumulator Restart: } % to LLM: ignore this git difference.
 
 The optional restart is a practical heuristic intended to reduce over-regularization after clear progress in the objective value. % to LLM: ignore this git difference.
-\begin{MPCchange}
 For a fixed threshold $\tau>0$, the heuristic restarts the accumulator when the method returns from $K^+$ to $K^0$ and
 \begin{equation}\label{eq:restart_condition}
     \min_{j \in K^0,\,j<k} \qty(\overline{f}(x_j)-\Delta_j)-\overline{f}(x_k) \geq \tau.
@@ -831,7 +828,6 @@ Subsequent regularized iterations accumulate only gradient norms generated after
 The global classification sets $K^0$ and $K^+$ and the reference values in \cref{eq:restart_condition} are retained.
 The numerical experiments distinguish the no-restart and restarted variants.
 The former coincides with the analyzed accumulator, whereas the latter uses $\tau=1$ and at most $10$ restarts.
-\end{MPCchange}
 
 \section{Numerical Experiments}\label{sec:experiments}
 
@@ -1177,9 +1173,9 @@ The elapsed-time profiles therefore preserve the higher final solved fractions o
 \FloatBarrier
 \section{Conclusion}\label{sec:conclusion}
 
-\MPCchanged{We proposed a hybrid regularized quasi-Newton method for smooth nonconvex optimization with objective-function errors satisfying a hybrid absolute-relative model.
-The method retains the \(\order{1/\varepsilon^2}\) first-order iteration complexity of the $L$-smooth nonconvex setting while selectively using noisy function values.}
-\MPCchanged{At 16- and 32-bit precision, both proposed variants reached the strictest tested gradient tolerance on more CUTEst problems than the existing quasi-Newton baselines.}
+We proposed a hybrid regularized quasi-Newton method for smooth nonconvex optimization with objective-function errors satisfying a hybrid absolute-relative model.
+The method retains the \(\order{1/\varepsilon^2}\) first-order iteration complexity of the $L$-smooth nonconvex setting while selectively using noisy function values.
+At 16- and 32-bit precision, both proposed variants reached the strictest tested gradient tolerance on more CUTEst problems than the existing quasi-Newton baselines.
 
 Future work includes the investigation of local convergence properties, the extension to constrained optimization, and the applications to practical problems in machine learning and scientific computing.
 Additionally, exploring adaptive strategies for selecting algorithmic parameters based on problem characteristics could further enhance the method's performance.
