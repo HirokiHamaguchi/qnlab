@@ -32,6 +32,7 @@
 \usepackage{orcidlink}
 \usepackage{physics}
 \usepackage{pifont}
+\usepackage{placeins}
 \usepackage{subcaption}
 \usepackage{subfiles}
 \usepackage{thm-restate}
@@ -61,6 +62,8 @@
 \newcommand{\brown}[1]{\textcolor{brown}{#1}}
 \newcommand{\black}[1]{\textcolor{black}{#1}}
 \newcommand{\orange}[1]{\textcolor{orange}{#1}}
+\newenvironment{MPCchange}{}{}
+\newcommand{\MPCchanged}[1]{#1}
 \newcommand{\st}{\text{ s.t. }}
 \newcommand{\Img}[1]{\mathrm{Im}\qty(#1)}
 \newcommand{\Ker}[1]{\mathrm{Ker}\qty(#1)}
@@ -100,6 +103,7 @@
 \newtheorem{lemma}{Lemma}
 \newtheorem{corollary}{Corollary}
 \newtheorem{assumption}{Assumption}
+\newtheorem*{problemsetting}{Problem Setting}
 
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}
@@ -113,6 +117,9 @@
 \crefname{proposition}{Proposition}{Propositions}
 \crefname{lemma}{Lemma}{Lemmas}
 \crefname{assumption}{Assumption}{Assumptions}
+\crefname{problemsetting}{Problem Setting}{Problem Settings}
+\crefformat{problemsetting}{#2Problem Setting#3}
+\Crefformat{problemsetting}{#2Problem Setting#3}
 \crefname{definition}{Definition}{Definitions}
 \crefname{corollary}{Corollary}{Corollaries}
 \crefname{remark}{Remark}{Remarks}
