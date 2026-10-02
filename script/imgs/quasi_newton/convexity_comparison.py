@@ -4,6 +4,9 @@ import seaborn as sns
 
 from qnlab.util.doc_paths import doc_imgs_dir
 
+COLOR_FUNCTION = "tab:blue"
+COLOR_QUADRATIC = "tab:orange"
+
 OUTPUT_DIR = doc_imgs_dir("quasi_newton")
 
 sns.set_style("darkgrid")
@@ -95,16 +98,16 @@ fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
 ax = axes[0]
 ax.set_title(r"$f(x) = x^4 + x$", fontsize=20, pad=20)
-ax.plot(x_range, f_x4(x_range), color="tab:blue", linewidth=2)
-ax.plot(x_range, quad_x4(x_range), "--", color="tab:orange", linewidth=2)
+ax.plot(x_range, f_x4(x_range), color=COLOR_FUNCTION, linewidth=2)
+ax.plot(x_range, quad_x4(x_range), "--", color=COLOR_QUADRATIC, linewidth=2)
 ax.set_xlabel("$x$")
 ax.set_ylabel("$f(x)$")
 ax.grid(True, alpha=0.3)
 
 ax = axes[1]
 ax.set_title(r"$f(x) = e^x$", fontsize=20, pad=20)
-ax.plot(x_range, f_exp(x_range), color="tab:blue", linewidth=2)
-ax.plot(x_range, quad_exp(x_range), "--", color="tab:orange", linewidth=2)
+ax.plot(x_range, f_exp(x_range), color=COLOR_FUNCTION, linewidth=2)
+ax.plot(x_range, quad_exp(x_range), "--", color=COLOR_QUADRATIC, linewidth=2)
 ax.set_xlabel("$x$")
 ax.set_ylabel("$f(x)$")
 ax.grid(True, alpha=0.3)
@@ -121,16 +124,16 @@ fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
 ax = axes[0]
 ax.set_title(r"$f(x) = x^4 + x^2$", fontsize=20, pad=20)
-ax.plot(x_range, f_x4_x2(x_range), color="tab:blue", linewidth=2)
-ax.plot(x_range, quad_x4_x2(x_range), "--", color="tab:orange", linewidth=2)
+ax.plot(x_range, f_x4_x2(x_range), color=COLOR_FUNCTION, linewidth=2)
+ax.plot(x_range, quad_x4_x2(x_range), "--", color=COLOR_QUADRATIC, linewidth=2)
 ax.set_xlabel("$x$")
 ax.set_ylabel("$f(x)$")
 ax.grid(True, alpha=0.3)
 
 ax = axes[1]
 ax.set_title(r"$f(x) = \cosh(x) = \frac{e^x + e^{-x}}{2}$", fontsize=20, pad=20)
-ax.plot(x_range, f_cosh(x_range), color="tab:blue", linewidth=2)
-ax.plot(x_range, quad_cosh(x_range), "--", color="tab:orange", linewidth=2)
+ax.plot(x_range, f_cosh(x_range), color=COLOR_FUNCTION, linewidth=2)
+ax.plot(x_range, quad_cosh(x_range), "--", color=COLOR_QUADRATIC, linewidth=2)
 ax.set_xlabel("$x$")
 ax.set_ylabel("$f(x)$")
 ax.grid(True, alpha=0.3)

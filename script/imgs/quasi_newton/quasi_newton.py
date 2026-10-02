@@ -8,6 +8,11 @@ import numpy as np
 
 from qnlab.util.doc_paths import doc_imgs_dir
 
+COLOR_CURRENT = "red"
+COLOR_NEXT = "yellow"
+COLOR_QUADRATIC = "tab:orange"
+COLOR_UPDATED_QUADRATIC = "tab:green"
+
 OUTPUT_DIR = doc_imgs_dir("quasi_newton")
 
 plt.rcParams.update(
@@ -119,14 +124,14 @@ def draw_common_elements(ax, draw_type: int):
         raise ValueError("draw_type must be 1, 2, or 3.")
 
     # x_k の点とテキスト
-    ax.scatter([x_now[0]], [x_now[1]], [f(x_now)], s=100, color="red")
+    ax.scatter([x_now[0]], [x_now[1]], [f(x_now)], s=100, color=COLOR_CURRENT)
     ax.text(
         x_now[0] - (0.0 if draw_type <= 2 else 0.4),
         x_now[1] + (0.2 if draw_type <= 2 else 0.4),
         f(x_now),
         r"$x_{k" + ("}$" if draw_type <= 2 else r"+1}$"),
         fontsize=45,
-        color="red",
+        color=COLOR_CURRENT,
     )
 
     # ステップ s_k の線とテキスト
@@ -148,14 +153,14 @@ def draw_common_elements(ax, draw_type: int):
         )
 
         # x_k の点とテキスト
-        ax.scatter([x_next[0]], [x_next[1]], [f(x_next)], s=100, color="yellow")
+        ax.scatter([x_next[0]], [x_next[1]], [f(x_next)], s=100, color=COLOR_NEXT)
         ax.text(
             x_next[0],
             x_next[1] + 0.2,
             f(x_next),
             r"$x_{k+1}$" if draw_type == 2 else r"$x_{k+2}$",
             fontsize=45,
-            color="yellow",
+            color=COLOR_NEXT,
         )
 
 
@@ -169,23 +174,23 @@ def draw_surface_quadratic(ax, Q, color, alpha):
     ax.plot_surface(
         X, Y, Q, alpha=alpha, linewidth=0, color=color, rcount=50, ccount=50
     )
-    if color == "tab:orange":
+    if color == COLOR_QUADRATIC:
         ax.text2D(
             0.65,
             0.7,
             r"$m_{k}(x)$",
             transform=ax.transAxes,
             fontsize=40,
-            color="tab:orange",
+            color=COLOR_QUADRATIC,
         )
-    elif color == "tab:green":
+    elif color == COLOR_UPDATED_QUADRATIC:
         ax.text2D(
             0.6,
             0.7,
             r"$m_{k+1}(x)$",
             transform=ax.transAxes,
             fontsize=40,
-            color="tab:green",
+            color=COLOR_UPDATED_QUADRATIC,
         )
 
 
@@ -272,11 +277,11 @@ g_kp1 = grad_f(x_kp1)
 def draw_panel2(ax, transparent_surfaces=True):
     if transparent_surfaces:
         draw_surface_z(ax, alpha=0.0)
-        draw_surface_quadratic(ax, Q_Bk, "tab:orange", alpha=0.0)
+        draw_surface_quadratic(ax, Q_Bk, COLOR_QUADRATIC, alpha=0.0)
         draw_common_elements(ax, 2)
     else:
         draw_surface_z(ax, alpha=1.0)
-        draw_surface_quadratic(ax, Q_Bk, "tab:orange", alpha=0.7)
+        draw_surface_quadratic(ax, Q_Bk, COLOR_QUADRATIC, alpha=0.7)
 
 
 create_enhanced_figure(draw_panel2, OUTPUT_DIR / "quasi_newton_2.pdf")
@@ -296,11 +301,11 @@ x_kp2 = x_kp1 - np.linalg.solve(B_kp1, g_kp1)
 def draw_panel3(ax, transparent_surfaces=True):
     if transparent_surfaces:
         draw_surface_z(ax, alpha=0.0)
-        draw_surface_quadratic(ax, Q_Bkp1, "tab:green", alpha=0.0)
+        draw_surface_quadratic(ax, Q_Bkp1, COLOR_UPDATED_QUADRATIC, alpha=0.0)
         draw_common_elements(ax, 3)
     else:
         draw_surface_z(ax, alpha=1.0)
-        draw_surface_quadratic(ax, Q_Bkp1, "tab:green", alpha=0.7)
+        draw_surface_quadratic(ax, Q_Bkp1, COLOR_UPDATED_QUADRATIC, alpha=0.7)
 
 
 create_enhanced_figure(draw_panel3, OUTPUT_DIR / "quasi_newton_3.pdf")

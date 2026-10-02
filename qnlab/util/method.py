@@ -57,6 +57,21 @@ COLORS.update(
     }
 )
 
+SENSITIVITY_COLORS = {
+    "underestimated": {
+        "NTRQN-MS": "#F7B6D2",
+        "NTRQN-Restart": "#AD1457",
+    },
+    "nominal": {
+        "NTRQN-MS": COLORS["NTRQN-MS"],
+        "NTRQN-Restart": COLORS["NTRQN-Restart"],
+    },
+    "overestimated": {
+        "NTRQN-MS": "#D6D98B",
+        "NTRQN-Restart": "#626B20",
+    },
+}
+
 LINE_STYLES = {
     "NTRQN": "o-",
     "NTRQN-MS": "o--",

@@ -10,7 +10,7 @@ os.environ.setdefault(
 
 import matplotlib.pyplot as plt
 
-from qnlab.util.method import COLORS, LINE_STYLES
+from qnlab.util.method import COLORS, LINE_STYLES, SENSITIVITY_COLORS
 
 LEGENDS = {
     "_legend.pdf": [
@@ -146,7 +146,7 @@ def create_sensitivity_legend():
             entries.append(
                 (
                     f"{method} ({setting})",
-                    COLORS[source],
+                    SENSITIVITY_COLORS[setting][source],
                     marker + setting_style,
                 )
             )

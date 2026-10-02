@@ -6,6 +6,9 @@ import seaborn as sns
 
 from qnlab.util.doc_paths import doc_imgs_dir
 
+COLOR_START = "#27AE60"
+COLOR_OPTIMUM = "#F39C12"
+
 OUTPUT_DIR = doc_imgs_dir("quasi_newton")
 
 # Set seaborn style for better-looking plots
@@ -109,7 +112,7 @@ def plot_trajectories(lambda_, x_bfgs, x_dfp):
         x_bfgs[0, 0],
         x_bfgs[0, 1],
         "o",
-        color="#27AE60",
+        color=COLOR_START,
         markersize=12,
         label="Start",
         markeredgecolor="white",
@@ -120,7 +123,7 @@ def plot_trajectories(lambda_, x_bfgs, x_dfp):
         0,
         0,
         "*",
-        color="#F39C12",
+        color=COLOR_OPTIMUM,
         markersize=20,
         label="Minimum",
         markeredgecolor="white",
@@ -161,7 +164,7 @@ def plot_trajectories(lambda_, x_bfgs, x_dfp):
         x_dfp[0, 0],
         x_dfp[0, 1],
         "o",
-        color="#27AE60",
+        color=COLOR_START,
         markersize=12,
         label="Start",
         markeredgecolor="white",
@@ -172,7 +175,7 @@ def plot_trajectories(lambda_, x_bfgs, x_dfp):
         0,
         0,
         "*",
-        color="#F39C12",
+        color=COLOR_OPTIMUM,
         markersize=20,
         label="Minimum",
         markeredgecolor="white",

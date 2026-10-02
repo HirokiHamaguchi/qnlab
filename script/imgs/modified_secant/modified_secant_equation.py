@@ -7,6 +7,10 @@ import numpy.typing as npt
 
 from qnlab.util.doc_paths import doc_imgs_dir
 
+COLOR_SECANT = "darkgreen"
+COLOR_MINIMUM = "red"
+COLOR_MODEL = "black"
+
 plt.rcParams["text.usetex"] = True
 
 
@@ -82,11 +86,11 @@ def trial(
 
     if "HESS" == kind:
         plt.plot(
-            xVals, yHESS, color="black", label="Exact Quadratic Model", linewidth=3
+            xVals, yHESS, color=COLOR_MODEL, label="Exact Quadratic Model", linewidth=3
         )
         # (bestX, bestY)を中心に赤色の円を描く
         circle = matplotlib.patches.Circle(
-            (bestX, bestY), 0.05, color="red", fill=False, linestyle="--"
+            (bestX, bestY), 0.05, color=COLOR_MINIMUM, fill=False, linestyle="--"
         )
         ax.add_artist(circle)
         plt.text(
@@ -94,7 +98,7 @@ def trial(
             bestY + 0.3,
             "Almost no gap",
             fontsize=35,
-            color="red",
+            color=COLOR_MINIMUM,
             zorder=5,
         )
 
@@ -106,32 +110,32 @@ def trial(
             [x[0] - dx, x[0] + dx],
             [fx - g * dx, fx + g * dx],
             "-.",
-            color="darkgreen",
+            color=COLOR_SECANT,
             zorder=-1,
         )
         plt.plot(
             [xp[0] - dx, xp[0] + dx],
             [fxp - gp * dx, fxp + gp * dx],
             "-.",
-            color="darkgreen",
+            color=COLOR_SECANT,
             zorder=-1,
         )
 
     if "BFGS" == kind:
-        plt.plot(xVals, yBFGS, color="black", label="Quadratic Model", linewidth=3)
+        plt.plot(xVals, yBFGS, color=COLOR_MODEL, label="Quadratic Model", linewidth=3)
         fBFGS = fx + g * (xp - x) + 0.5 * (g - gp) / (x - xp) * (x - xp) ** 2
         plt.plot(
             [xp - dx, xp + dx],
             [fxp - gp * dx, fxp + gp * dx],
             "-.",
-            color="darkgreen",
+            color=COLOR_SECANT,
             zorder=-1,
         )
         plt.plot(
             [xp - dx, xp + dx],
             [fBFGS - gp * dx, fBFGS + gp * dx],
             "-.",
-            color="darkgreen",
+            color=COLOR_SECANT,
             zorder=-1,
         )
         fBest = (fx + g * (bestX - x) + 0.5 * (gp - g) / (xp - x) * (x - bestX) ** 2)[0]
@@ -148,13 +152,13 @@ def trial(
             xVals,
             cubic,
             ":" if "1_quadratic" == kind else "--",
-            color="black",
+            color=COLOR_MODEL,
             label="Cubic Model",
             linewidth=3,
         )
 
         if "1_quadratic" == kind:
-            plt.plot(xVals, y1, color="black", label="Quadratic Model", linewidth=3)
+            plt.plot(xVals, y1, color=COLOR_MODEL, label="Quadratic Model", linewidth=3)
             fBest = (
                 fx
                 + g * (bestX - x)
@@ -166,7 +170,7 @@ def trial(
                 [xp[0] - dx, xp[0] + dx],
                 [fxp - gp * dx, fxp + gp * dx],
                 "-.",
-                color="darkgreen",
+                color=COLOR_SECANT,
                 zorder=-1,
             )
             fBest = (
@@ -177,7 +181,7 @@ def trial(
             )[0]
 
     if "2" == kind:
-        plt.plot(xVals, y2, color="black", label="Quadratic Model", linewidth=3)
+        plt.plot(xVals, y2, color=COLOR_MODEL, label="Quadratic Model", linewidth=3)
         fBest = (
             fx
             + g * (bestX - x)
@@ -185,14 +189,14 @@ def trial(
         )[0]
 
     if "3" == kind:
-        plt.plot(xVals, y1, ":", color="black", label="Quadratic Model", linewidth=3)
-        plt.plot(xVals, y3, color="black", label="Clipped Model", linewidth=3)
+        plt.plot(xVals, y1, ":", color=COLOR_MODEL, label="Quadratic Model", linewidth=3)
+        plt.plot(xVals, y3, color=COLOR_MODEL, label="Clipped Model", linewidth=3)
         plt.errorbar(
             xp,
             fxp,
             yerr=[(fxp - fx) / 2, (fxp - fx)],
             fmt="o",
-            color="darkgreen",
+            color=COLOR_SECANT,
             capsize=10,
             linewidth=3,
             zorder=-1,
@@ -211,21 +215,21 @@ def trial(
         head_width=0.05,
         head_length=0.05,
         length_includes_head=True,
-        fc="red",
-        ec="red",
+        fc=COLOR_MINIMUM,
+        ec=COLOR_MINIMUM,
         zorder=5,
     )
 
-    plt.scatter([xp], [fxp], color="black", zorder=5)
+    plt.scatter([xp], [fxp], color=COLOR_MODEL, zorder=5)
     plt.text(
         xp[0] + (-0.6 if "3" == kind else +0.1),
         fxp - 0.05,
         "$x_k$",
         fontsize=35,
-        color="black",
+        color=COLOR_MODEL,
     )
-    plt.scatter([x], [fx], color="black", zorder=5)
-    plt.text(x[0] - 0.1, fx - 0.15, "$x_{k+1}$", fontsize=35, color="black")
+    plt.scatter([x], [fx], color=COLOR_MODEL, zorder=5)
+    plt.text(x[0] - 0.1, fx - 0.15, "$x_{k+1}$", fontsize=35, color=COLOR_MODEL)
 
     plt.axis("off")
 

@@ -5,6 +5,9 @@ from matplotlib.patches import FancyArrowPatch
 
 from qnlab.util.doc_paths import doc_imgs_dir
 
+COLOR_K0 = "#1f77b4"
+COLOR_KP = "#d62728"
+
 OUTPUT_DIR = doc_imgs_dir("for_paper")
 
 # -------------------------
@@ -32,18 +35,18 @@ plt.figure(figsize=(10, 4.8))
 # draw line segments with color switching
 for i in range(len(k) - 1):
     if k[i] in K0:
-        color = "#1f77b4"  # blue
+        color = COLOR_K0  # blue
     else:
-        color = "#d62728"  # red
+        color = COLOR_KP  # red
 
     plt.plot(k[i : i + 2], f[i : i + 2], "-o", color=color, lw=2.5, ms=6)
 
 # final point
-last_color = "#1f77b4" if k[-1] in K0 else "#d62728"
+last_color = COLOR_K0 if k[-1] in K0 else COLOR_KP
 plt.plot(k[-1], f[-1], "o", color=last_color, ms=6)
 
 # continuation hint (dashed line after k=8)
-plt.plot([8, 8.5], [3.2, 3.0], "--", color="#d62728", lw=2.5)
+plt.plot([8, 8.5], [3.2, 3.0], "--", color=COLOR_KP, lw=2.5)
 
 # -------------------------
 # annotations (inequalities)
@@ -109,14 +112,14 @@ plt.plot(
     [],
     [],
     "-o",
-    color="#1f77b4",
+    color=COLOR_K0,
     label=r"\makebox[0pt][l]{$k\in K^0$}\phantom{$k\in K^+$} $(\mu_k=0)$",
 )
 plt.plot(
     [],
     [],
     "-o",
-    color="#d62728",
+    color=COLOR_KP,
     label=r"\makebox[0pt][l]{$k\in K^+$}\phantom{$k\in K^+$} $(\mu_k>0)$",
 )
 plt.legend(frameon=True, fontsize=25)

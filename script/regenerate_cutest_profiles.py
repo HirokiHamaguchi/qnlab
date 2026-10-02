@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from qnlab.experiment.profile import performance_profile
-from qnlab.util.method import COLORS, LINE_STYLES
+from qnlab.util.method import COLORS, LINE_STYLES, SENSITIVITY_COLORS
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 RESULT_ROOT = REPOSITORY_ROOT / "data" / "temp"
@@ -314,6 +314,10 @@ def main() -> None:
         "eps_nominal": ("nominal", "-"),
         "eps_over": ("overestimated", ":"),
     }
+    sensitivity_sources = {
+        "Ours": "NTRQN-MS",
+        "Ours-Heuristic": "NTRQN-Restart",
+    }
     for scenario, (setting, style) in setting_styles.items():
         precision, seeds, tolerances, methods = SCENARIOS[scenario]
         values = load_metric(
@@ -330,7 +334,9 @@ def main() -> None:
             marker = "o" if method == "Ours" else "s"
             sensitivity_methods.append(label)
             sensitivity_values.append(method_values)
-            sensitivity_colors[label] = PLOT_COLORS[method]
+            sensitivity_colors[label] = SENSITIVITY_COLORS[setting][
+                sensitivity_sources[method]
+            ]
             sensitivity_line_styles[label] = marker + style
     draw_profile(
         tuple(sensitivity_methods),

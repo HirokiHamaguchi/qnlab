@@ -4,6 +4,10 @@ import seaborn as sns
 
 from qnlab.util.doc_paths import doc_imgs_dir
 
+COLOR_FUNCTION = "tab:blue"
+COLOR_ITERATE = "tab:red"
+COLOR_PROJECTION = "tab:gray"
+
 OUTPUT_DIR = doc_imgs_dir("quasi_newton")
 
 sns.set_style("darkgrid")
@@ -71,7 +75,7 @@ x = np.linspace(0.7, 1.8, 400)
 
 fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
-# Create viridis colormap for iterations
+# Create plasma colormap for iterations
 n_iter = len(xs_root) - 1
 colors = plt.get_cmap("plasma")(
     np.linspace(0.2, 0.8, n_iter)
@@ -79,7 +83,7 @@ colors = plt.get_cmap("plasma")(
 
 # --- Left: Newton's method in optimization ---
 ax = axes[0]
-ax.plot(x, f(x), label="$f(x)$", color="tab:blue")
+ax.plot(x, f(x), label="$f(x)$", color=COLOR_FUNCTION)
 for i in range(len(xs_opt) - 1):
     x_i, x_next = xs_opt[i], xs_opt[i + 1]
     # Quadratic approximation
@@ -90,9 +94,9 @@ for i in range(len(xs_opt) - 1):
     x_model_min = -b / (2 * a)
     y_model_min = a * x_model_min**2 + b * x_model_min + c
     ax.plot(x, quad, "--", color=colors[i], alpha=0.9)
-    ax.plot([x_i], [f(x_i)], "o", color="tab:red", markersize=10)
+    ax.plot([x_i], [f(x_i)], "o", color=COLOR_ITERATE, markersize=10)
     ax.text(x_i, f(x_i) + 0.2, f"$x_{i}$", ha="center", fontsize=20)
-    ax.plot([x_next, x_next], [0, f(x_next)], ":", color="tab:gray")
+    ax.plot([x_next, x_next], [0, f(x_next)], ":", color=COLOR_PROJECTION)
 ax.set_title("Optimization on $f(x)$")
 ax.set_xlabel("$x$")
 ax.set_ylabel("$f(x)$")
@@ -100,15 +104,15 @@ ax.legend()
 
 # --- Right: Root finding on gradient (Newton's method) ---
 ax = axes[1]
-ax.plot(x, df(x), label=r"$\nabla f(x)$", color="tab:blue")
+ax.plot(x, df(x), label=r"$\nabla f(x)$", color=COLOR_FUNCTION)
 for i in range(len(xs_root) - 1):
     x_i, x_next = xs_root[i], xs_root[i + 1]
     # Tangent line
     tangent = df(x_i) + d2f(x_i) * (x - x_i)
     ax.plot(x, tangent, "--", color=colors[i], alpha=0.9)
-    ax.plot([x_i], [df(x_i)], "o", color="tab:red", markersize=10)
+    ax.plot([x_i], [df(x_i)], "o", color=COLOR_ITERATE, markersize=10)
     ax.text(x_i, df(x_i) + 0.3, f"$x_{i}$", ha="center", fontsize=20)
-    ax.plot([x_next, x_next], [0, df(x_next)], ":", color="tab:gray")
+    ax.plot([x_next, x_next], [0, df(x_next)], ":", color=COLOR_PROJECTION)
 ax.axhline(0, color="black", linewidth=1)
 ax.set_title("Root finding on $\\nabla f(x)$")
 ax.set_xlabel("$x$")
@@ -123,7 +127,7 @@ plt.close()
 # --- Storyboard: optimization-only (3 frames) ---
 def plot_opt_frame(step_idx, x, xs_opt, colors):
     fig, ax = plt.subplots(1, 1, figsize=(6, 4))
-    ax.plot(x, f(x), label="$f(x)$", color="tab:blue")
+    ax.plot(x, f(x), label="$f(x)$", color=COLOR_FUNCTION)
 
     x_i = xs_opt[step_idx]
     x_next = xs_opt[step_idx + 1]
@@ -141,7 +145,7 @@ def plot_opt_frame(step_idx, x, xs_opt, colors):
     y_quad_min = a * x_quad_min**2 + b * x_quad_min + c
 
     # Current point and next point
-    ax.plot([x_i], [f(x_i)], "o", color="tab:red", markersize=10)
+    ax.plot([x_i], [f(x_i)], "o", color=COLOR_ITERATE, markersize=10)
     ax.text(x_i, float(f(x_i)) + 0.2, f"$x_{step_idx}$", ha="center", fontsize=18)
     ax.plot([x_next], [f(x_next)], "o", color="tab:green", markersize=8)
     ax.annotate(

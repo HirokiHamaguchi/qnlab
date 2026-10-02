@@ -3,6 +3,8 @@ import numpy as np
 
 from qnlab.util.doc_paths import doc_imgs_dir
 
+COLOR_NEWTON_STEPS = "red"
+
 OUTPUT_DIR = doc_imgs_dir("quasi_newton")
 
 plt.rcParams["text.usetex"] = True
@@ -41,7 +43,7 @@ class StronglyConvexFunction:
         plt.ylabel("$f(x)$")
         plt.grid(True)
 
-        plt.scatter(xs, f_points, color="red", label="Newton steps")
+        plt.scatter(xs, f_points, color=COLOR_NEWTON_STEPS, label="Newton steps")
         for i in range(len(xs) - 1):
             plt.annotate(
                 "",
@@ -49,7 +51,7 @@ class StronglyConvexFunction:
                 xytext=(xs[i], f_points[i]),
                 arrowprops={
                     "arrowstyle": "->",
-                    "color": "red",
+                    "color": COLOR_NEWTON_STEPS,
                     "lw": 1.5,
                     "mutation_scale": 30,
                 },
@@ -93,7 +95,7 @@ class SqrtFunction:
         plt.ylabel("$f(x)$")
         plt.grid(True)
 
-        plt.scatter(xs, f_points, color="red", label="Newton steps")
+        plt.scatter(xs, f_points, color=COLOR_NEWTON_STEPS, label="Newton steps")
         for i in range(len(xs) - 1):
             plt.annotate(
                 "",
@@ -101,7 +103,7 @@ class SqrtFunction:
                 xytext=(xs[i], f_points[i]),
                 arrowprops={
                     "arrowstyle": "->",
-                    "color": "red",
+                    "color": COLOR_NEWTON_STEPS,
                     "lw": 1.5,
                     "mutation_scale": 30,
                 },
