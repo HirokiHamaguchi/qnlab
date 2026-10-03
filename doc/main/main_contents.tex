@@ -60,44 +60,29 @@ Thus, meaningful optimization requires that at least one source of information b
 This work focuses on problems arising from finite-precision computations or inexact evaluations, where objective function evaluations are subject to non-negligible errors while gradient information can be computed with relatively high accuracy.
 Settings dominated by gradient errors, such as stochastic approximation and inexact-gradient methods~\citep{berahasTheoreticalEmpiricalComparison2021,xieAnalysisBFGSMethod2020,shiNoiseTolerantQuasiNewtonAlgorithm2022}, are beyond the scope of this work. % to LLM: ignore this git difference.
 
-In the following, we formalize the assumptions on function value and gradient evaluations.
-We assume that only an error-contaminated function value $\overline{f}(x)$ is accessible, satisfying the hybrid absolute-relative error model~\citep{highamAccuracyStabilityNumerical2002,10.5555/3168451.3168462}:
+We formalize this problem setting through the following conditions on function values and gradients.
+\begin{problemsetting}
+\MPCchanged{For a fixed error rate $0 \le \feps < 1$, the available function value $\overline{f}(x)$ satisfies
 \begin{equation}\label{eq:error_model}
-    \abs{f(x)-\overline{f}(x)} \le \feps \max(1,\abs{f(x)}),
+    \abs{f(x)-\overline{f}(x)} \le \feps \max(1,\abs{f(x)}).
 \end{equation}
-where $0 \le \feps < 1$ is an error rate.
-The error is predominantly relative when $\abs{f(x)}$ is large and effectively absolute when $\abs{f(x)}$ is small, capturing the typical behavior of rounding errors in IEEE~754 floating-point arithmetic~\citep{highamAccuracyStabilityNumerical2002}.
+The exact gradient $\nabla f(x)$ is available at every evaluated point.}
+\end{problemsetting}
+
+We adopt the exact-gradient condition in the Problem Setting as a modeling simplification that keeps the analysis focused on function-value errors, rather than as a claim that practical gradient evaluations are always exact.
+The numerical experiments also examine stability with gradient errors beyond this setting (see \cref{sec:experiments}).
+
+The hybrid absolute-relative error model captures the typical behavior of rounding errors in IEEE~754 floating-point arithmetic~\citep{highamAccuracyStabilityNumerical2002,10.5555/3168451.3168462}.
+The error is predominantly relative when $\abs{f(x)}$ is large and effectively absolute when $\abs{f(x)}$ is small.
 \MPCchanged{In the numerical experiments, $\feps$ is supplied as a safety margin for accumulated errors in the computed function values, with its practical specification and sensitivity to misspecification discussed in \cref{sec:experiments}.}
 Closely related models are also employed in practical stopping criteria~\citep{2020SciPy-NMeth}.
-
-We next specify the assumption on gradient evaluations. % to LLM: ignore this git difference.
-Let $g(x)$ be the gradient returned by the available gradient oracle at $x$. % to LLM: ignore this git difference.
-In practice, termination is typically based on a gradient tolerance $\gtol$, and $\norm{g(x)}\leq\gtol$ is used as a stopping criterion. % to LLM: ignore this git difference.
-Reliable termination at the tolerance $\gtol$ requires gradient errors to be sufficiently small relative to $\gtol$. % to LLM: ignore this git difference.
-We therefore adopt the following exact-gradient assumption as a modeling simplification that keeps the analysis focused on function-value errors, rather than as a claim that practical gradient evaluations are exact. % to LLM: ignore this git difference.
-\begin{MPCchange}
-\begin{assumption}[Exact gradient]\label{ass:exact_gradient}
-    The algorithm has access to a gradient oracle $g$ such that, for every evaluated point $x$,
-    \begin{equation}\label{eq:exact_gradient_assumption}
-        g(x)=\nabla f(x).
-    \end{equation}
-\end{assumption}
-\end{MPCchange}
-\begin{MPCchange}
-The experiments using only function-value noise satisfy \cref{ass:exact_gradient}.
-Experiments with joint noise or reduced precision complement the theory by evaluating empirical performance beyond the exact-gradient setting.
-\end{MPCchange}
 
 \section{Proposed Algorithm}\label{sec:algorithm}
 
 We propose a new algorithm for the problem setting stated in \cref{sec:problem_setting}.
 We draw inspiration from the OFFO framework to design regularization and scaling strategies for inexact function values. % to LLM: ignore this git difference.
-Unlike purely OFFO methods, our algorithm exploits function values when they are numerically reliable and switches to gradient-based control otherwise.
+\MPCchanged{Unlike purely OFFO methods, our algorithm uses function values in the line search in both modes, while the OFFO-inspired regularization scale depends only on gradient information.}
 The pseudo-code of our algorithm is given in \cref{alg:regularized_qn}.
-\begin{MPCchange}
-The test in \refLine{line:mu_0_condition} permits an unregularized quasi-Newton step when the error-adjusted function values certify progress and otherwise invokes the OFFO-based scale.
-Function values are used in the line search in both modes, whereas the OFFO-based regularization scale depends only on gradient information.
-\end{MPCchange}
 The minimum of the empty set is defined as $+\infty$ in \refLine{line:mu_0_condition}.
 \Cref{alg:backtracking_linesearch} is an auxiliary line search algorithm called in \cref{alg:regularized_qn}.
 In the following, we explain the three main components of \cref{alg:regularized_qn}.
@@ -106,20 +91,20 @@ In the following, we explain the three main components of \cref{alg:regularized_
 \begin{algorithm}[ht]
     \normalsize
     \KwIn{$x_0$, $0 < k_{\max}$, $0 \le \feps < 1$, $0 < \theta_{\min} \leq \theta_{\max}$ and $0 < \varsigma < 1$}
-    $k \gets 0$, $g_0 \gets g(x_0)$, $K^0 \gets \emptyset$, $K^+ \gets \emptyset$ \label{line:init}\; % to LLM: ignore this git difference.
+    $k \gets 0$, $g_0 \gets \nabla f(x_0)$, \MPCchanged{$K^0_0 \gets \emptyset$, $K^+_0 \gets \emptyset$} \label{line:init}\;
     \For{$k=0,1,2,\ldots, k_{\max}-1$}{
-        \uIf{$\min_{j \in K^0\MPCchanged{,\,j < k}} (\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k)$\label{line:mu_0_condition}}{
-            $K^0 \gets K^0 \cup \{k\}$ \label{line:update_K_0}\;
+        \uIf{\MPCchanged{$\min_{j \in K^0_k} (\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k)$}\label{line:mu_0_condition}}{
+            \MPCchanged{$K^0_{k+1} \gets K^0_k \cup \{k\}$, $K^+_{k+1} \gets K^+_k$} \label{line:update_K_0}\;
             $\mu_k \gets 0$ \label{line:update_mu_0}\;
         }
         \uElse{
-            $K^+ \gets K^+ \cup \{k\}$ \label{line:update_K_plus}\;
-            $\mu_{k} \gets \theta_k \sqrt{\varsigma + \sum_{j \in K^+} \norm{g_{j}}^2}$ with $\theta_k \in [\theta_{\min}, \theta_{\max}]$ ~ (see \cref{sec:proposed_choice_mu}). \label{line:update_theta}\;
+            \MPCchanged{$K^0_{k+1} \gets K^0_k$, $K^+_{k+1} \gets K^+_k \cup \{k\}$} \label{line:update_K_plus}\;
+            \MPCchanged{$\mu_{k} \gets \theta_k \sqrt{\varsigma + \sum_{j \in K^+_{k+1}} \norm{g_{j}}^2}$} with $\theta_k \in [\theta_{\min}, \theta_{\max}]$ ~ (see \cref{sec:proposed_choice_mu}). \label{line:update_theta}\;
         }
         $d_k \gets -(B_k + \mu_k I)^{-1} g_k$ with $B_k$ ~ (see \cref{sec:proposed_choice_Bk}). \label{line:d_k}\;
         Find $\alpha_k$ and $\Delta_k$ satisfying \cref{eq:relaxed_Armijo_condition} by \cref{alg:backtracking_linesearch}.  \label{line:armijo}\;
         $x_{k+1} \gets x_k + \alpha_k d_k$,\,
-        $g_{k+1} \gets g(x_{k+1})$ \label{line:update}\; % to LLM: ignore this git difference.
+        $g_{k+1} \gets \nabla f(x_{k+1})$ \label{line:update}\;
     }
     \caption{Noise-Tolerant Regularized Quasi-Newton Method}
     \label{alg:regularized_qn}
@@ -143,7 +128,7 @@ In the following, we explain the three main components of \cref{alg:regularized_
 \paragraph{Computation of the Regularized Quasi-Newton Direction (\refLine{line:d_k}): }\label{sec:algorithm_components_d}
 
 The first component is the computation of the regularized quasi-Newton direction $d_k$ stated in \cref{sec:prel_rqn}.
-Given $g_k=g(x_k)=\nabla f(x_k)$, an approximate Hessian $B_k$, and a regularization parameter $\mu_k$, we compute the search direction $d_k = -(B_k+\mu_k I)^{-1} g_k$. % to LLM: ignore this git difference.
+Given $g_k=\nabla f(x_k)$, an approximate Hessian $B_k$, and a regularization parameter $\mu_k$, we compute the search direction $d_k = -(B_k+\mu_k I)^{-1} g_k$. % to LLM: ignore this git difference.
 A practical choice of $B_k$ is discussed in \cref{sec:proposed_choice_Bk}.
 
 \paragraph{Relaxed Armijo Condition with an Error-Absorbing Term (\refLine{line:armijo}): }\label{sec:algorithm_components_alpha}
@@ -167,40 +152,36 @@ This prevents unbounded growth of $\Delta_k$.
 The third component is the adaptive update of the regularization parameter $\mu_k$.
 A larger $\mu_k$ yields a more conservative step, while a smaller $\mu_k$ allows a more aggressive quasi-Newton step, especially when $\mu_k=0$.
 In practical settings, $\mu_k=0$ is preferred, since this allows us to fully exploit the quasi-Newton approximation and typically leads to practically faster convergence.
-Let us partition the iteration indices $K\defeq \{0,1,2,\ldots, k_{\max}-1\}$ into two sets:
+\begin{MPCchange}
+Let $K\coloneqq \{0,1,2,\ldots, k_{\max}-1\}$ be the set of iteration indices.
+As shown in \cref{alg:regularized_qn}, $K_k^0 = \{j \in K \mid \mu_j = 0,\ j < k\}$ and $K_k^+ = \{j \in K \mid \mu_j > 0,\ j < k\}$ contain the unregularized and regularized iteration indices classified before iteration $k$, respectively.
+After the final iteration, define
 \begin{equation}\label{eq:def_K0_Kplus}
-    K^0 \defeq \{k \in K \mid \mu_k = 0\}, \quad K^+ \defeq \{k \in K \mid \mu_k > 0\}.
+    K^0 \coloneqq K^0_{k_{\max}}, \quad K^+ \coloneqq K^+_{k_{\max}}.
 \end{equation}
+These final sets partition $K$.
+\end{MPCchange}
 We set $\mu_k=0$ if and only if the following condition is satisfied:
 \begin{equation}\label{eq:mu_0_condition}
-    \min_{j \in K^0, \, j < k} \qty(\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k).
+    \MPCchanged{\min_{j \in K_k^0} \qty(\overline{f}(x_j)- \Delta_j) \ge \overline{f}(x_k).}
 \end{equation}
-Note that $k=0$ satisfies \cref{eq:mu_0_condition} since $K^0$ is empty.
+Note that $k=0$ satisfies \cref{eq:mu_0_condition} since $K_0^0$ is empty.
 This condition restricts $\mu_k=0$ to iterations for which a sufficient decrease in $\overline f$ has been observed.
-Thus, although $\overline{f}$ can temporarily increase, every iteration in $K^0$ must improve the previous error-adjusted reference value. % to LLM: ignore this git difference.
+Thus, although $\overline{f}$ can temporarily increase, every iteration in $K^0$ must improve the previous error-adjusted reference value.
 Otherwise, to ensure convergence to first-order stationary points, we apply an OFFO-based update
 \begin{equation}\label{eq:offo_based_update}
-    \mu_k = \theta_k \sqrt{\varsigma+\sum_{j \in K^+, \, j \leq k}\norm{g_j}^2},
+    \mu_k = \theta_k \sqrt{\varsigma+\sum_{j \in K^+_{k+1}}\norm{g_j}^2},
 \end{equation}
 as described in \cref{sec:prel_offo}.
 Since OFFO schemes do not rely on function values, this update is independent of numerical errors in $\overline{f}$. % to LLM: ignore this git difference.
 
-\begin{MPCchange}
-The rationale for why a purely regularized quasi-Newton method is inadequate, thus necessitating the additional OFFO-inspired fallback mechanism, is that existing regularized Newton-type methods still rely on reliable function values: line search variants use them in sufficient-decrease tests, while adaptive regularization methods use the actual objective-function reduction to control step acceptance and the regularization parameter~\citep{uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023}.
-With inexact function values, neither comparison can be evaluated reliably, while the relaxed Armijo condition required to make our line search well-defined permits a persistent error allowance.
-Although the relaxed line search ensures that a step can be computed, relying on its decrease estimate at every iteration would not control the accumulated error and therefore would not support convergence to arbitrarily small first-order tolerances.
-Our switch therefore restricts unregularized steps to iterations for which error-adjusted function values certify progress and invokes the OFFO-inspired cumulative-gradient scale otherwise.
-Thus, a regularization mechanism driven solely by function-value comparisons is insufficient for our convergence goal.
-The OFFO-inspired fallback is needed to provide function-value-independent control when measured decreases cannot be trusted.
-\end{MPCchange}
-
 \section{Theoretical Analysis}\label{sec:analysis}
 
-In this section, we establish the global convergence properties of \cref{alg:regularized_qn} under the problem setting in \cref{sec:problem_setting}, namely, \cref{eq:error_model,eq:exact_gradient_assumption}.
+In this section, we establish the global convergence properties of \cref{alg:regularized_qn} under the problem setting in \cref{sec:problem_setting}.
 
 \subsection{Assumptions}\label{sec:assumptions}
 
-In addition to the exact-gradient assumption stated in \cref{ass:exact_gradient}, we make the following three structural assumptions. % to LLM: ignore this git difference.
+Throughout this section, we make the following three structural assumptions.
 The first assumption ensures that the objective function is bounded below.
 \begin{assumption}\label{ass:bounded}
     The function $f$ is bounded below, meaning that for all $x \in \mathbb{R}^n$,
@@ -210,8 +191,7 @@ The first assumption ensures that the objective function is bounded below.
 \end{assumption}
 By the triangle inequality and \cref{eq:error_model}, we have
 $\overline{f}(x) \ge f(x) - \feps \max(1, \abs{f(x)})$.
-Since the function $g(t) = t - \feps \max(1, \abs{t})$ is non-decreasing for $0 \le \feps < 1$, it follows that $\inf_x g(f(x)) = g(f^*)$.
-Consequently, we can also lower bound $\overline{f}$ as
+Since $t - \feps \max(1, \abs{t})$ is a continuous, non-decreasing function of $t$ for $0 \le \feps < 1$, we obtain
 \begin{equation}\label{eq:ass_bounded_overline_f}
     \overline{f}(x) \ge
     \overline{f}^*
@@ -468,7 +448,7 @@ We now bound the sum of $\delta_k = f(x_k) - f(x_{k+1})$ over $k \in K^0$ with $
 
 Next, we show that the sum of $\delta_{k}$ over $k \in K^+$ is lower bounded.
 Recall that $K^+$ is the set of iteration indices $k$ such that $\mu_k > 0$ as defined in \cref{eq:def_K0_Kplus}, % to LLM: ignore this git difference.
-and that $\mu_k$ is defined as $\theta_k \sqrt{\varsigma + \sum_{j \in K^+,\ j \MPCchanged{\leq} k} \norm{g_{j}}^2}$ with $\theta_k \in [\theta_{\min}, \theta_{\max}]$ in \refLine{line:update_theta} of \cref{alg:regularized_qn}.
+For $k\in K^+$, \cref{eq:offo_based_update} gives $\mu_k=\theta_k \sqrt{\varsigma + \sum_{j \in K^+_{k+1}} \norm{g_{j}}^2}$ with $\theta_k \in [\theta_{\min}, \theta_{\max}]$.
 
 Before proceeding to the main proof, we present \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}, which collects standard inequalities from the AdaGrad-Norm analysis~\citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020}~\citep[Lemma~3.1]{Gratton08022024}. % to LLM: ignore this git difference.
 Its proof is deferred to \cref{sec:proof_of_sum_norm_g_over_mu_geq_2sqrt_leq_log}.
@@ -562,7 +542,7 @@ Then, we can obtain the following unified bound for the two types of iterations.
 
 Now, we establish the following convergence rate for \cref{alg:regularized_qn}.
 \begin{theorem}\label{thm:gc}
-    Under \cref{ass:exact_gradient,ass:bounded,ass:LSmooth,ass:BBounds}, the average of squared gradient norms generated by \cref{alg:regularized_qn} satisfies % to LLM: ignore this git difference.
+    Under the problem setting in \cref{sec:problem_setting} and \cref{ass:bounded,ass:LSmooth,ass:BBounds}, the average of squared gradient norms generated by \cref{alg:regularized_qn} satisfies
     \begin{equation*}
         \frac{1}{k_{\max}} \sum_{k=0}^{k_{\max}-1} \norm{g_k}^2 = \order{\frac{1}{k_{\max}}}.
     \end{equation*}
@@ -628,35 +608,45 @@ Finally, \cref{thm:gc} implies the iteration-complexity bound % to LLM: ignore t
     \min\left\{k \relmiddle| \norm{\nabla f(x_k)} \leq \gtol \right\} = \order{1/\gtol^2}.
 \end{equation*}
 \begin{MPCchange}
-More explicitly, \cref{eq:gc_result} gives the sufficient bound
-\begin{equation*}
+Let us examine the hidden constants in this bound.
+By \cref{eq:gc_result}, an iterate satisfying $\norm{\nabla f(x_k)} \leq \gtol$ for some $0 \leq k < k_{\max}$ is guaranteed whenever
+\begin{equation}
     k_{\max}\geq \frac{1}{\gtol^2}
-    \max\left\{\frac{MF'}{c\overline\alpha},\frac{4(F')^2}{C_1^2}\right\}.
-\end{equation*}
-We treat $c$, $\beta_{\min}$, $\theta_{\min}$, $\theta_{\max}$, and $\varsigma$ as fixed algorithmic parameters.
+    \max\left\{\frac{MF'}{c\overline\alpha},\frac{4(F')^2}{C_1^2}\right\}. \label{eq:k_max_gtol_bound}
+\end{equation}
+In the following, we treat $c$, $\beta_{\min}$, $\theta_{\min}$, $\theta_{\max}$, and $\varsigma$ as fixed algorithmic parameters.
 For the proposed construction of $B_k$ (described in \cref{sec:proposed_choice_Bk}), let the memory size $p$ and pair-selection parameter $\Lambda$ also be fixed.
-The spectral constants are then
+The spectral constants, which are independent of the target accuracy $\gtol$, are then
 \begin{equation*}
     m   = \min\{1,\sqrt{\varsigma}\}>0, \quad
     M   = \qty(1+(1+p)\Lambda)\max\{1,\norm{g_0}\}.
 \end{equation*}
-Define the line-search conditioning factor $\kappa_{\mathrm{ls}}\coloneqq\max\{1,L/m\}$.
+Define the line-search conditioning factor $L_{\mathrm{ls}}\coloneqq\max\{1,L/m\}$.
 Using \cref{eq:def_alpha_bar,eq:def_C1_C2,eq:def_Delta_max}, we obtain
 \begin{align*}
-    \overline\alpha^{-1} & = \order{\kappa_{\mathrm{ls}}}, \qquad
-    C_1^{-1} = \order{\kappa_{\mathrm{ls}}}, \qquad
-    C_2 = \order{M/\kappa_{\mathrm{ls}}+L}, \\
+    \overline\alpha^{-1} & = \order{L_{\mathrm{ls}}}, \qquad
+    C_1^{-1} = \order{L_{\mathrm{ls}}}, \qquad
+    C_2 = \order{M/L_{\mathrm{ls}}+L}, \\
     \Delta_{\max}        & = \order{\frac{\feps}{1-\feps}\max\{1,\overline f(x_0),-\overline f^*\}}.
 \end{align*}
-Substituting these relations into \cref{eq:def_F_prime} gives
+Combining the logarithmic terms in \cref{eq:def_F_prime} and using the bounds above, we obtain
 \begin{align*}
-    F' = \mathcal{O}\bigg(&f(x_0)-f^*+\frac{\overline f(x_0)-\overline f^*}{1-\feps}
-    +\frac{\feps\max\{1,\overline f(x_0),-\overline f^*\}}{(1-\feps)^2} \\
-    &{}+(M/\kappa_{\mathrm{ls}}+L)\ln(2+M+L\kappa_{\mathrm{ls}})\bigg).
+    C_1 \sqrt{\varsigma} - C_2 \ln\varsigma - 2C_2 \ln\qty(\frac{\mathrm{e} C_1}{4C_2}) &= C_1 \sqrt{\varsigma} + 2C_2 \qty(\ln\frac{4C_2}{C_1 \sqrt{\varsigma}} - 1) \\
+    & = \order{\frac{1}{L_{\mathrm{ls}}} + \qty(\frac{M}{L_{\mathrm{ls}}} + L) \qty(1 + \ln(M + L L_{\mathrm{ls}}))}.
 \end{align*}
-Hence, the sufficient iteration bound is $\order{\gtol^{-2}\max\{M\kappa_{\mathrm{ls}}F',\kappa_{\mathrm{ls}}^2(F')^2\}}$.
-Here, $L$, $\feps$, $g_0$, and the initial function-value gaps are problem and oracle quantities whose dependence is displayed explicitly.
-Therefore, for fixed algorithmic parameters, problem data, and oracle model, the sufficient iteration bound retains its $\order{\gtol^{-2}}$ dependence on the target accuracy, while conditioning and noise affect only the prefactor.
+Here, the additive constant in $1 + \ln(M + L L_{\mathrm{ls}})$ absorbs the fixed factors inside the logarithm.
+The logarithm is nonnegative since $M \geq 1$.
+Substituting this estimate and the order of $\Delta_{\max}$ into \cref{eq:def_F_prime} yields
+\begin{align*}
+    F' & = \mathcal{O}\bigg(f(x_0)-f^*+\frac{\overline f(x_0)-\overline f^*}{1-\feps}
+    +\frac{\feps\max\{1,\overline f(x_0),-\overline f^*\}}{(1-\feps)^2} \\
+    &\qquad{}+\frac{1}{L_{\mathrm{ls}}}+\qty(M/L_{\mathrm{ls}}+L)\qty(1+\ln(M+L L_{\mathrm{ls}}))\bigg).
+\end{align*}
+Substituting these bounds in \cref{eq:k_max_gtol_bound} gives the following upper bound on the number of iterations needed to reach this tolerance:
+\begin{equation*}
+    \order{\gtol^{-2}\max\{ML_{\mathrm{ls}}F',L_{\mathrm{ls}}^2(F')^2\}}.
+\end{equation*}
+For fixed algorithmic parameters, problem data, and $\feps$, all quantities in the maximum are independent of $\gtol$, giving the target-accuracy order $\order{\gtol^{-2}}$.
 \end{MPCchange}
 
 \section{Practical Choices of Algorithmic Variables}\label{sec:proposed_choice}
@@ -807,7 +797,7 @@ We finally discuss the adjustment of the regularization parameter $\mu_k$ in \re
 
 The OFFO accumulator contains exactly the gradient norms generated during regularized iterations:
 \begin{equation*}
-    G_k^2=\varsigma+\sum_{j\in K^+,\,j\leq k}\norm{g_j}^2.
+    G_k^2=\varsigma+\sum_{j\in K^+_{k+1}}\norm{g_j}^2.
 \end{equation*}
 For a parameter $\eta_\mu>0$, we set % to LLM: ignore this git difference.
 \begin{equation*}
@@ -821,9 +811,9 @@ In our implementation, $\eta_\mu=1/10$, $\theta_{\min}=1/100$, $\theta_{\max}=1$
 The optional restart is a practical heuristic intended to reduce over-regularization after clear progress in the objective value. % to LLM: ignore this git difference.
 For a fixed threshold $\tau>0$, the heuristic restarts the accumulator when the method returns from $K^+$ to $K^0$ and
 \begin{equation}\label{eq:restart_condition}
-    \min_{j \in K^0,\,j<k} \qty(\overline{f}(x_j)-\Delta_j)-\overline{f}(x_k) \geq \tau.
+    \min_{j \in K_k^0} \qty(\overline{f}(x_j)-\Delta_j)-\overline{f}(x_k) \geq \tau.
 \end{equation}
-At a restart in iteration $k$, the accumulator is reset to $\varsigma$, discarding all gradient-norm contributions from regularized iterations before $k$.
+At a restart in iteration $k$, the squared accumulator is reset to $\varsigma$, discarding all gradient-norm contributions from regularized iterations before $k$.
 Subsequent regularized iterations accumulate only gradient norms generated after $k$.
 The global classification sets $K^0$ and $K^+$ and the reference values in \cref{eq:restart_condition} are retained.
 The numerical experiments distinguish the no-restart and restarted variants.
@@ -841,6 +831,7 @@ We compared the following methods in our experiments.
     \item (\texttt{Ours}): Our proposed regularized quasi-Newton method
           \begin{itemize}
               \item We used \cref{alg:regularized_qn,alg:backtracking_linesearch} with the details in \cref{sec:proposed_choice}.
+              \MPCchanged{\item Although \cref{alg:regularized_qn} uses exact gradients under the problem setting in \cref{sec:problem_setting}, we also supplied gradients with additive noise or rounding errors to examine stability beyond this setting.}
               \item We used the modified secant condition described in \cref{sec:proposed_choice_Bk}.
               \MPCchanged{\item (\texttt{Ours-AR}) denotes the variant with shifted-pair approximation (A) and accumulator restart (R), as described in \cref{eq:approx_computation_of_regularized_quasi_Newton,sec:proposed_choice_mu}.}
           \end{itemize}
@@ -868,8 +859,8 @@ We compared the following methods in our experiments.
     \item (\texttt{NTQN}): Noise-tolerant quasi-Newton method~\citep{xieAnalysisBFGSMethod2020,shiNoiseTolerantQuasiNewtonAlgorithm2022}
           \begin{itemize}
               \item A method designed to accommodate inexact gradient information, as mentioned in \cref{sec:problem_setting}.
-              \MPCchanged{\item For the primary comparison, we used the common gradient-tolerance stopping rule.
-              We also evaluated NTQN with its recommended termination mode in the function-value-noise experiment, as reported in \cref{sssec:noise_results}.}
+              \MPCchanged{\item For the primary comparison, instead of their recommended termination mode (\texttt{terminate=3}), we used \texttt{terminate=1} with an additional stop at the common gradient tolerance.
+              This allows NTQN to continue toward the common gradient tolerance rather than stopping at its estimated noise level.}
           \end{itemize}
 
     \MPCchanged{\item (\texttt{ASTR1-Adagrad}): The purely first-order \texttt{adagrad} variant of ASTR1.
@@ -915,15 +906,15 @@ The additive uniform-noise model follows the model used by Shi et al.~\citep{shi
 \MPCchanged{Each artificial-noise setting uses the five seeds $0, 1, 2, 3, 4$.}
 \MPCchanged{Each problem--seed pair is treated as a separate test instance in the performance profiles.}
 For NTQN in the function-value-noise and joint-noise experiments, we supplied the absolute noise bound $\texttt{eps\_f} = 10^{-2}$, which conservatively bounds function perturbations whose magnitude is at most $10^{-3}$.
+\MPCchanged{We supplied componentwise gradient-error bounds of $0$ and $10^{-3}$, respectively, through \texttt{eps\_g}.}
 
 In the reduced precision settings, we first cast the input vector $x$ to the target precision, evaluate CUTEst in 64-bit precision at the rounded input, and then round the returned function value and gradient to the target precision.
 The solver receives these rounded quantities as 64-bit values, so this tests reduced-precision input and output rather than entirely low-precision arithmetic.
-\MPCchanged{Since the returned gradient $g(x)$ need not equal $\nabla f(x)$, the reduced-precision and joint-noise experiments complement the exact-gradient analysis by evaluating performance beyond its assumptions.}
 
 The error allowances for the three precision settings are summarized in \cref{tab:machine_epsilon}.
 \MPCchanged{These values are empirical safety margins for accumulated floating-point errors rather than certified bounds.
 The multipliers of machine epsilon are $10^7$, $10^4$, and $10^2$ for 64-, 32-, and 16-bit precision, respectively.
-We reduce the multiplier at lower precision to retain $\feps < 1$ while allowing errors larger than a single rounding error.
+The specific multipliers are experimental choices.
 Because the appropriate value of $\feps$ may not be known accurately in practice, the sensitivity experiment examines how under- and overestimation affect performance.}
 We also set the maximum number of iterations to $k_{\max} = 15{,}000$ and timed out runs exceeding 10 minutes per problem.
 
@@ -949,17 +940,18 @@ Thus, the $y$-coordinate for solver $s$ at $x$-coordinate $\tau$ is given by % t
 A curve that lies above others indicates better performance.
 Following standard implementations~\citep{2020SciPy-NMeth}, we used the infinity norm for the gradient, though other norms may equally be employed.
 All reported success percentages use the same common gradient tolerance as the corresponding profiles.
+\MPCchanged{For joint noise and reduced precision, success is assessed using the gradient returned by the oracle.}
 A run that terminates without attaining that tolerance is counted as unsolved for this metric. % to LLM: ignore this git difference.
 
 \subsubsection{Results with Artificial Noise}\label{sssec:noise_results}
 
 We first present results for the artificial-noise settings described in \cref{sssec:problems}. % to LLM: ignore this git difference.
-\MPCchanged{\Cref{fig:results_function_noise} shows the performance profile for the function-value-noise experiment, which satisfies the assumptions of \cref{sec:analysis}.}
+\MPCchanged{\Cref{fig:results_function_noise} shows the performance profile for the function-value-noise experiment, which follows the problem setting in \cref{sec:problem_setting}.}
 \Cref{fig:results_noise} shows the performance profile for the joint-noise experiment. % to LLM: ignore this git difference.
 \MPCchanged{In the theory-aligned function-value-noise setting, both proposed variants attain higher solved percentages than the existing quasi-Newton baselines.}
 The same overall tendency holds in the joint-noise setting. % to LLM: ignore this git difference.
 Both proposed variants solve at least one instance of dimension $123{,}200$, the largest dimension in the retained collection. % to LLM: ignore this git difference.
-\MPCchanged{The joint-noise result provides complementary empirical evidence beyond the exact-gradient setting.}
+\MPCchanged{The joint-noise result provides complementary empirical evidence beyond the problem setting in \cref{sec:problem_setting}.}
 
 \begin{MPCchange}
 We also examine how NTQN's recommended noise-dependent termination rule affects the comparison in the function-value-noise experiment.
@@ -971,7 +963,7 @@ The lower scored fraction therefore mainly reflects NTQN's noise-dependent stopp
 \begin{MPCchange}
 \Cref{fig:results_error_bound_sensitivity} examines sensitivity to the supplied error bound by comparing both variants under all three tested bounds.
 The nominal bound gives the highest solved percentage for \texttt{Ours}, whereas \texttt{Ours-AR} is less sensitive to overestimation.
-Underestimation need not satisfy the assumed error model, and the results show no consistent performance benefit from it.
+Reducing the allowance from the conservative nominal value to the tested underestimated value has only a limited effect on the solved percentages in this experiment.
 \end{MPCchange}
 
 \begin{MPCchange}
@@ -1150,7 +1142,7 @@ We next assess whether the higher solved percentages under reduced precision per
 For this comparison, time to solution is the elapsed time until the first iterate attaining the common gradient tolerance, and a run that does not attain the tolerance is counted as unsolved.
 \Cref{fig:time_to_solution} plots the fraction of 32-bit problems attaining $\gtol=10^{-3}$ as a function of time to solution.
 At this tolerance, \texttt{Ours} solves $74.5\%$ of the problems and \texttt{Ours-AR} solves $73.6\%$, compared with $63.6\%$ for the best existing baseline.
-The elapsed-time profiles therefore preserve the higher final solved fractions of the proposed variants observed in the oracle-call profiles.
+\Cref{fig:time_to_solution} shows that the proposed variants also perform favorably against the existing baselines when performance is measured by elapsed time.
 \end{MPCchange}
 
 \begin{MPCchange}
