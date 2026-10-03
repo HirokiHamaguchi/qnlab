@@ -16,9 +16,9 @@ We begin by reviewing relevant background and formalizing the problem setting.
 \subsection{Regularized Quasi-Newton Method}
 \label{sec:prel_rqn}
 
-A regularized quasi-Newton method is a variant of quasi-Newton methods that does not rely heavily on linesearch techniques. % to LLM: ignore this git difference.
+A regularized quasi-Newton method is a variant of quasi-Newton methods that does not rely heavily on linesearch techniques.
 This property is important for optimization in noisy evaluation environments.
-There has been renewed interest in regularized Newton-type methods, including cubic-regularization schemes~\citep{nesterovCubicRegularizationNewton2006,ranganathSymmetricRankOneQuasiNewton2025,wangConvergenceRatesRegularized2025}, and we focus on quadratic regularization~\citep{kanzowRegularizationLimitedMemory2023,doikovSuperUniversalRegularizedNewton2024,liTruncatedRegularizedNewton2009,zhangNewRegularizedQuasiNewton2018,uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,shengNewAdaptiveTrust2018} for simplicity of analysis and implementation. % to LLM: ignore this git difference.
+There has been renewed interest in regularized Newton-type methods, including cubic-regularization schemes~\citep{nesterovCubicRegularizationNewton2006,ranganathSymmetricRankOneQuasiNewton2025,wangConvergenceRatesRegularized2025}, and we focus on quadratic regularization~\citep{kanzowRegularizationLimitedMemory2023,doikovSuperUniversalRegularizedNewton2024,liTruncatedRegularizedNewton2009,zhangNewRegularizedQuasiNewton2018,uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,shengNewAdaptiveTrust2018} for simplicity of analysis and implementation.
 
 For $g_k \defeq \nabla f(x_k)$ and an approximate Hessian $B_k \in \bbR^{n \times n}$, regularized quasi-Newton methods compute the step as
 \begin{equation*}
@@ -26,7 +26,7 @@ For $g_k \defeq \nabla f(x_k)$ and an approximate Hessian $B_k \in \bbR^{n \time
 \end{equation*}
 with a regularization parameter $\mu_k \ge 0$.
 Combining regularization with line search is also possible and has been explored~\citep{uedaConvergencePropertiesRegularized2010}.
-Several strategies for choosing $\mu_k$ in nonconvex optimization have been proposed~\citep{uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,shengNewAdaptiveTrust2018}, and one of them is given by % to LLM: ignore this git difference.
+Several strategies for choosing $\mu_k$ in nonconvex optimization have been proposed~\citep{uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,shengNewAdaptiveTrust2018}, and one of them is given by
 \begin{equation*}
     \mu_k = c_1 \max(0, -\lambda_{\min}(B_k)) + c_2 \norm{\nabla f(x_k)}^\delta,
 \end{equation*}
@@ -55,10 +55,10 @@ respectively, where $\varsigma>0$ and $\theta>0$ are algorithmic parameters, and
 \label{sec:problem_setting}
 
 We consider optimization problems in which exact objective function values are unavailable, following the recent literature on error-aware optimization~\citep{grattonNoteSolvingNonlinear2020,bellaviaImpactNoiseEvaluation2021,carterNumericalExperienceClass1993,clancyTROPHYTrustRegion2022,sunTrustRegionMethod2023,ruanAdaptiveRegularizedQuasiNewton2024}.
-When both objective values and gradients are subject to uncontrolled errors, reliable optimization cannot be guaranteed without additional assumptions. % to LLM: ignore this git difference.
+When both objective values and gradients are subject to uncontrolled errors, reliable optimization cannot be guaranteed without additional assumptions.
 Thus, meaningful optimization requires that at least one source of information be sufficiently accurate.
 This work focuses on problems arising from finite-precision computations or inexact evaluations, where objective function evaluations are subject to non-negligible errors while gradient information can be computed with relatively high accuracy.
-Settings dominated by gradient errors, such as stochastic approximation and inexact-gradient methods~\citep{berahasTheoreticalEmpiricalComparison2021,xieAnalysisBFGSMethod2020,shiNoiseTolerantQuasiNewtonAlgorithm2022}, are beyond the scope of this work. % to LLM: ignore this git difference.
+Settings dominated by gradient errors, such as stochastic approximation and inexact-gradient methods~\citep{berahasTheoreticalEmpiricalComparison2021,xieAnalysisBFGSMethod2020,shiNoiseTolerantQuasiNewtonAlgorithm2022}, are beyond the scope of this work.
 
 We formalize this problem setting through the following conditions on function values and gradients.
 \begin{problemsetting}
@@ -80,7 +80,7 @@ Closely related models are also employed in practical stopping criteria~\citep{2
 \section{Proposed Algorithm}\label{sec:algorithm}
 
 We propose a new algorithm for the problem setting stated in \cref{sec:problem_setting}.
-We draw inspiration from the OFFO framework to design regularization and scaling strategies for inexact function values. % to LLM: ignore this git difference.
+We draw inspiration from the OFFO framework to design regularization and scaling strategies for inexact function values.
 \MPCchanged{Unlike purely OFFO methods, our algorithm uses function values in the line search in both modes, while the OFFO-inspired regularization scale depends only on gradient information.}
 The pseudo-code of our algorithm is given in \cref{alg:regularized_qn}.
 The minimum of the empty set is defined as $+\infty$ in \refLine{line:mu_0_condition}.
@@ -120,7 +120,7 @@ In the following, we explain the three main components of \cref{alg:regularized_
         $\alpha_k \leftarrow \beta \alpha_k$ with $\beta \in [\beta_{\min},\beta_{\max}]$ ~ (see \cref{sec:proposed_choice_alpha}). \; \label{line:ls_backtracking}
         $\Delta_k \gets \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_k), -\overline{f}(x_k+\alpha_k d_k))$\;
     }
-    \Return{$\alpha_k, \Delta_k$}\; % to LLM: ignore this git difference.
+    \Return{$\alpha_k, \Delta_k$}\;
     \caption{Backtracking Line Search with Relaxed Armijo Condition}
     \label{alg:backtracking_linesearch}
 \end{algorithm}
@@ -128,7 +128,7 @@ In the following, we explain the three main components of \cref{alg:regularized_
 \paragraph{Computation of the Regularized Quasi-Newton Direction (\refLine{line:d_k}): }\label{sec:algorithm_components_d}
 
 The first component is the computation of the regularized quasi-Newton direction $d_k$ stated in \cref{sec:prel_rqn}.
-Given $g_k=\nabla f(x_k)$, an approximate Hessian $B_k$, and a regularization parameter $\mu_k$, we compute the search direction $d_k = -(B_k+\mu_k I)^{-1} g_k$. % to LLM: ignore this git difference.
+Given $g_k=\nabla f(x_k)$, an approximate Hessian $B_k$, and a regularization parameter $\mu_k$, we compute the search direction $d_k = -(B_k+\mu_k I)^{-1} g_k$.
 A practical choice of $B_k$ is discussed in \cref{sec:proposed_choice_Bk}.
 
 \paragraph{Relaxed Armijo Condition with an Error-Absorbing Term (\refLine{line:armijo}): }\label{sec:algorithm_components_alpha}
@@ -173,7 +173,7 @@ Otherwise, to ensure convergence to first-order stationary points, we apply an O
     \mu_k = \theta_k \sqrt{\varsigma+\sum_{j \in K^+_{k+1}}\norm{g_j}^2},
 \end{equation}
 as described in \cref{sec:prel_offo}.
-Since OFFO schemes do not rely on function values, this update is independent of numerical errors in $\overline{f}$. % to LLM: ignore this git difference.
+Since OFFO schemes do not rely on function values, this update is independent of numerical errors in $\overline{f}$.
 
 \section{Theoretical Analysis}\label{sec:analysis}
 
@@ -181,7 +181,7 @@ In this section, we establish the global convergence properties of \cref{alg:reg
 
 \subsection{Assumptions}\label{sec:assumptions}
 
-Throughout this section, we make the following three structural assumptions.
+Throughout this section, we make the following three assumptions.
 The first assumption ensures that the objective function is bounded below.
 \begin{assumption}\label{ass:bounded}
     The function $f$ is bounded below, meaning that for all $x \in \mathbb{R}^n$,
@@ -215,7 +215,7 @@ The third assumption requires the matrices $\{B_k\}_{k=0}^{k_{\mathrm{max}}-1}$ 
         mI \preceq B_k \preceq MI.
     \end{equation*}
 \end{assumption}
-\MPCchanged{As discussed in \cref{sec:proposed_choice}, the shifted raw L-BFGS construction with selected curvature pairs guarantees \cref{ass:BBounds}.}
+\MPCchanged{As discussed in \cref{sec:proposed_choice}, the shifted L-BFGS construction with selected curvature pairs guarantees \cref{ass:BBounds}.}
 By \cref{ass:BBounds}, we can derive useful bounds involving $g_k$ and $d_k$.
 Using $d_k=-(B_k+\mu_k I)^{-1} g_k$ (\refLine{line:d_k}) and \cref{ass:BBounds} asserting $(m + \mu_k)I \preceq B_k + \mu_k I \preceq (M + \mu_k)I$, we obtain the following bounds:
 \begin{align}
@@ -232,7 +232,7 @@ In the following, we define the actual and observed function decreases as
     \delta_k            & \defeq f(x_k) - f(x_{k+1}),           \label{eq:def_small_delta_k}                      \\
     \overline{\delta}_k & \defeq \overline{f}(x_k) - \overline{f}(x_{k+1}). \label{eq:def_overline_small_delta_k}
 \end{align}
-The first property bounds the difference between the actual decrease $\delta_k$ and the observed decrease $\overline{\delta}_k$ when the true function value decreases.
+The first property states that the error between the actual decrease $\delta_k$ and the observed decrease $\overline{\delta}_k$ can be bounded by $\Delta_k$ when $f(x_{k+1}) \le f(x_k)$.
 \begin{lemma}\label{lem:error_bound_on_function_evaluations}
     If $x_k$ and $x_{k+1}$ satisfy $f(x_{k+1}) \le f(x_k)$, it holds that
     \begin{equation*}
@@ -354,7 +354,7 @@ Recall that the parameter $c$ in \cref{alg:backtracking_linesearch} satisfies $0
 Now, let us analyze \cref{alg:backtracking_linesearch} using \cref{lem:backtracking_finite}.
 Define
 \begin{equation}\label{eq:def_alpha_bar}
-    \overline{\alpha}\defeq \beta_{\min}\min\qty(\frac{2(1-c)m}{L},1)>0. % to LLM: ignore this git difference.
+    \overline{\alpha}\defeq \beta_{\min}\min\qty(\frac{2(1-c)m}{L},1)>0.
 \end{equation}
 The following states the key property of the backtracking procedure.
 
@@ -365,11 +365,11 @@ The following states the key property of the backtracking procedure.
     \end{equation*}
 \end{proposition}
 \begin{proof}
-    Line~\ref{line:ls_backtracking} of \cref{alg:backtracking_linesearch} multiplies $\alpha_k$ by $\beta$ at each rejection, where $0<\beta_{\min} \leq \beta \leq \beta_{\max}<1$. % to LLM: ignore this git difference.
+    Line~\ref{line:ls_backtracking} of \cref{alg:backtracking_linesearch} multiplies $\alpha_k$ by $\beta$ at each rejection, where $0<\beta_{\min} \leq \beta \leq \beta_{\max}<1$.
     For the number of backtracking rejections $r$, we have $\alpha_k\le\beta_{\max}^r$.
     Thus, $r$ is finite since the backtracking procedure terminates for sufficiently small $\alpha_k$ by \cref{lem:backtracking_finite}.
     If $r=0$, $\alpha_k=1\ge\overline{\alpha}$.
-    Otherwise, $\alpha_k \geq \beta_{\min} \alpha'_k$, where $\alpha'_k$ is the last rejected step size. % to LLM: ignore this git difference.
+    Otherwise, $\alpha_k \geq \beta_{\min} \alpha'_k$, where $\alpha'_k$ is the last rejected step size.
     By \cref{lem:backtracking_finite}, we have $\alpha'_k > \frac{2(1-c)m}{L}$, and thus
     \begin{equation*}
         \alpha_k \ge \beta_{\min}\alpha'_k > \beta_{\min} \frac{2(1-c)m}{L} \geq \overline{\alpha}.
@@ -384,7 +384,7 @@ The following states the key property of the backtracking procedure.
 In this subsection, we lower bound the sum of actual function decreases $\delta_k$ over $k \in K^0$.
 Recall that $K^0$ denotes the set of iteration indices $k$ such that $\mu_k = 0$, as in \cref{eq:def_K0_Kplus}.
 To this end, we establish that the sum of $\Delta_k$ over $k \in K^0$ is upper bounded, where $\Delta_k$ is the error-absorbing term in the relaxed Armijo condition (\cref{eq:relaxed_Armijo_condition}).
-We introduce the following constant $\Delta_{\max}$, which serves as an upper bound for $\Delta_k$ of $k \in K^0$. % to LLM: ignore this git difference.
+We introduce the following constant $\Delta_{\max}$, which serves as an upper bound for $\Delta_k$ of $k \in K^0$.
 \begin{equation}\label{eq:def_Delta_max}
     \Delta_{\max} \defeq \frac{2\feps}{1-\feps} \max(1, \overline{f}(x_{0}), -\overline{f}^*).
 \end{equation}
@@ -447,10 +447,10 @@ We now bound the sum of $\delta_k = f(x_k) - f(x_{k+1})$ over $k \in K^0$ with $
 \subsection{Bound for the case \texorpdfstring{$\mu_k > 0$}{mu k > 0}}
 
 Next, we show that the sum of $\delta_{k}$ over $k \in K^+$ is lower bounded.
-Recall that $K^+$ is the set of iteration indices $k$ such that $\mu_k > 0$ as defined in \cref{eq:def_K0_Kplus}, % to LLM: ignore this git difference.
+Recall that $K^+$ is the set of iteration indices $k$ such that $\mu_k > 0$ as defined in \cref{eq:def_K0_Kplus}.
 For $k\in K^+$, \cref{eq:offo_based_update} gives $\mu_k=\theta_k \sqrt{\varsigma + \sum_{j \in K^+_{k+1}} \norm{g_{j}}^2}$ with $\theta_k \in [\theta_{\min}, \theta_{\max}]$.
 
-Before proceeding to the main proof, we present \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}, which collects standard inequalities from the AdaGrad-Norm analysis~\citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020}~\citep[Lemma~3.1]{Gratton08022024}. % to LLM: ignore this git difference.
+Before proceeding to the main proof, we present \cref{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}, which collects standard inequalities from the AdaGrad-Norm analysis~\citep[Lemma~3.2]{wardAdaGradStepsizesSharp2020}~\citep[Lemma~3.1]{Gratton08022024}.
 Its proof is deferred to \cref{sec:proof_of_sum_norm_g_over_mu_geq_2sqrt_leq_log}.
 \begin{lemma}\label{lem:sum_norm_g_over_mu_geq_2sqrt_leq_log}
     In \cref{alg:regularized_qn}, we have
@@ -511,9 +511,9 @@ We define a constant $F$ as follows:
     F \defeq f(x_0) - f^* + \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}) + C_1 \sqrt{\varsigma} - C_2 \ln(\varsigma).
     \label{eq:def_F}
 \end{equation}
-Then, we can obtain the following unified bound for the two types of iterations. % to LLM: ignore this git difference.
+Then, we can obtain the following unified bound for the two types of iterations.
 \begin{lemma}\label{lem:sum_norm_g_k_bound}
-    Under \cref{ass:bounded,ass:LSmooth,ass:BBounds}, the sum of $\norm{g_{k}}^2$ over $k \in K=K^0\cup K^+$ satisfies % to LLM: ignore this git difference.
+    Under \cref{ass:bounded,ass:LSmooth,ass:BBounds}, the sum of $\norm{g_{k}}^2$ over $k \in K=K^0\cup K^+$ satisfies
     \begin{equation*}
         F \ge
         \frac{c \overline{\alpha}}{M} \sum_{k \in K^0} \norm{g_{k}}^2 +
@@ -590,7 +590,7 @@ Now, we establish the following convergence rate for \cref{alg:regularized_qn}.
 \end{proof}
 
 As a remark, the function $\phi(G)$ in \cref{eq:phi_G} is closely related to the Lambert $W$ function~\citep{corlessLambertWFunction1996,Gratton08022024}.
-For $x \in (-1/\mathrm{e},0)$, the equation $y \mathrm{e}^y = x$ admits two real negative solutions, and the smaller one is given by the second branch of the Lambert $W$ function, $y = W_{-1}(x) < 0$. % to LLM: ignore this git difference.
+For $x \in (-1/\mathrm{e},0)$, the equation $y \mathrm{e}^y = x$ admits two real negative solutions, and the smaller one is given by the second branch of the Lambert $W$ function, $y = W_{-1}(x) < 0$.
 Using this function, the equation $\phi(G)=0$ can be solved in closed form, which leads to a sharper bound in \cref{thm:gc}.
 Since this is not essential for the main argument, we omit the details and refer to~\citep{Gratton08022024}.
 
@@ -603,7 +603,7 @@ Indeed, for gradient descent with fixed step size $\alpha = 1/L$, one has
 Thus, the term associated with $K^0$ reflects the standard $\order{f(x_0)-f^*}$ dependence of first-order methods since $F'$ contains the initial gaps $f(x_0)-f^*$ and $\overline{f}(x_0)-\overline{f}^*$.
 In contrast, the contribution of $K^+$ resembles the behavior of AdaGrad-Norm, whose convergence bound scales quadratically with the initial optimality gap~\citep{wardAdaGradStepsizesSharp2020}.
 
-Finally, \cref{thm:gc} implies the iteration-complexity bound % to LLM: ignore this git difference.
+Finally, \cref{thm:gc} implies the iteration-complexity bound
 \begin{equation*}
     \min\left\{k \relmiddle| \norm{\nabla f(x_k)} \leq \gtol \right\} = \order{1/\gtol^2}.
 \end{equation*}
@@ -662,7 +662,7 @@ We show that the shifted L-BFGS construction with the curvature-pair selection r
 
 \paragraph{Construction of $B_k$: }
 
-We recall the L-BFGS construction~\citep{nocedal1999numerical,liuLimitedMemoryBFGS1989,berahasLimitedmemoryBFGSDisplacement2022}. % to LLM: ignore this git difference.
+We recall the L-BFGS construction~\citep{nocedal1999numerical,liuLimitedMemoryBFGS1989,berahasLimitedmemoryBFGSDisplacement2022}.
 For an iteration $k$, we define
 \begin{equation*}
     s_k \defeq x_{k+1}-x_k,\qquad
@@ -670,8 +670,8 @@ For an iteration $k$, we define
 \end{equation*}
 where $g_k$ and $g_{k+1}$ are the gradients at $x_k$ and $x_{k+1}$, respectively.
 Starting from an initial matrix, an approximate Hessian is obtained by successively applying BFGS updates to a sequence of curvature pairs.
-Let $\{(s_{k_i},y_{k_i})\}_{i=0}^{p-1}$ be a collection of curvature pairs ordered so that $k_0<\cdots<k_{p-1}$. % to LLM: ignore this git difference.
-Starting from the initial matrix $B^{(0)} = \gamma I$ with $\gamma=\norm{y_{k_{p-1}}}^2 / y_{k_{p-1}}^\top s_{k_{p-1}}$, we define $\mathrm{BFGS}(\{(s_{k_i},y_{k_i})\}_{i=0}^{p-1})$ as the matrix $B^{(p)}$ obtained by sequentially applying the BFGS update as % to LLM: ignore this git difference.
+Let $\{(s_{k_i},y_{k_i})\}_{i=0}^{p-1}$ be a collection of curvature pairs ordered so that $k_0<\cdots<k_{p-1}$.
+Starting from the initial matrix $B^{(0)} = \gamma I$ with $\gamma=\norm{y_{k_{p-1}}}^2 / y_{k_{p-1}}^\top s_{k_{p-1}}$, we define $\mathrm{BFGS}(\{(s_{k_i},y_{k_i})\}_{i=0}^{p-1})$ as the matrix $B^{(p)}$ obtained by sequentially applying the BFGS update as
 \begin{equation*}
     B^{(j+1)} = B^{(j)} - \frac{B^{(j)} s_{k_j} s_{k_j}^\top B^{(j)}}{s_{k_j}^\top B^{(j)} s_{k_j}} + \frac{y_{k_j} y_{k_j}^\top}{y_{k_j}^\top s_{k_j}}
 \end{equation*}
@@ -679,8 +679,8 @@ for $j=0,1,\ldots,p-1$, where each curvature pair $(s_{k_j},y_{k_j})$ is applied
 Here, $p>0$ denotes the maximum number of stored curvature pairs and is a fixed small integer in the L-BFGS method.
 When fewer than $p$ curvature pairs are available, the BFGS update is applied using all currently available pairs.
 
-We now give a sufficient condition for the upper spectral bound in \cref{ass:BBounds}, based on variants of existing results~\citep[Theorem~5.5]{gaoQuasiNewtonMethodsSuperlinear2018} \citep[Lemma~1]{gowerStochasticBlockBFGS2016}. % to LLM: do not insert `and' between the two citations.
-Its proof is deferred to \cref{app:proof_of_bounded_BFGS}. % to LLM: ignore this git difference.
+We now give a sufficient condition for the upper spectral bound in \cref{ass:BBounds}, based on variants of existing results~\citep[Theorem~5.5]{gaoQuasiNewtonMethodsSuperlinear2018} \citep[Lemma~1]{gowerStochasticBlockBFGS2016}.
+Its proof is deferred to \cref{app:proof_of_bounded_BFGS}.
 \begin{proposition}\label{prop:bounded_BFGS}
     Let $\{(s_{k_i},y_{k_i})\}_{i=0}^{p-1}$ be curvature pairs with $s_{k_i} \neq 0$.
     \MPCchanged{Suppose that there exists a constant $\Lambda>0$ such that every pair $(s,y)$ in this collection satisfies}
@@ -693,7 +693,6 @@ Its proof is deferred to \cref{app:proof_of_bounded_BFGS}. % to LLM: ignore this
     \end{equation}
 \end{proposition}
 \MPCchanged{Proposition~\ref{prop:bounded_BFGS} supplies the upper bound, while a fixed diagonal shift will supply the lower bound in \cref{ass:BBounds}.}
-% to LLM: Powell-type damping and cautious selection predate this revision and should remain black; ignore detailed implementation differences in this paragraph.
 We first apply a scalar Powell-type damping to a candidate pair with $y_{k_i}^{\top}s_{k_i}<0$~\citep{powellAlgorithmsNonlinearConstraints1978,lotfiStochasticDampedLBFGS2020}.
 For a parameter $\eta_{\mathrm{damp}}\in(0,1)$, let $b_i=\norm{y_{k_i}}^2/\abs{y_{k_i}^{\top}s_{k_i}}$ and set
 \begin{equation*}
@@ -751,7 +750,6 @@ When the memory is empty, the same definition reduces to $d_k=-g_k/(\rho_0+\omeg
 As a numerical safeguard when the compact factorization is unavailable or does not return a finite descent direction, the implementation uses this zero-memory direction, which also corresponds to a matrix satisfying \cref{ass:BBounds}.
 \end{MPCchange}
 
-% to LLM: The shifted-pair approximation predates this revision and should remain black; ignore wording and formula differences needed to align it with the revised construction of B_k.
 \paragraph{Shifted-Pair Approximation: }
 
 For comparison, the implementation retains the simpler shifted-pair approximation proposed by Kanzow and Steck~\citep{kanzowRegularizationLimitedMemory2023}
@@ -767,9 +765,9 @@ The analysis applies to the exact compact solve used by \texttt{Ours}.
 
 Both proposed variants apply a function-based modified secant correction before the damping and cautious selection described above~\citep{zhangNewQuasiNewtonEquation1999,yuanConvergenceAnalysisModified2010}.
 \end{MPCchange}
-A scale-aware safeguard suppresses the correction whenever it would dominate the raw gradient difference. % to LLM: ignore this git difference.
+A scale-aware safeguard suppresses the correction whenever it would dominate the raw gradient difference.
 \MPCchanged{The final corrected and damped pair must still satisfy \cref{eq:implemented_cautious_test}, so this modification preserves the spectral guarantee for \texttt{Ours}.}
-The correction formula and safeguard are specified in our open-source implementation. % to LLM: ignore this git difference.
+The correction formula and safeguard are specified in our open-source implementation.
 
 \subsection{Step Size \texorpdfstring{$\alpha_k$}{alpha k}}\label{sec:proposed_choice_alpha}
 
@@ -787,28 +785,28 @@ If the directional derivative along $d_k$ changes sign, $d_k^\top g_k<0$ and $d_
 \end{equation*}
 where $\mathrm{clip}(x,a,b) \defeq \min(\max(x,a),b)$ is a clipping function.
 When objective values are unreliable and backtracking and interpolation do not occur, this correction effectively refines the step size.
-After the adjustment, the relaxed Armijo condition is evaluated again, and ordinary backtracking continues if necessary. % to LLM: ignore this git difference.
-The clipping interval gives $\alpha_k\geq\beta_{\min}$ whenever this adjustment is applied, so the conservative lower bound $\overline\alpha$ in \cref{prop:backtracking_summary} and the subsequent convergence analysis remain valid. % to LLM: ignore this git difference.
+After the adjustment, the relaxed Armijo condition is evaluated again, and ordinary backtracking continues if necessary.
+The clipping interval gives $\alpha_k\geq\beta_{\min}$ whenever this adjustment is applied, so the conservative lower bound $\overline\alpha$ in \cref{prop:backtracking_summary} and the subsequent convergence analysis remain valid.
 
 \subsection{Regularization Parameter \texorpdfstring{$\mu_k$}{mu k}}\label{sec:proposed_choice_mu}
 
 We finally discuss the adjustment of the regularization parameter $\mu_k$ in \refLine{line:update_theta} of \cref{alg:regularized_qn}.
-\paragraph{Regularization Update: } % to LLM: ignore this git difference.
+\paragraph{Regularization Update: }
 
 The OFFO accumulator contains exactly the gradient norms generated during regularized iterations:
 \begin{equation*}
     G_k^2=\varsigma+\sum_{j\in K^+_{k+1}}\norm{g_j}^2.
 \end{equation*}
-For a parameter $\eta_\mu>0$, we set % to LLM: ignore this git difference.
+For a parameter $\eta_\mu>0$, we set
 \begin{equation*}
     \mu_k=\mathrm{clip}\left(\eta_\mu\norm{g_k},\theta_{\min}G_k,\theta_{\max}G_k\right).
-\end{equation*} % to LLM: ignore this git difference.
-This clipping rule gives $\mu_k=\theta_kG_k$ for some $\theta_k\in[\theta_{\min},\theta_{\max}]$, as required by \cref{eq:offo_based_update}. % to LLM: ignore this git difference.
+\end{equation*}
+This clipping rule gives $\mu_k=\theta_kG_k$ for some $\theta_k\in[\theta_{\min},\theta_{\max}]$, as required by \cref{eq:offo_based_update}.
 In our implementation, $\eta_\mu=1/10$, $\theta_{\min}=1/100$, $\theta_{\max}=1$, and \MPCchanged{$\varsigma=10^{-20}$, so the initial accumulator scale is $G_{-1}=\sqrt{\varsigma}=10^{-10}$}.
 
-\paragraph{Optional Accumulator Restart: } % to LLM: ignore this git difference.
+\paragraph{Optional Accumulator Restart: }
 
-The optional restart is a practical heuristic intended to reduce over-regularization after clear progress in the objective value. % to LLM: ignore this git difference.
+The optional restart is a practical heuristic intended to reduce over-regularization after clear progress in the objective value.
 For a fixed threshold $\tau>0$, the heuristic restarts the accumulator when the method returns from $K^+$ to $K^0$ and
 \begin{equation}\label{eq:restart_condition}
     \min_{j \in K_k^0} \qty(\overline{f}(x_j)-\Delta_j)-\overline{f}(x_k) \geq \tau.
@@ -870,8 +868,8 @@ We compared the following methods in our experiments.
 \end{itemize}
 
 In the following, each method is referred to by the name given in parentheses.
-Except for the first-order \texttt{ASTR1-Adagrad} baseline, all these methods are L-BFGS-based, and we set the number of stored curvature pairs to $10$, the default value in SciPy's L-BFGS-B implementation. % to LLM: ignore this git difference.
-All experiments were conducted on an Apple Mac Pro (Late 2013) with a 2.7~GHz 12-core Intel Xeon E5-2697 v2 processor and 64~GB of memory. % to LLM: ignore this git difference. % LLDisable: it is dangerous to include SI units in this project.
+Except for the first-order \texttt{ASTR1-Adagrad} baseline, all these methods are L-BFGS-based, and we set the number of stored curvature pairs to $10$, the default value in SciPy's L-BFGS-B implementation.
+All experiments were conducted on an Apple Mac Pro (Late 2013) with a 2.7~GHz 12-core Intel Xeon E5-2697 v2 processor and 64~GB of memory. % LLDisable: it is dangerous to include SI units in this project.
 All computations were performed using the CPU only.
 
 \subsection{Experimental Results}\label{sec:results}
@@ -883,7 +881,7 @@ All problems were initialized with the default starting points provided by the l
 Following previous work~\citep{kanzowRegularizationLimitedMemory2023}, we excluded problems whose initial points were already stationary or whose function values or gradients contained \texttt{NaN} or \texttt{INF}.
 \MPCchanged{The retained problems have dimensions ranging from $2$ to $123{,}200$.}
 
-We organize the CUTEst experiments into the following two groups: % to LLM: ignore this git difference.
+We organize the CUTEst experiments into the following two groups:
 \begin{itemize}
     \item \emph{Artificial-noise experiments} on 220 problems using 64-bit arithmetic (results in \cref{sssec:noise_results})
           \begin{itemize}
@@ -933,7 +931,7 @@ Then, the performance ratio $r_{p,s}$ is defined as
 \end{equation*}
 If no solver succeeds on an instance, we set all its performance ratios to $+\infty$.
 For a given threshold $\tau \geq 1$ and solver $s$, the performance profile plots the proportion of test instances for which $r_{p,s} \leq \tau$.
-Thus, the $y$-coordinate for solver $s$ at $x$-coordinate $\tau$ is given by % to LLM: ignore this git difference.
+Thus, the $y$-coordinate for solver $s$ at $x$-coordinate $\tau$ is given by
 \begin{equation*}
     \rho_s(\tau) = \frac{1}{\abs{P}} \abs{\left\{ p \in P \relmiddle| r_{p,s} \leq \tau \right\}}.
 \end{equation*}
@@ -941,16 +939,16 @@ A curve that lies above others indicates better performance.
 Following standard implementations~\citep{2020SciPy-NMeth}, we used the infinity norm for the gradient, though other norms may equally be employed.
 All reported success percentages use the same common gradient tolerance as the corresponding profiles.
 \MPCchanged{For joint noise and reduced precision, success is assessed using the gradient returned by the oracle.}
-A run that terminates without attaining that tolerance is counted as unsolved for this metric. % to LLM: ignore this git difference.
+A run that terminates without attaining that tolerance is counted as unsolved for this metric.
 
 \subsubsection{Results with Artificial Noise}\label{sssec:noise_results}
 
-We first present results for the artificial-noise settings described in \cref{sssec:problems}. % to LLM: ignore this git difference.
+We first present results for the artificial-noise settings described in \cref{sssec:problems}.
 \MPCchanged{\Cref{fig:results_function_noise} shows the performance profile for the function-value-noise experiment, which follows the problem setting in \cref{sec:problem_setting}.}
-\Cref{fig:results_noise} shows the performance profile for the joint-noise experiment. % to LLM: ignore this git difference.
+\Cref{fig:results_noise} shows the performance profile for the joint-noise experiment.
 \MPCchanged{In the theory-aligned function-value-noise setting, both proposed variants attain higher solved percentages than the existing quasi-Newton baselines.}
-The same overall tendency holds in the joint-noise setting. % to LLM: ignore this git difference.
-Both proposed variants solve at least one instance of dimension $123{,}200$, the largest dimension in the retained collection. % to LLM: ignore this git difference.
+The same overall tendency holds in the joint-noise setting.
+Both proposed variants solve at least one instance of dimension $123{,}200$, the largest dimension in the retained collection.
 \MPCchanged{The joint-noise result provides complementary empirical evidence beyond the problem setting in \cref{sec:problem_setting}.}
 
 \begin{MPCchange}
@@ -993,7 +991,7 @@ Reducing the allowance from the conservative nominal value to the tested underes
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_legend_noise.pdf}
     \end{subfigure}
-    \caption{Performance profile for the joint function-and-gradient noise setting (componentwise level \(10^{-3}\)) and $\gtol = 10^{-2}$.} % to LLM: ignore this git difference.
+    \caption{Performance profile for the joint function-and-gradient noise setting (componentwise level \(10^{-3}\)) and $\gtol = 10^{-2}$.}
     \label{fig:results_noise}
 \end{figure}
 
@@ -1020,7 +1018,7 @@ We next present performance profiles for each floating-point precision (64-, 32-
 We evaluated each method at three gradient norm tolerance levels, i.e., $\gtol \in \{10^{-1}, 10^{-3}, 10^{-5}\}$.
 These tolerance levels represent different optimization regimes, from moderate accuracy to high precision requirements.
 \Cref{fig:results_all_precisions} shows the performance profiles across all three precision levels.
-These performance profiles quantify how attained accuracy changes as oracle precision is reduced, while both proposed variants attain higher solved percentages than all existing quasi-Newton baselines at 16- and 32-bit precision. % to LLM: ignore this git difference.
+These performance profiles quantify how attained accuracy changes as oracle precision is reduced, while both proposed variants attain higher solved percentages than all existing quasi-Newton baselines at 16- and 32-bit precision.
 \MPCchanged{Across the artificial-noise and reduced-precision experiments, the purely first-order \texttt{ASTR1-Adagrad} baseline solves fewer instances and generally requires more oracle calls than the proposed variants.}
 \MPCchanged{These results illustrate the practical motivation for invoking the OFFO-based scale only when error-adjusted function-value certification fails, while retaining quasi-Newton steps whenever they can be used safely.}
 
@@ -1094,17 +1092,16 @@ These performance profiles quantify how attained accuracy changes as oracle prec
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_legend_precision.pdf}
     \end{subfigure}
-    \caption{Performance profiles across floating-point precisions (64-, 32-, and 16-bit) and tolerance levels.} % to LLM: ignore this git difference.
+    \caption{Performance profiles across floating-point precisions (64-, 32-, and 16-bit) and tolerance levels.}
     \label{fig:results_all_precisions}
 \end{figure}
 
 \subsection{Computational Time}\label{sec:comp_time}
 
-We next compare computational cost from two complementary wall-clock perspectives. % to LLM: ignore this git difference.
+We next compare computational cost from two complementary wall-clock perspectives.
 
-\subsubsection{Per-Iteration Computational Cost}\label{sssec:per_iteration_cost} % to LLM: ignore this git difference in this subsubsection.
+\subsubsection{Per-Iteration Computational Cost}\label{sssec:per_iteration_cost}
 
-% to LLM: This pre-revision experiment is intentionally retained alongside the end-to-end time-to-solution comparison and should remain black.
 \begin{figure}[t]
     \centering
     \includegraphics[width=0.9\textwidth]{../imgs/for_paper/time.pdf}
@@ -1171,7 +1168,7 @@ At 16- and 32-bit precision, both proposed variants reached the strictest tested
 
 Future work includes the investigation of local convergence properties, the extension to constrained optimization, and the applications to practical problems in machine learning and scientific computing.
 Additionally, exploring adaptive strategies for selecting algorithmic parameters based on problem characteristics could further enhance the method's performance.
-An explicit analysis of the effect of inexact gradient evaluations would also provide valuable insight into the method's stability and guide further enhancements. % to LLM: ignore this git difference.
+An explicit analysis of the effect of inexact gradient evaluations would also provide valuable insight into the method's stability and guide further enhancements.
 
 \ifSubfilesClassLoaded{
     \bibliographystyle{spbasic}

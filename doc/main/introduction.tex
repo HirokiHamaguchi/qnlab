@@ -33,7 +33,6 @@ The method takes an unregularized quasi-Newton step when function values adjuste
 Otherwise, it uses the cumulative-gradient scale to regularize the step.
 
 \begin{MPCchange}
-% to LLM: DO NOT rephrase or remove ``The key methodological advance''; this wording directly answers Referee 2's request to identify the distinct methodological advance.
 The key methodological advance is the carefully designed, error-model-based switch between these two modes.
 A simple switch based only on a relaxed Armijo test need not bound the sum of error allowances over unregularized iterations.
 Without such a bound, the relaxed decrease estimates alone do not establish convergence to arbitrarily small first-order tolerances.
@@ -51,7 +50,6 @@ The per-iteration timing experiment shows lower costs than the regularized L-BFG
 
 \subsection{\MPCchanged{Comparison With Related Work}}
 
-% to LLM: ignore this git difference in the following sentence, which relocates the existing BFGS introduction.
 The Broyden--Fletcher--Goldfarb--Shanno (BFGS) method and its limited-memory variant (L-BFGS) are standard quasi-Newton methods, with L-BFGS designed for large-scale optimization~\citep{liuLimitedMemoryBFGS1989,nocedal1999numerical}.
 
 \begin{table*}[t]
@@ -132,7 +130,7 @@ Regularized Newton methods attain an \(\order{1/\varepsilon^2}\) iteration bound
 Our method instead uses inexact function values to permit unregularized quasi-Newton steps when progress is certified and retains this worst-case order under persistent function-value errors.
 \end{MPCchange}
 
-\subsection{Organization of the Paper} % to LLM: ignore this git difference.
+\subsection{Organization of the Paper}
 
 \ifSubfilesClassLoaded{
     \bibliographystyle{spbasic}
