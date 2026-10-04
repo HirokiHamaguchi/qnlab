@@ -964,10 +964,10 @@ Reducing the allowance from the conservative nominal value to the tested underes
 \end{MPCchange}
 
 \begin{MPCchange}
-\begin{figure}[t]
+\begin{figure}[tp]
     \ifdefined\MPCRevision\captionsetup{font={color=red}}\fi
     \centering
-    \begin{subfigure}[b]{0.72\textwidth}
+    \begin{subfigure}[b]{0.68\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_pp_function_only_gtol1e-02.pdf}
     \end{subfigure}
@@ -975,14 +975,14 @@ Reducing the allowance from the conservative nominal value to the tested underes
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_legend_noise.pdf}
     \end{subfigure}
-    \caption{Theory-aligned function-value-noise results at noise level $10^{-3}$, supplied error bound \(\feps = 10^{-2}\), and \(\gtol = 10^{-2}\).}
+    \caption{Performance profiles under function-value noise of level $10^{-3}$, with exact gradients, $\feps = 10^{-2}$, and $\gtol = 10^{-2}$.}
     \label{fig:results_function_noise}
 \end{figure}
 \end{MPCchange}
 
-\begin{figure}[t]
+\begin{figure}[tp]
     \centering
-    \begin{subfigure}[b]{0.72\textwidth}
+    \begin{subfigure}[b]{0.68\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_pp_noise0.001_gtol1e-02.pdf}
     \end{subfigure}
@@ -990,15 +990,15 @@ Reducing the allowance from the conservative nominal value to the tested underes
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_legend_noise.pdf}
     \end{subfigure}
-    \caption{Performance profile for the joint function-and-gradient noise setting (componentwise level \(10^{-3}\)) and $\gtol = 10^{-2}$.}
+    \caption{Performance profiles under joint function-and-gradient noise of componentwise level $10^{-3}$, with $\gtol = 10^{-2}$.}
     \label{fig:results_noise}
 \end{figure}
 
 \begin{MPCchange}
-\begin{figure}[t]
+\begin{figure}[tp]
     \ifdefined\MPCRevision\captionsetup{font={color=red}}\fi
     \centering
-    \begin{subfigure}[b]{0.72\textwidth}
+    \begin{subfigure}[b]{0.68\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_pp_error_bound_sensitivity_gtol1e-02.pdf}
     \end{subfigure}
@@ -1006,7 +1006,7 @@ Reducing the allowance from the conservative nominal value to the tested underes
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_legend_sensitivity.pdf}
     \end{subfigure}
-    \caption{Performance profiles for error-bound misspecification under function-value-only noise of level $10^{-3}$ and \(\gtol = 10^{-2}\).}
+    \caption{Performance profiles for error-bound misspecification under function-value noise of level $10^{-3}$, with $\gtol = 10^{-2}$.}
     \label{fig:results_error_bound_sensitivity}
 \end{figure}
 \end{MPCchange}
@@ -1091,7 +1091,7 @@ These results support the practical motivation for invoking the OFFO-based scale
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_legend_precision.pdf}
     \end{subfigure}
-    \caption{Performance profiles across floating-point precisions (64-bit, 32-bit, and 16-bit) and tolerance levels.}
+    \caption{Performance profiles across evaluation precisions and gradient tolerances.}
     \label{fig:results_all_precisions}
 \end{figure}
 
@@ -1104,8 +1104,8 @@ We next compare computational cost from two complementary wall-clock perspective
 \begin{figure}[t]
     \centering
     \includegraphics[width=0.9\textwidth]{../imgs/for_paper/time.pdf}
-    \caption{Mean execution times over $100$ fixed iterations for the ill-conditioned quadratic experiment in \cref{sssec:per_iteration_cost}.
-        Error bars represent one standard deviation over $100$ runs.}
+    \caption{Mean execution time for $100$ iterations on the ill-conditioned quadratic problem.
+        Error bars show one standard deviation over $100$ runs.}
     \label{fig:exec_time}
 \end{figure}
 
@@ -1153,7 +1153,8 @@ At this tolerance, \texttt{Ours} solves $74.5\%$ of the problems and \texttt{Our
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_legend_precision.pdf}
     \end{subfigure}
-    \caption{Proportion of 32-bit test problems attaining $\gtol = 10^{-3}$ as a function of runtime.}
+    \caption{Time-to-solution comparison with 32-bit evaluations and $\gtol = 10^{-3}$.
+Each curve shows the fraction of problems reaching the gradient tolerance within the elapsed time.}
     \label{fig:time_to_solution}
 \end{figure}
 \end{MPCchange}
