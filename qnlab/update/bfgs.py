@@ -1,10 +1,17 @@
 import numpy as np
 import numpy.typing as npt
-import scipy.linalg
 from scipy.linalg.blas import daxpy
+from scipy.linalg.lapack import dpotrs
 
 from qnlab.update.base import BaseUpdateRule
 from qnlab.util.memory_interface import QuasiNewtonMemory
+
+
+def _solve_cholesky(factor, rhs):
+    solution, info = dpotrs(factor, rhs, lower=True)
+    if info != 0:
+        raise np.linalg.LinAlgError(f"Cholesky solve failed (LAPACK info={info}).")
+    return solution
 
 
 def compute_BH(
@@ -55,6 +62,10 @@ class BFGSUpdateRule(BaseUpdateRule):
         workspace = lm.workspace
         steps = workspace._steps
         gradients = workspace._gradients
+        shifted_gradients = workspace.shifted_gradients(mu)
+        if shifted_gradients is not None:
+            gradients = shifted_gradients
+        uncached_shift = mu != 0.0 and shifted_gradients is None
         step_norms = workspace._step_norms
         pair_products = workspace._pair_products
         gradient_norms = workspace._gradient_norms
@@ -69,7 +80,7 @@ class BFGSUpdateRule(BaseUpdateRule):
             alphas[index] = alpha
             # daxpy computes d <- d - alpha*y in place, avoiding an n-vector temporary.
             d = daxpy(gradients[:, index], d, a=-alpha)
-            if mu != 0.0:
+            if uncached_shift:
                 d = daxpy(steps[:, index], d, a=-alpha * mu)
 
         last = workspace.last_index
@@ -84,7 +95,7 @@ class BFGSUpdateRule(BaseUpdateRule):
         for index in indices:
             denominator = pair_products[index] + mu * step_norms[index]
             numerator = np.dot(gradients[:, index], d)
-            if mu != 0.0:
+            if uncached_shift:
                 numerator += mu * np.dot(steps[:, index], d)
             beta = numerator / denominator
             # daxpy computes d <- d + (alpha - beta)*s without an allocation.
@@ -143,55 +154,22 @@ class BFGSUpdateRule(BaseUpdateRule):
         q22 = -(mu / gamma) * step_products
 
         chol_q11 = np.linalg.cholesky(q11)
-        q11_inv_q21_t = scipy.linalg.solve_triangular(
-            chol_q11,
-            q21.T,
-            lower=True,
-            check_finite=False,
-        )
-        schur_complement = q22 - q21 @ scipy.linalg.solve_triangular(
-            chol_q11.T,
-            q11_inv_q21_t,
-            lower=False,
-            check_finite=False,
-        )
+        q11_inv_q21_t = _solve_cholesky(chol_q11, q21.T)
+        schur_complement = q22 - q21 @ q11_inv_q21_t
         chol_negative_schur = np.linalg.cholesky(-schur_complement)
-
-        zeros = np.zeros_like(chol_q11)
-        factor_lower = np.block(
-            [
-                [chol_q11, zeros],
-                [q11_inv_q21_t.T, -chol_negative_schur],
-            ]
+        # Block elimination avoids constructing two 2m-by-2m triangular factors.
+        gradient_solution = _solve_cholesky(
+            chol_q11, (normalized_gradients.T @ g)[indices]
         )
-        factor_upper = np.block(
-            [
-                [chol_q11.T, q11_inv_q21_t],
-                [zeros, chol_negative_schur.T],
-            ]
+        step_solution = _solve_cholesky(
+            chol_negative_schur,
+            q21 @ gradient_solution - (normalized_steps.T @ g)[indices],
         )
-        projected_gradient = np.concatenate(
-            (
-                (normalized_gradients.T @ g)[indices],
-                (normalized_steps.T @ g)[indices],
-            )
-        )
-        compact_solution = scipy.linalg.solve_triangular(
-            factor_lower,
-            projected_gradient,
-            lower=True,
-            check_finite=False,
-        )
-        compact_solution = scipy.linalg.solve_triangular(
-            factor_upper,
-            compact_solution,
-            lower=False,
-            check_finite=False,
-        )
+        gradient_solution -= q11_inv_q21_t @ step_solution
         gradient_coefficients = np.empty(len(lm), dtype=np.float64)
         step_coefficients = np.empty(len(lm), dtype=np.float64)
-        gradient_coefficients[indices] = compact_solution[: len(lm)]
-        step_coefficients[indices] = compact_solution[len(lm) :]
+        gradient_coefficients[indices] = gradient_solution
+        step_coefficients[indices] = step_solution
         correction = (
             normalized_gradients @ gradient_coefficients
             + normalized_steps @ step_coefficients

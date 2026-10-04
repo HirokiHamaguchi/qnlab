@@ -34,7 +34,27 @@ class LBFGSWorkspace:
         self._pair_products = np.empty(capacity, dtype=np.float64)
         self._gradient_norms = np.empty(capacity, dtype=np.float64)
         self._grams_initialized = False
+        self._shifted_gradients: npt.NDArray[np.float64] | None = None
+        self._previous_shift: np.float64 | None = None
+        self._cached_shift: np.float64 | None = None
         self.alphas = np.empty(capacity, dtype=np.float64)
+
+    def shifted_gradients(
+        self, mu: np.float64
+    ) -> npt.NDArray[np.float64] | None:
+        """Cache shifted pairs only when the shift repeats across iterations."""
+        if mu == 0.0 or mu != self._previous_shift:
+            self._previous_shift = mu
+            self._cached_shift = None
+            return None
+        if self._cached_shift != mu:
+            if self._shifted_gradients is None:
+                self._shifted_gradients = np.empty_like(self._gradients)
+            shifted = self._shifted_gradients[:, : self.size]
+            np.multiply(self._steps[:, : self.size], mu, out=shifted)
+            np.add(shifted, self._gradients[:, : self.size], out=shifted)
+            self._cached_shift = mu
+        return self._shifted_gradients
 
     @property
     def steps(self) -> npt.NDArray[np.float64]:
@@ -162,6 +182,11 @@ class LBFGSWorkspace:
         self._step_norms[index] = step_norm
         self._pair_products[index] = pair_product
         self._gradient_norms[index] = gradient_norm
+        if self._cached_shift is not None:
+            assert self._shifted_gradients is not None
+            shifted = self._shifted_gradients[:, index]
+            np.multiply(step, self._cached_shift, out=shifted)
+            np.add(shifted, gradient_difference, out=shifted)
         if self._normalized_initialized and step_norm > 0.0:
             np.divide(step, np.sqrt(step_norm), out=self._normalized_steps[:, index])
         if self._normalized_initialized and gradient_norm > 0.0:

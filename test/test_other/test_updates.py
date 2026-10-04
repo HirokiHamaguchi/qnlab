@@ -99,6 +99,40 @@ def test_lbfgs_workspace_keeps_contiguous_pairs_and_gram_matrices():
     )
 
 
+def test_shifted_pair_cache_tracks_ring_buffer_and_changing_regularization():
+    workspace = LBFGSWorkspace(n=5, capacity=3)
+    rng = np.random.default_rng(13)
+    mu = np.float64(0.7)
+    for _ in range(7):
+        workspace.append(rng.normal(size=5), rng.normal(size=5))
+        _ = workspace.shifted_gradients(mu)
+        shifted = workspace.shifted_gradients(mu)
+        np.testing.assert_allclose(
+            shifted[:, : workspace.size],
+            workspace._gradients[:, : workspace.size]
+            + mu * workspace._steps[:, : workspace.size],
+        )
+    for mu in (np.float64(1.2), np.float64(0.0), np.float64(0.7)):
+        assert workspace.shifted_gradients(mu) is None
+        shifted = workspace.shifted_gradients(mu)
+        if mu == 0.0:
+            assert shifted is None
+        else:
+            np.testing.assert_allclose(
+                shifted[:, : workspace.size],
+                workspace._gradients[:, : workspace.size]
+                + mu * workspace._steps[:, : workspace.size],
+            )
+    items = [IterationData(rng.normal(size=5), rng.normal(size=5)) for _ in range(2)]
+    workspace.rebuild(iter(items))
+    shifted = workspace.shifted_gradients(mu)
+    np.testing.assert_allclose(
+        shifted[:, : workspace.size],
+        workspace._gradients[:, : workspace.size]
+        + mu * workspace._steps[:, : workspace.size],
+    )
+
+
 def test_cautious_rule_enforces_both_uniform_curvature_bounds():
     method = Method("NTRQN", "cautious", "raw", "bfgs")
     accepted = IterationData()
@@ -265,7 +299,7 @@ def test_workspace_two_loop_matches_pairwise_reference():
         point = new_point
 
     gradient = rng.normal(size=n)
-    for mu in (np.float64(0.0), np.float64(0.7)):
+    for mu in map(np.float64, (0.0, 0.7, 0.7, 1.2, 1.2, 0.0, 0.7, 0.7)):
         direction = -gradient.copy()
         alphas = np.empty(len(memory))
         items = list(memory)
