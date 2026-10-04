@@ -68,7 +68,7 @@ We formalize this problem setting through the following conditions on function v
 The exact gradient $\nabla f(x)$ is available at every evaluated point.}
 \end{problemsetting}
 
-We adopt the exact-gradient condition in the Problem Setting as a modeling simplification that keeps the analysis focused on function-value errors, rather than as a claim that practical gradient evaluations are always exact.
+We adopt the exact-gradient condition in the problem setting as a modeling simplification that keeps the analysis focused on function-value errors, rather than as a claim that practical gradient evaluations are always exact.
 The numerical experiments also examine stability with gradient errors beyond this setting (see \cref{sec:experiments}).
 
 The hybrid absolute-relative error model captures the typical behavior of rounding errors in IEEE~754 floating-point arithmetic~\citep{highamAccuracyStabilityNumerical2002,10.5555/3168451.3168462}.
@@ -607,14 +607,14 @@ Finally, \cref{thm:gc} implies the iteration-complexity bound
 \end{equation*}
 \begin{MPCchange}
 Let us examine the hidden constants in this bound.
-By \cref{eq:gc_result}, an iterate satisfying $\norm{\nabla f(x_k)} \leq \gtol$ for some $0 \leq k < k_{\max}$ is guaranteed whenever
+By \cref{eq:gc_result}, there exists an index $0 \leq k < k_{\max}$ satisfying $\norm{\nabla f(x_k)} \leq \gtol$ whenever
 \begin{equation}
     k_{\max}\geq \frac{1}{\gtol^2}
     \max\left\{\frac{MF'}{c\overline\alpha},\frac{4(F')^2}{C_1^2}\right\}. \label{eq:k_max_gtol_bound}
 \end{equation}
 In the following, we treat $c$, $\beta_{\min}$, $\theta_{\min}$, $\theta_{\max}$, and $\varsigma$ as fixed algorithmic parameters.
 For the proposed construction of $B_k$ (described in \cref{sec:proposed_choice_Bk}), let the memory size $p$ and pair-selection parameter $\Lambda$ also be fixed.
-The spectral constants, which are independent of the target accuracy $\gtol$, are then
+The spectral constants in \cref{ass:BBounds}, which are independent of the target accuracy $\gtol$, are then
 \begin{equation*}
     m   = \min\{1,\sqrt{\varsigma}\}>0, \quad
     M   = \qty(1+(1+p)\Lambda)\max\{1,\norm{g_0}\}.
@@ -623,10 +623,11 @@ Define the line-search conditioning factor $L_{\mathrm{ls}}\coloneqq\max\{1,L/m\
 Using \cref{eq:def_alpha_bar,eq:def_C1_C2,eq:def_Delta_max}, we obtain
 \begin{align*}
     \overline\alpha^{-1} & = \order{L_{\mathrm{ls}}}, \qquad
-    C_1^{-1} = \order{L_{\mathrm{ls}}}, \qquad
-    C_2 = \order{M/L_{\mathrm{ls}}+L}, \\
-    \Delta_{\max}        & = \order{\frac{\feps}{1-\feps}\max\{1,\overline f(x_0),-\overline f^*\}}.
+    C_1 = \Theta\qty(\frac{1}{L_{\mathrm{ls}}}), \qquad
+    C_2 = \order{\frac{M}{L_{\mathrm{ls}}} + L}, \\
+    \Delta_{\max}        & = \order{\frac{\feps \max\{1, \overline f(x_0), -\overline f^*\}}{1 - \feps}}.
 \end{align*}
+Here, $\Theta$ denotes upper and lower bounds up to positive constant factors.
 Combining the logarithmic terms in \cref{eq:def_F_prime} and using the bounds above, we obtain
 \begin{align*}
     C_1 \sqrt{\varsigma} - C_2 \ln\varsigma - 2C_2 \ln\qty(\frac{\mathrm{e} C_1}{4C_2}) &= C_1 \sqrt{\varsigma} + 2C_2 \qty(\ln\frac{4C_2}{C_1 \sqrt{\varsigma}} - 1) \\
@@ -638,7 +639,7 @@ Substituting this estimate and the order of $\Delta_{\max}$ into \cref{eq:def_F_
 \begin{align*}
     F' & = \mathcal{O}\bigg(f(x_0)-f^*+\frac{\overline f(x_0)-\overline f^*}{1-\feps}
     +\frac{\feps\max\{1,\overline f(x_0),-\overline f^*\}}{(1-\feps)^2} \\
-    &\qquad{}+\frac{1}{L_{\mathrm{ls}}}+\qty(M/L_{\mathrm{ls}}+L)\qty(1+\ln(M+L L_{\mathrm{ls}}))\bigg).
+    &\qquad{}+\frac{1}{L_{\mathrm{ls}}}+\qty(\frac{M}{L_{\mathrm{ls}}} + L)\qty(1+\ln(M+L L_{\mathrm{ls}}))\bigg).
 \end{align*}
 Substituting these bounds in \cref{eq:k_max_gtol_bound} gives the following upper bound on the number of iterations needed to reach this tolerance:
 \begin{equation*}
@@ -716,11 +717,11 @@ For a fixed $\Lambda\geq1$, a candidate pair $(s,\overline y)$ is retained only 
 \begin{equation}\label{eq:implemented_cautious_test}
     \overline y^\top s\geq\frac{\norm{\overline y}^2}{\Lambda\rho_0}>0.
 \end{equation}
-Consequently, every retained pair $(s,\overline y/\rho_0)$ satisfies \cref{eq:curvature_conditions1}, and the homogeneity of the BFGS update gives
-\begin{equation*}
+Consequently, every retained pair $(s,\overline y/\rho_0)$ satisfies \cref{eq:curvature_conditions1}, and the definition of the BFGS update gives
+\begin{equation}\label{eq:BFGS_scaling}
     \mathrm{BFGS}(\{(s_{k_i},\overline y_{k_i})\})
     =\rho_0\mathrm{BFGS}(\{(s_{k_i},\overline y_{k_i}/\rho_0)\}).
-\end{equation*}
+\end{equation}
 Using at most $p$ retained pairs, we define
 \begin{equation}\label{eq:proposed_choice_of_Bk}
     B_k=
@@ -729,7 +730,7 @@ Using at most $p$ retained pairs, we define
         (\omega_{\min}+\rho_0)I,                                      & \text{otherwise}.
     \end{cases}
 \end{equation}
-It follows from \cref{prop:bounded_BFGS}, the homogeneity identity, and $\omega_{\min}\leq1\leq\rho_0$ that
+It follows from \cref{prop:bounded_BFGS,eq:BFGS_scaling}, and $\omega_{\min}\leq1\leq\rho_0$ that
 \begin{equation*}
     \omega_{\min}I\preceq B_k\preceq\qty(1+(1+p)\Lambda)\rho_0I.
 \end{equation*}
@@ -741,11 +742,8 @@ In our implementation, we use $p=10$ and $\eta_{\mathrm{damp}}=0.8$.
 \begin{MPCchange}
 \paragraph{Exact Compact Solve: }
 
-We use a compact representation of the raw L-BFGS matrix to solve the regularized system exactly~\citep{kanzowRegularizationLimitedMemory2023}.
-Specifically, we compute $d_k=-(B_k+\mu_k I)^{-1}g_k$ for the matrix in \cref{eq:proposed_choice_of_Bk}, without absorbing the additive regularization into the curvature pairs.
-This exact compact solve therefore coincides with the direction analyzed in \cref{sec:analysis}.
-When the memory is empty, the same definition reduces to $d_k=-g_k/(\rho_0+\omega_{\min}+\mu_k)$.
-As a numerical safeguard when the compact factorization is unavailable or does not return a finite descent direction, the implementation uses this zero-memory direction, which also corresponds to a matrix satisfying \cref{ass:BBounds}.
+We use a compact representation of the L-BFGS matrix in \cref{eq:proposed_choice_of_Bk} to solve the regularized system exactly, as analyzed in \cref{sec:analysis}~\citep{kanzowRegularizationLimitedMemory2023}.
+If the compact factorization is unavailable or does not return a finite descent direction, the implementation falls back to the matrix used when the memory is empty, which also satisfies \cref{ass:BBounds}.
 \end{MPCchange}
 
 \paragraph{Shifted-Pair Approximation: }
@@ -909,7 +907,7 @@ The solver receives these rounded quantities as 64-bit values, so this tests red
 
 The error allowances for the three precision settings are summarized in \cref{tab:machine_epsilon}.
 \MPCchanged{These values are empirical safety margins for accumulated floating-point errors rather than certified bounds.
-The multipliers of machine epsilon are $10^7$, $10^4$, and $10^2$ for 64-, 32-, and 16-bit precision, respectively.
+The multipliers of machine epsilon are $10^7$, $10^4$, and $10^2$ for 64-bit, 32-bit, and 16-bit precision, respectively.
 Because the appropriate value of $\feps$ may not be known accurately in practice, the sensitivity experiment examines how under- and overestimation affect performance.}
 We also set the maximum number of iterations to $k_{\max} = 15{,}000$ and timed out runs exceeding 10 minutes per problem.
 
@@ -950,14 +948,18 @@ Both proposed variants solve at least one instance of dimension $123{,}200$, the
 
 \begin{MPCchange}
 We also examine how NTQN's recommended noise-dependent termination rule affects the comparison in the function-value-noise experiment.
-Under this termination mode, $50.1\%$ of the instances attain the common tolerance, compared with $81.2\%$ when the common gradient-tolerance stop is used.
-All recommended-mode runs terminate without timeout or exception, and $619$ of them stop because NTQN detects that function-value changes have reached its estimated function-noise level (flag~4).
+With NTQN's recommended termination rule, $50.1\%$ of the instances attain the gradient tolerance $\gtol$, compared with $81.2\%$ under the termination settings used in our primary comparison, which include a stop at $\gtol$.
+All recommended-mode runs terminate without timeout or exception, and many stop when function-value changes reach the estimated noise level.
 The lower scored fraction therefore mainly reflects NTQN's noise-dependent stopping rule rather than failed execution.
+Thus, our primary comparison gives NTQN a greater opportunity to attain the evaluation tolerance, avoiding a disadvantage due to its noise-dependent termination rule.
 \end{MPCchange}
 
 \begin{MPCchange}
 \Cref{fig:results_error_bound_sensitivity} examines sensitivity to the supplied error bound by comparing both variants under all three tested bounds.
 The nominal bound gives the highest solved percentage for \texttt{Ours}, whereas \texttt{Ours-AR} is less sensitive to overestimation.
+Overestimating the error bound triggers OFFO-inspired regularization earlier, and the resulting conservative steps are the main cause of the lower solved percentage.
+Restart resets the accumulated regularization scale after sufficient progress, mitigating subsequent over-regularization.
+The improved performance of \texttt{Ours-AR} indicates the effectiveness of this restart mechanism.
 Reducing the allowance from the conservative nominal value to the tested underestimated value has only a limited effect on the solved percentages in this experiment.
 \end{MPCchange}
 
@@ -1011,13 +1013,13 @@ Reducing the allowance from the conservative nominal value to the tested underes
 
 \subsubsection{Results at Different Precision Levels}\label{sssec:exact_results}
 
-We next present performance profiles for each floating-point precision (64-, 32-, and 16-bit).
+We next present performance profiles for each floating-point precision (64-bit, 32-bit, and 16-bit).
 We evaluated each method at three gradient norm tolerance levels, i.e., $\gtol \in \{10^{-1}, 10^{-3}, 10^{-5}\}$.
 These tolerance levels represent different optimization regimes, from moderate accuracy to high precision requirements.
 \Cref{fig:results_all_precisions} shows the performance profiles across all three precision levels.
-These performance profiles quantify how attained accuracy changes as oracle precision is reduced, while both proposed variants attain higher solved percentages than all existing quasi-Newton baselines at 16- and 32-bit precision.
+These performance profiles quantify how attained accuracy changes as oracle precision is reduced, while both proposed variants attain higher solved percentages than all existing quasi-Newton baselines at 16-bit and 32-bit precision.
 \MPCchanged{Across the artificial-noise and reduced-precision experiments, the purely first-order \texttt{ASTR1-Adagrad} baseline solves fewer instances and generally requires more oracle calls than the proposed variants.}
-\MPCchanged{These results support the practical motivation for invoking the OFFO-based scale selectively while exploiting quasi-Newton steps.}
+These results support the practical motivation for invoking the OFFO-based scale selectively while exploiting quasi-Newton steps.
 
 \begin{figure}[t]
     \centering
@@ -1089,7 +1091,7 @@ These performance profiles quantify how attained accuracy changes as oracle prec
         \centering
         \includegraphics[width=\textwidth]{../imgs/compare/_legend_precision.pdf}
     \end{subfigure}
-    \caption{Performance profiles across floating-point precisions (64-, 32-, and 16-bit) and tolerance levels.}
+    \caption{Performance profiles across floating-point precisions (64-bit, 32-bit, and 16-bit) and tolerance levels.}
     \label{fig:results_all_precisions}
 \end{figure}
 
@@ -1115,7 +1117,7 @@ We conducted experiments on the ill-conditioned quadratic problem
 \end{equation*}
 with $n=10{,}000$.
 The initial point $x_0$ was chosen as the all-ones vector.
-We used memory size \MPCchanged{$p=10$} and the iteration limit $k_{\max}=100$, with no other stopping criterion.
+We used memory size $p=10$ and the iteration limit $k_{\max}=100$, with no other stopping criterion.
 Because every method performs exactly $100$ iterations and the objective and gradient evaluations are inexpensive, differences in total runtime primarily reflect differences in per-iteration algorithmic overhead.
 Timing data were collected after three warm-up runs, followed by $100$ recorded trials.
 
@@ -1161,7 +1163,7 @@ At this tolerance, \texttt{Ours} solves $74.5\%$ of the problems and \texttt{Our
 
 We proposed a hybrid regularized quasi-Newton method for smooth nonconvex optimization with objective-function errors satisfying a hybrid absolute-relative model.
 The method retains the \(\order{1/\varepsilon^2}\) first-order iteration complexity of the $L$-smooth nonconvex setting while selectively using noisy function values.
-At 16- and 32-bit precision, both proposed variants reached the strictest tested gradient tolerance on more CUTEst problems than the existing quasi-Newton baselines.
+At 16-bit and 32-bit precision, both proposed variants reached the strictest tested gradient tolerance on more CUTEst problems than the existing quasi-Newton baselines.
 
 Future work includes the investigation of local convergence properties, the extension to constrained optimization, and the applications to practical problems in machine learning and scientific computing.
 Additionally, exploring adaptive strategies for selecting algorithmic parameters based on problem characteristics could further enhance the method's performance.
