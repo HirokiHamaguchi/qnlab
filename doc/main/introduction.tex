@@ -18,35 +18,32 @@ Accurate function values are used to determine whether a step is accepted or rej
 When function values are contaminated by numerical noise, these mechanisms become unreliable, and the algorithms may lose their theoretical guarantees, behave erratically, or terminate prematurely with unreliable solutions.}
 
 In the presence of noise, \MPCchanged{there are mainly two approaches to address function-value errors.
-The first is to use a noise-tolerant methods that account for bounded errors such as relaxed Armijo tests~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022,paquetteStochasticLineSearch2020}.
+The first is to use noise-tolerant methods that account for bounded errors, such as the noise-tolerant quasi-Newton (NTQN) method~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
 The second is to avoid function values entirely~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
-However, as we will detail in \cref{sec:related_work}, the part of their theory does not cover our nonconvex setting, and totally discarding function values can limit practical efficiency when reliable function values are available.}
+However, the NTQN convergence analysis covers only strongly convex objectives, and totally discarding function values can limit practical efficiency when reliable function values are available.}
 
 These observations naturally motivate us to design noise-tolerant quasi-Newton methods that use function values when they are reliable and use noise-aware strategies when they are not.
-\MPCchanged{Natural idea is to combine the former with the latter, switching between them.
-The key difficulty of this approach is how to determine when to switch between the two methods while maintaining convergence guarantees and practical efficiency.
-If we overlook the noise, we may accept unreliable steps and lose convergence guarantees, being unstable or even diverging.
-If we are too conservative, we may reject reliable steps and lose practical efficiency, slowing down the practical convergence speed.
-Achieving a balance between these two is crucial for designing effective methods.}
+\MPCchanged{A natural idea is to switch between quasi-Newton steps guided by function values and OFFO-inspired regularized steps.
+Still, overlooking function-value errors can compromise convergence guarantees, whereas overly conservative switching can slow practical convergence.
+The key difficulty is therefore to determine when to switch while maintaining both convergence guarantees and practical efficiency.}
 
 In this work, we propose a noise-tolerant regularized quasi-Newton method.
 Our approach combines Armijo-type line search with quadratic regularization~\citep{uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023}
 and Objective-Function-Free Optimization (OFFO) inspired strategy~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
 When a sufficient decrease in function value is observed, the method behaves similarly to standard quasi-Newton methods with line search, preserving its practical efficiency.
-When numerical noise dominates, we introduce regularization on the approximate Hessian to ensure numerical stability, which yields convergence properties similar to those of OFFO methods, particularly AdaGrad-Norm~\citep{wardAdaGradStepsizesSharp2020}.
+Otherwise, an OFFO-inspired cumulative-gradient scale controls the regularization and supports convergence under function-value errors.
 
 \MPCchanged{The key methodological advance is the carefully designed, error-model-based switch between unregularized quasi-Newton steps and OFFO-inspired regularized steps.
 A relaxed Armijo condition alone may accept steps without sufficient decrease in the true objective, so its decrease estimates need not establish convergence to arbitrarily small first-order tolerances.
-Our switch allows another unregularized step only after the observed objective decrease is large enough for the relaxation used at the preceding unregularized iteration.
-This leads to a flexible and adaptive switching strategy that can exploit reliable function while maintaining convergence guarantees under persistent function-value noise.
-Together, these estimates yield an $\order{\varepsilon^{-2}}$ iteration bound, preserving the optimal worst-case order for smooth nonconvex optimization under the problem setting of persistent function-value errors and exact gradients.}
+Our switch permits unregularized quasi-Newton steps only when the observed progress is sufficient to account for function-value errors.
+This allows the method to exploit reliable function values while retaining convergence guarantees without applying OFFO-inspired regularization throughout.
+The resulting method achieves an $\order{\varepsilon^{-2}}$ iteration bound, preserving the optimal worst-case order for smooth nonconvex optimization under the problem setting of persistent function-value errors and exact gradients.}
 
-We also conducted extensive numerical experiments on the CUTEst benchmark collection.
-We compare the analyzed method, a practical variant incorporating approximation and restart mechanisms, and several baseline methods we have mentioned so far.
-We examined function-value noise settings as the theory aligned one, joint function-and-gradient noise as an extended practical setting, and reduced precision settings as a realistic scenario.
-Almost all of the experiments show that our method is faster in terms of oracle calls and elapsed time, and is more robust to noise than the baselines.
-We also considered error-bound misspecification to assess the robustness of the method.
-A fixed-iteration timing experiment shows lower overhead than the regularized L-BFGS baselines, and a separate time-to-solution comparison shows favorable elapsed-time performance at this precision and tolerance.
+We also conducted extensive numerical experiments on the CUTEst benchmark collection to compare the analyzed method and a heuristic variant with existing methods.
+We evaluated their performance under function-value noise within the theoretical problem setting, and under joint function-and-gradient noise and reduced-precision evaluations as complementary empirical tests beyond this setting.
+We also assessed sensitivity to error-bound misspecification.
+Both proposed variants attain higher solved percentages than the existing quasi-Newton baselines under artificial noise and at reduced precision.
+A fixed-iteration timing experiment shows lower overhead than the regularized L-BFGS baselines, and a separate time-to-solution comparison shows favorable elapsed-time performance under reduced precision.
 
 \subsection{Comparison With Related Work}
 \label{sec:related_work}
@@ -57,8 +54,9 @@ A fixed-iteration timing experiment shows lower overhead than the regularized L-
     \centering
     \caption{
         Theoretical comparison of the proposed method and related Newton-type, quasi-Newton, and OFFO methods.
-        A checkmark (\ding{51}) denotes that the corresponding property holds or is covered by the theory, and ``--'' denotes its absence.
+        A checkmark (\ding{51}) denotes that the corresponding property holds or is covered by the cited theory, and ``--'' denotes that it does not hold or is not established by that theory.
         The ``Noisy $f$,'' ``Noisy $\nabla f$,'' and ``Nonconvex'' columns indicate whether the corresponding convergence theory allows function-value errors, allows gradient errors, and covers nonconvex objectives, respectively.
+        For OFFO, function-value errors have no effect because function values are not evaluated.
         The asterisk indicates that gradient noise is considered in the algorithm design and numerical stress tests, but its analysis is outside the scope of this paper.
     }
     \label{tab:related_work_comparison}
@@ -76,7 +74,7 @@ A fixed-iteration timing experiment shows lower overhead than the regularized L-
              & \ding{51}
              & --
              & --
-             & \ding{51}
+             & --
              & -- \\
             \makecell[l]{Regularized\\Newton\\[-0.4em]\scalebox{0.8}{\citep{uedaConvergencePropertiesRegularized2010}}}
              & \ding{51}
@@ -114,28 +112,25 @@ A fixed-iteration timing experiment shows lower overhead than the regularized L-
 \end{table*}
 
 \begin{MPCchange}
-We next compare our method with related quasi-Newton and OFFO methods, whose theoretical guarantees are summarized in \cref{tab:related_work_comparison}.
+We next discuss the methods in \cref{tab:related_work_comparison} in order, focusing on their assumptions and convergence guarantees.
 
 The first three methods in the table are standard quasi-Newton and regularized Newton-type methods.
 The Broyden--Fletcher--Goldfarb--Shanno (BFGS) method and its Limited-memory variant (L-BFGS) are among the most efficient and widely used algorithms to solve the problem~\eqref{prob:main_problem}~\citep{liuLimitedMemoryBFGS1989,nocedal1999numerical}.
-It generally employs line search procedures that enforce the Wolfe conditions to guarantee sufficient descent and the positive definiteness of the Hessian approximation.
-Regularized Newton methods attain an $\order{\varepsilon^{-2}}$ iteration bound with accurate function values~\citep[Theorem~4.1]{uedaConvergencePropertiesRegularized2010}, while the regularized L-BFGS method \citep{kanzowRegularizationLimitedMemory2023} establishes global convergence to first-order stationarity.
-% ここにどのようにfunction valueを使うかの説明を入れる。
+They generally employ line search procedures that enforce the Wolfe conditions to guarantee sufficient descent and the positive definiteness of the Hessian approximation.
+Regularized Newton methods attain an $\order{\varepsilon^{-2}}$ iteration bound under their stated assumptions and with accurate function values~\citep[Theorem~4.2]{uedaConvergencePropertiesRegularized2010}, while the regularized L-BFGS method \citep{kanzowRegularizationLimitedMemory2023} establishes global convergence to first-order stationarity.
+Line search methods use function values in sufficient-decrease tests, whereas Kanzow--Steck regularization uses the ratio of actual to predicted reduction to accept steps and adjust regularization~\citep[Algorithm~1]{kanzowRegularizationLimitedMemory2023}.
 As discussed, their theoretical guarantees rely on accurate function values, and do not cover function-value errors.
 Their practical performance may degrade in noisy environments.
 
-The next one is the noise-tolerant quasi-Newton (NTQN) method \citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
-NTQN uses a noise-tolerant line search and a lengthening procedure to stabilize curvature information under bounded errors in function and gradient evaluations.
+NTQN addresses bounded errors in function and gradient evaluations through a noise-tolerant line search and a lengthening procedure~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
 The NTQN analysis allows bounded gradient errors and establishes convergence to a noise-dependent neighborhood for strongly convex objectives~\citep[Theorem~3.5]{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
 Its practical line search adds twice the absolute function-error bound to the Armijo right-hand side after an unsuccessful initial trial~\citep[Section~4.2]{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
 Our relaxation instead follows a hybrid absolute-relative error model and is recomputed at each trial point.
 
-The next one is the OFFO method.
 OFFO methods obtain convergence guarantees without evaluating function values~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
-They attain an $\order{\varepsilon^{-2}}$ iteration bound for smooth nonconvex objectives, but cannot use function-value information to guide the steps.
+The Adagrad-like class analyzed in \citet{Gratton08022024} attains an $\order{\varepsilon^{-2}}$ iteration bound for smooth nonconvex objectives, but cannot use function-value information to guide the steps.
 
-Lastly, our method combines the strengths of quasi-Newton and OFFO methods.
-Our method instead uses inexact function values to permit unregularized quasi-Newton steps when progress is certified and retains this worst-case order under persistent function-value errors.
+Lastly, our method uses inexact function values to permit unregularized quasi-Newton steps when progress is certified and retains this worst-case order under persistent function-value errors.
 \end{MPCchange}
 
 \subsection{Organization of the Paper}
