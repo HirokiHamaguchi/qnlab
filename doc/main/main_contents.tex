@@ -16,8 +16,7 @@ We begin by reviewing relevant background and formalizing the problem setting.
 \subsection{Regularized Quasi-Newton Method}
 \label{sec:prel_rqn}
 
-A regularized quasi-Newton method is a variant of quasi-Newton methods that does not rely heavily on linesearch techniques.
-This property is important for optimization in noisy evaluation environments.
+Regularized quasi-Newton methods control the search direction by adding a regularization term to the Hessian approximation.
 There has been renewed interest in regularized Newton-type methods, including cubic-regularization schemes~\citep{nesterovCubicRegularizationNewton2006,ranganathSymmetricRankOneQuasiNewton2025,wangConvergenceRatesRegularized2025}, and we focus on quadratic regularization~\citep{kanzowRegularizationLimitedMemory2023,doikovSuperUniversalRegularizedNewton2024,liTruncatedRegularizedNewton2009,zhangNewRegularizedQuasiNewton2018,uedaConvergencePropertiesRegularized2010,uedaRegularizedNewtonMethod2014,shengNewAdaptiveTrust2018} for simplicity of analysis and implementation.
 
 For $g_k \defeq \nabla f(x_k)$ and an approximate Hessian $B_k \in \bbR^{n \times n}$, regularized quasi-Newton methods compute the step as
@@ -31,13 +30,13 @@ Several strategies for choosing $\mu_k$ in nonconvex optimization have been prop
     \mu_k = c_1 \max(0, -\lambda_{\min}(B_k)) + c_2 \norm{\nabla f(x_k)}^\delta,
 \end{equation*}
 where $c_1 > 1$, $c_2 > 0$, $\delta \ge 0$, and $\lambda_{\min}(B_k)$ denotes the smallest eigenvalue of $B_k$.
-This choice guarantees that $B_k + \mu_k I$ is positive definite, ensuring that $d_k$ is a descent direction.
+For symmetric $B_k$ and $\nabla f(x_k) \neq 0$, this choice makes $B_k + \mu_k I$ positive definite and yields a descent direction.
 We adapt such regularization strategies to noisy evaluation environments.
 
 \subsection{Objective-Function-Free Optimization}
 \label{sec:prel_offo}
 
-Objective-Function-Free Optimization (OFFO) refers to a class of methods that avoid explicit evaluations of the objective function and rely solely on gradient information~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
+Objective-Function-Free Optimization (OFFO) refers to methods that do not evaluate the objective function~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
 Such methods are particularly attractive when function values are unreliable due to noise.
 Similar adaptive trust-region approaches are also discussed~\citep{grapigliaAdaptiveTrustregionMethod2022}.
 
@@ -144,14 +143,13 @@ where $\Delta_k$ is the error-absorbing term that is recomputed for each $\alpha
 \MPCchanged{As shown in the proof of \cref{lem:error_bound_on_function_evaluations}, $\Delta_k$ bounds the absolute discrepancy between the true and observed function decreases whenever the true function value decreases.}
 This relaxation guarantees the existence of $\alpha_k \in (0,1]$ even in the presence of errors in $\overline{f}$.
 When $d_k$ is a descent direction ($g_k^\top d_k < 0$), \cref{eq:relaxed_Armijo_condition} ensures that a temporary increase of $\overline{f}$ is at most $\Delta_k$.
-Since $\Delta_k$ depends on $-\overline{f}(x_k + \alpha_k d_k)$ but not on $\overline{f}(x_k + \alpha_k d_k)$, $\Delta_k$ does not increase when $\overline{f}(x_k + \alpha_k d_k)$ becomes large.
-This prevents unbounded growth of $\Delta_k$.
+An increase in the trial function value does not enlarge the relaxation, since $\Delta_k$ depends on $-\overline{f}(x_k + \alpha_k d_k)$ rather than $\overline{f}(x_k + \alpha_k d_k)$.
 
 \paragraph{Adaptive Update of the Regularization Parameter (\refLines{line:mu_0_condition}{line:update_theta}): }\label{sec:algorithm_components_mu}
 
 The third component is the adaptive update of the regularization parameter $\mu_k$.
 A larger $\mu_k$ yields a more conservative step, while a smaller $\mu_k$ allows a more aggressive quasi-Newton step, especially when $\mu_k=0$.
-In practical settings, $\mu_k=0$ is preferred, since this allows us to fully exploit the quasi-Newton approximation and typically leads to practically faster convergence.
+In practical settings, $\mu_k=0$ is preferred, since this allows us to fully exploit the quasi-Newton approximation and typically accelerates practical convergence.
 \begin{MPCchange}
 Let $K\coloneqq \{0,1,2,\ldots, k_{\max}-1\}$ be the set of iteration indices.
 As shown in \cref{alg:regularized_qn}, $K_k^0 = \{j \in K \mid \mu_j = 0,\ j < k\}$ and $K_k^+ = \{j \in K \mid \mu_j > 0,\ j < k\}$ contain the unregularized and regularized iteration indices classified before iteration $k$, respectively.
@@ -693,7 +691,7 @@ Its proof is deferred to \cref{app:proof_of_bounded_BFGS}.
     \end{equation}
 \end{proposition}
 \MPCchanged{Proposition~\ref{prop:bounded_BFGS} supplies the upper bound, while a fixed diagonal shift will supply the lower bound in \cref{ass:BBounds}.}
-We first apply a scalar Powell-type damping to a candidate pair with $y_{k_i}^{\top}s_{k_i}<0$~\citep{powellAlgorithmsNonlinearConstraints1978,lotfiStochasticDampedLBFGS2020}.
+After the modified secant correction described below, we apply scalar Powell-type damping to a candidate pair with $y_{k_i}^{\top}s_{k_i}<0$~\citep{powellAlgorithmsNonlinearConstraints1978,lotfiStochasticDampedLBFGS2020}.
 For a parameter $\eta_{\mathrm{damp}}\in(0,1)$, let $b_i=\norm{y_{k_i}}^2/\abs{y_{k_i}^{\top}s_{k_i}}$ and set
 \begin{equation*}
     \overline y_{k_i}
@@ -763,7 +761,7 @@ The analysis applies to the exact compact solve used by \texttt{Ours}.
 \begin{MPCchange}
 \paragraph{Modified Secant Correction: }
 
-Both proposed variants apply a function-based modified secant correction before the damping and cautious selection described above~\citep{zhangNewQuasiNewtonEquation1999,yuanConvergenceAnalysisModified2010}.
+Both proposed variants apply a function-based modified secant correction when the observed decrease is sufficiently large relative to the function-value error bound, before damping and cautious selection~\citep{zhangNewQuasiNewtonEquation1999,yuanConvergenceAnalysisModified2010}.
 \end{MPCchange}
 A scale-aware safeguard suppresses the correction whenever it would dominate the raw gradient difference.
 \MPCchanged{The final corrected and damped pair must still satisfy \cref{eq:implemented_cautious_test}, so this modification preserves the spectral guarantee for \texttt{Ours}.}
@@ -836,7 +834,7 @@ We compared the following methods in our experiments.
 
     \item (\texttt{Line}): Line search L-BFGS method
           \begin{itemize}
-              \item Our Python implementation ported from LBFGSpp~\citep{Okazaki2007libLBFGS}.
+              \item Our Python implementation ported from libLBFGS~\citep{Okazaki2007libLBFGS}.
               \item The step size was determined using the Mor\'e--Thuente line search, closely resembling SciPy's implementation.
           \end{itemize}
 
@@ -912,7 +910,6 @@ The solver receives these rounded quantities as 64-bit values, so this tests red
 The error allowances for the three precision settings are summarized in \cref{tab:machine_epsilon}.
 \MPCchanged{These values are empirical safety margins for accumulated floating-point errors rather than certified bounds.
 The multipliers of machine epsilon are $10^7$, $10^4$, and $10^2$ for 64-, 32-, and 16-bit precision, respectively.
-The specific multipliers are experimental choices.
 Because the appropriate value of $\feps$ may not be known accurately in practice, the sensitivity experiment examines how under- and overestimation affect performance.}
 We also set the maximum number of iterations to $k_{\max} = 15{,}000$ and timed out runs exceeding 10 minutes per problem.
 
@@ -1020,7 +1017,7 @@ These tolerance levels represent different optimization regimes, from moderate a
 \Cref{fig:results_all_precisions} shows the performance profiles across all three precision levels.
 These performance profiles quantify how attained accuracy changes as oracle precision is reduced, while both proposed variants attain higher solved percentages than all existing quasi-Newton baselines at 16- and 32-bit precision.
 \MPCchanged{Across the artificial-noise and reduced-precision experiments, the purely first-order \texttt{ASTR1-Adagrad} baseline solves fewer instances and generally requires more oracle calls than the proposed variants.}
-\MPCchanged{These results illustrate the practical motivation for invoking the OFFO-based scale only when error-adjusted function-value certification fails, while retaining quasi-Newton steps whenever they can be used safely.}
+\MPCchanged{These results support the practical motivation for invoking the OFFO-based scale selectively while exploiting quasi-Newton steps.}
 
 \begin{figure}[t]
     \centering
