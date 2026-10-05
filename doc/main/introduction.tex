@@ -29,7 +29,7 @@ The key difficulty is therefore to determine when to switch while maintaining bo
 
 In this work, we propose a noise-tolerant regularized quasi-Newton method.
 Our approach combines Armijo-type line search with quadratic regularization~\citep{uedaRegularizedNewtonMethod2014,kanzowRegularizationLimitedMemory2023}
-and Objective-Function-Free Optimization (OFFO) inspired strategy~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
+and an Objective-Function-Free Optimization (OFFO) inspired strategy~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
 When a sufficient decrease in function value is observed, the method behaves similarly to standard quasi-Newton methods with line search, preserving its practical efficiency.
 Otherwise, an OFFO-inspired cumulative-gradient scale controls the regularization and supports convergence under function-value errors.
 
@@ -51,7 +51,6 @@ A fixed-iteration timing experiment shows lower overhead than the regularized L-
 \begin{table*}[t]
     \begin{MPCchange}
     \ifdefined\MPCRevision\captionsetup{font={color=red}}\fi
-    \centering
     \caption{
         Theoretical comparison of the proposed method and related Newton-type, quasi-Newton, and OFFO methods.
         A checkmark (\ding{51}) denotes that the corresponding property holds or is covered by the cited theory, and ``--'' denotes that it does not hold or is not established by that theory.
@@ -61,7 +60,8 @@ A fixed-iteration timing experiment shows lower overhead than the regularized L-
     }
     \label{tab:related_work_comparison}
     \setlength{\tabcolsep}{3pt}
-        \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.34\linewidth}ccccc@{}}
+    \begin{centering}
+    \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.3\linewidth}ccccc@{}}
             \toprule
             Method
              & Uses $f$
@@ -70,37 +70,37 @@ A fixed-iteration timing experiment shows lower overhead than the regularized L-
              & Nonconvex
              & $\order{\varepsilon^{-2}}$ guarantee \\
             \midrule
-            \makecell[l]{L-BFGS\\[-0.4em]\scalebox{0.8}{\citep{liuLimitedMemoryBFGS1989,Okazaki2007libLBFGS,2020SciPy-NMeth}}}
+            \makecell[l]{L-BFGS~\scalebox{0.8}{\citep{liuLimitedMemoryBFGS1989,Okazaki2007libLBFGS,2020SciPy-NMeth}}}
              & \ding{51}
              & --
              & --
-             & --
+             & \ding{51}
              & -- \\
-            \makecell[l]{Regularized\\Newton\\[-0.4em]\scalebox{0.8}{\citep{uedaConvergencePropertiesRegularized2010}}}
+            \makecell[l]{Regularized Newton~\scalebox{0.8}{\citep{uedaConvergencePropertiesRegularized2010}}}
              & \ding{51}
              & --
              & --
              & \ding{51}
              & \ding{51} \\
-            \makecell[l]{Regularized\\L-BFGS\\[-0.4em]\scalebox{0.8}{\citep{kanzowRegularizationLimitedMemory2023}}}
+            \makecell[l]{Regularized L-BFGS~\scalebox{0.8}{\citep{kanzowRegularizationLimitedMemory2023}}}
              & \ding{51}
              & --
              & --
              & \ding{51}
              & -- \\
-            \makecell[l]{NTQN\\[-0.4em]\scalebox{0.8}{\citep{xieAnalysisBFGSMethod2020,shiNoiseTolerantQuasiNewtonAlgorithm2022}}}
+            \makecell[l]{NTQN~\scalebox{0.8}{\citep{xieAnalysisBFGSMethod2020,shiNoiseTolerantQuasiNewtonAlgorithm2022}}}
              & \ding{51}
              & \ding{51}
              & \ding{51}
              & --
              & -- \\
-            \makecell[l]{OFFO\\[-0.4em]\scalebox{0.8}{\citep{Gratton08022024}}}
+            \makecell[l]{OFFO~\scalebox{0.8}{\citep{Gratton08022024}}}
              & --
              & \ding{51}
              & --
              & \ding{51}
              & \ding{51} \\
-            \makecell[l]{Proposed method\\[-0.4em]\scalebox{0.8}{\cref{alg:regularized_qn}}}
+            \makecell[l]{Proposed method~\scalebox{0.8}{\cref{alg:regularized_qn}}}
              & \ding{51}
              & \ding{51}
              & --\rlap{\raisebox{0.3ex}{\large *}}
@@ -108,6 +108,8 @@ A fixed-iteration timing experiment shows lower overhead than the regularized L-
              & \ding{51} \\
             \bottomrule
         \end{tabular}
+    \par
+    \end{centering}
     \end{MPCchange}
 \end{table*}
 
@@ -117,18 +119,18 @@ We next discuss the methods in \cref{tab:related_work_comparison} in order, focu
 The first three methods in the table are standard quasi-Newton and regularized Newton-type methods.
 The Broyden--Fletcher--Goldfarb--Shanno (BFGS) method and its Limited-memory variant (L-BFGS) are among the most efficient and widely used algorithms to solve the problem~\eqref{prob:main_problem}~\citep{liuLimitedMemoryBFGS1989,nocedal1999numerical}.
 They generally employ line search procedures that enforce the Wolfe conditions to guarantee sufficient descent and the positive definiteness of the Hessian approximation.
-Regularized Newton methods attain an $\order{\varepsilon^{-2}}$ iteration bound under their stated assumptions and with accurate function values~\citep[Theorem~4.2]{uedaConvergencePropertiesRegularized2010}, while the regularized L-BFGS method \citep{kanzowRegularizationLimitedMemory2023} establishes global convergence to first-order stationarity.
+Regularized Newton methods attain an $\order{\varepsilon^{-2}}$ iteration bound under their stated assumptions and with accurate function values~\citep[Theorem~4.2]{uedaConvergencePropertiesRegularized2010}, while the regularized L-BFGS method establishes global convergence to first-order stationarity \citep[Theorem~2]{kanzowRegularizationLimitedMemory2023}.
 Line search methods use function values in sufficient-decrease tests, whereas Kanzow--Steck regularization uses the ratio of actual to predicted reduction to accept steps and adjust regularization~\citep[Algorithm~1]{kanzowRegularizationLimitedMemory2023}.
 As discussed, their theoretical guarantees rely on accurate function values, and do not cover function-value errors.
 Their practical performance may degrade in noisy environments.
 
 NTQN addresses bounded errors in function and gradient evaluations through a noise-tolerant line search and a lengthening procedure~\citep{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
 The NTQN analysis allows bounded gradient errors and establishes convergence to a noise-dependent neighborhood for strongly convex objectives~\citep[Theorem~3.5]{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
-Its practical line search adds twice the absolute function-error bound to the Armijo right-hand side after an unsuccessful initial trial~\citep[Section~4.2]{shiNoiseTolerantQuasiNewtonAlgorithm2022}.
+Its practical line search adds twice the absolute function-error bound to the Armijo right-hand side after an unsuccessful initial trial.
 Our relaxation instead follows a hybrid absolute-relative error model and is recomputed at each trial point.
 
 OFFO methods obtain convergence guarantees without evaluating function values~\citep{Gratton08022024,grattonOFFOMinimizationAlgorithms2023}.
-The Adagrad-like class analyzed in \citet{Gratton08022024} attains an $\order{\varepsilon^{-2}}$ iteration bound for smooth nonconvex objectives, but cannot use function-value information to guide the steps.
+The Adagrad-like class analyzed by Gratton et al.~\citep{Gratton08022024} attains an $\order{\varepsilon^{-2}}$ iteration bound for smooth nonconvex objectives, but do not use function-value information to guide the steps.
 
 Lastly, our method uses inexact function values to permit unregularized quasi-Newton steps when progress is certified and retains this worst-case order under persistent function-value errors.
 \end{MPCchange}

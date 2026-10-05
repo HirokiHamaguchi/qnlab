@@ -67,8 +67,8 @@ SENSITIVITY_COLORS = {
         "NTRQN-Restart": COLORS["NTRQN-Restart"],
     },
     "overestimated": {
-        "NTRQN-MS": "#D6D98B",
-        "NTRQN-Restart": "#626B20",
+        "NTRQN-MS": "#9DA344",
+        "NTRQN-Restart": "#50551F",
     },
 }
 

@@ -3,7 +3,7 @@ In smooth nonconvex optimization, quasi-Newton methods combined with line search
 These methods implicitly assume accurate function evaluations and thus may fail to converge in noisy settings.
 Developing fast and stable quasi-Newton methods for such scenarios is therefore crucial.
 
-To address this issue, we propose a noise-tolerant regularized quasi-Newton method equipped with a relaxed Armijo-type line search, designed to remain stable under inaccurate function evaluations.
+To address this issue, we propose a novel noise-tolerant regularized quasi-Newton method equipped with a relaxed Armijo-type line search, designed to remain stable under inaccurate function evaluations.
 By combining a regularization parameter update rule inspired by Objective-Function-Free Optimization and the AdaGrad-Norm method, \MPCchanged{we prove an order-optimal \(\order{1/\varepsilon^2}\) complexity bound under errors in function values.}
 
 We performed extensive experiments on the CUTEst benchmark collection with artificially noisy objective function evaluations, as well as with low-precision floating-point arithmetic (64-, 32-, and 16-bit).
