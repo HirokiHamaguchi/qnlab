@@ -25,7 +25,7 @@ PROBLEM_LIST = REPOSITORY_ROOT / "data" / "CUTEst" / "valid_problems.json"
 
 STANDARD_METHODS = (
     "Ours",
-    "Ours-Heuristic",
+    "Ours-AR",
     "Line",
     "Reg",
     "Reg-Sec",
@@ -44,19 +44,19 @@ SCENARIOS = {
         64,
         tuple(range(5)),
         (1e-2,),
-        ("Ours", "Ours-Heuristic"),
+        ("Ours", "Ours-AR"),
     ),
     "eps_nominal": (
         64,
         tuple(range(5)),
         (1e-2,),
-        ("Ours", "Ours-Heuristic"),
+        ("Ours", "Ours-AR"),
     ),
     "eps_over": (
         64,
         tuple(range(5)),
         (1e-2,),
-        ("Ours", "Ours-Heuristic"),
+        ("Ours", "Ours-AR"),
     ),
 }
 
@@ -64,11 +64,11 @@ SCENARIO_ALIASES = {"eps_nominal": "function_only"}
 
 PLOT_COLORS = COLORS | {
     "Ours": COLORS["NTRQN-MS"],
-    "Ours-Heuristic": COLORS["NTRQN-Restart"],
+    "Ours-AR": COLORS["NTRQN-Restart"],
 }
 PLOT_LINE_STYLES = LINE_STYLES | {
     "Ours": LINE_STYLES["NTRQN-MS"],
-    "Ours-Heuristic": LINE_STYLES["NTRQN-Restart"],
+    "Ours-AR": LINE_STYLES["NTRQN-Restart"],
 }
 
 
@@ -316,7 +316,7 @@ def main() -> None:
     }
     sensitivity_sources = {
         "Ours": "NTRQN-MS",
-        "Ours-Heuristic": "NTRQN-Restart",
+        "Ours-AR": "NTRQN-Restart",
     }
     for scenario, (setting, style) in setting_styles.items():
         precision, seeds, tolerances, methods = SCENARIOS[scenario]
@@ -349,7 +349,7 @@ def main() -> None:
     diagnostic_profiles = (
         (
             "function_only_restart",
-            ("Ours", "Ours-Heuristic"),
+            ("Ours", "Ours-AR"),
         ),
         (
             "ntqn_termination",

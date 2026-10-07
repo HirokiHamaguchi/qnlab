@@ -17,7 +17,7 @@ PRIVATE_ROOT = REPOSITORY_ROOT.parent / "qnlab_private"
 
 STANDARD_METHODS = {
     "Ours",
-    "Ours-Heuristic",
+    "Ours-AR",
     "Line",
     "ASTR1-Adagrad",
     "Reg",
@@ -27,7 +27,7 @@ STANDARD_METHODS = {
 }
 PROPOSED_METHODS = {
     "Ours",
-    "Ours-Heuristic",
+    "Ours-AR",
 }
 SCENARIOS = {
     "float64": (64, (0,), (1e-1, 1e-3, 1e-5), STANDARD_METHODS),
@@ -81,11 +81,11 @@ def load_problem_sets() -> dict[int, tuple[str, ...]]:
 def expected_option_subset(method: str) -> dict[str, object]:
     if method == "Ours":
         expected: dict[str, object] = {"regularization_solver": "compact"}
-    elif method == "Ours-Heuristic":
+    elif method == "Ours-AR":
         expected = {"regularization_solver": "shifted_pair"}
     else:
         return {}
-    if method in {"Ours", "Ours-Heuristic"}:
+    if method in {"Ours", "Ours-AR"}:
         expected["modified_secant_max_ratio"] = 1.0
     return expected
 
