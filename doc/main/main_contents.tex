@@ -191,13 +191,13 @@ The first assumption ensures that the objective function is bounded below.
 By the triangle inequality and \cref{eq:error_model}, we have
 $\overline{f}(x) \ge f(x) - \feps \max(1, \abs{f(x)})$.
 Since $t - \feps \max(1, \abs{t})$ is a continuous, non-decreasing function of $t$ for $0 \le \feps < 1$, we obtain
-\begin{equation}\label{eq:ass_bounded_overline_f}
+\begin{equation*}
     \overline{f}(x) \ge
     \overline{f}^*
     \defeq \inf_{x \in \bbR^n} \qty( f(x) - \feps \max(1, \abs{f(x)}) )
     = f^* - \feps \max(1, \abs{f^*})
     > -\infty .
-\end{equation}
+\end{equation*}
 
 The second assumption ensures smoothness of the objective function.
 \begin{assumption}\label{ass:LSmooth}
@@ -249,9 +249,9 @@ The first property states that the error between the actual decrease $\delta_k$ 
     We prove the inequality with the plus sign.
     If $+f(x)\le 1$, then $\max(1,+f(x)) = 1 \leq \frac{1}{1-\feps} \leq \frac{1}{1-\feps} \max(1,+\overline f(x))$.
     If $+f(x) > 1$, \cref{eq:error_model} implies
-    \begin{equation}\label{eq:error_model_fx_1}
+    \begin{equation*}
         \abs{f(x)-\overline{f}(x)} \le \feps \max(1,\abs{f(x)}) = +\feps f(x)
-    \end{equation}
+    \end{equation*}
     and thus $f(x) - \overline f(x) \leq +\feps f(x)$. Hence,
     \begin{equation*}
         \max(1,+f(x)) = +f(x) \le +\frac{1}{1-\feps} \overline f(x) \le \frac{1}{1-\feps} \max(1,+\overline f(x)).
@@ -568,7 +568,7 @@ Now, we establish the following convergence rate for \cref{alg:regularized_qn}.
     \end{equation}
     where
     \begin{align}
-        F' & \defeq F - \phi(G^\ast)                                                                                                                                                              \\
+        F' & \defeq F - \phi(G^\ast) \notag \\
            & = f(x_0) - f^* + \frac{2}{1-\feps} \qty(\overline{f}(x_0) - \overline{f}^* + \Delta_{\max}) + C_1 \sqrt{\varsigma} - C_2 \ln(\varsigma) - 2C_2 \ln\qty(\frac{\mathrm{e} C_1}{4C_2}). \label{eq:def_F_prime}
     \end{align}
 
