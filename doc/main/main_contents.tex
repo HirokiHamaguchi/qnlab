@@ -141,7 +141,7 @@ The second component is the computation of the step size $\alpha_k$ using a rela
 \end{equation}
 where $\Delta_k$ is the error-absorbing term that is recomputed for each $\alpha_k$.
 \MPCchanged{When the maximum in the definition of $\Delta_k$ equals $1$, the relaxation reduces to $2\feps/(1-\feps)$, giving a constant allowance analogous to the absolute-error relaxation used by Shi et al.~\citep[Section~4.2]{shiNoiseTolerantQuasiNewtonAlgorithm2022}.}
-\MPCchanged{As shown in the proof of \cref{lem:error_bound_on_function_evaluations}, $\Delta_k$ bounds the absolute discrepancy between the true and observed function decreases whenever the true function value decreases.}
+\MPCchanged{As shown \TAKEDAchanged{later} in the proof of \cref{lem:error_bound_on_function_evaluations}, $\Delta_k$ bounds the absolute discrepancy between the true and observed function decreases whenever the true function value decreases.}
 This relaxation guarantees the existence of $\alpha_k \in (0,1]$ even in the presence of errors in $\overline{f}$.
 When $d_k$ is a descent direction ($g_k^\top d_k < 0$), \cref{eq:relaxed_Armijo_condition} ensures that a temporary increase of $\overline{f}$ is at most $\Delta_k$.
 An increase in the trial function value does not enlarge the relaxation, since $\Delta_k$ depends on $-\overline{f}(x_k + \alpha_k d_k)$ rather than $\overline{f}(x_k + \alpha_k d_k)$.
@@ -214,7 +214,6 @@ The third assumption requires the matrices $\{B_k\}_{k=0}^{k_{\mathrm{max}}-1}$ 
         mI \preceq B_k \preceq MI.
     \end{equation*}
 \end{assumption}
-\MPCchanged{As discussed in \cref{sec:proposed_choice}, the shifted L-BFGS construction with selected curvature pairs guarantees \cref{ass:BBounds}.}
 By \cref{ass:BBounds}, we can derive useful bounds involving $g_k$ and $d_k$.
 Using $d_k=-(B_k+\mu_k I)^{-1} g_k$ (\refLine{line:d_k}) and \cref{ass:BBounds} asserting $(m + \mu_k)I \preceq B_k + \mu_k I \preceq (M + \mu_k)I$, we obtain the following bounds:
 \begin{align}
@@ -658,7 +657,7 @@ The quantities to be discussed here are the matrices $B_k$, the step sizes $\alp
 \subsection{Approximate Hessian \texorpdfstring{$B_k$}{B k}}\label{sec:proposed_choice_Bk}
 
 We first discuss the construction of the matrices $B_k$ used in \refLine{line:d_k} of \cref{alg:regularized_qn}.
-We show that the shifted L-BFGS construction with the curvature-pair selection rule below satisfies \cref{ass:BBounds}.
+We show that the \TAKEDAchanged{construction below} satisfies \cref{ass:BBounds}.
 
 \paragraph{Construction of $B_k$: }
 
@@ -692,7 +691,6 @@ Its proof is deferred to \cref{app:proof_of_bounded_BFGS}.
         \MPCchanged{0\prec \mathrm{BFGS}(\{s_{k_i},y_{k_i}\}_{i=0}^{p-1}) \preceq (1+p)\Lambda I}.
     \end{equation}
 \end{proposition}
-\MPCchanged{\Cref{prop:bounded_BFGS} supplies the upper bound, while a fixed diagonal shift will supply the lower bound in \cref{ass:BBounds}.}
 After the modified secant correction described below, we apply scalar Powell-type damping to a candidate pair with $y_{k_i}^{\top}s_{k_i}<0$~\citep{powellAlgorithmsNonlinearConstraints1978,lotfiStochasticDampedLBFGS2020}.
 For a parameter $\eta_{\mathrm{damp}}\in(0,1)$, let $b_i=\norm{y_{k_i}}^2/\abs{y_{k_i}^{\top}s_{k_i}}$ and set
 \begin{equation*}
@@ -708,7 +706,7 @@ Candidate pairs proceed to cautious selection only when the damping can be compu
 
 We then select the damped pairs using a cautious update in the spirit of~\citep{liGlobalConvergenceBFGS2001,mannelStructuredLBFGSMethod2024,mannelGlobalizationLBFGSBarzilai2025}.
 \begin{MPCchange}
-Define the fixed initial scale and diagonal shift by
+Define the fixed initial scale \TAKEDAchanged{$\rho_0$} and \TAKEDAchanged{a positive constant $\omega_{\min}$} by
 \begin{equation*}
     \rho_0\defeq\max\{1,\norm{g_0}\},
     \qquad
@@ -723,6 +721,7 @@ Consequently, every retained pair $(s,\overline y/\rho_0)$ satisfies \cref{eq:cu
     \mathrm{BFGS}(\{(s_{k_i},\overline y_{k_i})\})
     =\rho_0\mathrm{BFGS}(\{(s_{k_i},\overline y_{k_i}/\rho_0)\}).
 \end{equation}
+\TAKEDAchanged{To supply the lower spectral bound in \cref{ass:BBounds}, we add the fixed positive diagonal matrix $\omega_{\min}I$ to the L-BFGS matrix.}
 Using at most $p$ retained pairs, we define
 \begin{equation}\label{eq:proposed_choice_of_Bk}
     B_k=
@@ -738,7 +737,7 @@ It follows from \cref{prop:bounded_BFGS,eq:BFGS_scaling}, and $\omega_{\min}\leq
 Thus, \cref{ass:BBounds} holds with the iteration-independent constants $m=\omega_{\min}$ and $M=\qty(1+(1+p)\Lambda)\rho_0$.
 \end{MPCchange}
 In our implementation, we use $p=10$ and $\eta_{\mathrm{damp}}=0.8$.
-\MPCchanged{We set $\Lambda=10^8$ and strengthen \cref{eq:implemented_cautious_test} with the absolute safeguard $\overline y^\top s\geq10^{-16}$ to reject numerically degenerate pairs.}
+\MPCchanged{We set $\Lambda=10^8$ and \TAKEDAchanged{retain a pair only if it also satisfies} $\overline y^\top s \geq 10^{-16}$\TAKEDAchanged{,} to reject numerically degenerate pairs.}
 
 \begin{MPCchange}
 \paragraph{Exact Compact Solve: }

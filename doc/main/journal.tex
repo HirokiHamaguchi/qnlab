@@ -59,6 +59,8 @@
     \ifdefined\MPCRevision\color{red}\fi
 }{}
 \newcommand{\MPCchanged}[1]{\begin{MPCchange}#1\end{MPCchange}}
+\definecolor{TAKEDAcolor}{HTML}{8000C0}
+\DeclareRobustCommand{\TAKEDAchanged}[1]{\ifdefined\MPCRevision\textcolor{TAKEDAcolor}{#1}\else#1\fi}
 
 \newcommand{\red}[1]{\textcolor{red}{#1}}
 \newcommand{\blue}[1]{\textcolor{blue}{#1}}
