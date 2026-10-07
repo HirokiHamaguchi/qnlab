@@ -189,7 +189,9 @@ def trial(
         )[0]
 
     if "3" == kind:
-        plt.plot(xVals, y1, ":", color=COLOR_MODEL, label="Quadratic Model", linewidth=3)
+        plt.plot(
+            xVals, y1, ":", color=COLOR_MODEL, label="Quadratic Model", linewidth=3
+        )
         plt.plot(xVals, y3, color=COLOR_MODEL, label="Clipped Model", linewidth=3)
         plt.errorbar(
             xp,

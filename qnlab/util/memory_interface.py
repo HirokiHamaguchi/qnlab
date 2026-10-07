@@ -39,9 +39,7 @@ class LBFGSWorkspace:
         self._cached_shift: np.float64 | None = None
         self.alphas = np.empty(capacity, dtype=np.float64)
 
-    def shifted_gradients(
-        self, mu: np.float64
-    ) -> npt.NDArray[np.float64] | None:
+    def shifted_gradients(self, mu: np.float64) -> npt.NDArray[np.float64] | None:
         """Cache shifted pairs only when the shift repeats across iterations."""
         if mu == 0.0 or mu != self._previous_shift:
             self._previous_shift = mu

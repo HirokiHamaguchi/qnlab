@@ -47,10 +47,7 @@ methods = [
             "max_restarts": 10,
         },
     ),
-    *(
-        methods_by_label[label]
-        for label in ("Line", "Reg", "Reg-Sec", "SciPy", "NTQN")
-    ),
+    *(methods_by_label[label] for label in ("Line", "Reg", "Reg-Sec", "SciPy", "NTQN")),
 ]
 
 
