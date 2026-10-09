@@ -613,12 +613,7 @@ By \cref{eq:gc_result}, there exists an index $0 \leq k < k_{\max}$ satisfying $
     \max\left\{\frac{MF'}{c\overline\alpha},\frac{4(F')^2}{C_1^2}\right\}. \label{eq:k_max_gtol_bound}
 \end{equation}
 In the following, we treat $c$, $\beta_{\min}$, $\theta_{\min}$, $\theta_{\max}$, and $\varsigma$ as fixed algorithmic parameters.
-For the proposed construction of $B_k$ (described in \cref{sec:proposed_choice_Bk}), let the memory size $p$ and pair-selection parameter $\Lambda$ also be fixed.
-The spectral constants in \cref{ass:BBounds}, which are independent of the target accuracy $\gtol$, are then
-\begin{equation*}
-    m   = \min\{1,\sqrt{\varsigma}\}>0, \quad
-    M   = \qty(1+(1+p)\Lambda)\max\{1,\norm{g_0}\}.
-\end{equation*}
+\TAKEDAchanged{Recall that $mI \preceq B_k \preceq MI$ by \cref{ass:BBounds}.}
 Define the line-search conditioning factor $L_{\mathrm{ls}}\coloneqq\max\{1,L/m\}$.
 Using \cref{eq:def_alpha_bar,eq:def_C1_C2,eq:def_Delta_max}, we obtain
 \begin{align*}
@@ -634,7 +629,7 @@ Combining the logarithmic terms in \cref{eq:def_F_prime} and using the bounds ab
     & = \order{\frac{1}{L_{\mathrm{ls}}} + \qty(\frac{M}{L_{\mathrm{ls}}} + L) \qty(1 + \ln(M + L L_{\mathrm{ls}}))}.
 \end{align*}
 Here, the additive constant in $1 + \ln(M + L L_{\mathrm{ls}})$ absorbs the fixed factors inside the logarithm.
-The logarithm is nonnegative since $M \geq 1$.
+\TAKEDAchanged{We take $M \geq 1$ without loss of generality, so the logarithm is nonnegative.}
 Substituting this estimate and the order of $\Delta_{\max}$ into \cref{eq:def_F_prime} yields
 \begin{align*}
     F' & = \mathcal{O}\bigg(f(x_0)-f^*+\frac{\overline f(x_0)-\overline f^*}{1-\feps}
