@@ -110,31 +110,31 @@ Thanks to the developers of these projects.
 
 ### Included in Our Repository as Git Submodules
 
-* [LBFGSpp](https://github.com/yixuan/LBFGSpp)
-* [liblbfgs](https://github.com/chokkan/liblbfgs)
-* [paper-regularized-qn-benchmark](https://github.com/dmsteck/paper-regularized-qn-benchmark)
-* [noise-tolerant-bfgs](https://github.com/hjmshi/noise-tolerant-bfgs.git)
+- [LBFGSpp](https://github.com/yixuan/LBFGSpp)
+- [liblbfgs](https://github.com/chokkan/liblbfgs)
+- [paper-regularized-qn-benchmark](https://github.com/dmsteck/paper-regularized-qn-benchmark)
+- [noise-tolerant-bfgs](https://github.com/hjmshi/noise-tolerant-bfgs.git)
 
 ### Cubic Regularized (Quasi-)Newton Methods
 
-* [ARNCG](https://github.com/miskcoo/ARNCG.git)
-* [krylov-cubic-regularized-newton](https://github.com/amazon-science/krylov-cubic-regularized-newton.git)
-* [super-newton](https://github.com/doikov/super-newton.git)
+- [ARNCG](https://github.com/miskcoo/ARNCG.git)
+- [krylov-cubic-regularized-newton](https://github.com/amazon-science/krylov-cubic-regularized-newton.git)
+- [super-newton](https://github.com/doikov/super-newton.git)
 
 ### Other L-BFGS Implementations and Related Resources
 
-* [DirL-BFGS](https://github.com/ashkansl/DirL-BFGS)
-* [mL-BFGS](https://github.com/yuehniu/mL-BFGS?tab=readme-ov-file)
-* [py-owlqn](https://github.com/samson-wang/py-owlqn.git)
-* [pylbfgs-dedupeio](https://github.com/dedupeio/pylbfgs)
-* [pylbfgs-larsmans](https://github.com/larsmans/pylbfgs)
-* [python_lbfgsb](https://github.com/avieira/python_lbfgsb)
-* [self_scaled_algorithms_pinns](https://github.com/jorgeurban/self_scaled_algorithms_pinns.git)
+- [DirL-BFGS](https://github.com/ashkansl/DirL-BFGS)
+- [mL-BFGS](https://github.com/yuehniu/mL-BFGS?tab=readme-ov-file)
+- [py-owlqn](https://github.com/samson-wang/py-owlqn.git)
+- [pylbfgs-dedupeio](https://github.com/dedupeio/pylbfgs)
+- [pylbfgs-larsmans](https://github.com/larsmans/pylbfgs)
+- [python_lbfgsb](https://github.com/avieira/python_lbfgsb)
+- [self_scaled_algorithms_pinns](https://github.com/jorgeurban/self_scaled_algorithms_pinns.git)
 
 ### Benchmarks
 
-* [Python_Benchmark_Test_Optimization_Function_Single_Objective](https://github.com/AxelThevenot/Python_Benchmark_Test_Optimization_Function_Single_Objective.git): A collection of benchmark test functions in Python.
-* [opfunu](https://github.com/thieu1995/opfunu.git): A collection of Benchmark functions for numerical optimization problems
+- [Python_Benchmark_Test_Optimization_Function_Single_Objective](https://github.com/AxelThevenot/Python_Benchmark_Test_Optimization_Function_Single_Objective.git): A collection of benchmark test functions in Python.
+- [opfunu](https://github.com/thieu1995/opfunu.git): A collection of Benchmark functions for numerical optimization problems
 
 ## License
 
