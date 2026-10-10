@@ -1,6 +1,8 @@
 # QNLab
 
-QNLab is a research repository containing the implementation of our paper "Practical Regularized Quasi-Newton Methods with Inexact Function Values." It also includes various quasi-Newton methods, specifically focusing on L-BFGS variants.
+QNLab is a research repository containing the implementation of our paper "[Practical Regularized Quasi-Newton Methods with Inexact Function Values](https://arxiv.org/abs/2603.10642)." It also includes various quasi-Newton methods, specifically focusing on L-BFGS variants.
+
+See the [Releases](https://github.com/HirokiHamaguchi/qnlab/releases) for versioned snapshots corresponding to the paper.
 
 ## Features
 
