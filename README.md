@@ -83,12 +83,11 @@ The deterministic precision scenarios use seed `0`. Each noisy scenario uses the
 five paired seeds `0`, `1`, `2`, `3`, and `4`; every solver receives the same seed
 for a given problem and scenario.
 
-The full CUTEst benchmark is long-running. The checked-in configuration is a
-50-problem, seed-0 pilot. For the final run, set `PROBLEMS_TO_RUN = None` and
-remove the `NOISY_SEEDS[:1]` restriction only after reviewing the selected
-scenarios and methods. SciPy is run first with a 15,000-iteration limit; when it
-reaches the scenario tolerance after $k_{\mathrm{SciPy}}$ iterations, the other
-methods use `min(15000, 15 * k_SciPy)`, and otherwise use 15,000. Results are
+The full CUTEst benchmark is long-running. The checked-in configuration selects
+all problems and all five noisy seeds, but reruns only `Ours` and `Ours-AR` after
+the SciPy reference tasks. Set `METHODS_TO_RUN = None` to run all methods selected
+for each scenario. Set `OVERWRITE_EXISTING = False` to reuse matching results.
+All methods use a 15,000-iteration limit. SciPy reference tasks run first. Results are
 saved under `data/temp/` and reused only when their task-defining metadata
 exactly matches the current task, unless `OVERWRITE_EXISTING = True` is selected.
 

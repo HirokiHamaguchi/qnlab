@@ -141,7 +141,7 @@ The second component is the computation of the step size $\alpha_k$ using a rela
 \end{equation}
 where $\Delta_k$ is the error-absorbing term that is recomputed for each $\alpha_k$.
 \MPCchanged{When the maximum in the definition of $\Delta_k$ equals $1$, the relaxation reduces to $2\feps/(1-\feps)$, giving a constant allowance analogous to the absolute-error relaxation used by Shi et al.~\citep[Section~4.2]{shiNoiseTolerantQuasiNewtonAlgorithm2022}.}
-\MPCchanged{As shown \TAKEDAchanged{later} in the proof of \cref{lem:error_bound_on_function_evaluations}, $\Delta_k$ bounds the absolute discrepancy between the true and observed function decreases whenever the true function value decreases.}
+\MPCchanged{As shown later in the proof of \cref{lem:error_bound_on_function_evaluations}, $\Delta_k$ bounds the absolute discrepancy between the true and observed function decreases whenever the true function value decreases.}
 This relaxation guarantees the existence of $\alpha_k \in (0,1]$ even in the presence of errors in $\overline{f}$.
 When $d_k$ is a descent direction ($g_k^\top d_k < 0$), \cref{eq:relaxed_Armijo_condition} ensures that a temporary increase of $\overline{f}$ is at most $\Delta_k$.
 An increase in the trial function value does not enlarge the relaxation, since $\Delta_k$ depends on $-\overline{f}(x_k + \alpha_k d_k)$ rather than $\overline{f}(x_k + \alpha_k d_k)$.
@@ -603,7 +603,7 @@ In contrast, the contribution of $K^+$ resembles the behavior of AdaGrad-Norm, w
 
 Finally, \cref{thm:gc} implies the iteration-complexity bound
 \begin{equation*}
-    \min\left\{k \relmiddle| \norm{\nabla f(x_k)} \leq \gtol \right\} = \order{1/\gtol^2}.
+    \min\left\{k \relmiddle| \norm{\nabla f(x_k)} \leq \gtol \right\} = \order{\gtol^{-2}}.
 \end{equation*}
 \begin{MPCchange}
 Let us examine the hidden constants in this bound.
@@ -613,7 +613,7 @@ By \cref{eq:gc_result}, there exists an index $0 \leq k < k_{\max}$ satisfying $
     \max\left\{\frac{MF'}{c\overline\alpha},\frac{4(F')^2}{C_1^2}\right\}. \label{eq:k_max_gtol_bound}
 \end{equation}
 In the following, we treat $c$, $\beta_{\min}$, $\theta_{\min}$, $\theta_{\max}$, and $\varsigma$ as fixed algorithmic parameters.
-\TAKEDAchanged{Recall that $mI \preceq B_k \preceq MI$ by \cref{ass:BBounds}.}
+Recall that $mI \preceq B_k \preceq MI$ by \cref{ass:BBounds}.
 Define the line-search conditioning factor $L_{\mathrm{ls}}\coloneqq\max\{1,L/m\}$.
 Using \cref{eq:def_alpha_bar,eq:def_C1_C2,eq:def_Delta_max}, we obtain
 \begin{align*}
@@ -629,7 +629,7 @@ Combining the logarithmic terms in \cref{eq:def_F_prime} and using the bounds ab
     & = \order{\frac{1}{L_{\mathrm{ls}}} + \qty(\frac{M}{L_{\mathrm{ls}}} + L) \qty(1 + \ln(M + L L_{\mathrm{ls}}))}.
 \end{align*}
 Here, the additive constant in $1 + \ln(M + L L_{\mathrm{ls}})$ absorbs the fixed factors inside the logarithm.
-\TAKEDAchanged{We take $M \geq 1$ without loss of generality, so the logarithm is nonnegative.}
+We take $M \geq 1$ without loss of generality, so the logarithm is nonnegative.
 Substituting this estimate and the order of $\Delta_{\max}$ into \cref{eq:def_F_prime} yields
 \begin{align*}
     F' & = \mathcal{O}\bigg(f(x_0)-f^*+\frac{\overline f(x_0)-\overline f^*}{1-\feps}
@@ -652,7 +652,7 @@ The quantities to be discussed here are the matrices $B_k$, the step sizes $\alp
 \subsection{Approximate Hessian \texorpdfstring{$B_k$}{B k}}\label{sec:proposed_choice_Bk}
 
 We first discuss the construction of the matrices $B_k$ used in \refLine{line:d_k} of \cref{alg:regularized_qn}.
-We show that the \TAKEDAchanged{construction below} satisfies \cref{ass:BBounds}.
+We show that the construction below satisfies \cref{ass:BBounds}.
 
 \paragraph{Construction of $B_k$: }
 
@@ -701,7 +701,7 @@ Candidate pairs proceed to cautious selection only when the damping can be compu
 
 We then select the damped pairs using a cautious update in the spirit of~\citep{liGlobalConvergenceBFGS2001,mannelStructuredLBFGSMethod2024,mannelGlobalizationLBFGSBarzilai2025}.
 \begin{MPCchange}
-Define the fixed initial scale \TAKEDAchanged{$\rho_0$} and \TAKEDAchanged{a positive constant $\omega_{\min}$} by
+Define the fixed initial scale $\rho_0$ and a positive constant $\omega_{\min}$ by
 \begin{equation*}
     \rho_0\defeq\max\{1,\norm{g_0}\},
     \qquad
@@ -716,7 +716,7 @@ Consequently, every retained pair $(s,\overline y/\rho_0)$ satisfies \cref{eq:cu
     \mathrm{BFGS}(\{(s_{k_i},\overline y_{k_i})\})
     =\rho_0\mathrm{BFGS}(\{(s_{k_i},\overline y_{k_i}/\rho_0)\}).
 \end{equation}
-\TAKEDAchanged{To supply the lower spectral bound in \cref{ass:BBounds}, we add the fixed positive diagonal matrix $\omega_{\min}I$ to the L-BFGS matrix.}
+To supply the lower spectral bound in \cref{ass:BBounds}, we add the fixed positive diagonal matrix $\omega_{\min}I$ to the L-BFGS matrix.
 Using at most $p$ retained pairs, we define
 \begin{equation}\label{eq:proposed_choice_of_Bk}
     B_k=
@@ -732,7 +732,7 @@ It follows from \cref{prop:bounded_BFGS,eq:BFGS_scaling}, and $\omega_{\min}\leq
 Thus, \cref{ass:BBounds} holds with the iteration-independent constants $m=\omega_{\min}$ and $M=\qty(1+(1+p)\Lambda)\rho_0$.
 \end{MPCchange}
 In our implementation, we use $p=10$ and $\eta_{\mathrm{damp}}=0.8$.
-\MPCchanged{We set $\Lambda=10^8$ and \TAKEDAchanged{retain a pair only if it also satisfies} $\overline y^\top s \geq 10^{-16}$\TAKEDAchanged{,} to reject numerically degenerate pairs.}
+\MPCchanged{We set $\Lambda=10^8$ and retain a pair only if it also satisfies $\overline y^\top s \geq 10^{-16}$, to reject numerically degenerate pairs.}
 
 \begin{MPCchange}
 \paragraph{Exact Compact Solve: }
@@ -1132,7 +1132,7 @@ The comparable evaluation counts and final objective values indicate that differ
 Finally, we assess whether the higher solved percentages under reduced precision persist when performance is measured against elapsed time.
 For this comparison, time to solution is the elapsed time until the first iterate attaining the common gradient tolerance, and a run that does not attain the tolerance is counted as unsolved.
 \Cref{fig:time_to_solution} plots the fraction of 32-bit problems attaining $\gtol=10^{-3}$ as a function of time to solution.
-At this tolerance, \texttt{Ours} solves $74.5\%$ of the problems and \texttt{Ours-AR} solves $73.6\%$, compared with $63.6\%$ for the best existing baseline.
+At this tolerance, \texttt{Ours} solves $74.1\%$ of the problems and \texttt{Ours-AR} solves $73.2\%$, compared with $63.6\%$ for the best existing baseline.
 \Cref{fig:time_to_solution} shows that the proposed variants also perform favorably against the existing baselines when performance is measured by elapsed time.
 \end{MPCchange}
 
@@ -1158,7 +1158,7 @@ Each curve shows the fraction of problems reaching the gradient tolerance within
 \section{Conclusion}\label{sec:conclusion}
 
 We proposed a hybrid regularized quasi-Newton method for smooth nonconvex optimization with objective-function errors satisfying a hybrid absolute-relative model.
-The method retains the \(\order{1/\varepsilon^2}\) first-order iteration complexity of the $L$-smooth nonconvex setting while selectively using noisy function values.
+The method retains the \(\order{\varepsilon^{-2}}\) first-order iteration complexity of the $L$-smooth nonconvex setting while selectively using noisy function values.
 At 16-bit and 32-bit precision, both proposed variants reached the strictest tested gradient tolerance on more CUTEst problems than the existing quasi-Newton baselines.
 
 Future work includes the investigation of local convergence properties, the extension to constrained optimization, and the applications to practical problems in machine learning and scientific computing.
